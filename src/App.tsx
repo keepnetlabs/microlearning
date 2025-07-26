@@ -12,12 +12,17 @@ import { SurveyScene } from "./components/scenes/SurveyScene";
 import { SummaryScene } from "./components/scenes/SummaryScene";
 import { NudgeScene } from "./components/scenes/NudgeScene";
 import { ChevronDown, Search, Loader2, ChevronDown as ChevronDownIcon, Star, X, Moon, Sun, Award, Timer } from "lucide-react";
+import { educationConfigs, EducationType } from "./components/configs/educationConfigs";
 /*
 import keepnetLogoLight from './assets/keepnet-logo-light.png';
 import keepnetLogoDark from './assets/keepnet-logo-dark.png';
 */
 const scenes = [
-  { component: IntroScene, title: "Giriş", points: 10 },
+  {
+    component: IntroScene,
+    points: 10,
+    config: educationConfigs['socialEngineering']
+  },
   { component: GoalScene, title: "Hedefler", points: 15 },
   { component: ScenarioScene, title: "Senaryo", points: 20 },
   { component: ActionableContentScene, title: "Eylemler", points: 25 },
@@ -228,6 +233,10 @@ export default function App() {
 
   // Parallax scroll state for background movement
   const [scrollY, setScrollY] = useState(0);
+
+  const [currentEducation, setCurrentEducation] = useState<EducationType>('smishing');
+
+  const currentConfig = educationConfigs[currentEducation];
 
   // Apply dark mode to document
   useEffect(() => {
@@ -648,6 +657,7 @@ export default function App() {
 
   const CurrentSceneComponent = scenes[currentScene].component as React.ComponentType<any>;
   const currentLanguage = languages.find(lang => lang.code === selectedLanguage);
+  const currentSceneConfig = scenes[currentScene].config;
 
   // PERFORMANCE OPTIMIZED slide variants - simpler animations for mobile
   const slideVariants = {
@@ -1581,7 +1591,7 @@ export default function App() {
                             isSubmitted={isSurveySubmitted}
                           />
                         ) : (
-                          <CurrentSceneComponent />
+                          <CurrentSceneComponent config={currentSceneConfig} />
                         )
                       )}
                     </motion.div>
