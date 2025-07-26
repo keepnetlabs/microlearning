@@ -1,7 +1,19 @@
-import { ColorType, BgColorType } from "../scenes/IntroScene";
+// Standart renk tipi enum'u - Tüm scene'ler için ortak
+export enum ColorType {
+    BLUE = 'blue',
+    GREEN = 'green',
+    PURPLE = 'purple',
+    RED = 'red',
+    ORANGE = 'orange',
+    YELLOW = 'yellow',
+    INDIGO = 'indigo',
+    PINK = 'pink',
+    GRAY = 'gray',
+    EMERALD = 'emerald'
+}
 
 // Smishing Eğitimi Config
-export const smishingConfig = {
+const smishingIntroConfig = {
     // Content
     title: {
         words: ["SMS", "Phishing", "Korunma"],
@@ -14,26 +26,22 @@ export const smishingConfig = {
         {
             iconName: "smartphone",
             text: "SMS phishing saldırılarını tanıma",
-            colorType: ColorType.RED,
-            bgColorType: BgColorType.RED
+            colorType: ColorType.RED
         },
         {
             iconName: "shield",
             text: "Korunma stratejileri",
-            colorType: ColorType.GREEN,
-            bgColorType: BgColorType.GREEN
+            colorType: ColorType.GREEN
         },
         {
             iconName: "alert-triangle",
             text: "Şüpheli mesajları tespit etme",
-            colorType: ColorType.ORANGE,
-            bgColorType: BgColorType.ORANGE
+            colorType: ColorType.ORANGE
         },
         {
             iconName: "users",
             text: "Ekip farkındalığı oluşturma",
-            colorType: ColorType.BLUE,
-            bgColorType: BgColorType.BLUE
+            colorType: ColorType.BLUE
         }
     ],
     duration: "~10 dakika",
@@ -123,8 +131,52 @@ export const smishingConfig = {
     }
 };
 
+const smishingGoalConfig = {
+    title: "SMS Güvenlik Hedefleri",
+    goals: [
+        {
+            iconName: "smartphone",
+            title: "SMS Tehditleri Tanıma",
+            subtitle: "Farkındalık",
+            description: "SMS tabanlı phishing saldırılarını hızlıca tanıma ve tespit etme",
+            colorType: ColorType.RED
+        },
+        {
+            iconName: "shield",
+            title: "Korunma Stratejileri",
+            subtitle: "Savunma",
+            description: "SMS saldırılarına karşı etkili korunma yöntemleri geliştirme",
+            colorType: ColorType.GREEN
+        },
+        {
+            iconName: "alert-triangle",
+            title: "Şüpheli Mesaj Tespiti",
+            subtitle: "Vigilance",
+            description: "Şüpheli SMS mesajlarını analiz etme ve doğrulama",
+            colorType: ColorType.ORANGE
+        }
+    ],
+    icon: {
+        component: null,
+        size: 48,
+        sceneIconName: "target",
+        className: "text-red-500"
+    },
+    containerClassName: "flex flex-col items-center justify-center h-full text-center px-6",
+    cardSpacing: "space-y-4",
+    maxWidth: "max-w-md w-full",
+    glassEffect: {
+        blur: "blur(24px)",
+        saturation: "saturate(180%)",
+        border: "1px solid rgba(255, 255, 255, 0.30)",
+        shadow: `0 8px 32px rgba(0, 0, 0, 0.08),
+                 0 4px 16px rgba(0, 0, 0, 0.06),
+                 inset 0 1px 0 rgba(255, 255, 255, 0.20)`
+    }
+};
+
 // Parola Güvenliği Eğitimi Config
-export const passwordSecurityConfig = {
+const passwordSecurityIntroConfig = {
     title: {
         words: ["Parola", "Güvenliği", "Eğitimi"],
         highlightLastWord: true,
@@ -136,26 +188,22 @@ export const passwordSecurityConfig = {
         {
             iconName: "key",
             text: "Güçlü parola oluşturma",
-            colorType: ColorType.BLUE,
-            bgColorType: BgColorType.BLUE
+            colorType: ColorType.BLUE
         },
         {
             iconName: "lock",
             text: "Parola yöneticisi kullanımı",
-            colorType: ColorType.GREEN,
-            bgColorType: BgColorType.GREEN
+            colorType: ColorType.GREEN
         },
         {
             iconName: "shield",
             text: "İki faktörlü doğrulama",
-            colorType: ColorType.PURPLE,
-            bgColorType: BgColorType.PURPLE
+            colorType: ColorType.PURPLE
         },
         {
             iconName: "database",
             text: "Güvenli parola saklama",
-            colorType: ColorType.INDIGO,
-            bgColorType: BgColorType.INDIGO
+            colorType: ColorType.INDIGO
         }
     ],
     duration: "~8 dakika",
@@ -245,8 +293,52 @@ export const passwordSecurityConfig = {
     }
 };
 
+const passwordSecurityGoalConfig = {
+    title: "Parola Güvenlik Hedefleri",
+    goals: [
+        {
+            iconName: "key",
+            title: "Güçlü Parola Oluşturma",
+            subtitle: "Komplekslik",
+            description: "Karmaşık ve güvenli parolalar oluşturma becerisi geliştirme",
+            colorType: ColorType.BLUE
+        },
+        {
+            iconName: "lock",
+            title: "Parola Yöneticisi",
+            subtitle: "Organizasyon",
+            description: "Parola yöneticisi kullanarak güvenli parola saklama",
+            colorType: ColorType.GREEN
+        },
+        {
+            iconName: "shield",
+            title: "İki Faktörlü Doğrulama",
+            subtitle: "Ekstra Güvenlik",
+            description: "2FA kullanarak hesap güvenliğini artırma",
+            colorType: ColorType.PURPLE
+        }
+    ],
+    icon: {
+        component: null,
+        size: 48,
+        sceneIconName: "shield",
+        className: "text-blue-500"
+    },
+    containerClassName: "flex flex-col items-center justify-center h-full text-center px-6",
+    cardSpacing: "space-y-4",
+    maxWidth: "max-w-md w-full",
+    glassEffect: {
+        blur: "blur(24px)",
+        saturation: "saturate(180%)",
+        border: "1px solid rgba(255, 255, 255, 0.30)",
+        shadow: `0 8px 32px rgba(0, 0, 0, 0.08),
+                 0 4px 16px rgba(0, 0, 0, 0.06),
+                 inset 0 1px 0 rgba(255, 255, 255, 0.20)`
+    }
+};
+
 // Sosyal Mühendislik Eğitimi Config
-export const socialEngineeringConfig = {
+const socialEngineeringIntroConfig = {
     title: {
         words: ["Sosyal", "Mühendislik", "Korunma"],
         highlightLastWord: true,
@@ -264,26 +356,22 @@ export const socialEngineeringConfig = {
         {
             iconName: "users",
             text: "Sosyal mühendislik teknikleri",
-            colorType: ColorType.PURPLE,
-            bgColorType: BgColorType.PURPLE
+            colorType: ColorType.PURPLE
         },
         {
             iconName: "brain",
             text: "Psikolojik manipülasyon",
-            colorType: ColorType.PINK,
-            bgColorType: BgColorType.PINK
+            colorType: ColorType.PINK
         },
         {
             iconName: "eye",
             text: "Şüpheli davranışları tanıma",
-            colorType: ColorType.ORANGE,
-            bgColorType: BgColorType.ORANGE
+            colorType: ColorType.ORANGE
         },
         {
             iconName: "shield-check",
             text: "Korunma yöntemleri",
-            colorType: ColorType.GREEN,
-            bgColorType: BgColorType.GREEN
+            colorType: ColorType.GREEN
         }
     ],
     duration: "~12 dakika",
@@ -367,12 +455,70 @@ export const socialEngineeringConfig = {
     }
 };
 
-// Eğitim türlerine göre config mapping
+const socialEngineeringGoalConfig = {
+    title: "Sosyal Mühendislik Korunma Hedefleri",
+    goals: [
+        {
+            iconName: "users",
+            title: "Sosyal Mühendislik Teknikleri",
+            subtitle: "Farkındalık",
+            description: "Yaygın sosyal mühendislik saldırı tekniklerini tanıma",
+            colorType: ColorType.PURPLE
+        },
+        {
+            iconName: "brain",
+            title: "Psikolojik Manipülasyon",
+            subtitle: "Anlayış",
+            description: "Saldırganların kullandığı psikolojik manipülasyon tekniklerini anlama",
+            colorType: ColorType.PINK
+        },
+        {
+            iconName: "shield-check",
+            title: "Korunma Yöntemleri",
+            subtitle: "Savunma",
+            description: "Sosyal mühendislik saldırılarına karşı etkili korunma stratejileri",
+            colorType: ColorType.GREEN
+        }
+    ],
+    icon: {
+        component: null,
+        size: 48,
+        sceneIconName: "users",
+        className: "text-purple-500"
+    },
+    containerClassName: "flex flex-col items-center justify-center h-full text-center px-6",
+    cardSpacing: "space-y-4",
+    maxWidth: "max-w-md w-full",
+    glassEffect: {
+        blur: "blur(24px)",
+        saturation: "saturate(180%)",
+        border: "1px solid rgba(255, 255, 255, 0.30)",
+        shadow: `0 8px 32px rgba(0, 0, 0, 0.08),
+                 0 4px 16px rgba(0, 0, 0, 0.06),
+                 inset 0 1px 0 rgba(255, 255, 255, 0.20)`
+    }
+};
+
+// Eğitim türlerine göre config mapping - Object of Objects yapısı
 export const educationConfigs = {
-    smishing: smishingConfig,
-    passwordSecurity: passwordSecurityConfig,
-    socialEngineering: socialEngineeringConfig,
+    smishing: {
+        introSceneConfig: smishingIntroConfig,
+        goalSceneConfig: smishingGoalConfig
+    },
+    passwordSecurity: {
+        introSceneConfig: passwordSecurityIntroConfig,
+        goalSceneConfig: passwordSecurityGoalConfig
+    },
+    socialEngineering: {
+        introSceneConfig: socialEngineeringIntroConfig,
+        goalSceneConfig: socialEngineeringGoalConfig
+    }
     // Diğer eğitim türleri buraya eklenebilir...
 };
 
 export type EducationType = keyof typeof educationConfigs;
+
+// Backward compatibility için eski export'lar (isteğe bağlı)
+export const smishingConfig = smishingIntroConfig;
+export const passwordSecurityConfig = passwordSecurityIntroConfig;
+export const socialEngineeringConfig = socialEngineeringIntroConfig;

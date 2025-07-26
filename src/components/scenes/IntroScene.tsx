@@ -2,30 +2,7 @@ import * as LucideIcons from "lucide-react";
 import { motion } from "framer-motion";
 import React, { ReactNode, useMemo, useCallback } from "react";
 import { LucideIcon } from "lucide-react";
-// Color type enums
-export enum ColorType {
-  BLUE = 'blue',
-  GREEN = 'green',
-  PURPLE = 'purple',
-  RED = 'red',
-  ORANGE = 'orange',
-  YELLOW = 'yellow',
-  INDIGO = 'indigo',
-  PINK = 'pink',
-  GRAY = 'gray'
-}
-
-export enum BgColorType {
-  BLUE = 'blue',
-  GREEN = 'green',
-  PURPLE = 'purple',
-  RED = 'red',
-  ORANGE = 'orange',
-  YELLOW = 'yellow',
-  INDIGO = 'indigo',
-  PINK = 'pink',
-  GRAY = 'gray'
-}
+import { ColorType } from "../configs/educationConfigs";
 
 // İkon mapping fonksiyonu
 const getIconComponent = (iconName: string): LucideIcon => {
@@ -50,7 +27,6 @@ interface HighlightItem {
   iconName: string; // "book-open", "users", "target" gibi
   text: string;
   colorType: ColorType;
-  bgColorType: BgColorType;
 }
 
 interface ParticlesConfig {
@@ -441,20 +417,17 @@ export const IntroScene = React.memo(({
       {
         iconName: "target",
         text: "Hedefli saldırılardan korunma",
-        colorType: ColorType.BLUE,
-        bgColorType: BgColorType.BLUE
+        colorType: ColorType.BLUE
       },
       {
         iconName: "users",
         text: "Ekip güvenliği liderliği",
-        colorType: ColorType.GREEN,
-        bgColorType: BgColorType.GREEN
+        colorType: ColorType.GREEN
       },
       {
         iconName: "book-open",
         text: "Pratik uygulamalar",
-        colorType: ColorType.PURPLE,
-        bgColorType: BgColorType.PURPLE
+        colorType: ColorType.PURPLE
       }
     ],
     duration: "~8 dakika",

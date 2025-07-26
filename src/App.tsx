@@ -12,18 +12,15 @@ import { SurveyScene } from "./components/scenes/SurveyScene";
 import { SummaryScene } from "./components/scenes/SummaryScene";
 import { NudgeScene } from "./components/scenes/NudgeScene";
 import { ChevronDown, Search, Loader2, ChevronDown as ChevronDownIcon, Star, X, Moon, Sun, Award, Timer } from "lucide-react";
-import { educationConfigs, EducationType } from "./components/configs/educationConfigs";
-/*
-import keepnetLogoLight from './assets/keepnet-logo-light.png';
-import keepnetLogoDark from './assets/keepnet-logo-dark.png';
-*/
+import { educationConfigs } from "./components/configs/educationConfigs";
+
 const scenes = [
   {
     component: IntroScene,
     points: 10,
-    config: educationConfigs['socialEngineering']
+    config: educationConfigs.smishing.introSceneConfig
   },
-  { component: GoalScene, title: "Hedefler", points: 15 },
+  { component: GoalScene, points: 15, config: educationConfigs.smishing.goalSceneConfig },
   { component: ScenarioScene, title: "Senaryo", points: 20 },
   { component: ActionableContentScene, title: "Eylemler", points: 25 },
   { component: QuizScene, title: "Quiz", points: 50 },
@@ -233,10 +230,6 @@ export default function App() {
 
   // Parallax scroll state for background movement
   const [scrollY, setScrollY] = useState(0);
-
-  const [currentEducation, setCurrentEducation] = useState<EducationType>('smishing');
-
-  const currentConfig = educationConfigs[currentEducation];
 
   // Apply dark mode to document
   useEffect(() => {
