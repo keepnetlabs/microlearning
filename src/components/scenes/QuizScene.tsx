@@ -1125,7 +1125,7 @@ export function QuizScene({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3, delay: index * 0.1 }}
                     draggable={!showResult && !isLoading}
-                    onDragStart={(e) => handleDragStart(e, item.id)}
+                    onDragStart={(e) => handleDragStart(e as any, item.id)}
                     onClick={() => handleItemSelect(item.id)}
                     disabled={showResult || isLoading}
                     className={`

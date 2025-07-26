@@ -1,7 +1,7 @@
-import { Shield, Users, Target, BookOpen, Sparkles, LucideIcon } from "lucide-react";
+import { Users, Target, BookOpen, Sparkles, LucideIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { IntroIcon } from "../icons/CyberSecurityIcons";
-import { useState, useEffect, ReactNode } from "react";
+import React, { ReactNode } from "react";
 
 // Color type enums
 export enum ColorType {
@@ -18,7 +18,7 @@ export enum ColorType {
 
 export enum BgColorType {
   BLUE = 'blue',
-  GREEN = 'green', 
+  GREEN = 'green',
   PURPLE = 'purple',
   RED = 'red',
   ORANGE = 'orange',
@@ -34,15 +34,6 @@ interface HighlightItem {
   text: string;
   colorType: ColorType;
   bgColorType: BgColorType;
-}
-
-interface WelcomeFlashConfig {
-  enabled?: boolean;
-  duration?: number;
-  colors?: {
-    primary: string;
-    secondary: string;
-  };
 }
 
 interface ParticlesConfig {
@@ -65,25 +56,53 @@ interface TitleConfig {
   gradientClasses?: string;
 }
 
-interface IntroSceneProps {
-  // Content props
-  title?: TitleConfig;
-  subtitle?: string;
-  sectionTitle?: string;
-  highlights?: HighlightItem[];
-  duration?: string;
-  level?: string;
-  callToActionText?: string;
-  
-  // Visual configuration
-  welcomeFlash?: WelcomeFlashConfig;
-  particles?: ParticlesConfig;
-  icon?: IconConfig;
-  
-  // Layout props
-  containerClassName?: string;
-  
-  // Animation delays
+interface SparklesConfig {
+  enabled?: boolean;
+  ambient?: {
+    count?: number;
+    opacity?: number;
+    size?: number;
+    duration?: number;
+    delay?: number;
+  };
+  floating?: {
+    count?: number;
+    opacity?: number;
+    size?: number;
+    duration?: number;
+    delay?: number;
+  };
+  twinkling?: {
+    count?: number;
+    opacity?: number;
+    size?: number;
+    duration?: number;
+    delay?: number;
+  };
+  gradient?: {
+    count?: number;
+    opacity?: number;
+    size?: number;
+    duration?: number;
+    delay?: number;
+  };
+  drifting?: {
+    count?: number;
+    opacity?: number;
+    size?: number;
+    duration?: number;
+    delay?: number;
+  };
+  breathing?: {
+    count?: number;
+    opacity?: number;
+    size?: number;
+    duration?: number;
+    delay?: number;
+  };
+}
+
+interface AnimationDelays {
   welcomeDelay?: number;
   iconDelay?: number;
   titleDelay?: number;
@@ -91,6 +110,28 @@ interface IntroSceneProps {
   cardDelay?: number;
   statsDelay?: number;
   ctaDelay?: number;
+}
+
+interface IntroSceneConfig {
+  // Content
+  title?: TitleConfig;
+  subtitle?: string;
+  sectionTitle?: string;
+  highlights?: HighlightItem[];
+  duration?: string;
+  level?: string;
+  callToActionText?: string;
+
+  // Visual configuration
+  particles?: ParticlesConfig;
+  icon?: IconConfig;
+  sparkles?: SparklesConfig;
+
+  // Layout
+  containerClassName?: string;
+
+  // Animation delays
+  animationDelays?: AnimationDelays;
 }
 
 // Color mapping functions
@@ -119,30 +160,6 @@ const getTextColorClass = (colorType: ColorType): string => {
   }
 };
 
-const getBgGradientClass = (bgColorType: BgColorType): string => {
-  switch (bgColorType) {
-    case BgColorType.BLUE:
-      return 'from-blue-500/10 to-blue-600/5';
-    case BgColorType.GREEN:
-      return 'from-emerald-500/10 to-emerald-600/5';
-    case BgColorType.PURPLE:
-      return 'from-purple-500/10 to-purple-600/5';
-    case BgColorType.RED:
-      return 'from-red-500/10 to-red-600/5';
-    case BgColorType.ORANGE:
-      return 'from-orange-500/10 to-orange-600/5';
-    case BgColorType.YELLOW:
-      return 'from-yellow-500/10 to-yellow-600/5';
-    case BgColorType.INDIGO:
-      return 'from-indigo-500/10 to-indigo-600/5';
-    case BgColorType.PINK:
-      return 'from-pink-500/10 to-pink-600/5';
-    case BgColorType.GRAY:
-      return 'from-gray-500/10 to-gray-600/5';
-    default:
-      return 'from-blue-500/10 to-blue-600/5';
-  }
-};
 
 const getLiquidGlassBackground = (colorType: ColorType): string => {
   switch (colorType) {
@@ -385,113 +402,286 @@ const getInnerDepthGradient = (colorType: ColorType): string => {
 };
 
 export function IntroScene({
-  // Content defaults
-  title = {
-    words: ["Siber", "Güvenlik", "Eğitimi"],
-    highlightLastWord: true,
-    gradientClasses: "bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
-  },
-  subtitle = "Yöneticiler için kapsamlı parola güvenliği ve siber tehdit farkındalığı",
-  sectionTitle = "Bu Eğitimde Öğrenecekleriniz:",
-  highlights = [
-    {
-      icon: Target,
-      text: "Hedefli saldırılardan korunma",
-      colorType: ColorType.BLUE,
-      bgColorType: BgColorType.BLUE
+  config = {
+    // Content defaults
+    title: {
+      words: ["Siber", "Güvenlik", "Eğitimi"],
+      highlightLastWord: true,
+      gradientClasses: "bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
     },
-    {
-      icon: Users,
-      text: "Ekip güvenliği liderliği",
-      colorType: ColorType.GREEN,
-      bgColorType: BgColorType.GREEN
-    },
-    {
-      icon: BookOpen,
-      text: "Pratik uygulamalar",
-      colorType: ColorType.PURPLE,
-      bgColorType: BgColorType.PURPLE
-    }
-  ],
-  duration = "~8 dakika",
-  level = "Yönetici Seviyesi",
-  callToActionText = "Kaydırarak devam edin",
-  
-  // Visual configuration defaults
-  welcomeFlash = {
-    enabled: true,
-    duration: 2000,
-    colors: {
-      primary: "blue-400/30",
-      secondary: "indigo-400/20"
-    }
-  },
-  particles = {
-    enabled: true,
-    count: 12,
-    color: "bg-blue-400/60",
-    baseDuration: 4
-  },
-  icon = {
-    component: null,
-    size: 48,
-    sparkleCount: 6,
-    sparkleEnabled: true
-  },
-  
-  // Layout defaults
-  containerClassName = "flex flex-col items-center justify-center h-full text-center relative font-['Open_Sans'] overflow-hidden px-2 sm:px-4",
-  
-  // Animation delay defaults
-  welcomeDelay = 1.5,
-  iconDelay = 0.1,
-  titleDelay = 0.2,
-  subtitleDelay = 1.2,
-  cardDelay = 0.4,
-  statsDelay = 1.0,
-  ctaDelay = 1.2
-}: IntroSceneProps) {
-  const [showWelcome, setShowWelcome] = useState(welcomeFlash.enabled);
+    subtitle: "Yöneticiler için kapsamlı parola güvenliği ve siber tehdit farkındalığı",
+    sectionTitle: "Bu Eğitimde Öğrenecekleriniz:",
+    highlights: [
+      {
+        icon: Target,
+        text: "Hedefli saldırılardan korunma",
+        colorType: ColorType.BLUE,
+        bgColorType: BgColorType.BLUE
+      },
+      {
+        icon: Users,
+        text: "Ekip güvenliği liderliği",
+        colorType: ColorType.GREEN,
+        bgColorType: BgColorType.GREEN
+      },
+      {
+        icon: BookOpen,
+        text: "Pratik uygulamalar",
+        colorType: ColorType.PURPLE,
+        bgColorType: BgColorType.PURPLE
+      }
+    ],
+    duration: "~8 dakika",
+    level: "Yönetici Seviyesi",
+    callToActionText: "Kaydırarak devam edin",
 
-  useEffect(() => {
-    if (welcomeFlash.enabled) {
-      const timer = setTimeout(() => {
-        setShowWelcome(false);
-      }, welcomeFlash.duration);
-      return () => clearTimeout(timer);
+    // Visual configuration defaults
+    particles: {
+      enabled: true,
+      count: 12,
+      color: "bg-blue-400/60",
+      baseDuration: 4
+    },
+    icon: {
+      component: null,
+      size: 48,
+      sparkleCount: 6,
+      sparkleEnabled: true
+    },
+    sparkles: {
+      enabled: true,
+      ambient: {
+        count: 4,
+        opacity: 25,
+        size: 0.5,
+        duration: 8,
+        delay: 2
+      },
+      floating: {
+        count: 6,
+        opacity: 20,
+        size: 0.5,
+        duration: 10,
+        delay: 3
+      },
+      twinkling: {
+        count: 8,
+        opacity: 18,
+        size: 0.5,
+        duration: 6,
+        delay: 4
+      },
+      gradient: {
+        count: 3,
+        opacity: 15,
+        size: 1,
+        duration: 12,
+        delay: 5
+      },
+      drifting: {
+        count: 4,
+        opacity: 15,
+        size: 0.5,
+        duration: 15,
+        delay: 6
+      },
+      breathing: {
+        count: 5,
+        opacity: 12,
+        size: 0.5,
+        duration: 9,
+        delay: 7
+      }
+    },
+
+    // Layout defaults
+    containerClassName: "flex flex-col items-center justify-center h-full text-center relative font-['Open_Sans'] overflow-hidden px-2 sm:px-4",
+
+    // Animation delay defaults
+    animationDelays: {
+      welcomeDelay: 1.5,
+      iconDelay: 0.1,
+      titleDelay: 0.2,
+      subtitleDelay: 1.2,
+      cardDelay: 0.4,
+      statsDelay: 1.0,
+      ctaDelay: 1.2
     }
-  }, [welcomeFlash.enabled, welcomeFlash.duration]);
+  }
+}: { config?: IntroSceneConfig }) {
+
+  const {
+    title,
+    subtitle,
+    sectionTitle,
+    highlights,
+    duration,
+    level,
+    callToActionText,
+    particles,
+    icon,
+    sparkles,
+    containerClassName,
+    animationDelays
+  } = config;
 
   return (
     <div className={containerClassName}>
-      {/* Welcome Light Flash Animation */}
-      {welcomeFlash.enabled && showWelcome && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ 
-            opacity: [0, 1, 0.8, 0],
-            scale: [0, 3, 4, 6]
-          }}
-          transition={{ 
-            duration: welcomeFlash.duration / 1000,
-            times: [0, 0.3, 0.7, 1],
-            ease: "easeOut"
-          }}
-          className="fixed inset-0 z-50 pointer-events-none"
-        >
-          <div className={`absolute inset-0 bg-gradient-radial from-${welcomeFlash.colors.primary} via-${welcomeFlash.colors.secondary} to-transparent`}></div>
-          <div className="absolute inset-0 bg-gradient-radial from-white/40 via-blue-100/30 to-transparent"></div>
-        </motion.div>
+      {/* Apple-style Background Sparkles - Balanced */}
+      {sparkles?.enabled && (
+        <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
+          {/* Subtle ambient sparkles */}
+          {[...Array(sparkles.ambient?.count || 4)].map((_, i) => (
+            <motion.div
+              key={`ambient-${i}`}
+              className={`absolute w-${sparkles.ambient?.size || 0.5} h-${sparkles.ambient?.size || 0.5} bg-white/${sparkles.ambient?.opacity || 25} rounded-full`}
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{
+                opacity: [0, (sparkles.ambient?.opacity || 25) / 100, 0],
+                scale: [0, 0.8, 0],
+              }}
+              transition={{
+                duration: (sparkles.ambient?.duration || 8) + Math.random() * 4,
+                delay: Math.random() * (sparkles.ambient?.delay || 2),
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
+          ))}
+
+          {/* Gentle floating sparkles */}
+          {[...Array(sparkles.floating?.count || 6)].map((_, i) => (
+            <motion.div
+              key={`floating-${i}`}
+              className={`absolute w-${sparkles.floating?.size || 0.5} h-${sparkles.floating?.size || 0.5} bg-white/${sparkles.floating?.opacity || 20} rounded-full`}
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{
+                opacity: [0, (sparkles.floating?.opacity || 20) / 100, 0],
+                scale: [0, 0.6, 0],
+                y: [0, -8, 0],
+              }}
+              transition={{
+                duration: (sparkles.floating?.duration || 10) + Math.random() * 5,
+                delay: Math.random() * (sparkles.floating?.delay || 3),
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
+          ))}
+
+          {/* Soft twinkling sparkles */}
+          {[...Array(sparkles.twinkling?.count || 8)].map((_, i) => (
+            <motion.div
+              key={`twinkle-${i}`}
+              className={`absolute w-${sparkles.twinkling?.size || 0.5} h-${sparkles.twinkling?.size || 0.5} bg-white/${sparkles.twinkling?.opacity || 18} rounded-full`}
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{
+                opacity: [0, (sparkles.twinkling?.opacity || 18) / 100, 0],
+                scale: [0, 0.5, 0],
+              }}
+              transition={{
+                duration: (sparkles.twinkling?.duration || 6) + Math.random() * 3,
+                delay: Math.random() * (sparkles.twinkling?.delay || 4),
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
+          ))}
+
+          {/* Delicate gradient sparkles */}
+          {[...Array(sparkles.gradient?.count || 3)].map((_, i) => (
+            <motion.div
+              key={`gradient-${i}`}
+              className={`absolute w-${sparkles.gradient?.size || 1} h-${sparkles.gradient?.size || 1} rounded-full`}
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                background: `radial-gradient(circle, rgba(255, 255, 255, ${(sparkles.gradient?.opacity || 15) / 100}) 0%, rgba(255, 255, 255, ${(sparkles.gradient?.opacity || 15) / 200}) 50%, transparent 100%)`,
+              }}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{
+                opacity: [0, (sparkles.gradient?.opacity || 15) / 100, 0],
+                scale: [0, 1, 0],
+              }}
+              transition={{
+                duration: (sparkles.gradient?.duration || 12) + Math.random() * 6,
+                delay: Math.random() * (sparkles.gradient?.delay || 5),
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
+          ))}
+
+          {/* Gentle drifting sparkles */}
+          {[...Array(sparkles.drifting?.count || 4)].map((_, i) => (
+            <motion.div
+              key={`drift-${i}`}
+              className={`absolute w-${sparkles.drifting?.size || 0.5} h-${sparkles.drifting?.size || 0.5} bg-white/${sparkles.drifting?.opacity || 15} rounded-full`}
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{
+                opacity: [0, (sparkles.drifting?.opacity || 15) / 100, 0],
+                scale: [0, 0.4, 0],
+                x: [0, Math.random() * 12 - 6],
+                y: [0, Math.random() * 12 - 6],
+              }}
+              transition={{
+                duration: (sparkles.drifting?.duration || 15) + Math.random() * 8,
+                delay: Math.random() * (sparkles.drifting?.delay || 6),
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
+          ))}
+
+          {/* Subtle breathing sparkles */}
+          {[...Array(sparkles.breathing?.count || 5)].map((_, i) => (
+            <motion.div
+              key={`breathing-${i}`}
+              className={`absolute w-${sparkles.breathing?.size || 0.5} h-${sparkles.breathing?.size || 0.5} bg-white/${sparkles.breathing?.opacity || 12} rounded-full`}
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{
+                opacity: [0, (sparkles.breathing?.opacity || 12) / 100, 0],
+                scale: [0, 0.7, 0],
+              }}
+              transition={{
+                duration: (sparkles.breathing?.duration || 9) + Math.random() * 4,
+                delay: Math.random() * (sparkles.breathing?.delay || 7),
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
+          ))}
+        </div>
       )}
 
       {/* Floating Light Particles */}
-      {particles.enabled && (
+      {particles?.enabled && (
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {[...Array(particles.count)].map((_, i) => (
+          {[...Array(particles.count || 12)].map((_, i) => (
             <motion.div
               key={i}
-              className={`absolute w-1 h-1 ${particles.color} rounded-full`}
-              initial={{ 
+              className={`absolute w-1 h-1 ${particles.color || "bg-blue-400/60"} rounded-full`}
+              initial={{
                 x: Math.random() * window.innerWidth,
                 y: window.innerHeight + 20,
                 opacity: 0
@@ -502,7 +692,7 @@ export function IntroScene({
                 scale: [0.5, 1, 0.5]
               }}
               transition={{
-                duration: particles.baseDuration + Math.random() * 3,
+                duration: (particles.baseDuration || 4) + Math.random() * 3,
                 delay: Math.random() * 2,
                 repeat: Infinity,
                 ease: "easeOut"
@@ -516,36 +706,36 @@ export function IntroScene({
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut", delay: showWelcome ? welcomeDelay : 0 }}
+        transition={{ duration: 0.8, ease: "easeOut", delay: animationDelays?.welcomeDelay || 1.5 }}
         className="mb-3 sm:mb-5 relative"
       >
         {/* Scene Icon with Enhanced Effects */}
         <motion.div
           initial={{ opacity: 0, scale: 0.5, rotateY: 180 }}
           animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-          transition={{ 
-            duration: 1.2, 
-            delay: showWelcome ? welcomeDelay + 0.2 : iconDelay,
+          transition={{
+            duration: 1.2,
+            delay: (animationDelays?.welcomeDelay || 1.5) + (animationDelays?.iconDelay || 0.2),
             type: "spring",
             stiffness: 200
           }}
           className="flex justify-center mb-2 sm:mb-3 relative"
         >
           {/* Icon glow effect */}
-          <div className="absolute inset-0 bg-gradient-radial from-blue-400/30 to-transparent rounded-full animate-pulse scale-150"></div>
-          
+          <div className="absolute inset-0 from-blue-400/30 to-transparent rounded-full animate-pulse scale-150"></div>
+
           <div className="relative z-10">
-            {icon.component || (
-              <IntroIcon 
+            {icon?.component || (
+              <IntroIcon
                 isActive={true}
                 isCompleted={false}
-                size={icon.size}
+                size={icon?.size || 48}
               />
             )}
           </div>
-          
+
           {/* Sparkle effects */}
-          {icon.sparkleEnabled && [...Array(icon.sparkleCount)].map((_, i) => (
+          {icon?.sparkleEnabled && [...Array(icon.sparkleCount || 6)].map((_, i) => (
             <motion.div
               key={i}
               className="absolute"
@@ -563,7 +753,7 @@ export function IntroScene({
               }}
               transition={{
                 duration: 2,
-                delay: showWelcome ? 2 + i * 0.1 : 0.5 + i * 0.1,
+                delay: 2 + i * 0.1,
                 repeat: Infinity,
                 repeatDelay: 3
               }}
@@ -577,49 +767,51 @@ export function IntroScene({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: showWelcome ? welcomeDelay + 0.7 : titleDelay }}
+          transition={{ duration: 0.8, delay: (animationDelays?.welcomeDelay || 1.5) + (animationDelays?.titleDelay || 0.7) }}
         >
-          <motion.h1 
+          <motion.h1
             className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-900 dark:text-white"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: showWelcome ? welcomeDelay + 0.9 : titleDelay + 0.2 }}
+            transition={{ duration: 1, delay: (animationDelays?.welcomeDelay || 1.5) + (animationDelays?.titleDelay || 0.9) }}
           >
-            {title.words.map((word, index) => (
-              <motion.span
-                key={index}
-                initial={{ display: "inline-block", opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: showWelcome ? welcomeDelay + 1.1 + index * 0.2 : titleDelay + 0.4 + index * 0.2 }}
-                className={title.highlightLastWord && index === title.words.length - 1 ? title.gradientClasses : ''}
-              >
-                {word}
-              </motion.span>
-            )).reduce((prev, curr, index) => [prev, " ", curr])}
+            {title?.words.map((word, index) => (
+              <React.Fragment key={index}>
+                {index > 0 && " "}
+                <motion.span
+                  initial={{ display: "inline-block", opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: (animationDelays?.welcomeDelay || 1.5) + (animationDelays?.titleDelay || 1.1) + index * 0.2 }}
+                  className={title?.highlightLastWord && index === title.words.length - 1 ? title.gradientClasses : ''}
+                >
+                  {word}
+                </motion.span>
+              </React.Fragment>
+            ))}
           </motion.h1>
-          
-          <motion.p 
+
+          <motion.p
             className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-200 max-w-sm sm:max-w-md mt-2 sm:mt-3 font-medium leading-relaxed px-2"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: showWelcome ? welcomeDelay + 1.7 : subtitleDelay }}
+            transition={{ duration: 0.8, delay: (animationDelays?.welcomeDelay || 1.5) + (animationDelays?.subtitleDelay || 1.7) }}
           >
             {subtitle}
           </motion.p>
         </motion.div>
       </motion.div>
-      
+
       {/* Enhanced Learning Points Card with Parallax Effect */}
       <motion.div
         initial={{ opacity: 0, y: 40, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ 
-          duration: 0.8, 
-          delay: showWelcome ? welcomeDelay + 1.9 : cardDelay,
+        transition={{
+          duration: 0.8,
+          delay: (animationDelays?.welcomeDelay || 1.5) + (animationDelays?.cardDelay || 1.9),
           type: "spring",
           stiffness: 120
         }}
-        whileHover={{ 
+        whileHover={{
           y: -5,
           scale: 1.02,
           transition: { type: "spring", stiffness: 400 }
@@ -629,18 +821,18 @@ export function IntroScene({
         {/* Enhanced Card Background Effects with Noise */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-white/30 to-white/20 dark:from-gray-800/30 dark:via-gray-800/20 dark:to-gray-800/10 rounded-2xl sm:rounded-3xl"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-blue-50/40 via-transparent to-purple-50/30 dark:from-blue-900/10 dark:via-transparent dark:to-purple-900/8 rounded-2xl sm:rounded-3xl"></div>
-        
+
         {/* Noise texture overlay */}
-        <div 
+        <div
           className="absolute inset-0 opacity-10 dark:opacity-5 rounded-2xl sm:rounded-3xl mix-blend-overlay"
           style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
             backgroundSize: '128px 128px'
           }}
         ></div>
-        
+
         {/* ENHANCED LIQUID GLASS BORDER EFFECTS */}
-        <div 
+        <div
           className="absolute inset-0.5 rounded-2xl sm:rounded-3xl overflow-hidden"
           style={{
             // LIQUID GLASS BACKGROUND with colored gradients
@@ -667,7 +859,7 @@ export function IntroScene({
           }}
         >
           {/* Ultra-fine noise texture for authentic glass feel */}
-          <div 
+          <div
             className="absolute inset-0 opacity-[0.015] dark:opacity-[0.008] rounded-2xl sm:rounded-3xl mix-blend-overlay pointer-events-none"
             style={{
               backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='innerGlassNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23innerGlassNoise)'/%3E%3C/svg%3E")`,
@@ -678,18 +870,18 @@ export function IntroScene({
           {/* Multi-layer liquid glass gradients */}
           <div className="absolute inset-0 bg-gradient-to-br from-blue-50/20 via-indigo-50/12 to-purple-50/8 dark:from-blue-900/15 dark:via-indigo-900/8 dark:to-purple-900/5 rounded-2xl sm:rounded-3xl transition-colors duration-500"></div>
           <div className="absolute inset-0 bg-gradient-to-tl from-cyan-50/15 via-transparent to-violet-50/10 dark:from-cyan-900/8 dark:via-transparent dark:to-violet-900/5 rounded-2xl sm:rounded-3xl transition-colors duration-500"></div>
-          
+
           {/* Apple-style inner highlight with color tinting */}
-          <div 
+          <div
             className="absolute inset-0 rounded-2xl sm:rounded-3xl pointer-events-none"
             style={{
               background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(59, 130, 246, 0.20) 0%, rgba(99, 102, 241, 0.12) 30%, rgba(255, 255, 255, 0.08) 60%, transparent 80%)`,
               mixBlendMode: 'overlay'
             }}
           />
-          
+
           {/* Enhanced inner depth with colored gradients */}
-          <div 
+          <div
             className="absolute inset-0 rounded-2xl sm:rounded-3xl pointer-events-none"
             style={{
               background: `linear-gradient(135deg, rgba(59, 130, 246, 0.10) 0%, rgba(255, 255, 255, 0.15) 30%, transparent 70%)`
@@ -699,19 +891,19 @@ export function IntroScene({
           {/* Traditional inner glow maintained for compatibility */}
           <div className="absolute inset-0 bg-gradient-to-b from-white/25 via-transparent to-transparent dark:from-white/12 rounded-2xl sm:rounded-3xl"></div>
         </div>
-        
+
         <div className="relative z-10">
           <motion.h3
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: showWelcome ? welcomeDelay + 2.1 : cardDelay + 0.2 }}
+            transition={{ delay: (animationDelays?.welcomeDelay || 1.5) + (animationDelays?.cardDelay || 2.1) }}
             className="mb-3 sm:mb-4 text-gray-800 dark:text-gray-100 font-semibold text-center text-sm sm:text-base"
           >
             {sectionTitle}
           </motion.h3>
-          
+
           <div className="space-y-3 sm:space-y-4">
-            {highlights.map((item, index) => {
+            {highlights?.map((item, index) => {
               const Icon = item.icon;
               const textColor = getTextColorClass(item.colorType);
               const liquidGlassBackground = getLiquidGlassBackground(item.colorType);
@@ -726,22 +918,22 @@ export function IntroScene({
                   key={index}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ 
-                    duration: 0.6, 
-                    delay: showWelcome ? welcomeDelay + 2.3 + index * 0.15 : cardDelay + 0.2 + index * 0.15,
+                  transition={{
+                    duration: 0.6,
+                    delay: (animationDelays?.welcomeDelay || 1.5) + (animationDelays?.cardDelay || 2.3) + index * 0.15,
                     type: "spring",
                     stiffness: 200
                   }}
-                  whileHover={{ 
+                  whileHover={{
                     x: 5,
                     transition: { type: "spring", stiffness: 400 }
                   }}
                   className="flex items-center group hover:transform hover:scale-102 transition-all duration-300"
                 >
                   <div className="flex-shrink-0 mr-3 sm:mr-4">
-                    <motion.div 
+                    <motion.div
                       className="relative p-2 sm:p-3 rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-500 ease-out group-item"
-                      whileHover={{ 
+                      whileHover={{
                         scale: 1.1,
                         rotate: 5,
                         transition: { type: "spring", stiffness: 400 }
@@ -757,7 +949,7 @@ export function IntroScene({
                       }}
                     >
                       {/* Ultra-fine noise texture */}
-                      <div 
+                      <div
                         className="absolute inset-0 opacity-[0.020] dark:opacity-[0.012] rounded-xl sm:rounded-2xl mix-blend-overlay pointer-events-none"
                         style={{
                           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='iconNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23iconNoise)'/%3E%3C/svg%3E")`,
@@ -766,24 +958,24 @@ export function IntroScene({
                       />
 
                       {/* Multi-layer gradients with color theming */}
-                      <div 
+                      <div
                         className="absolute inset-0 rounded-xl sm:rounded-2xl transition-colors duration-500"
                         style={{
                           background: multiLayerGradient
                         }}
                       />
-                      
+
                       {/* Apple-style highlight with color tinting */}
-                      <div 
+                      <div
                         className="absolute inset-0 rounded-xl sm:rounded-2xl pointer-events-none"
                         style={{
                           background: radialHighlight,
                           mixBlendMode: 'overlay'
                         }}
                       />
-                      
+
                       {/* Enhanced inner depth with themed colors */}
-                      <div 
+                      <div
                         className="absolute inset-0 rounded-xl sm:rounded-2xl pointer-events-none"
                         style={{
                           background: innerDepthGradient
@@ -792,7 +984,7 @@ export function IntroScene({
 
                       {/* Traditional background gradients maintained for compatibility */}
                       <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent rounded-xl sm:rounded-2xl"></div>
-                      
+
                       <Icon size={14} className={`${textColor} relative z-10 sm:w-4 sm:h-4`} strokeWidth={2} />
                     </motion.div>
                   </div>
@@ -803,16 +995,16 @@ export function IntroScene({
               );
             })}
           </div>
-          
+
           {/* Enhanced Stats */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: showWelcome ? welcomeDelay + 2.8 : statsDelay }}
+            transition={{ delay: (animationDelays?.welcomeDelay || 1.5) + (animationDelays?.statsDelay || 2.8) }}
             className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200/50 dark:border-gray-600/50"
           >
             <div className="flex justify-between items-center">
-              <motion.div 
+              <motion.div
                 className="relative flex items-center space-x-2 px-2 py-1 rounded-lg overflow-hidden transition-all duration-500 ease-out group"
                 whileHover={{ scale: 1.05 }}
                 style={{
@@ -834,7 +1026,7 @@ export function IntroScene({
                 }}
               >
                 {/* Ultra-fine noise texture */}
-                <div 
+                <div
                   className="absolute inset-0 opacity-[0.010] dark:opacity-[0.005] rounded-lg mix-blend-overlay pointer-events-none"
                   style={{
                     backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='statsNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23statsNoise)'/%3E%3C/svg%3E")`,
@@ -843,7 +1035,7 @@ export function IntroScene({
                 />
 
                 {/* Apple-style highlight */}
-                <div 
+                <div
                   className="absolute inset-0 rounded-lg pointer-events-none"
                   style={{
                     background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 30%, transparent 70%)`,
@@ -853,8 +1045,8 @@ export function IntroScene({
 
                 <span className="relative z-10 text-xs text-gray-600 dark:text-gray-300 font-medium">⏱ {duration}</span>
               </motion.div>
-              
-              <motion.div 
+
+              <motion.div
                 className="relative flex items-center space-x-2 px-2 py-1 rounded-lg overflow-hidden transition-all duration-500 ease-out group"
                 whileHover={{ scale: 1.05 }}
                 style={{
@@ -876,7 +1068,7 @@ export function IntroScene({
                 }}
               >
                 {/* Ultra-fine noise texture */}
-                <div 
+                <div
                   className="absolute inset-0 opacity-[0.010] dark:opacity-[0.005] rounded-lg mix-blend-overlay pointer-events-none"
                   style={{
                     backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='statsNoise2'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23statsNoise2)'/%3E%3C/svg%3E")`,
@@ -885,7 +1077,7 @@ export function IntroScene({
                 />
 
                 {/* Apple-style highlight */}
-                <div 
+                <div
                   className="absolute inset-0 rounded-lg pointer-events-none"
                   style={{
                     background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 30%, transparent 70%)`,
@@ -898,25 +1090,25 @@ export function IntroScene({
             </div>
           </motion.div>
         </div>
-        
+
         {/* Floating card shadow */}
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-2xl sm:rounded-3xl blur-xl -z-10 opacity-50 animate-pulse"></div>
       </motion.div>
-      
+
       {/* Enhanced Call to Action */}
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ 
-          delay: showWelcome ? welcomeDelay + 3.0 : ctaDelay,
+        transition={{
+          delay: (animationDelays?.welcomeDelay || 1.5) + (animationDelays?.ctaDelay || 3.0),
           type: "spring",
           stiffness: 200
         }}
         className="mt-4 sm:mt-6 relative"
       >
-        <motion.div 
+        <motion.div
           className="relative flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-full overflow-hidden transition-all duration-500 ease-out group"
-          whileHover={{ 
+          whileHover={{
             scale: 1.05,
             y: -2
           }}
@@ -929,7 +1121,6 @@ export function IntroScene({
             ease: "easeInOut"
           }}
           style={{
-            // LIQUID GLASS BACKGROUND for call to action
             background: `linear-gradient(135deg, 
               rgba(71, 85, 105, 0.12) 0%, 
               rgba(100, 116, 139, 0.08) 50%, 
@@ -948,7 +1139,7 @@ export function IntroScene({
           }}
         >
           {/* Ultra-fine noise texture */}
-          <div 
+          <div
             className="absolute inset-0 opacity-[0.015] dark:opacity-[0.008] rounded-full mix-blend-overlay pointer-events-none"
             style={{
               backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='ctaNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23ctaNoise)'/%3E%3C/svg%3E")`,
@@ -958,9 +1149,9 @@ export function IntroScene({
 
           {/* Multi-layer gradients */}
           <div className="absolute inset-0 bg-gradient-to-br from-slate-50/20 via-slate-100/10 to-slate-200/5 dark:from-slate-800/15 dark:via-slate-700/8 dark:to-slate-600/4 rounded-full transition-colors duration-500"></div>
-          
+
           {/* Apple-style highlight */}
-          <div 
+          <div
             className="absolute inset-0 rounded-full pointer-events-none"
             style={{
               background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.08) 40%, transparent 70%)`,

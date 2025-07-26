@@ -462,7 +462,7 @@ export default function App() {
     setTotalPoints(prev => prev + scenePoints);
     setPointsAwardedScenes(prev => new Set([...prev, sceneIndex]));
 
-    const newAchievements = [];
+    const newAchievements: string[] = [];
     if (sceneIndex === 4 && quizCompleted) {
       newAchievements.push('quiz-master');
     }
@@ -646,7 +646,7 @@ export default function App() {
     }
   }, [currentScene, handleSceneChange, resetScrollPosition, isMobile]);
 
-  const CurrentSceneComponent = scenes[currentScene].component;
+  const CurrentSceneComponent = scenes[currentScene].component as React.ComponentType<any>;
   const currentLanguage = languages.find(lang => lang.code === selectedLanguage);
 
   // PERFORMANCE OPTIMIZED slide variants - simpler animations for mobile
@@ -1692,7 +1692,7 @@ export default function App() {
 
               const handleTouchMove = (moveEvent: TouchEvent) => {
                 const currentX = moveEvent.touches[0].clientX;
-                const currentY = moveEvent.touches[0].currentY;
+                const currentY = moveEvent.touches[0].clientY;
                 const diffX = Math.abs(startX - currentX);
                 const diffY = Math.abs(startY - currentY);
 

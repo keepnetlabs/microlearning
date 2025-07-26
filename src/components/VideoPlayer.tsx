@@ -383,15 +383,13 @@ export function VideoPlayer({
         const plyrInstance = playerRef.current;
 
         // Override forward method
-        const originalForward = plyrInstance.forward;
         plyrInstance.forward = function (seekTime: number) {
           console.warn("Forward seeking method blocked");
           return false;
         };
 
         // Override seek method
-        const originalSeek = plyrInstance.seek;
-        plyrInstance.seek = function (input: number) {
+        (plyrInstance as any).seek = function (input: number) {
           const video = videoRef.current;
           if (video && input > (video._lastTime || 0)) {
             console.warn(
@@ -399,7 +397,7 @@ export function VideoPlayer({
             );
             return false;
           }
-          return originalSeek.call(this, input);
+          return (plyrInstance as any).seek.call(this, input);
         };
 
         plyrInstance.on("ready", () => {
@@ -631,7 +629,7 @@ export function VideoPlayer({
         </video>
 
         {/* Transcript Toggle Icon */}
-        {parsedTranscript.length > 0 && (
+        {parsedTranscript && parsedTranscript.length > 0 && (
           <motion.button
             onClick={() =>
               setIsTranscriptOpen(!isTranscriptOpen)
