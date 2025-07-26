@@ -3,8 +3,10 @@ import React, {
   useRef,
   useState,
   useCallback,
+  useMemo,
 } from "react";
 import Plyr from "plyr";
+import "plyr/dist/plyr.css";
 import Hls from "hls.js";
 import { motion } from "framer-motion";
 import { ChevronDown, FileText } from "lucide-react";
@@ -103,21 +105,26 @@ export function VideoPlayer({
   const [isTranscriptOpen, setIsTranscriptOpen] =
     useState(showTranscript);
 
-  // Parse transcript if it's a string
-  const parsedTranscript =
+  // Parse transcript if it's a string - useMemo ile optimize edildi
+  const parsedTranscript = useMemo(() =>
     typeof transcript === "string"
       ? parseTactiqTranscript(transcript)
-      : transcript || [];
+      : transcript || [],
+    [transcript]
+  );
 
-  // Find current transcript row
-  const currentRowIndex = parsedTranscript.findIndex(
-    (row, index) => {
-      const nextRow = parsedTranscript[index + 1];
-      return (
-        currentTime >= row.start &&
-        (!nextRow || currentTime < nextRow.start)
-      );
-    },
+  // Find current transcript row - useMemo ile optimize edildi
+  const currentRowIndex = useMemo(() =>
+    parsedTranscript.findIndex(
+      (row, index) => {
+        const nextRow = parsedTranscript[index + 1];
+        return (
+          currentTime >= row.start &&
+          (!nextRow || currentTime < nextRow.start)
+        );
+      },
+    ),
+    [parsedTranscript, currentTime]
   );
 
   // Auto-scroll to current transcript row
@@ -216,6 +223,89 @@ export function VideoPlayer({
     },
     [disableForwardSeek],
   );
+
+  // Memoized styles - sadece gerekli olanlar
+  const containerStyle = useMemo((): React.CSSProperties => ({
+    maxWidth: 1200,
+    margin: "1rem auto",
+    display: "flex",
+    gap: "20px",
+    flexDirection: "column",
+    ...style,
+  }), [style]);
+
+  const videoContainerStyle = useMemo((): React.CSSProperties => ({
+    width: "100%",
+    maxWidth: "100%",
+    position: "relative",
+  }), []);
+
+  const videoStyle = useMemo((): React.CSSProperties => ({
+    width: "100%",
+    borderRadius: "12px",
+    maxWidth: "100%",
+  }), []);
+
+  // Memoized transcript panel styles
+  const transcriptPanelStyle = useMemo(() => ({
+    background: `linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.85) 0%, 
+      rgba(255, 255, 255, 0.75) 50%, 
+      rgba(248, 250, 252, 0.80) 100%
+    )`,
+    backdropFilter: "blur(20px) saturate(180%)",
+    WebkitBackdropFilter: "blur(20px) saturate(180%)",
+    border: "1px solid rgba(226, 232, 240, 0.40)",
+    borderRadius: "16px",
+    boxShadow: `
+      0 8px 32px rgba(15, 23, 42, 0.08),
+      0 4px 16px rgba(15, 23, 42, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.20)
+    `,
+    maxHeight: "480px",
+    transform: "translateZ(0)",
+    willChange: "transform",
+  }), []);
+
+  const transcriptScrollStyle = useMemo((): React.CSSProperties => ({
+    maxHeight: "380px",
+    padding: "8px 0",
+    overscrollBehavior: "contain",
+    WebkitOverflowScrolling: "touch",
+    touchAction: "pan-y",
+    isolation: "isolate",
+  }), []);
+
+  const noiseTextureStyle = useMemo(() => ({
+    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='transcriptNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23transcriptNoise)'/%3E%3C/svg%3E")`,
+    backgroundSize: "128px 128px",
+  }), []);
+
+  const highlightStyle = useMemo(() => ({
+    background: `radial-gradient(ellipse 120% 50% at 50% 0%, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.12) 30%, transparent 70%)`,
+    mixBlendMode: "overlay" as const,
+  }), []);
+
+  const toggleButtonStyle = useMemo(() => ({
+    padding: "8px",
+    background: `linear-gradient(135deg, 
+      rgba(0, 0, 0, 0.7) 0%, 
+      rgba(0, 0, 0, 0.6) 50%, 
+      rgba(0, 0, 0, 0.8) 100%
+    )`,
+    backdropFilter: "blur(12px) saturate(180%)",
+    WebkitBackdropFilter: "blur(12px) saturate(180%)",
+    border: "1px solid rgba(255, 255, 255, 0.20)",
+    borderRadius: "8px",
+    boxShadow: `
+      0 4px 16px rgba(0, 0, 0, 0.3),
+      0 2px 8px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15)
+    `,
+    color: "white",
+    transform: "translateZ(0)",
+    willChange: "transform",
+  }), []);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -566,33 +656,16 @@ export function VideoPlayer({
   return (
     <div
       className={`video-player-container ${className || ""}`}
-      style={{
-        maxWidth: 1200,
-        margin: "2rem auto",
-        display: "flex",
-        gap: "20px",
-        flexDirection: "column",
-        ...style,
-      }}
+      style={containerStyle}
     >
       {/* Video Player */}
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "100%",
-          position: "relative",
-        }}
-      >
+      <div style={videoContainerStyle}>
         <video
           ref={videoRef}
           className={`plyr-react plyr ${disableForwardSeek ? "plyr--disable-seek" : ""}`}
           controls
           poster={poster}
-          style={{
-            width: "100%",
-            borderRadius: "12px",
-            maxWidth: "100%",
-          }}
+          style={videoStyle}
           onContextMenu={
             disableForwardSeek
               ? (e) => e.preventDefault()
@@ -637,26 +710,7 @@ export function VideoPlayer({
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="absolute top-4 right-4 z-20 overflow-hidden transition-all duration-300"
-            style={{
-              padding: "8px",
-              background: `linear-gradient(135deg, 
-                rgba(0, 0, 0, 0.7) 0%, 
-                rgba(0, 0, 0, 0.6) 50%, 
-                rgba(0, 0, 0, 0.8) 100%
-              )`,
-              backdropFilter: "blur(12px) saturate(180%)",
-              WebkitBackdropFilter: "blur(12px) saturate(180%)",
-              border: "1px solid rgba(255, 255, 255, 0.20)",
-              borderRadius: "8px",
-              boxShadow: `
-                0 4px 16px rgba(0, 0, 0, 0.3),
-                0 2px 8px rgba(0, 0, 0, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15)
-              `,
-              color: "white",
-              transform: "translateZ(0)",
-              willChange: "transform",
-            }}
+            style={toggleButtonStyle}
             title={
               isTranscriptOpen
                 ? "Transkripti Gizle"
@@ -685,33 +739,12 @@ export function VideoPlayer({
         >
           <div
             className="relative overflow-hidden"
-            style={{
-              background: `linear-gradient(135deg, 
-                rgba(255, 255, 255, 0.85) 0%, 
-                rgba(255, 255, 255, 0.75) 50%, 
-                rgba(248, 250, 252, 0.80) 100%
-              )`,
-              backdropFilter: "blur(20px) saturate(180%)",
-              WebkitBackdropFilter: "blur(20px) saturate(180%)",
-              border: "1px solid rgba(226, 232, 240, 0.40)",
-              borderRadius: "16px",
-              boxShadow: `
-                0 8px 32px rgba(15, 23, 42, 0.08),
-                0 4px 16px rgba(15, 23, 42, 0.04),
-                inset 0 1px 0 rgba(255, 255, 255, 0.20)
-              `,
-              maxHeight: "480px",
-              transform: "translateZ(0)",
-              willChange: "transform",
-            }}
+            style={transcriptPanelStyle}
           >
             {/* Noise texture */}
             <div
               className="absolute inset-0 opacity-[0.015] dark:opacity-[0.008] rounded-2xl mix-blend-overlay pointer-events-none"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='transcriptNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23transcriptNoise)'/%3E%3C/svg%3E")`,
-                backgroundSize: "128px 128px",
-              }}
+              style={noiseTextureStyle}
             />
 
             {/* Gradients */}
@@ -720,10 +753,7 @@ export function VideoPlayer({
             {/* Highlight */}
             <div
               className="absolute inset-0 rounded-2xl pointer-events-none"
-              style={{
-                background: `radial-gradient(ellipse 120% 50% at 50% 0%, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.12) 30%, transparent 70%)`,
-                mixBlendMode: "overlay",
-              }}
+              style={highlightStyle}
             />
 
             {/* Header */}
@@ -755,14 +785,7 @@ export function VideoPlayer({
             <div
               ref={transcriptContainerRef}
               className="relative z-10 overflow-y-auto custom-scrollbar"
-              style={{
-                maxHeight: "380px",
-                padding: "8px 0",
-                overscrollBehavior: "contain",
-                WebkitOverflowScrolling: "touch",
-                touchAction: "pan-y",
-                isolation: "isolate",
-              }}
+              style={transcriptScrollStyle}
               onWheel={(e) => e.stopPropagation()}
               onTouchStart={(e) => e.stopPropagation()}
               onTouchMove={(e) => e.stopPropagation()}

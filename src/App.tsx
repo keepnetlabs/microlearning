@@ -21,7 +21,7 @@ const scenes = [
     config: educationConfigs.smishing.introSceneConfig
   },
   { component: GoalScene, points: 15, config: educationConfigs.smishing.goalSceneConfig },
-  { component: ScenarioScene, title: "Senaryo", points: 20 },
+  { component: ScenarioScene, points: 20, config: educationConfigs.smishing.scenarioSceneConfig },
   { component: ActionableContentScene, title: "Eylemler", points: 25 },
   { component: QuizScene, title: "Quiz", points: 50 },
   { component: SurveyScene, title: "Anket", points: 20 },
