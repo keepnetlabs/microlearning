@@ -122,6 +122,9 @@
   );
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --spacing-4: 1rem;
+  --sidebar-width: 280px;
+  --sidebar-width-icon: 60px;
 }
 
 @layer base {

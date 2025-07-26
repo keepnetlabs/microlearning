@@ -878,23 +878,24 @@ export default function App() {
 
                 {/* Logo Image */}
                 <div className="relative z-10">
-                  { /*
-                  {isDarkMode ? (
-                    <img
-                      src={keepnetLogoDark}
-                      alt="Keepnet Labs"
-                      className="h-4 w-auto sm:h-6 md:h-7 transition-opacity duration-300"
-                      style={{ display: 'block' }}
-                    />
-                  ) : (
-                    <img
-                      src={keepnetLogoLight}
-                      alt="Keepnet Labs"
-                      className="h-4 w-auto sm:h-6 md:h-7 transition-opacity duration-300"
-                      style={{ display: 'block' }}
-                    />
-                  )}
-                  */}
+
+                  {
+                    isDarkMode ? (
+                      <img
+                        src="https://keepnetlabs.com/keepnet-logo.svg"
+                        alt="Keepnet Labs"
+                        className="h-4 w-auto sm:h-6 md:h-7 transition-opacity duration-300"
+                        style={{ display: 'block' }}
+                      />
+                    ) : (
+                      <img
+                        src="https://keepnetlabs.com/keepnet-logo.svg"
+                        alt="Keepnet Labs"
+                        className="h-4 w-auto sm:h-6 md:h-7 transition-opacity duration-300"
+                        style={{ display: 'block' }}
+                      />
+                    )}
+
                 </div>
               </motion.div>
             </div>
