@@ -588,11 +588,16 @@ export default function App() {
 
 
 
+  // Get timer duration from config
+  const getTimerDuration = useCallback(() => {
+    return quizSceneConfig.timer?.duration || 30;
+  }, []);
+
   // Quiz timer handlers
   const handleQuizTimerStart = useCallback(() => {
-    setQuizTimeLeft(30);
+    setQuizTimeLeft(getTimerDuration());
     setIsQuizTimerActive(true);
-  }, []);
+  }, [getTimerDuration]);
 
   const handleQuizTimerStop = useCallback(() => {
     setIsQuizTimerActive(false);
@@ -675,9 +680,9 @@ export default function App() {
   useEffect(() => {
     if (currentScene === 4 && !isQuizTimerActive && !quizCompleted) {
       setIsQuizTimerActive(true);
-      setQuizTimeLeft(30);
+      setQuizTimeLeft(getTimerDuration());
     }
-  }, [currentScene, isQuizTimerActive, quizCompleted]);
+  }, [currentScene, isQuizTimerActive, quizCompleted, getTimerDuration]);
 
   // Enhanced scene change handler with scroll reset
   const handleAnimationComplete = useCallback(() => {
@@ -689,11 +694,11 @@ export default function App() {
       // Reset quiz timer when leaving quiz scene
       if (currentScene !== 4) {
         setIsQuizTimerActive(false);
-        setQuizTimeLeft(30);
+        setQuizTimeLeft(getTimerDuration());
       } else {
         // Start quiz timer when entering quiz scene
         setIsQuizTimerActive(true);
-        setQuizTimeLeft(30);
+        setQuizTimeLeft(getTimerDuration());
       }
 
       // Immediate scroll reset on mobile for better performance
@@ -705,7 +710,7 @@ export default function App() {
         }, 50);
       }
     }
-  }, [currentScene, previousScene, handleSceneChange, resetScrollPosition, isMobile]);
+  }, [currentScene, previousScene, handleSceneChange, resetScrollPosition, isMobile, getTimerDuration]);
 
   const CurrentSceneComponent = scenes[currentScene].component as React.ComponentType<any>;
   const currentLanguage = languages.find(lang => lang.code === selectedLanguage);
@@ -884,13 +889,13 @@ export default function App() {
         <div className="absolute inset-0 bg-gradient-to-r from-blue-50/30 via-transparent to-purple-50/20 dark:from-blue-900/10 dark:via-transparent dark:to-purple-900/8 transition-colors duration-300"></div>
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gray-200/60 dark:via-gray-600/60 to-transparent transition-colors duration-300"></div>
 
-        <div className="relative z-10 px-2 py-2 sm:px-4 sm:py-3 md:px-16 lg:px-20 xl:px-24">
-          {/* Top Navigation Row - Redesigned for proper title centering */}
-          <div className="relative flex items-center justify-between mb-1.5 sm:mb-2">
-            {/* ENHANCED LIQUID GLASS LOGO CONTAINER */}
+        <div className="relative z-10 px-1.5 py-1.5 sm:px-2 sm:py-2 md:px-4 md:py-3 lg:px-16 xl:px-20 2xl:px-24">
+          {/* Top Navigation Row - Mobile Optimized */}
+          <div className="relative flex items-center justify-between mb-2 sm:mb-2.5 md:mb-3">
+            {/* ENHANCED LIQUID GLASS LOGO CONTAINER - Mobile Optimized */}
             <div className="flex-shrink-0 z-20">
               <motion.div
-                className="relative p-1.5 sm:p-2 rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-500 ease-out group"
+                className="relative p-1 sm:p-1.5 md:p-2 rounded-lg sm:rounded-xl md:rounded-2xl overflow-hidden transition-all duration-500 ease-out group"
                 whileHover={{
                   scale: 1.02,
                   y: -1
@@ -916,7 +921,7 @@ export default function App() {
               >
                 {/* Ultra-fine noise texture */}
                 <div
-                  className="absolute inset-0 opacity-[0.015] dark:opacity-[0.008] rounded-xl sm:rounded-2xl mix-blend-overlay pointer-events-none"
+                  className="absolute inset-0 opacity-[0.015] dark:opacity-[0.008] rounded-lg sm:rounded-xl md:rounded-2xl mix-blend-overlay pointer-events-none"
                   style={{
                     backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='logoNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23logoNoise)'/%3E%3C/svg%3E")`,
                     backgroundSize: '128px 128px'
@@ -924,11 +929,11 @@ export default function App() {
                 />
 
                 {/* Multi-layer gradients */}
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-50/20 via-slate-100/10 to-slate-200/5 dark:from-slate-800/15 dark:via-slate-700/8 dark:to-slate-600/4 rounded-xl sm:rounded-2xl transition-colors duration-500"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-50/20 via-slate-100/10 to-slate-200/5 dark:from-slate-800/15 dark:via-slate-700/8 dark:to-slate-600/4 rounded-lg sm:rounded-xl md:rounded-2xl transition-colors duration-500"></div>
 
                 {/* Apple-style highlight */}
                 <div
-                  className="absolute inset-0 rounded-xl sm:rounded-2xl pointer-events-none"
+                  className="absolute inset-0 rounded-lg sm:rounded-xl md:rounded-2xl pointer-events-none"
                   style={{
                     background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.08) 30%, transparent 70%)`,
                     mixBlendMode: 'overlay'
@@ -937,41 +942,29 @@ export default function App() {
 
                 {/* Logo Image */}
                 <div className="relative z-10">
-
-                  {
-                    isDarkMode ? (
-                      <img
-                        src="https://keepnetlabs.com/keepnet-logo.svg"
-                        alt="Keepnet Labs"
-                        className="h-4 w-auto sm:h-6 md:h-7 transition-opacity duration-300"
-                        style={{ display: 'block' }}
-                      />
-                    ) : (
-                      <img
-                        src="https://keepnetlabs.com/keepnet-logo.svg"
-                        alt="Keepnet Labs"
-                        className="h-4 w-auto sm:h-6 md:h-7 transition-opacity duration-300"
-                        style={{ display: 'block' }}
-                      />
-                    )}
-
+                  <img
+                    src="https://keepnetlabs.com/keepnet-logo.svg"
+                    alt="Keepnet Labs"
+                    className="h-3.5 w-auto sm:h-4 md:h-6 lg:h-7 transition-opacity duration-300"
+                    style={{ display: 'block' }}
+                  />
                 </div>
               </motion.div>
             </div>
 
-            {/* PROPERLY CENTERED TITLE - Absolute positioned to center on entire page */}
-            <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg px-2">
-              <h1 className="text-xs sm:text-base md:text-lg font-semibold text-gray-900 dark:text-white tracking-tight transition-colors duration-300 text-center truncate">
+            {/* PROPERLY CENTERED TITLE - Mobile Optimized */}
+            <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 max-w-[120px] sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg px-1 sm:px-2">
+              <h1 className="text-[10px] sm:text-xs md:text-base lg:text-lg font-semibold text-gray-900 dark:text-white tracking-tight transition-colors duration-300 text-center truncate">
                 <span className="hidden sm:inline">Siber Güvenlik Eğitimi</span>
                 <span className="sm:hidden">Güvenlik Eğitimi</span>
               </h1>
             </div>
 
-            {/* Right Controls */}
-            <div className="flex items-center space-x-1.5 sm:space-x-3 flex-shrink-0 z-20">
-              {/* ENHANCED LIQUID GLASS POINTS BADGE */}
+            {/* Right Controls - Mobile Optimized */}
+            <div className="flex items-center space-x-1 sm:space-x-1.5 md:space-x-3 flex-shrink-0 z-20">
+              {/* ENHANCED LIQUID GLASS POINTS BADGE - Mobile Optimized */}
               <motion.div
-                className="relative flex items-center space-x-1.5 sm:space-x-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl overflow-hidden transition-all duration-500 ease-out group"
+                className="relative flex items-center space-x-1 sm:space-x-1.5 md:space-x-2 px-1.5 sm:px-2 md:px-3 py-1 sm:py-1.5 md:py-2 rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group"
                 whileHover={{
                   scale: 1.02,
                   y: -1
@@ -1018,18 +1011,18 @@ export default function App() {
                 />
 
                 {/* Badge Content */}
-                <div className="relative z-10 flex items-center space-x-1.5 sm:space-x-2">
-                  <Award size={12} className="text-yellow-700 dark:text-yellow-300 sm:w-3.5 sm:h-3.5 transition-colors duration-300" />
-                  <span className="text-xs font-semibold text-yellow-900 dark:text-white transition-colors duration-300">
+                <div className="relative z-10 flex items-center space-x-1 sm:space-x-1.5 md:space-x-2">
+                  <Award size={10} className="text-yellow-700 dark:text-yellow-300 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5 transition-colors duration-300" />
+                  <span className="text-[10px] sm:text-xs font-semibold text-yellow-900 dark:text-white transition-colors duration-300">
                     {totalPoints}p
                   </span>
                 </div>
               </motion.div>
 
-              {/* ENHANCED LIQUID GLASS THEME TOGGLE BUTTON */}
+              {/* ENHANCED LIQUID GLASS THEME TOGGLE BUTTON - Mobile Optimized */}
               <motion.button
                 onClick={toggleTheme}
-                className="relative flex items-center justify-center p-1.5 sm:p-2 rounded-lg sm:rounded-xl overflow-hidden transition-all duration-500 ease-out group focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20"
+                className="relative flex items-center justify-center p-1 sm:p-1.5 md:p-2 rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20"
                 whileHover={{
                   scale: 1.05,
                   y: -2
@@ -1126,11 +1119,11 @@ export default function App() {
                 </div>
               </motion.button>
 
-              {/* ENHANCED LIQUID GLASS LANGUAGE SELECTOR */}
+              {/* ENHANCED LIQUID GLASS LANGUAGE SELECTOR - Mobile Optimized */}
               <div className="relative">
                 <motion.button
                   onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
-                  className="relative flex items-center space-x-1 sm:space-x-2 px-1.5 py-1.5 sm:px-3 sm:py-2 rounded-lg sm:rounded-xl overflow-hidden transition-all duration-500 ease-out group focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20"
+                  className="relative flex items-center space-x-0.5 sm:space-x-1 md:space-x-2 px-1 sm:px-1.5 md:px-3 py-1 sm:py-1.5 md:py-2 rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20"
                   whileHover={{
                     scale: 1.02,
                     y: -1
@@ -1193,14 +1186,14 @@ export default function App() {
                   />
 
                   {/* Content */}
-                  <div className="relative z-10 flex items-center space-x-1 sm:space-x-2">
-                    <span className="text-xs sm:text-sm">{currentLanguage?.flag}</span>
-                    <span className="text-xs text-gray-800 dark:text-gray-200 font-medium hidden md:block transition-colors duration-300">
+                  <div className="relative z-10 flex items-center space-x-0.5 sm:space-x-1 md:space-x-2">
+                    <span className="text-[10px] sm:text-xs md:text-sm">{currentLanguage?.flag}</span>
+                    <span className="text-[8px] sm:text-xs text-gray-800 dark:text-gray-200 font-medium hidden lg:block transition-colors duration-300">
                       {currentLanguage?.code.toUpperCase()}
                     </span>
                     <ChevronDown
-                      size={10}
-                      className="text-gray-600 dark:text-gray-300 transition-all duration-200 sm:w-3 sm:h-3"
+                      size={8}
+                      className="text-gray-600 dark:text-gray-300 transition-all duration-200 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3"
                       style={{ transform: isLanguageDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
                     />
                   </div>
@@ -1367,97 +1360,135 @@ export default function App() {
             </div>
           </div>
 
-          {/* Progress Bar and Quiz Timer Row */}
-          <div className="flex items-center justify-between space-x-3">
+          {/* Progress Bar and Quiz Timer Row - Mobile Optimized */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0 sm:space-x-3">
             {/* Progress Bar */}
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <ProgressBar currentScene={currentScene + 1} totalScenes={scenes.length} />
             </div>
 
-            {/* ENHANCED LIQUID GLASS QUIZ TIMER - Header positioned */}
-            {currentScene === 4 && isQuizTimerActive && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8, x: 20 }}
-                animate={{ opacity: 1, scale: 1, x: 0 }}
-                exit={{ opacity: 0, scale: 0.8, x: 20 }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-                className="flex-shrink-0"
-              >
-                <div
-                  className="relative flex items-center space-x-2 px-3 py-2 rounded-xl overflow-hidden transition-all duration-500 ease-out group"
-                  style={{
-                    // LIQUID GLASS BACKGROUND for header timer
-                    background: quizTimeLeft <= 10
-                      ? `linear-gradient(135deg, 
-                          rgba(239, 68, 68, 0.18) 0%, 
-                          rgba(220, 38, 38, 0.15) 50%, 
-                          rgba(185, 28, 28, 0.12) 100%
-                        )`
-                      : `linear-gradient(135deg, 
-                          rgba(59, 130, 246, 0.18) 0%, 
-                          rgba(37, 99, 235, 0.15) 50%, 
-                          rgba(29, 78, 216, 0.12) 100%
-                        )`,
-                    backdropFilter: 'blur(20px) saturate(180%)',
-                    WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                    border: quizTimeLeft <= 10
-                      ? '1px solid rgba(239, 68, 68, 0.30)'
-                      : '1px solid rgba(59, 130, 246, 0.30)',
-                    boxShadow: quizTimeLeft <= 10
-                      ? `
-                        0 4px 16px rgba(239, 68, 68, 0.18),
-                        0 2px 8px rgba(220, 38, 38, 0.12),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.25)
-                      `
-                      : `
-                        0 4px 16px rgba(59, 130, 246, 0.18),
-                        0 2px 8px rgba(37, 99, 235, 0.12),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.25)
-                      `,
-                    transform: 'translateZ(0)',
-                    willChange: 'transform'
-                  }}
-                >
-                  {/* Ultra-fine noise texture */}
+            {/* APPLE LIQUID GLASS QUIZ TIMER - Industry Standard */}
+            <AnimatePresence mode="wait">
+              {currentScene === 4 && isQuizTimerActive && !quizCompleted && (
+                <div className="flex-shrink-0 self-center sm:self-auto">
                   <div
-                    className="absolute inset-0 opacity-[0.020] dark:opacity-[0.012] rounded-xl mix-blend-overlay pointer-events-none"
+                    className={`
+                      relative flex items-center space-x-1.5 sm:space-x-2 px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg sm:rounded-xl overflow-hidden 
+                      transition-all duration-500 ease-out cursor-default
+                      ${quizTimeLeft <= 6 ? 'animate-pulse' : quizTimeLeft <= 15 ? 'animate-bounce' : ''}
+                      hover:scale-105 active:scale-95
+                    `}
                     style={{
-                      backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='headerTimerNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23headerTimerNoise)'/%3E%3C/svg%3E")`,
-                      backgroundSize: '128px 128px'
+                      // APPLE LIQUID GLASS BACKGROUND - Industry Standard
+                      background: quizTimeLeft <= 6
+                        ? `linear-gradient(135deg, 
+                            rgba(239, 68, 68, 0.25) 0%, 
+                            rgba(220, 38, 38, 0.20) 50%, 
+                            rgba(185, 28, 28, 0.15) 100%
+                          )`
+                        : quizTimeLeft <= 15
+                          ? `linear-gradient(135deg, 
+                            rgba(251, 146, 60, 0.25) 0%, 
+                            rgba(245, 101, 101, 0.20) 50%, 
+                            rgba(217, 119, 6, 0.15) 100%
+                          )`
+                          : `linear-gradient(135deg, 
+                            rgba(59, 130, 246, 0.25) 0%, 
+                            rgba(37, 99, 235, 0.20) 50%, 
+                            rgba(29, 78, 216, 0.15) 100%
+                          )`,
+                      backdropFilter: 'blur(24px) saturate(200%)',
+                      WebkitBackdropFilter: 'blur(24px) saturate(200%)',
+                      border: quizTimeLeft <= 6
+                        ? '1.5px solid rgba(239, 68, 68, 0.40)'
+                        : quizTimeLeft <= 15
+                          ? '1.5px solid rgba(251, 146, 60, 0.40)'
+                          : '1.5px solid rgba(59, 130, 246, 0.40)',
+                      boxShadow: quizTimeLeft <= 6
+                        ? `
+                          0 8px 32px rgba(239, 68, 68, 0.25),
+                          0 4px 16px rgba(220, 38, 38, 0.15),
+                          inset 0 1px 0 rgba(255, 255, 255, 0.30),
+                          inset 0 -1px 0 rgba(0, 0, 0, 0.10)
+                        `
+                        : quizTimeLeft <= 15
+                          ? `
+                          0 8px 32px rgba(251, 146, 60, 0.25),
+                          0 4px 16px rgba(245, 101, 101, 0.15),
+                          inset 0 1px 0 rgba(255, 255, 255, 0.30),
+                          inset 0 -1px 0 rgba(0, 0, 0, 0.10)
+                        `
+                          : `
+                          0 8px 32px rgba(59, 130, 246, 0.25),
+                          0 4px 16px rgba(37, 99, 235, 0.15),
+                          inset 0 1px 0 rgba(255, 255, 255, 0.30),
+                          inset 0 -1px 0 rgba(0, 0, 0, 0.10)
+                        `,
+                      transform: 'translateZ(0)',
+                      willChange: 'transform'
                     }}
-                  />
+                  >
+                    {/* Ultra-fine noise texture */}
+                    <div
+                      className="absolute inset-0 opacity-[0.020] dark:opacity-[0.012] rounded-xl mix-blend-overlay pointer-events-none"
+                      style={{
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='headerTimerNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23headerTimerNoise)'/%3E%3C/svg%3E")`,
+                        backgroundSize: '128px 128px'
+                      }}
+                    />
 
-                  {/* Multi-layer gradients with color theming */}
-                  <div
-                    className="absolute inset-0 rounded-xl transition-colors duration-500"
-                    style={{
-                      background: quizTimeLeft <= 10
-                        ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(220, 38, 38, 0.08) 50%, rgba(185, 28, 28, 0.06) 100%)'
-                        : 'linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(37, 99, 235, 0.08) 50%, rgba(29, 78, 216, 0.06) 100%)'
-                    }}
-                  />
+                    {/* Multi-layer gradients with color theming */}
+                    <div
+                      className="absolute inset-0 rounded-xl transition-colors duration-500"
+                      style={{
+                        background: quizTimeLeft <= 6
+                          ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.10) 50%, rgba(185, 28, 28, 0.08) 100%)'
+                          : quizTimeLeft <= 15
+                            ? 'linear-gradient(135deg, rgba(251, 146, 60, 0.15) 0%, rgba(245, 101, 101, 0.10) 50%, rgba(217, 119, 6, 0.08) 100%)'
+                            : 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.10) 50%, rgba(29, 78, 216, 0.08) 100%)'
+                      }}
+                    />
 
-                  {/* Apple-style highlight with color tinting */}
-                  <div
-                    className="absolute inset-0 rounded-xl pointer-events-none"
-                    style={{
-                      background: quizTimeLeft <= 10
-                        ? `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(239, 68, 68, 0.30) 0%, rgba(220, 38, 38, 0.18) 30%, rgba(255, 255, 255, 0.12) 60%, transparent 80%)`
-                        : `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(59, 130, 246, 0.30) 0%, rgba(37, 99, 235, 0.18) 30%, rgba(255, 255, 255, 0.12) 60%, transparent 80%)`,
-                      mixBlendMode: 'overlay'
-                    }}
-                  />
+                    {/* Apple-style highlight with color tinting */}
+                    <div
+                      className="absolute inset-0 rounded-xl pointer-events-none"
+                      style={{
+                        background: quizTimeLeft <= 6
+                          ? `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(239, 68, 68, 0.35) 0%, rgba(220, 38, 38, 0.20) 30%, rgba(255, 255, 255, 0.15) 60%, transparent 80%)`
+                          : quizTimeLeft <= 15
+                            ? `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(251, 146, 60, 0.35) 0%, rgba(245, 101, 101, 0.20) 30%, rgba(255, 255, 255, 0.15) 60%, transparent 80%)`
+                            : `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(59, 130, 246, 0.35) 0%, rgba(37, 99, 235, 0.20) 30%, rgba(255, 255, 255, 0.15) 60%, transparent 80%)`,
+                        mixBlendMode: 'overlay'
+                      }}
+                    />
 
-                  {/* Content */}
-                  <div className="relative z-10 flex items-center space-x-2">
-                    <Timer size={14} className={`${quizTimeLeft <= 10 ? 'text-red-600 dark:text-red-300' : 'text-blue-600 dark:text-blue-300'} transition-colors duration-300`} />
-                    <span className={`text-sm font-mono font-semibold ${quizTimeLeft <= 10 ? 'text-red-700 dark:text-red-200' : 'text-blue-700 dark:text-blue-200'} transition-colors duration-300 min-w-[40px] text-center`}>
-                      {Math.floor(quizTimeLeft / 60)}:{(quizTimeLeft % 60).toString().padStart(2, '0')}
-                    </span>
+                    {/* Content */}
+                    <div className="relative z-10 flex items-center space-x-2">
+                      <Timer
+                        size={14}
+                        className={`transition-colors duration-300 ${quizTimeLeft <= 6 ? 'text-red-600 dark:text-red-300' :
+                          quizTimeLeft <= 15 ? 'text-orange-600 dark:text-orange-300' :
+                            'text-blue-600 dark:text-blue-300'
+                          }`}
+                      />
+                      <span className={`text-sm font-mono font-semibold transition-colors duration-300 min-w-[40px] text-center ${quizTimeLeft <= 6 ? 'text-red-700 dark:text-red-200' :
+                        quizTimeLeft <= 15 ? 'text-orange-700 dark:text-orange-200' :
+                          'text-blue-700 dark:text-blue-200'
+                        }`}>
+                        {Math.floor(quizTimeLeft / 60)}:{(quizTimeLeft % 60).toString().padStart(2, '0')}
+                      </span>
+                      {quizTimeLeft <= 6 && (
+                        <motion.div
+                          animate={{ scale: [1, 1.2, 1] }}
+                          transition={{ duration: 1, repeat: Infinity }}
+                          className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-red-500 rounded-full"
+                        />
+                      )}
+                    </div>
                   </div>
                 </div>
-              </motion.div>
-            )}
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </div>
@@ -1630,6 +1661,7 @@ export default function App() {
                       <div style={{ display: currentScene === 4 ? 'block' : 'none' }}>
                         <QuizScene
                           config={quizSceneConfig}
+                          timerDuration={getTimerDuration()}
                           onQuizCompleted={handleQuizCompleted}
                           onTimerStart={handleQuizTimerStart}
                           onTimerStop={handleQuizTimerStop}

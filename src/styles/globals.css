@@ -461,3 +461,77 @@ html {
   -moz-user-select: none !important;
   -ms-user-select: none !important;
 }
+
+/* Quiz Slider - Prevent Page Navigation */
+.quiz-slider-container {
+  touch-action: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+.quiz-slider-container * {
+  touch-action: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+}
+
+/* Allow slider and button interactions */
+.quiz-slider-container [data-slot="slider"] {
+  touch-action: pan-x !important;
+  overscroll-behavior: none !important;
+  -webkit-overflow-scrolling: touch !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+.quiz-slider-container [data-slot="slider-track"] {
+  touch-action: pan-x !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+.quiz-slider-container [data-slot="slider-thumb"] {
+  touch-action: pan-x !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  cursor: grab !important;
+  pointer-events: auto !important;
+}
+
+.quiz-slider-container [data-slot="slider-thumb"]:active {
+  cursor: grabbing !important;
+  touch-action: pan-x !important;
+}
+
+.quiz-slider-container [data-slot="slider-thumb"]:hover {
+  cursor: grab !important;
+}
+
+.quiz-slider-container button {
+  touch-action: manipulation !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* Ensure slider works at all positions */
+.quiz-slider-container [data-slot="slider"] * {
+  touch-action: pan-x !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}

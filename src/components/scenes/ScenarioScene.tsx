@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import * as LucideIcons from "lucide-react";
 import { LucideIcon } from "lucide-react";
@@ -48,6 +48,20 @@ function parseTactiqTranscript(raw: string): TranscriptRow[] {
   return transcript;
 }
 
+// URL'den transcript yükleme fonksiyonu
+async function fetchTranscriptFromUrl(url: string): Promise<string> {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.text();
+  } catch (error) {
+    console.error('Error fetching transcript from URL:', error);
+    throw error;
+  }
+}
+
 interface ScenarioSceneProps {
   config?: typeof educationConfigs.smishing.scenarioSceneConfig;
 }
@@ -55,10 +69,72 @@ interface ScenarioSceneProps {
 export function ScenarioScene({
   config = educationConfigs.smishing.scenarioSceneConfig
 }: ScenarioSceneProps) {
-  // Parse transcript from config
+  const [transcriptData, setTranscriptData] = useState<string>('');
+  const [isLoadingTranscript, setIsLoadingTranscript] = useState(false);
+  const [transcriptError, setTranscriptError] = useState<string | null>(null);
+
+  // URL algılama fonksiyonu
+  const isUrl = (str: string): boolean => {
+    try {
+      // URL pattern'lerini kontrol et
+      const urlPatterns = [
+        /^https?:\/\//,           // http:// veya https://
+        /^\/\//,                  // // (protocol-relative)
+        /^\/[^\/]/,               // /path (absolute path)
+        /^\.\/|\/\./,             // ./path veya /./path (relative path)
+        /^[a-zA-Z0-9-]+:\/\//,    // custom:// (custom protocols)
+      ];
+
+      return urlPatterns.some(pattern => pattern.test(str.trim()));
+    } catch {
+      return false;
+    }
+  };
+
+  // Transcript'i dinamik olarak yükle (string veya URL'den)
+  useEffect(() => {
+    const loadTranscript = async () => {
+      if (!config.transcript) return;
+
+      const transcriptValue = config.transcript;
+
+      // Transcript'in tipini dinamik olarak algıla
+      if (typeof transcriptValue === 'string') {
+        if (isUrl(transcriptValue)) {
+          // URL olarak algılandı - fetch et
+          console.log('📡 Transcript URL olarak algılandı:', transcriptValue);
+          setIsLoadingTranscript(true);
+          setTranscriptError(null);
+
+          try {
+            const transcriptText = await fetchTranscriptFromUrl(transcriptValue);
+            setTranscriptData(transcriptText);
+            console.log('✅ Transcript başarıyla yüklendi');
+          } catch (error) {
+            setTranscriptError(`Transcript yüklenirken hata oluştu: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`);
+            console.error('❌ Transcript loading error:', error);
+          } finally {
+            setIsLoadingTranscript(false);
+          }
+        } else {
+          // String olarak algılandı - direkt kullan
+          console.log('📝 Transcript string olarak algılandı');
+          setTranscriptData(transcriptValue);
+        }
+      } else {
+        // Diğer tipler için string'e çevir
+        console.log('🔄 Transcript string\'e çevriliyor');
+        setTranscriptData(String(transcriptValue));
+      }
+    };
+
+    loadTranscript();
+  }, [config.transcript]);
+
+  // Parse transcript from loaded data
   const tactiqTranscript = useMemo(
-    () => parseTactiqTranscript(config.transcript),
-    [config.transcript]
+    () => parseTactiqTranscript(transcriptData),
+    [transcriptData]
   );
 
   // Memoize icon component
@@ -96,24 +172,53 @@ export function ScenarioScene({
         {config.title}
       </motion.h1>
 
+      {/* Loading State */}
+      {isLoadingTranscript && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-center py-8"
+        >
+          <div className="inline-flex items-center space-x-2">
+            <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            <span className="text-gray-600 dark:text-gray-400">Transcript yükleniyor...</span>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Error State */}
+      {transcriptError && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-center py-8"
+        >
+          <div className="inline-flex items-center space-x-2 text-red-600 dark:text-red-400">
+            <span>⚠️ {transcriptError}</span>
+          </div>
+        </motion.div>
+      )}
+
       {/* Video Player */}
-      <motion.div
-        initial={config.animations.videoPlayer.initial}
-        animate={config.animations.videoPlayer.animate}
-        transition={config.animations.videoPlayer.transition}
-        className={config.videoContainerClassName}
-      >
-        <VideoPlayer
-          src={config.video.src}
-          poster={config.video.poster || undefined}
-          disableForwardSeek={config.video.disableForwardSeek}
-          transcript={tactiqTranscript}
-          showTranscript={config.video.showTranscript}
-          transcriptTitle={config.video.transcriptTitle}
-          transcriptLanguage={config.video.transcriptLanguage}
-          className="w-full"
-        />
-      </motion.div>
+      {!isLoadingTranscript && !transcriptError && (
+        <motion.div
+          initial={config.animations.videoPlayer.initial}
+          animate={config.animations.videoPlayer.animate}
+          transition={config.animations.videoPlayer.transition}
+          className={config.videoContainerClassName}
+        >
+          <VideoPlayer
+            src={config.video.src}
+            poster={config.video.poster || undefined}
+            disableForwardSeek={config.video.disableForwardSeek}
+            transcript={tactiqTranscript}
+            showTranscript={config.video.showTranscript}
+            transcriptTitle={config.video.transcriptTitle}
+            transcriptLanguage={config.video.transcriptLanguage}
+            className="w-full"
+          />
+        </motion.div>
+      )}
 
       {/* Mobile Hint */}
       <motion.div

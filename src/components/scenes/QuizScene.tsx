@@ -6,9 +6,10 @@ import {
   RotateCcw,
   Move,
   Zap,
+  X,
+  Undo2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { QuizIcon } from "../icons/CyberSecurityIcons";
 import { Button } from "../ui/button";
 import { Slider } from "../ui/slider";
 import {
@@ -21,9 +22,12 @@ import {
   DragDropQuestion,
   SliderScaleQuestion
 } from "../configs/educationConfigs";
+import * as LucideIcons from "lucide-react";
+import { LucideIcon } from "lucide-react";
 
 interface QuizSceneProps {
   config?: QuizSceneConfig;
+  timerDuration?: number;
   onQuizCompleted: () => void;
   onTimerStart: () => void;
   onTimerStop: () => void;
@@ -58,6 +62,7 @@ interface QuizSceneProps {
 
 export const QuizScene = React.memo(function QuizScene({
   config = quizSceneConfig,
+  timerDuration,
   onQuizCompleted,
   onTimerStart,
   onTimerStop,
@@ -93,6 +98,7 @@ export const QuizScene = React.memo(function QuizScene({
 
   // Refs for auto-scroll
   const resultPanelRef = useRef<HTMLDivElement>(null);
+  const sliderContainerRef = useRef<HTMLDivElement>(null);
 
   // Check if device is mobile
   const isMobile = useMemo(() => {
@@ -107,6 +113,113 @@ export const QuizScene = React.memo(function QuizScene({
   const currentQuestion = useMemo(() => questions[currentQuestionIndex], [questions, currentQuestionIndex]);
   const currentAnswer = useMemo(() => answers.get(currentQuestion?.id), [answers, currentQuestion?.id]);
   const progress = useMemo(() => ((currentQuestionIndex + 1) / questions.length) * 100, [currentQuestionIndex, questions.length]);
+
+  // Answer options style helper - Endüstri standartlarına uygun dark mod desteği
+  const getAnswerOptionStyle = useCallback((isSelected: boolean, isCorrect?: boolean, showResult?: boolean) => {
+    // Endüstri standartlarına uygun renk paleti (WCAG 2.1 AA uyumlu)
+    const colorStyles = {
+      // Doğru cevap - Yeşil tonları
+      correct: {
+        light: {
+          background: "linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.08) 100%)",
+          border: "1.5px solid rgba(34, 197, 94, 0.4)",
+          text: "text-green-800 dark:text-green-300",
+          icon: "text-green-600 dark:text-green-400"
+        },
+        dark: {
+          background: "linear-gradient(135deg, rgba(34, 197, 94, 0.12) 0%, rgba(34, 197, 94, 0.06) 100%)",
+          border: "1.5px solid rgba(34, 197, 94, 0.3)",
+          text: "text-green-300",
+          icon: "text-green-400"
+        }
+      },
+      // Yanlış cevap - Kırmızı tonları
+      incorrect: {
+        light: {
+          background: "linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.08) 100%)",
+          border: "1.5px solid rgba(239, 68, 68, 0.4)",
+          text: "text-red-800 dark:text-red-300",
+          icon: "text-red-600 dark:text-red-400"
+        },
+        dark: {
+          background: "linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(239, 68, 68, 0.06) 100%)",
+          border: "1.5px solid rgba(239, 68, 68, 0.3)",
+          text: "text-red-300",
+          icon: "text-red-400"
+        }
+      },
+      // Seçili cevap - Mavi tonları
+      selected: {
+        light: {
+          background: "linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.08) 100%)",
+          border: "1.5px solid rgba(59, 130, 246, 0.4)",
+          text: "text-blue-800 dark:text-blue-300",
+          icon: "text-blue-600 dark:text-blue-400"
+        },
+        dark: {
+          background: "linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(59, 130, 246, 0.06) 100%)",
+          border: "1.5px solid rgba(59, 130, 246, 0.3)",
+          text: "text-blue-300",
+          icon: "text-blue-400"
+        }
+      },
+      // Varsayılan durum - Nötr tonlar
+      default: {
+        light: {
+          background: "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 25%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.65) 75%, rgba(255, 255, 255, 0.55) 100%)",
+          border: "1.5px solid rgba(255, 255, 255, 0.6)",
+          text: "text-gray-900 dark:text-gray-100",
+          icon: "text-gray-600 dark:text-gray-400"
+        },
+        dark: {
+          background: "linear-gradient(135deg, rgba(55, 65, 81, 0.95) 0%, rgba(55, 65, 81, 0.85) 25%, rgba(55, 65, 81, 0.75) 50%, rgba(55, 65, 81, 0.65) 75%, rgba(55, 65, 81, 0.55) 100%)",
+          border: "1.5px solid rgba(75, 85, 99, 0.6)",
+          text: "text-gray-100",
+          icon: "text-gray-400"
+        }
+      }
+    };
+
+    // Dark mod algılama
+    const isDarkMode = typeof window !== 'undefined' &&
+      (document.documentElement.classList.contains('dark') ||
+        window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+    let styleType: keyof typeof colorStyles;
+    let colorVariant: 'light' | 'dark';
+
+    if (showResult && isCorrect) {
+      styleType = 'correct';
+    } else if (showResult && !isCorrect && isSelected) {
+      styleType = 'incorrect';
+    } else if (isSelected) {
+      styleType = 'selected';
+    } else {
+      styleType = 'default';
+    }
+
+    colorVariant = isDarkMode ? 'dark' : 'light';
+
+    const currentStyle = colorStyles[styleType][colorVariant];
+
+    return {
+      className: currentStyle.text,
+      style: {
+        background: currentStyle.background,
+        border: currentStyle.border,
+        backdropFilter: "blur(28px) saturate(220%)",
+        WebkitBackdropFilter: "blur(28px) saturate(220%)",
+        boxShadow: `
+          0 6px 20px rgba(0, 0, 0, 0.06),
+          0 3px 10px rgba(0, 0, 0, 0.04),
+          0 1px 4px rgba(0, 0, 0, 0.02),
+          inset 0 1px 0 rgba(255, 255, 255, 0.8),
+          inset 0 -1px 0 rgba(0, 0, 0, 0.04)
+        `,
+      },
+      iconClassName: currentStyle.icon
+    };
+  }, [config.styling?.answerOptions]);
 
   // Timer Effects
   useEffect(() => {
@@ -274,17 +387,26 @@ export const QuizScene = React.memo(function QuizScene({
 
   const resetQuestionState = useCallback(() => {
     setShowResult(false);
-    setTimeLeft(config.timer?.duration || 30);
+    setTimeLeft(timerDuration || config.timer?.duration || 30);
     setIsTimerActive(true);
     setAttempts(0);
     setIsAnswerLocked(false);
     setIsLoading(false);
     setMultiSelectAnswers([]);
-    setSliderValue(5);
+
+    // Set slider value based on current question type
+    if (currentQuestion?.type === QuestionType.SLIDER_SCALE) {
+      const sliderQuestion = currentQuestion as SliderScaleQuestion;
+      const midValue = Math.floor((sliderQuestion.min + sliderQuestion.max) / 2);
+      setSliderValue(midValue);
+    } else {
+      setSliderValue(5);
+    }
+
     setDraggedItems(new Map());
     setSelectedItem(null);
     // Timer will be started by the effect when isTimerActive becomes true
-  }, [setShowResult, setTimeLeft, setIsTimerActive, setAttempts, setIsAnswerLocked, setIsLoading, setMultiSelectAnswers, setSliderValue, setDraggedItems, setSelectedItem, config.timer?.duration]);
+  }, [setShowResult, setTimeLeft, setIsTimerActive, setAttempts, setIsAnswerLocked, setIsLoading, setMultiSelectAnswers, setSliderValue, setDraggedItems, setSelectedItem, timerDuration, config.timer?.duration, currentQuestion]);
 
   const handleNextQuestion = useCallback(() => {
     setCurrentQuestionIndex((prev) => prev + 1);
@@ -310,6 +432,25 @@ export const QuizScene = React.memo(function QuizScene({
     );
   }, [showResult, isLoading]);
 
+  // Prevent page navigation when interacting with slider
+  const handleSliderContainerTouch = useCallback((e: React.TouchEvent) => {
+    // Only prevent if it's not on the slider or button
+    const target = e.target as Element;
+    if (!target?.closest('[data-slot="slider"]') && !target?.closest('button')) {
+      e.preventDefault();
+    }
+    e.stopPropagation();
+  }, []);
+
+  const handleSliderContainerWheel = useCallback((e: React.WheelEvent) => {
+    // Only prevent if it's not on the slider or button
+    const target = e.target as Element;
+    if (!target?.closest('[data-slot="slider"]') && !target?.closest('button')) {
+      e.preventDefault();
+    }
+    e.stopPropagation();
+  }, []);
+
   // Render Functions
   const renderMultipleChoice = useCallback(() => {
     const question = currentQuestion as MultipleChoiceQuestion;
@@ -321,6 +462,7 @@ export const QuizScene = React.memo(function QuizScene({
           const isSelected = userAnswer === option.id;
           const isCorrect = option.isCorrect;
           const showCorrectness = showResult;
+          const optionStyle = getAnswerOptionStyle(isSelected, isCorrect, showResult);
 
           return (
             <motion.button
@@ -342,47 +484,21 @@ export const QuizScene = React.memo(function QuizScene({
                 handleAnswer(option.id)
               }
               disabled={showResult || isLoading}
-              className="group relative w-full p-3 text-left rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-ring/20 disabled:cursor-not-allowed"
-              style={{
-                background:
-                  showCorrectness && isCorrect
-                    ? "linear-gradient(135deg, rgba(34, 197, 94, 0.25) 0%, rgba(34, 197, 94, 0.18) 30%, rgba(34, 197, 94, 0.12) 70%, rgba(34, 197, 94, 0.08) 100%)"
-                    : showCorrectness &&
-                      isSelected &&
-                      !isCorrect
-                      ? "linear-gradient(135deg, rgba(212, 24, 61, 0.25) 0%, rgba(212, 24, 61, 0.18) 30%, rgba(212, 24, 61, 0.12) 70%, rgba(212, 24, 61, 0.08) 100%)"
-                      : "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 25%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.65) 75%, rgba(255, 255, 255, 0.55) 100%)",
-                backdropFilter: "blur(28px) saturate(220%)",
-                WebkitBackdropFilter: "blur(28px) saturate(220%)",
-                border:
-                  showCorrectness && isCorrect
-                    ? "0.5px solid rgba(34, 197, 94, 0.6)"
-                    : showCorrectness &&
-                      isSelected &&
-                      !isCorrect
-                      ? "0.5px solid rgba(212, 24, 61, 0.6)"
-                      : "0.5px solid rgba(255, 255, 255, 0.6)",
-                boxShadow: `
-                  0 6px 20px rgba(0, 0, 0, 0.06),
-                  0 3px 10px rgba(0, 0, 0, 0.04),
-                  0 1px 4px rgba(0, 0, 0, 0.02),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.8),
-                  inset 0 -1px 0 rgba(0, 0, 0, 0.04)
-                `,
-              }}
+              className={`group relative w-full p-3 text-left rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-ring/20 disabled:cursor-not-allowed ${optionStyle.className}`}
+              style={optionStyle.style}
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1 pr-3">
-                  <span className="block mb-1 text-foreground font-medium transition-colors duration-300">
+                  <span className="block mb-1 font-medium transition-colors duration-300">
                     {option.text}
                   </span>
                   {option.strength && (
                     <span
                       className={`text-xs font-medium transition-colors duration-300 ${option.color === "green"
-                        ? "text-chart-4"
+                        ? "text-green-600 dark:text-green-400"
                         : option.color === "yellow"
-                          ? "text-chart-5"
-                          : "text-destructive"
+                          ? "text-yellow-600 dark:text-yellow-400"
+                          : "text-red-600 dark:text-red-400"
                         }`}
                     >
                       {option.strength}
@@ -401,12 +517,12 @@ export const QuizScene = React.memo(function QuizScene({
                     }}
                   >
                     {isCorrect ? (
-                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-chart-4/20">
-                        <CheckCircle className="w-4 h-4 text-chart-4" />
+                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30">
+                        <CheckCircle className={`w-4 h-4 ${optionStyle.iconClassName}`} />
                       </div>
                     ) : isSelected ? (
-                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-destructive/20">
-                        <XCircle className="w-4 h-4 text-destructive" />
+                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-red-100 dark:bg-red-900/30">
+                        <XCircle className={`w-4 h-4 ${optionStyle.iconClassName}`} />
                       </div>
                     ) : null}
                   </motion.div>
@@ -424,7 +540,7 @@ export const QuizScene = React.memo(function QuizScene({
         })}
       </div>
     );
-  }, [currentQuestion, currentAnswer, showResult, isLoading, handleAnswer]);
+  }, [currentQuestion, currentAnswer, showResult, isLoading, handleAnswer, getAnswerOptionStyle]);
 
   const renderTrueFalse = useCallback(() => {
     const question = currentQuestion as TrueFalseQuestion;
@@ -689,7 +805,14 @@ export const QuizScene = React.memo(function QuizScene({
     const question = currentQuestion as SliderScaleQuestion;
 
     return (
-      <div className="space-y-4">
+      <div
+        ref={sliderContainerRef}
+        className="space-y-4 quiz-slider-container"
+        onTouchStart={handleSliderContainerTouch}
+        onTouchMove={handleSliderContainerTouch}
+        onWheel={handleSliderContainerWheel}
+        style={{ touchAction: 'none' }}
+      >
         <div
           className="p-3 rounded-lg border-2 border-border/60"
           style={{
@@ -819,6 +942,32 @@ export const QuizScene = React.memo(function QuizScene({
       setDraggedItems((prev) => new Map(prev).set(itemId, categoryId));
     };
 
+    // Remove item from category (undo functionality)
+    const handleRemoveItem = (itemId: string) => {
+      if (showResult || isLoading) return;
+
+      setDraggedItems((prev) => {
+        const newMap = new Map(prev);
+        newMap.delete(itemId);
+        return newMap;
+      });
+    };
+
+    // Remove all items from a category
+    const handleClearCategory = (categoryId: string) => {
+      if (showResult || isLoading) return;
+
+      setDraggedItems((prev) => {
+        const newMap = new Map(prev);
+        question.items.forEach((item) => {
+          if (newMap.get(item.id) === categoryId) {
+            newMap.delete(item.id);
+          }
+        });
+        return newMap;
+      });
+    };
+
     const getCategoryColorStyles = (color: string, hasItems: boolean = false) => {
       const baseStyles = {
         background: "",
@@ -886,6 +1035,9 @@ export const QuizScene = React.memo(function QuizScene({
           </p>
           <p className="text-xs text-muted-foreground">
             {config.texts?.desktopInstructions || "🖥️ Masaüstü: Öğeleri sürükleyip kategorilere bırakın"}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            💡 <strong>İpucu:</strong> Öğeleri kaldırmak için üzerine gelin ve X butonuna tıklayın
           </p>
         </div>
 
@@ -992,7 +1144,7 @@ export const QuizScene = React.memo(function QuizScene({
               const categoryStyles = getCategoryColorStyles(category.color, hasItems);
 
               return (
-                <motion.button
+                <motion.div
                   key={category.id}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -1000,11 +1152,11 @@ export const QuizScene = React.memo(function QuizScene({
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(e, category.id)}
                   onClick={() => handleCategoryTap(category.id)}
-                  disabled={showResult || isLoading || !selectedItem}
                   className={`
                     min-h-[120px] p-4 rounded-xl text-left transition-all duration-300 touch-manipulation
                     ${!showResult && !isLoading && selectedItem ? 'hover:scale-[1.02] active:scale-[0.98]' : ''}
                     ${selectedItem ? 'cursor-pointer' : 'cursor-not-allowed'}
+                    ${showResult || isLoading ? 'pointer-events-none' : 'pointer-events-auto'}
                   `}
                   style={categoryStyles}
                 >
@@ -1035,14 +1187,39 @@ export const QuizScene = React.memo(function QuizScene({
                       </div>
                     </div>
 
-                    <div
-                      className="px-2 py-1 rounded-md text-xs font-medium"
-                      style={{
-                        background: "rgba(255, 255, 255, 0.1)",
-                        border: "1px solid rgba(255, 255, 255, 0.15)"
-                      }}
-                    >
-                      {categoryItems.length}
+                    <div className="flex items-center space-x-2">
+                      <div
+                        className="px-2 py-1 rounded-md text-xs font-medium"
+                        style={{
+                          background: "rgba(255, 255, 255, 0.1)",
+                          border: "1px solid rgba(255, 255, 255, 0.15)"
+                        }}
+                      >
+                        {categoryItems.length}
+                      </div>
+
+                      {/* Clear category button */}
+                      {categoryItems.length > 0 && !showResult && !isLoading && (
+                        <motion.button
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleClearCategory(category.id);
+                          }}
+                          className="p-1.5 rounded-lg transition-all duration-200"
+                          style={{
+                            background: "rgba(239, 68, 68, 0.15)",
+                            border: "1px solid rgba(239, 68, 68, 0.3)",
+                            backdropFilter: "blur(8px)"
+                          }}
+                          title={config.texts?.clearCategory || "Kategoriyi Temizle"}
+                        >
+                          <Undo2 className="w-3 h-3 text-red-500" />
+                        </motion.button>
+                      )}
                     </div>
                   </div>
 
@@ -1069,21 +1246,45 @@ export const QuizScene = React.memo(function QuizScene({
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: itemIndex * 0.1 }}
-                        className="p-2 rounded-lg text-xs font-medium"
+                        className="group relative p-2 rounded-lg text-xs font-medium"
                         style={{
                           background: "rgba(255, 255, 255, 0.15)",
                           border: "1px solid rgba(255, 255, 255, 0.2)",
                           backdropFilter: "blur(8px)"
                         }}
                       >
-                        <div className="flex items-center space-x-2">
-                          <CheckCircle className="w-3 h-3 text-green-600" />
-                          <span className="text-foreground">{item.text}</span>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <CheckCircle className="w-3 h-3 text-green-600" />
+                            <span className="text-foreground">{item.text}</span>
+                          </div>
+
+                          {/* Remove item button */}
+                          {!showResult && !isLoading && (
+                            <motion.button
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              whileHover={{ scale: 1.2 }}
+                              whileTap={{ scale: 0.8 }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRemoveItem(item.id);
+                              }}
+                              className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1 rounded-md"
+                              style={{
+                                background: "rgba(239, 68, 68, 0.2)",
+                                border: "1px solid rgba(239, 68, 68, 0.4)"
+                              }}
+                              title={config.texts?.removeItem || "Öğeyi Kaldır"}
+                            >
+                              <X className="w-2.5 h-2.5 text-red-500" />
+                            </motion.button>
+                          )}
                         </div>
                       </motion.div>
                     ))}
                   </div>
-                </motion.button>
+                </motion.div>
               );
             })}
           </div>
@@ -1166,34 +1367,138 @@ export const QuizScene = React.memo(function QuizScene({
     }
   }, [currentQuestionIndex, showResult, isAnswerCorrect, isAnswerLocked, onQuizCompleted, questions.length]);
 
-  // Memoized style objects
-  const cardStyle = useMemo(() => ({
-    background: config.styling?.cardStyle?.background || "linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card) / 0.95) 25%, hsl(var(--card) / 0.85) 50%, hsl(var(--card) / 0.75) 75%, hsl(var(--card) / 0.65) 100%)",
-    backdropFilter: "blur(36px) saturate(240%)",
-    WebkitBackdropFilter: "blur(36px) saturate(240%)",
-    border: config.styling?.cardStyle?.border || "0.5px solid rgba(255, 255, 255, 0.4)",
-    boxShadow: config.styling?.cardStyle?.shadow || `
-      0 12px 40px rgba(0, 0, 0, 0.08),
-      0 6px 20px rgba(0, 0, 0, 0.06),
-      0 2px 8px rgba(0, 0, 0, 0.03),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.06)
-    `,
-  }), [config.styling?.cardStyle]);
+  // Prevent page scrolling when slider is active
+  useEffect(() => {
+    if (currentQuestion?.type === QuestionType.SLIDER_SCALE && !showResult && sliderContainerRef.current) {
+      const container = sliderContainerRef.current;
 
-  const resultPanelStyle = useMemo(() => ({
-    background: config.styling?.resultPanelStyle?.background || "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 25%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.65) 75%, rgba(255, 255, 255, 0.55) 100%)",
-    backdropFilter: "blur(28px) saturate(220%)",
-    WebkitBackdropFilter: "blur(28px) saturate(220%)",
-    border: config.styling?.resultPanelStyle?.border || "0.5px solid rgba(255, 255, 255, 0.4)",
-    boxShadow: config.styling?.resultPanelStyle?.shadow || `
-      0 8px 32px rgba(0, 0, 0, 0.08),
-      0 4px 16px rgba(0, 0, 0, 0.06),
-      0 2px 8px rgba(0, 0, 0, 0.03),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.06)
-    `,
-  }), [config.styling?.resultPanelStyle]);
+      const preventScroll = (e: TouchEvent | WheelEvent) => {
+        // Only prevent if it's not on the slider or button
+        const target = e.target as Element;
+        if (!target?.closest('[data-slot="slider"]') && !target?.closest('button')) {
+          e.preventDefault();
+        }
+        e.stopPropagation();
+      };
+
+      const preventTouchStart = (e: TouchEvent) => {
+        // Only prevent if it's not on the slider or button
+        const target = e.target as Element;
+        if (!target?.closest('[data-slot="slider"]') && !target?.closest('button')) {
+          e.preventDefault();
+        }
+        e.stopPropagation();
+      };
+
+      const preventTouchMove = (e: TouchEvent) => {
+        // Allow slider touch move events to work properly
+        const target = e.target as Element;
+        if (target?.closest('[data-slot="slider"]')) {
+          // Don't prevent default for slider touch move
+          e.stopPropagation();
+        } else if (!target?.closest('button')) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      };
+
+      // Add non-passive event listeners directly to the container
+      container.addEventListener('touchstart', preventTouchStart, { passive: false });
+      container.addEventListener('touchmove', preventTouchMove, { passive: false });
+      container.addEventListener('wheel', preventScroll, { passive: false });
+
+      return () => {
+        container.removeEventListener('touchstart', preventTouchStart);
+        container.removeEventListener('touchmove', preventTouchMove);
+        container.removeEventListener('wheel', preventScroll);
+      };
+    }
+  }, [currentQuestion?.type, showResult]);
+
+  // Lightweight card style objects
+  const cardStyle = useMemo(() => {
+    const card = config.styling?.card;
+    const cardStyle = config.styling?.cardStyle; // Backward compatibility
+
+    return {
+      // Yeni lightweight props'ları kullan, yoksa eski cardStyle'ı kullan
+      background: card?.backgroundColor || cardStyle?.background || "linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card) / 0.95) 25%, hsl(var(--card) / 0.85) 50%, hsl(var(--card) / 0.75) 75%, hsl(var(--card) / 0.65) 100%)",
+      backdropFilter: "blur(36px) saturate(240%)",
+      WebkitBackdropFilter: "blur(36px) saturate(240%)",
+      border: cardStyle?.border || "0.5px solid rgba(255, 255, 255, 0.4)", // Eski border kullan
+      boxShadow: `
+        0 12px 40px rgba(0, 0, 0, 0.08),
+        0 6px 20px rgba(0, 0, 0, 0.06),
+        0 2px 8px rgba(0, 0, 0, 0.03),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.06)
+      `,
+      borderRadius: card?.borderRadius || "rounded-2xl",
+      gradientFrom: card?.gradientFrom,
+      gradientTo: card?.gradientTo,
+      // Yeni lightweight props'ları ayrı tut
+      backgroundColor: card?.backgroundColor,
+      borderColor: card?.borderColor,
+      shadow: card?.shadow,
+    };
+  }, [config.styling?.card, config.styling?.cardStyle]);
+
+  const resultPanelStyle = useMemo(() => {
+    const resultPanel = config.styling?.resultPanel;
+    const resultPanelStyle = config.styling?.resultPanelStyle; // Backward compatibility
+
+    return {
+      background: resultPanelStyle?.background || "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 25%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.65) 75%, rgba(255, 255, 255, 0.55) 100%)",
+      backdropFilter: "blur(28px) saturate(220%)",
+      WebkitBackdropFilter: "blur(28px) saturate(220%)",
+      border: resultPanelStyle?.border || "0.5px solid rgba(255, 255, 255, 0.4)",
+      boxShadow: `
+        0 8px 32px rgba(0, 0, 0, 0.08),
+        0 4px 16px rgba(0, 0, 0, 0.06),
+        0 2px 8px rgba(0, 0, 0, 0.03),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.06)
+      `,
+      borderRadius: resultPanel?.borderRadius || "rounded-xl",
+      gradientFrom: resultPanel?.gradientFrom,
+      gradientTo: resultPanel?.gradientTo,
+      // Yeni lightweight props'ları ayrı tut
+      backgroundColor: resultPanel?.backgroundColor,
+      borderColor: resultPanel?.borderColor,
+      shadow: resultPanel?.shadow,
+    };
+  }, [config.styling?.resultPanel, config.styling?.resultPanelStyle]);
+
+  const getIconComponent = (iconName?: string): LucideIcon => {
+    if (!iconName) return LucideIcons.HelpCircle;
+    const camelCaseName = iconName
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join('');
+    if (camelCaseName in LucideIcons) {
+      return LucideIcons[camelCaseName as keyof typeof LucideIcons] as LucideIcon;
+    }
+    return LucideIcons.HelpCircle;
+  };
+
+  const iconConfig = config.icon || {};
+  let iconNode: React.ReactNode = null;
+
+  if (iconConfig.component) {
+    iconNode = iconConfig.component;
+  } else if (iconConfig.sceneIconName) {
+    const LucideIconComponent = getIconComponent(iconConfig.sceneIconName);
+    iconNode = (
+      <LucideIconComponent
+        size={iconConfig.size ?? 48}
+        className={iconConfig.className}
+        color={iconConfig.color}
+        strokeWidth={iconConfig.strokeWidth ?? 2}
+      />
+    );
+  } else {
+    iconNode = <LucideIcons.HelpCircle size={48} />;
+  }
 
   // Safety check for currentQuestion
   if (!currentQuestion) {
@@ -1224,11 +1529,7 @@ export const QuizScene = React.memo(function QuizScene({
         className="text-center mb-4"
       >
         <div className="flex items-center justify-center mb-3">
-          <QuizIcon
-            isActive={true}
-            isCompleted={false}
-            size={48}
-          />
+          {iconNode}
         </div>
 
         <h1 className="mb-2 text-foreground">
@@ -1273,8 +1574,16 @@ export const QuizScene = React.memo(function QuizScene({
         className="w-full max-w-3xl"
       >
         <div
-          className="p-5 md:p-6 rounded-2xl shadow-xl"
-          style={cardStyle}
+          className={`p-5 md:p-6 ${cardStyle.borderRadius} ${cardStyle.shadow || ''} ${cardStyle.borderColor || ''}`}
+          style={{
+            background: cardStyle.gradientFrom && cardStyle.gradientTo
+              ? `linear-gradient(135deg, ${cardStyle.gradientFrom} 0%, ${cardStyle.gradientTo} 100%)`
+              : cardStyle.backgroundColor || cardStyle.background,
+            backdropFilter: cardStyle.backdropFilter,
+            WebkitBackdropFilter: cardStyle.WebkitBackdropFilter,
+            border: cardStyle.border,
+            boxShadow: cardStyle.boxShadow,
+          }}
         >
           {/* Question Header */}
           <div className="text-center mb-2">
@@ -1299,8 +1608,15 @@ export const QuizScene = React.memo(function QuizScene({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="mt-4 p-4 rounded-xl border-2 border-border/60"
-                style={resultPanelStyle}
+                className={`mt-4 p-4 ${resultPanelStyle.borderRadius} border-2 ${resultPanelStyle.borderColor || 'border-border/60'} ${resultPanelStyle.shadow || ''}`}
+                style={{
+                  background: resultPanelStyle.gradientFrom && resultPanelStyle.gradientTo
+                    ? `linear-gradient(135deg, ${resultPanelStyle.gradientFrom} 0%, ${resultPanelStyle.gradientTo} 100%)`
+                    : resultPanelStyle.backgroundColor || resultPanelStyle.background,
+                  backdropFilter: resultPanelStyle.backdropFilter,
+                  WebkitBackdropFilter: resultPanelStyle.WebkitBackdropFilter,
+                  boxShadow: resultPanelStyle.boxShadow,
+                }}
               >
                 <div className="flex items-start space-x-3 mb-2.5">
                   <div className="p-1.5 bg-chart-2/20 rounded-lg">

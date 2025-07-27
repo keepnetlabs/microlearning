@@ -122,8 +122,42 @@ export interface QuizSceneConfig {
         showDifficulty?: boolean;
         showCategory?: boolean;
     };
+    // Icon configuration
+    icon?: {
+        component?: React.ReactNode;
+        sceneIconName?: string; // Lucide icon name (e.g., "brain-circuit", "shield", "book-open")
+        size?: number;
+        className?: string;
+        strokeWidth?: number;
+        color?: string;
+    };
     styling?: {
         primaryColor?: ColorType;
+        card?: {
+            backgroundColor?: string;    // "bg-white/60", "bg-blue-50/80"
+            borderColor?: string;        // "border-white/60", "border-blue-200"
+            gradientFrom?: string;       // "from-white/50", "from-blue-50"
+            gradientTo?: string;         // "to-white/20", "to-blue-100"
+            shadow?: string;             // "shadow-lg", "shadow-xl"
+            borderRadius?: string;       // "rounded-xl", "rounded-2xl"
+        };
+        resultPanel?: {
+            backgroundColor?: string;    // "bg-green-50/90", "bg-blue-50/80"
+            borderColor?: string;        // "border-green-200", "border-blue-200"
+            gradientFrom?: string;       // "from-green-50", "from-blue-50"
+            gradientTo?: string;         // "to-green-100", "to-blue-100"
+            shadow?: string;             // "shadow-md", "shadow-lg"
+            borderRadius?: string;       // "rounded-xl", "rounded-2xl"
+        };
+        answerOptions?: {
+            backgroundColor?: string;    // "bg-white/80", "bg-gray-50/90"
+            borderColor?: string;        // "border-gray-200", "border-blue-200"
+            selectedColor?: string;      // "bg-blue-100", "bg-primary/20"
+            correctColor?: string;       // "bg-green-100", "bg-green-50"
+            incorrectColor?: string;     // "bg-red-100", "bg-red-50"
+            hoverColor?: string;         // "hover:bg-gray-50", "hover:bg-blue-50"
+        };
+        // Backward compatibility için eski cardStyle ve resultPanelStyle
         cardStyle?: {
             background?: string;
             border?: string;
@@ -156,6 +190,8 @@ export interface QuizSceneConfig {
         explanation?: string;
         tips?: string;
         mobileHint?: string;
+        clearCategory?: string;
+        removeItem?: string;
     };
 }
 
@@ -646,6 +682,8 @@ const socialEngineeringGoalConfig = {
     }
 };
 
+
+
 // Scenario Scene Config
 const smishingScenarioConfig = {
     title: "Gerçek Hayat Senaryosu",
@@ -662,7 +700,14 @@ const smishingScenarioConfig = {
         transcriptLanguage: "Türkçe"
     },
 
-    // Transcript Data
+    // Transcript Data - Dinamik olarak string veya URL algılanır
+    // Desteklenen formatlar:
+    // 1. String: `00:00:01.040 transcript content...`
+    // 2. HTTP URL: "https://api.example.com/transcripts/smishing-scenario.txt"
+    // 3. HTTPS URL: "https://cdn.example.com/transcripts/scenario.txt"
+    // 4. Absolute path: "/api/transcripts/smishing-scenario.txt"
+    // 5. Relative path: "./transcripts/scenario.txt"
+    // 6. Protocol-relative: "//cdn.example.com/transcript.txt"
     transcript: `00:00:01.040 as a devops manager my job is hectic and
 00:00:04.400 security is always a top priority but an
 00:00:07.919 experience I had last month made me
@@ -1172,6 +1217,14 @@ export const quizSceneConfig: QuizSceneConfig = {
         duration: 30,
         warningThreshold: 10
     },
+    // Icon configuration
+    icon: {
+        sceneIconName: "brain-circuit", // Lucide icon name
+        size: 48,
+        className: "text-blue-500",
+        strokeWidth: 2,
+        color: "#3b82f6"
+    },
     questions: {
         totalCount: 5,
         maxAttempts: 2,
@@ -1392,6 +1445,31 @@ export const quizSceneConfig: QuizSceneConfig = {
     },
     styling: {
         primaryColor: ColorType.BLUE,
+        card: {
+            backgroundColor: "bg-white/60 dark:bg-gray-800/80",
+            borderColor: "border-white/60 dark:border-gray-600/60",
+            gradientFrom: "from-white/50",
+            gradientTo: "to-white/20",
+            shadow: "shadow-xl",
+            borderRadius: "rounded-2xl"
+        },
+        resultPanel: {
+            backgroundColor: "bg-green-50/90 dark:bg-green-900/20",
+            borderColor: "border-green-200 dark:border-green-700",
+            gradientFrom: "from-green-50",
+            gradientTo: "to-green-100",
+            shadow: "shadow-lg",
+            borderRadius: "rounded-xl"
+        },
+        answerOptions: {
+            backgroundColor: "bg-white/80 dark:bg-gray-700/80",
+            borderColor: "border-gray-200 dark:border-gray-600",
+            selectedColor: "bg-blue-100 dark:bg-blue-900/30",
+            correctColor: "bg-green-100 dark:bg-green-900/30",
+            incorrectColor: "bg-red-100 dark:bg-red-900/30",
+            hoverColor: "hover:bg-gray-50 dark:hover:bg-gray-600/50"
+        },
+        // Backward compatibility için eski cardStyle ve resultPanelStyle
         cardStyle: {
             background: "linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card) / 0.95) 25%, hsl(var(--card) / 0.85) 50%, hsl(var(--card) / 0.75) 75%, hsl(var(--card) / 0.65) 100%)",
             border: "0.5px solid rgba(255, 255, 255, 0.4)",

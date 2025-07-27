@@ -34,6 +34,30 @@ function Slider({
         "relative flex w-full touch-none items-center select-none data-[disabled]:opacity-50 data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col",
         className,
       )}
+      style={{
+        ...props.style,
+        touchAction: 'pan-x',
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
+        WebkitTouchCallout: 'none',
+        overscrollBehavior: 'none',
+        WebkitOverflowScrolling: 'touch',
+      }}
+      onTouchStart={(e) => {
+        // Allow slider touch events to work properly
+        e.stopPropagation();
+        props.onTouchStart?.(e);
+      }}
+      onTouchMove={(e) => {
+        // Allow slider touch events to work properly
+        e.stopPropagation();
+        props.onTouchMove?.(e);
+      }}
+      onWheel={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        props.onWheel?.(e);
+      }}
       {...props}
     >
       <SliderPrimitive.Track
@@ -46,6 +70,11 @@ function Slider({
           backdropFilter: 'blur(12px) saturate(180%)',
           border: '0.5px solid rgba(0, 0, 0, 0.2)',
           boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+          touchAction: 'pan-x',
+          userSelect: 'none',
+          WebkitUserSelect: 'none',
+          WebkitTouchCallout: 'none',
+          WebkitTapHighlightColor: 'transparent',
         }}
       >
         <SliderPrimitive.Range
@@ -72,6 +101,12 @@ function Slider({
             boxShadow: 'var(--slider-thumb-shadow, 0 6px 20px rgba(0, 0, 0, 0.15), 0 3px 10px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8))',
             backdropFilter: 'blur(20px) saturate(220%)',
             WebkitBackdropFilter: 'blur(20px) saturate(220%)',
+            touchAction: 'pan-x',
+            cursor: 'grab',
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+            WebkitTouchCallout: 'none',
+            WebkitTapHighlightColor: 'transparent',
           }}
         />
       ))}
