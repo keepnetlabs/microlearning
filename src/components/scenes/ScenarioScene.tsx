@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { ScenarioIcon } from "../icons/CyberSecurityIcons";
+import * as LucideIcons from "lucide-react";
+import { LucideIcon } from "lucide-react";
 import { VideoPlayer } from "../VideoPlayer";
 import { educationConfigs } from "../configs/educationConfigs";
 
@@ -8,6 +9,24 @@ export interface TranscriptRow {
   start: number;
   text: string;
 }
+
+// İkon mapping fonksiyonu
+const getIconComponent = (iconName: string): LucideIcon => {
+  // İkon adını camelCase'e çevir (örn: "book-open" -> "BookOpen")
+  const camelCaseName = iconName
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join('');
+
+  // Lucide ikonlarını kontrol et
+  if (camelCaseName in LucideIcons) {
+    return LucideIcons[camelCaseName as keyof typeof LucideIcons] as LucideIcon;
+  }
+
+  // Fallback ikon
+  console.warn(`Icon "${iconName}" not found, using default icon`);
+  return LucideIcons.HelpCircle;
+};
 
 // Enhanced video data with multi-language transcript support
 function parseTactiqTranscript(raw: string): TranscriptRow[] {
@@ -42,6 +61,19 @@ export function ScenarioScene({
     [config.transcript]
   );
 
+  // Memoize icon component
+  const iconComponent = useMemo(() => {
+    if (config.icon?.component) return config.icon.component;
+
+    const SceneIcon = getIconComponent(config.icon?.sceneIconName || 'play-circle');
+    return (
+      <SceneIcon
+        size={config.icon?.size || 40}
+        className={config.icon?.className || "text-blue-500"}
+      />
+    );
+  }, [config.icon?.component, config.icon?.sceneIconName, config.icon?.size, config.icon?.className]);
+
   return (
     <div className={config.containerClassName}>
       {/* Header Icon */}
@@ -51,11 +83,7 @@ export function ScenarioScene({
         transition={config.animations.headerIcon.transition}
         className="mb-2 sm:mb-4 relative"
       >
-        <ScenarioIcon
-          isActive={true}
-          isCompleted={false}
-          size={config.icon.size}
-        />
+        {iconComponent}
       </motion.div>
 
       {/* Title */}

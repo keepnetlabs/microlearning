@@ -22,7 +22,7 @@ const scenes = [
   },
   { component: GoalScene, points: 15, config: educationConfigs.smishing.goalSceneConfig },
   { component: ScenarioScene, points: 20, config: educationConfigs.smishing.scenarioSceneConfig },
-  { component: ActionableContentScene, title: "Eylemler", points: 25 },
+  { component: ActionableContentScene, points: 25, config: educationConfigs.smishing.actionableContentSceneConfig },
   { component: QuizScene, title: "Quiz", points: 50 },
   { component: SurveyScene, title: "Anket", points: 20 },
   { component: SummaryScene, title: "Özet", points: 30 },
@@ -628,25 +628,32 @@ export default function App() {
     touchEndY.current = 0;
   }, [isMobile, isSwiping, canProceedNext, nextScene, prevScene, currentScene]);
 
+  // Track previous scene to detect actual scene changes
+  const [previousScene, setPreviousScene] = useState(currentScene);
+
   // Enhanced scene change handler with scroll reset
   const handleAnimationComplete = useCallback(() => {
-    handleSceneChange(currentScene);
+    // Only trigger if this is an actual scene change, not just animation completion
+    if (previousScene !== currentScene) {
+      handleSceneChange(currentScene);
+      setPreviousScene(currentScene);
 
-    // Reset quiz timer when leaving quiz scene
-    if (currentScene !== 4) {
-      setIsQuizTimerActive(false);
-      setQuizTimeLeft(30);
-    }
+      // Reset quiz timer when leaving quiz scene
+      if (currentScene !== 4) {
+        setIsQuizTimerActive(false);
+        setQuizTimeLeft(30);
+      }
 
-    // Immediate scroll reset on mobile for better performance
-    if (isMobile) {
-      resetScrollPosition();
-    } else {
-      setTimeout(() => {
+      // Immediate scroll reset on mobile for better performance
+      if (isMobile) {
         resetScrollPosition();
-      }, 50);
+      } else {
+        setTimeout(() => {
+          resetScrollPosition();
+        }, 50);
+      }
     }
-  }, [currentScene, handleSceneChange, resetScrollPosition, isMobile]);
+  }, [currentScene, previousScene, handleSceneChange, resetScrollPosition, isMobile]);
 
   const CurrentSceneComponent = scenes[currentScene].component as React.ComponentType<any>;
   const currentLanguage = languages.find(lang => lang.code === selectedLanguage);

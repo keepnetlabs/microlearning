@@ -818,22 +818,194 @@ const socialEngineeringScenarioConfig = {
     }
 };
 
+// Actionable Content Scene Configs
+const smishingActionableContentConfig = {
+    title: "Hemen Uygulanabilir Adımlar",
+    actions: [
+        {
+            iconName: "key",
+            title: "Güçlü Parola Oluşturun",
+            description: "En az 12 karakter, büyük-küçük harf, sayı ve sembol",
+            tip: "Örnek: 'Kahve!çok7Güzel#2024'",
+            colorType: ColorType.BLUE,
+            bgColorType: ColorType.BLUE
+        },
+        {
+            iconName: "smartphone",
+            title: "2FA Aktifleştirin",
+            description: "Tüm kritik hesaplarınızda çok faktörlü kimlik doğrulama",
+            tip: "Google Authenticator veya Authy kullanın",
+            colorType: ColorType.GREEN,
+            bgColorType: ColorType.GREEN
+        },
+        {
+            iconName: "database",
+            title: "Parola Yöneticisi",
+            description: "Her hesap için farklı ve karmaşık parolalar",
+            tip: "1Password, Bitwarden veya LastPass",
+            colorType: ColorType.PURPLE,
+            bgColorType: ColorType.PURPLE
+        }
+    ],
+
+    // Visual configuration
+    icon: {
+        component: null,
+        size: 40,
+        sceneIconName: "shield-check",
+        className: "text-blue-500"
+    },
+    tipConfig: {
+        iconName: "check-circle",
+        iconSize: 12,
+        bgColorType: ColorType.BLUE
+    },
+
+    // Layout configuration
+    containerClassName: "flex flex-col items-center justify-center h-full px-6",
+    cardSpacing: "space-y-4",
+    maxWidth: "max-w-md w-full",
+
+    // Glass effect configuration
+    glassEffect: {
+        cardBackground: "bg-white/60 dark:bg-gray-800/80",
+        cardBorder: "border-white/30 dark:border-gray-600/60",
+        shadow: "shadow-lg hover:shadow-xl",
+        backdropBlur: "backdrop-blur-xl"
+    }
+};
+
+const passwordSecurityActionableContentConfig = {
+    title: "Parola Güvenliği Adımları",
+    actions: [
+        {
+            iconName: "key",
+            title: "Güçlü Parola Oluşturun",
+            description: "En az 12 karakter, büyük-küçük harf, sayı ve sembol",
+            tip: "Örnek: 'Kahve!çok7Güzel#2024'",
+            colorType: ColorType.BLUE,
+            bgColorType: ColorType.BLUE
+        },
+        {
+            iconName: "smartphone",
+            title: "2FA Aktifleştirin",
+            description: "Tüm kritik hesaplarınızda çok faktörlü kimlik doğrulama",
+            tip: "Google Authenticator veya Authy kullanın",
+            colorType: ColorType.GREEN,
+            bgColorType: ColorType.GREEN
+        },
+        {
+            iconName: "database",
+            title: "Parola Yöneticisi",
+            description: "Her hesap için farklı ve karmaşık parolalar",
+            tip: "1Password, Bitwarden veya LastPass",
+            colorType: ColorType.PURPLE,
+            bgColorType: ColorType.PURPLE
+        }
+    ],
+
+    // Visual configuration
+    icon: {
+        component: null,
+        size: 40,
+        sceneIconName: "shield-check",
+        className: "text-green-500"
+    },
+    tipConfig: {
+        iconName: "check-circle",
+        iconSize: 12,
+        bgColorType: ColorType.GREEN
+    },
+
+    // Layout configuration
+    containerClassName: "flex flex-col items-center justify-center h-full px-6",
+    cardSpacing: "space-y-4",
+    maxWidth: "max-w-md w-full",
+
+    // Glass effect configuration
+    glassEffect: {
+        cardBackground: "bg-white/60 dark:bg-gray-800/80",
+        cardBorder: "border-white/30 dark:border-gray-600/60",
+        shadow: "shadow-lg hover:shadow-xl",
+        backdropBlur: "backdrop-blur-xl"
+    }
+};
+
+const socialEngineeringActionableContentConfig = {
+    title: "Sosyal Mühendislik Korunma Adımları",
+    actions: [
+        {
+            iconName: "eye",
+            title: "Şüpheli Mesajları Tanıyın",
+            description: "Acil durum, korku veya acele hissi veren mesajlara dikkat",
+            tip: "Resmi kurumlar asla SMS ile şifre istemez",
+            colorType: ColorType.RED,
+            bgColorType: ColorType.RED
+        },
+        {
+            iconName: "phone",
+            title: "Doğrulama Yapın",
+            description: "Gönderen numarasını ve mesaj içeriğini kontrol edin",
+            tip: "Resmi web sitelerinden doğrulayın",
+            colorType: ColorType.ORANGE,
+            bgColorType: ColorType.ORANGE
+        },
+        {
+            iconName: "shield",
+            title: "Güvenlik Yazılımı",
+            description: "Güncel antivirüs ve güvenlik yazılımları kullanın",
+            tip: "Otomatik güncellemeleri aktif tutun",
+            colorType: ColorType.BLUE,
+            bgColorType: ColorType.BLUE
+        }
+    ],
+
+    // Visual configuration
+    icon: {
+        component: null,
+        size: 40,
+        sceneIconName: "shield-check",
+        className: "text-red-500"
+    },
+    tipConfig: {
+        iconName: "check-circle",
+        iconSize: 12,
+        bgColorType: ColorType.RED
+    },
+
+    // Layout configuration
+    containerClassName: "flex flex-col items-center justify-center h-full px-6",
+    cardSpacing: "space-y-4",
+    maxWidth: "max-w-md w-full",
+
+    // Glass effect configuration
+    glassEffect: {
+        cardBackground: "bg-white/60 dark:bg-gray-800/80",
+        cardBorder: "border-white/30 dark:border-gray-600/60",
+        shadow: "shadow-lg hover:shadow-xl",
+        backdropBlur: "backdrop-blur-xl"
+    }
+};
+
 // Eğitim türlerine göre config mapping - Object of Objects yapısı
 export const educationConfigs = {
     smishing: {
         introSceneConfig: smishingIntroConfig,
         goalSceneConfig: smishingGoalConfig,
-        scenarioSceneConfig: smishingScenarioConfig
+        scenarioSceneConfig: smishingScenarioConfig,
+        actionableContentSceneConfig: smishingActionableContentConfig
     },
     passwordSecurity: {
         introSceneConfig: passwordSecurityIntroConfig,
         goalSceneConfig: passwordSecurityGoalConfig,
-        scenarioSceneConfig: passwordSecurityScenarioConfig
+        scenarioSceneConfig: passwordSecurityScenarioConfig,
+        actionableContentSceneConfig: passwordSecurityActionableContentConfig
     },
     socialEngineering: {
         introSceneConfig: socialEngineeringIntroConfig,
         goalSceneConfig: socialEngineeringGoalConfig,
-        scenarioSceneConfig: socialEngineeringScenarioConfig
+        scenarioSceneConfig: socialEngineeringScenarioConfig,
+        actionableContentSceneConfig: socialEngineeringActionableContentConfig
     }
     // Diğer eğitim türleri buraya eklenebilir...
 };

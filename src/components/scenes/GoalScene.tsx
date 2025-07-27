@@ -102,14 +102,16 @@ const defaultConfig: GoalSceneConfig = {
   cardSpacing: "space-y-4",
   maxWidth: "max-w-md w-full",
 
-  // Glass effect defaults
+  // Glass effect defaults - Enhanced Apple liquid glass
   glassEffect: {
-    blur: "blur(24px)",
-    saturation: "saturate(180%)",
-    border: "1px solid rgba(255, 255, 255, 0.30)",
-    shadow: `0 8px 32px rgba(0, 0, 0, 0.08),
-             0 4px 16px rgba(0, 0, 0, 0.06),
-             inset 0 1px 0 rgba(255, 255, 255, 0.20)`
+    blur: "blur(28px) saturate(220%)",
+    saturation: "saturate(220%)",
+    border: "0.5px solid rgba(255, 255, 255, 0.35)",
+    shadow: `0 12px 40px rgba(0, 0, 0, 0.12),
+             0 6px 20px rgba(0, 0, 0, 0.08),
+             0 2px 8px rgba(0, 0, 0, 0.04),
+             inset 0 1px 0 rgba(255, 255, 255, 0.25),
+             inset 0 -1px 0 rgba(0, 0, 0, 0.08)`
   }
 };
 
@@ -133,11 +135,16 @@ const staticStyles = {
   },
   hoverGlow: {
     background: `linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.20) 0%, 
-      rgba(255, 255, 255, 0.12) 50%, 
-      rgba(255, 255, 255, 0.06) 100%
+      rgba(255, 255, 255, 0.25) 0%, 
+      rgba(255, 255, 255, 0.18) 30%, 
+      rgba(255, 255, 255, 0.12) 60%, 
+      rgba(255, 255, 255, 0.08) 100%
     )`,
-    boxShadow: '0 0 40px rgba(255, 255, 255, 0.08)'
+    boxShadow: `
+      0 0 50px rgba(255, 255, 255, 0.12),
+      0 0 25px rgba(255, 255, 255, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3)
+    `
   },
   ultraThinBorder: {
     border: '0.5px solid rgba(255, 255, 255, 0.7)',
@@ -148,18 +155,19 @@ const staticStyles = {
   },
   iconContainer: {
     background: `linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.70) 0%, 
-      rgba(255, 255, 255, 0.55) 50%,
-      rgba(255, 255, 255, 0.40) 100%
+      rgba(255, 255, 255, 0.85) 0%, 
+      rgba(255, 255, 255, 0.75) 30%,
+      rgba(255, 255, 255, 0.65) 60%,
+      rgba(255, 255, 255, 0.55) 100%
     )`,
-    backdropFilter: 'blur(24px) saturate(180%)',
-    WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-    border: '0.5px solid rgba(255, 255, 255, 0.6)',
+    backdropFilter: 'blur(28px) saturate(220%)',
+    WebkitBackdropFilter: 'blur(28px) saturate(220%)',
+    border: '0.5px solid rgba(255, 255, 255, 0.7)',
     boxShadow: `
-      0 4px 16px rgba(0, 0, 0, 0.04),
-      0 2px 8px rgba(0, 0, 0, 0.02),
-      inset 0 1px 0 rgba(255, 255, 255, 0.5),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.03)
+      0 6px 20px rgba(0, 0, 0, 0.06),
+      0 3px 10px rgba(0, 0, 0, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.04)
     `,
     transform: 'translateZ(0)',
     willChange: 'transform'
@@ -264,20 +272,21 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
 
   const cardStyle = useMemo(() => ({
     background: `linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.90) 0%, 
-      rgba(255, 255, 255, 0.80) 30%,
-      rgba(255, 255, 255, 0.70) 70%,
-      rgba(255, 255, 255, 0.60) 100%
+      rgba(255, 255, 255, 0.95) 0%, 
+      rgba(255, 255, 255, 0.85) 25%,
+      rgba(255, 255, 255, 0.75) 50%,
+      rgba(255, 255, 255, 0.65) 75%,
+      rgba(255, 255, 255, 0.55) 100%
     )`,
-    backdropFilter: glassEffect?.blur || 'blur(32px) saturate(200%)',
-    WebkitBackdropFilter: glassEffect?.blur || 'blur(32px) saturate(200%)',
-    border: glassEffect?.border || '0.5px solid rgba(255, 255, 255, 0.6)',
+    backdropFilter: glassEffect?.blur || 'blur(36px) saturate(240%)',
+    WebkitBackdropFilter: glassEffect?.blur || 'blur(36px) saturate(240%)',
+    border: glassEffect?.border || '0.5px solid rgba(255, 255, 255, 0.4)',
     boxShadow: glassEffect?.shadow || `
-      0 8px 32px rgba(0, 0, 0, 0.06),
-      0 4px 16px rgba(0, 0, 0, 0.04),
-      0 2px 8px rgba(0, 0, 0, 0.02),
-      inset 0 1px 0 rgba(255, 255, 255, 0.8),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.05)
+      0 12px 40px rgba(0, 0, 0, 0.08),
+      0 6px 20px rgba(0, 0, 0, 0.06),
+      0 2px 8px rgba(0, 0, 0, 0.03),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.06)
     `,
     transform: 'translateZ(0)',
     willChange: 'transform'
@@ -285,7 +294,7 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
 
   return (
     <div
-      className="relative p-4 sm:p-5 rounded-2xl overflow-hidden transition-all duration-500 ease-out group hover:scale-[1.02] hover:shadow-2xl cursor-pointer"
+      className="relative p-4 sm:p-5 rounded-2xl overflow-hidden transition-all duration-700 ease-out group hover:scale-[1.015] hover:shadow-2xl cursor-pointer"
       style={cardStyle}
     >
       {/* APPLE-STYLE ULTRA-FINE NOISE TEXTURE - VisionOS Quality */}
@@ -343,7 +352,18 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
           {/* APPLE ICON CONTAINER - Ultra-refined liquid glass */}
           <div
             className="p-2 sm:p-2.5 rounded-xl mr-3 overflow-hidden transition-all duration-500 ease-out group-hover:scale-105"
-            style={staticStyles.iconContainer}
+            style={{
+              ...staticStyles.iconContainer,
+              backdropFilter: 'blur(28px) saturate(220%)',
+              WebkitBackdropFilter: 'blur(28px) saturate(220%)',
+              border: '0.5px solid rgba(255, 255, 255, 0.7)',
+              boxShadow: `
+                0 6px 20px rgba(0, 0, 0, 0.06),
+                0 3px 10px rgba(0, 0, 0, 0.04),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.04)
+              `
+            }}
           >
             {/* Apple-style icon noise texture */}
             <div
@@ -377,7 +397,7 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
         </div>
 
         {/* APPLE DESCRIPTION TEXT - Perfect readability */}
-        <p className="text-xs text-gray-700 dark:text-gray-200 leading-relaxed transition-colors duration-500 ease-out group-hover:text-gray-600 dark:group-hover:text-gray-100">
+        <p className="text-xs text-left text-gray-700 dark:text-gray-200 leading-relaxed transition-colors duration-500 ease-out group-hover:text-gray-600 dark:group-hover:text-gray-100">
           {goal.description}
         </p>
       </div>

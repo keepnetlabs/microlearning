@@ -589,21 +589,23 @@ export function QuizScene({
                       isSelected &&
                       !isCorrect
                       ? "linear-gradient(135deg, rgba(212, 24, 61, 0.25) 0%, rgba(212, 24, 61, 0.18) 30%, rgba(212, 24, 61, 0.12) 70%, rgba(212, 24, 61, 0.08) 100%)"
-                      : "linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card) / 0.95) 50%, hsl(var(--card) / 0.9) 100%)",
-                backdropFilter: "blur(20px) saturate(180%)",
+                      : "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 25%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.65) 75%, rgba(255, 255, 255, 0.55) 100%)",
+                backdropFilter: "blur(28px) saturate(220%)",
+                WebkitBackdropFilter: "blur(28px) saturate(220%)",
                 border:
                   showCorrectness && isCorrect
-                    ? "1.5px solid hsl(var(--chart-4) / 0.6)"
+                    ? "0.5px solid rgba(34, 197, 94, 0.6)"
                     : showCorrectness &&
                       isSelected &&
                       !isCorrect
-                      ? "1.5px solid hsl(var(--destructive) / 0.6)"
-                      : "1.5px solid #eee",
+                      ? "0.5px solid rgba(212, 24, 61, 0.6)"
+                      : "0.5px solid rgba(255, 255, 255, 0.6)",
                 boxShadow: `
-                  0 2px 8px hsl(var(--foreground) / 0.04),
-                  0 1px 4px hsl(var(--foreground) / 0.02),
-                  inset 0 1px 0 hsl(var(--background) / 0.15),
-                  inset 0 -1px 0 hsl(var(--foreground) / 0.03)
+                  0 6px 20px rgba(0, 0, 0, 0.06),
+                  0 3px 10px rgba(0, 0, 0, 0.04),
+                  0 1px 4px rgba(0, 0, 0, 0.02),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.8),
+                  inset 0 -1px 0 rgba(0, 0, 0, 0.04)
                 `,
               }}
             >
@@ -615,10 +617,10 @@ export function QuizScene({
                   {option.strength && (
                     <span
                       className={`text-xs font-medium transition-colors duration-300 ${option.color === "green"
-                          ? "text-chart-4"
-                          : option.color === "yellow"
-                            ? "text-chart-5"
-                            : "text-destructive"
+                        ? "text-chart-4"
+                        : option.color === "yellow"
+                          ? "text-chart-5"
+                          : "text-destructive"
                         }`}
                     >
                       {option.strength}
@@ -727,21 +729,23 @@ export function QuizScene({
                         isSelected &&
                         !isCorrect
                         ? "linear-gradient(135deg, rgba(212, 24, 61, 0.25) 0%, rgba(212, 24, 61, 0.18) 30%, rgba(212, 24, 61, 0.12) 70%, rgba(212, 24, 61, 0.08) 100%)"
-                        : "linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card) / 0.95) 100%)",
-                  backdropFilter: "blur(20px) saturate(180%)",
+                        : "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 25%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.65) 75%, rgba(255, 255, 255, 0.55) 100%)",
+                  backdropFilter: "blur(28px) saturate(220%)",
+                  WebkitBackdropFilter: "blur(28px) saturate(220%)",
                   border:
                     showCorrectness && isCorrect
-                      ? "1.5px solid hsl(var(--chart-4) / 0.6)"
+                      ? "0.5px solid rgba(34, 197, 94, 0.6)"
                       : showCorrectness &&
                         isSelected &&
                         !isCorrect
-                        ? "1.5px solid hsl(var(--destructive) / 0.6)"
-                        : "1.5px solid hsl(var(--border) / 0.8)",
+                        ? "0.5px solid rgba(212, 24, 61, 0.6)"
+                        : "0.5px solid rgba(255, 255, 255, 0.6)",
                   boxShadow: `
-                    0 2px 8px hsl(var(--foreground) / 0.04),
-                    0 1px 4px hsl(var(--foreground) / 0.02),
-                    inset 0 1px 0 hsl(var(--background) / 0.15),
-                    inset 0 -1px 0 hsl(var(--foreground) / 0.03)
+                    0 6px 20px rgba(0, 0, 0, 0.06),
+                    0 3px 10px rgba(0, 0, 0, 0.04),
+                    0 1px 4px rgba(0, 0, 0, 0.02),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+                    inset 0 -1px 0 rgba(0, 0, 0, 0.04)
                   `,
                 }}
               >
@@ -851,29 +855,33 @@ export function QuizScene({
                         ? "linear-gradient(135deg, rgba(212, 24, 61, 0.25) 0%, rgba(212, 24, 61, 0.18) 30%, rgba(212, 24, 61, 0.12) 70%, rgba(212, 24, 61, 0.08) 100%)"
                         : isSelected && !showCorrectness
                           ? "linear-gradient(135deg, rgba(59, 130, 246, 0.22) 0%, rgba(59, 130, 246, 0.15) 30%, rgba(59, 130, 246, 0.10) 70%, rgba(59, 130, 246, 0.06) 100%)"
-                          : "linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card) / 0.9) 100%)",
+                          : "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 25%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.65) 75%, rgba(255, 255, 255, 0.55) 100%)",
                   border:
                     showCorrectness && isCorrect
-                      ? "1.5px solid hsl(var(--chart-4) / 0.6)"
+                      ? "0.5px solid rgba(34, 197, 94, 0.6)"
                       : showCorrectness &&
                         isSelected &&
                         !isCorrect
-                        ? "1.5px solid hsl(var(--destructive) / 0.6)"
+                        ? "0.5px solid rgba(212, 24, 61, 0.6)"
                         : isSelected && !showCorrectness
-                          ? "1.5px solid hsl(var(--primary) / 0.6)"
-                          : "1.5px solid hsl(var(--border) / 0.8)",
-                  backdropFilter: "blur(12px) saturate(180%)",
+                          ? "0.5px solid rgba(59, 130, 246, 0.6)"
+                          : "0.5px solid rgba(255, 255, 255, 0.6)",
+                  backdropFilter: "blur(28px) saturate(220%)",
+                  WebkitBackdropFilter: "blur(28px) saturate(220%)",
                   boxShadow: `
-                    0 1px 4px hsl(var(--foreground) / 0.03),
-                    inset 0 1px 0 hsl(var(--background) / 0.1)
+                    0 6px 20px rgba(0, 0, 0, 0.06),
+                    0 3px 10px rgba(0, 0, 0, 0.04),
+                    0 1px 4px rgba(0, 0, 0, 0.02),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+                    inset 0 -1px 0 rgba(0, 0, 0, 0.04)
                   `,
                 }}
               >
                 <div className="flex items-center space-x-3">
                   <div
                     className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all duration-300 ${isSelected
-                        ? "bg-primary border-primary"
-                        : "border-border"
+                      ? "bg-primary border-primary"
+                      : "border-border"
                       }`}
                   >
                     {isSelected && (
@@ -953,21 +961,44 @@ export function QuizScene({
           </div>
 
           <div className="px-3">
-            <Slider
-              value={[sliderValue]}
-              onValueChange={(value) =>
-                setSliderValue(value[0])
-              }
-              max={question.max}
-              min={question.min}
-              step={1}
-              disabled={showResult || isLoading}
-              className="w-full"
-            />
+            <div className="relative">
+              <Slider
+                value={[sliderValue]}
+                onValueChange={(value) =>
+                  setSliderValue(value[0])
+                }
+                max={question.max}
+                min={question.min}
+                step={1}
+                disabled={showResult || isLoading}
+                className="w-full"
+                style={{
+                  // Dynamic Apple liquid glass styling for slider based on theme
+                  '--slider-track-bg': 'rgba(0, 0, 0, 0.1)',
+                  '--slider-range-bg': 'linear-gradient(90deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%)',
+                  '--slider-thumb-bg': 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 25%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.65) 75%, rgba(255, 255, 255, 0.55) 100%)',
+                  '--slider-thumb-border': 'hsl(var(--primary))',
+                  '--slider-thumb-shadow': '0 6px 20px rgba(0, 0, 0, 0.15), 0 3px 10px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
+                } as React.CSSProperties}
+              />
+            </div>
           </div>
 
           <div className="text-center">
-            <div className="inline-flex items-center space-x-2 px-3 py-1.5 bg-primary/10 rounded-lg border-2 border-border/50">
+            <div
+              className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-lg border-2"
+              style={{
+                background: "linear-gradient(135deg, hsl(var(--primary) / 0.15) 0%, hsl(var(--primary) / 0.08) 100%)",
+                border: "0.5px solid hsl(var(--primary) / 0.3)",
+                backdropFilter: "blur(16px) saturate(200%)",
+                WebkitBackdropFilter: "blur(16px) saturate(200%)",
+                boxShadow: `
+                  0 4px 16px hsl(var(--primary) / 0.1),
+                  0 2px 8px hsl(var(--primary) / 0.05),
+                  inset 0 1px 0 hsl(var(--background) / 0.2)
+                `
+              }}
+            >
               <Zap className="w-4 h-4 text-primary" />
               <span className="font-bold text-primary">
                 {sliderValue}
@@ -1427,13 +1458,16 @@ export function QuizScene({
           className="p-5 md:p-6 rounded-2xl shadow-xl"
           style={{
             background:
-              "linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card) / 0.9) 50%, hsl(var(--card) / 0.8) 100%)",
-            backdropFilter: "blur(20px) saturate(180%)",
-            border: "1px solid hsl(var(--border) / 0.2)",
+              "linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card) / 0.95) 25%, hsl(var(--card) / 0.85) 50%, hsl(var(--card) / 0.75) 75%, hsl(var(--card) / 0.65) 100%)",
+            backdropFilter: "blur(36px) saturate(240%)",
+            WebkitBackdropFilter: "blur(36px) saturate(240%)",
+            border: "0.5px solid rgba(255, 255, 255, 0.4)",
             boxShadow: `
-              0 8px 32px hsl(var(--foreground) / 0.08),
-              0 4px 16px hsl(var(--foreground) / 0.04),
-              inset 0 1px 0 hsl(var(--background) / 0.1)
+              0 12px 40px rgba(0, 0, 0, 0.08),
+              0 6px 20px rgba(0, 0, 0, 0.06),
+              0 2px 8px rgba(0, 0, 0, 0.03),
+              inset 0 1px 0 rgba(255, 255, 255, 0.9),
+              inset 0 -1px 0 rgba(0, 0, 0, 0.06)
             `,
           }}
         >
@@ -1462,8 +1496,17 @@ export function QuizScene({
                 className="mt-4 p-4 rounded-xl border-2 border-border/60"
                 style={{
                   background:
-                    "linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--muted) / 0.5) 100%)",
-                  backdropFilter: "blur(12px)",
+                    "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 25%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.65) 75%, rgba(255, 255, 255, 0.55) 100%)",
+                  backdropFilter: "blur(28px) saturate(220%)",
+                  WebkitBackdropFilter: "blur(28px) saturate(220%)",
+                  border: "0.5px solid rgba(255, 255, 255, 0.4)",
+                  boxShadow: `
+                    0 8px 32px rgba(0, 0, 0, 0.08),
+                    0 4px 16px rgba(0, 0, 0, 0.06),
+                    0 2px 8px rgba(0, 0, 0, 0.03),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+                    inset 0 -1px 0 rgba(0, 0, 0, 0.06)
+                  `,
                 }}
               >
                 <div className="flex items-start space-x-3 mb-2.5">
@@ -1514,14 +1557,19 @@ export function QuizScene({
                       <div
                         className="flex items-center space-x-2 px-3 py-2 rounded-lg"
                         style={{
-                          background: "linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.08) 100%)",
-                          border: "1px solid rgba(34, 197, 94, 0.3)",
-                          backdropFilter: "blur(8px) saturate(150%)",
-                          boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.1)"
+                          background: "linear-gradient(135deg, rgba(34, 197, 94, 0.25) 0%, rgba(34, 197, 94, 0.18) 30%, rgba(34, 197, 94, 0.12) 70%, rgba(34, 197, 94, 0.08) 100%)",
+                          border: "0.5px solid rgba(34, 197, 94, 0.6)",
+                          backdropFilter: "blur(16px) saturate(200%)",
+                          WebkitBackdropFilter: "blur(16px) saturate(200%)",
+                          boxShadow: `
+                            0 4px 16px rgba(34, 197, 94, 0.15),
+                            0 2px 8px rgba(34, 197, 94, 0.1),
+                            inset 0 1px 0 rgba(255, 255, 255, 0.2)
+                          `
                         }}
                       >
-                        <CheckCircle className="w-5 h-5 text-green-600" />
-                        <span className="font-medium text-green-700">
+                        <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+                        <span className="font-medium text-green-700 dark:text-green-300">
                           Doğru! 🎉
                         </span>
                       </div>
@@ -1611,27 +1659,7 @@ export function QuizScene({
         </p>
       </motion.div>
 
-      {/* Timer Display */}
-      {isTimerActive && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="fixed top-4 right-4 px-3 py-2 rounded-lg flex items-center space-x-2"
-          style={{
-            background:
-              timeLeft <= 10
-                ? "linear-gradient(135deg, hsl(var(--destructive)) 0%, hsl(var(--destructive) / 0.8) 100%)"
-                : "linear-gradient(135deg, hsl(var(--chart-5)) 0%, hsl(var(--chart-5) / 0.8) 100%)",
-            backdropFilter: "blur(12px)",
-            border: "1px solid hsl(var(--border))",
-          }}
-        >
-          <Timer className="w-4 h-4 text-primary-foreground" />
-          <span className="font-medium text-primary-foreground">
-            {timeLeft}s
-          </span>
-        </motion.div>
-      )}
+
     </div>
   );
 }
