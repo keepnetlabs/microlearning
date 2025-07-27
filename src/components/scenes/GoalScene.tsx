@@ -452,7 +452,7 @@ export const GoalScene = memo(({
         {iconComponent}
       </div>
 
-      <h1 className="text-2xl mb-6 text-gray-900 dark:text-white">
+      <h1 className="text-2xl mb-5 text-gray-900 dark:text-white">
         {title}
       </h1>
 

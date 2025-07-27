@@ -12,7 +12,7 @@ import { SurveyScene } from "./components/scenes/SurveyScene";
 import { SummaryScene } from "./components/scenes/SummaryScene";
 import { NudgeScene } from "./components/scenes/NudgeScene";
 import { ChevronDown, Search, Loader2, ChevronDown as ChevronDownIcon, Star, X, Moon, Sun, Award, Timer } from "lucide-react";
-import { educationConfigs } from "./components/configs/educationConfigs";
+import { educationConfigs, quizSceneConfig } from "./components/configs/educationConfigs";
 
 const scenes = [
   {
@@ -23,7 +23,7 @@ const scenes = [
   { component: GoalScene, points: 15, config: educationConfigs.smishing.goalSceneConfig },
   { component: ScenarioScene, points: 20, config: educationConfigs.smishing.scenarioSceneConfig },
   { component: ActionableContentScene, points: 25, config: educationConfigs.smishing.actionableContentSceneConfig },
-  { component: QuizScene, title: "Quiz", points: 50 },
+  { component: QuizScene, points: 50, config: quizSceneConfig },
   { component: SurveyScene, title: "Anket", points: 20 },
   { component: SummaryScene, title: "Özet", points: 30 },
   { component: NudgeScene, title: "Harekete Geç", points: 40 }
@@ -189,6 +189,39 @@ export default function App() {
   // Quiz timer state - moved to App level for header display
   const [quizTimeLeft, setQuizTimeLeft] = useState(30);
   const [isQuizTimerActive, setIsQuizTimerActive] = useState(false);
+
+  // Quiz state management - moved to App level to persist across scene changes
+  const [quizCurrentQuestionIndex, setQuizCurrentQuestionIndex] = useState(0);
+  const [quizAnswers, setQuizAnswers] = useState<Map<string, any>>(new Map());
+  const [quizShowResult, setQuizShowResult] = useState(false);
+  const [quizAttempts, setQuizAttempts] = useState(0);
+  const [quizIsAnswerLocked, setQuizIsAnswerLocked] = useState(false);
+  const [quizIsLoading, setQuizIsLoading] = useState(false);
+  const [quizMultiSelectAnswers, setQuizMultiSelectAnswers] = useState<string[]>([]);
+  const [quizSliderValue, setQuizSliderValue] = useState(5);
+  const [quizDraggedItems, setQuizDraggedItems] = useState<Map<string, string>>(new Map());
+  const [quizSelectedItem, setQuizSelectedItem] = useState<string | null>(null);
+
+  // Stabilized state setters with useCallback to prevent unnecessary re-renders
+  const setQuizAnswersStable = useCallback((answers: Map<string, any> | ((prev: Map<string, any>) => Map<string, any>)) => {
+    setQuizAnswers(answers);
+  }, []);
+
+  const setQuizShowResultStable = useCallback((show: boolean) => {
+    setQuizShowResult(show);
+  }, []);
+
+  const setQuizAttemptsStable = useCallback((attempts: number | ((prev: number) => number)) => {
+    setQuizAttempts(attempts);
+  }, []);
+
+  const setQuizIsAnswerLockedStable = useCallback((locked: boolean) => {
+    setQuizIsAnswerLocked(locked);
+  }, []);
+
+  const setQuizIsLoadingStable = useCallback((loading: boolean) => {
+    setQuizIsLoading(loading);
+  }, []);
 
   // Survey feedback submission state
   const [isSurveySubmitted, setIsSurveySubmitted] = useState(false);
@@ -480,6 +513,7 @@ export default function App() {
 
   // ULTRA FAST MOBILE TRANSITIONS - NO LOADING DELAY
   const nextScene = useCallback(() => {
+    // Allow progression if quiz is completed or we're not on quiz scene
     if (currentScene === 4 && !quizCompleted) {
       return;
     }
@@ -546,7 +580,13 @@ export default function App() {
     setQuizCompleted(true);
     setIsQuizTimerActive(false);
     setAchievements(prev => [...prev, 'quiz-completed'].filter((a, i, arr) => arr.indexOf(a) === i));
+
+    // Don't reset quiz state - keep the final state for review
+    // Quiz state will be preserved until user navigates away from quiz scene
+    // No auto-advance - let user navigate manually
   }, []);
+
+
 
   // Quiz timer handlers
   const handleQuizTimerStart = useCallback(() => {
@@ -573,9 +613,9 @@ export default function App() {
   }, [nextScene]);
 
   const handleSceneChange = useCallback((newScene: number) => {
-    if (newScene !== 4) {
-      setQuizCompleted(false);
-    }
+    // Don't reset quizCompleted state when leaving quiz scene
+    // Once quiz is completed, it should stay completed
+    // Only reset quiz state when leaving quiz scene - preserve progress
   }, []);
 
   // Mobile swipe gesture handlers - ONLY FOR MOBILE
@@ -631,6 +671,14 @@ export default function App() {
   // Track previous scene to detect actual scene changes
   const [previousScene, setPreviousScene] = useState(currentScene);
 
+  // Start quiz timer when entering quiz scene for the first time
+  useEffect(() => {
+    if (currentScene === 4 && !isQuizTimerActive && !quizCompleted) {
+      setIsQuizTimerActive(true);
+      setQuizTimeLeft(30);
+    }
+  }, [currentScene, isQuizTimerActive, quizCompleted]);
+
   // Enhanced scene change handler with scroll reset
   const handleAnimationComplete = useCallback(() => {
     // Only trigger if this is an actual scene change, not just animation completion
@@ -641,6 +689,10 @@ export default function App() {
       // Reset quiz timer when leaving quiz scene
       if (currentScene !== 4) {
         setIsQuizTimerActive(false);
+        setQuizTimeLeft(30);
+      } else {
+        // Start quiz timer when entering quiz scene
+        setIsQuizTimerActive(true);
         setQuizTimeLeft(30);
       }
 
@@ -1577,10 +1629,37 @@ export default function App() {
                       {/* Quiz Scene - Always mounted to preserve state */}
                       <div style={{ display: currentScene === 4 ? 'block' : 'none' }}>
                         <QuizScene
+                          config={quizSceneConfig}
                           onQuizCompleted={handleQuizCompleted}
                           onTimerStart={handleQuizTimerStart}
                           onTimerStop={handleQuizTimerStop}
                           onTimerUpdate={handleQuizTimerUpdate}
+
+                          // Quiz state props
+                          currentQuestionIndex={quizCurrentQuestionIndex}
+                          setCurrentQuestionIndex={setQuizCurrentQuestionIndex}
+                          answers={quizAnswers}
+                          setAnswers={setQuizAnswersStable}
+                          showResult={quizShowResult}
+                          setShowResult={setQuizShowResultStable}
+                          timeLeft={quizTimeLeft}
+                          setTimeLeft={setQuizTimeLeft}
+                          isTimerActive={isQuizTimerActive}
+                          setIsTimerActive={setIsQuizTimerActive}
+                          attempts={quizAttempts}
+                          setAttempts={setQuizAttemptsStable}
+                          isAnswerLocked={quizIsAnswerLocked}
+                          setIsAnswerLocked={setQuizIsAnswerLockedStable}
+                          isLoading={quizIsLoading}
+                          setIsLoading={setQuizIsLoadingStable}
+                          multiSelectAnswers={quizMultiSelectAnswers}
+                          setMultiSelectAnswers={setQuizMultiSelectAnswers}
+                          sliderValue={quizSliderValue}
+                          setSliderValue={setQuizSliderValue}
+                          draggedItems={quizDraggedItems}
+                          setDraggedItems={setQuizDraggedItems}
+                          selectedItem={quizSelectedItem}
+                          setSelectedItem={setQuizSelectedItem}
                         />
                       </div>
 
@@ -1768,22 +1847,33 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* Enhanced Quiz Completion Notification */}
+      {/* Enhanced Quiz Completion Notification - Industry Standard Position */}
       <AnimatePresence>
         {currentScene === 4 && !quizCompleted && (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-30"
+            className={`fixed z-30 ${isMobile ? 'bottom-4 right-4' : 'bottom-6 right-6'}`}
           >
-            <div className={`relative px-5 py-3 bg-amber-50/95 dark:bg-gray-900/95 border border-amber-200/60 dark:border-amber-600/60 rounded-2xl shadow-xl shadow-amber-500/10 dark:shadow-black/30 transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-2xl'}`}>
-              <div className="flex items-center space-x-3 relative z-10">
+            <div className={`relative px-4 py-3 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-gray-800 dark:to-gray-900 border border-amber-200/60 dark:border-amber-600/60 rounded-xl shadow-lg shadow-amber-500/20 dark:shadow-black/40 transition-all duration-300 ${isMobile ? '' : 'backdrop-blur-xl'} hover:shadow-xl hover:shadow-amber-500/30 dark:hover:shadow-black/50 group`}>
+              <div className="flex items-center space-x-2.5 relative z-10">
                 <div className="w-2 h-2 bg-amber-500 dark:bg-amber-400 rounded-full animate-pulse"></div>
-                <p className="text-sm text-amber-900 dark:text-white font-medium transition-colors duration-300">
+                <p className="text-sm text-amber-900 dark:text-amber-100 font-medium transition-colors duration-300">
                   Quiz'i tamamlayın ve devam edin
                 </p>
+                {/* Industry Standard: Close Button */}
+                <button
+                  onClick={() => setQuizCompleted(true)}
+                  className="ml-1 p-1 rounded-full hover:bg-amber-200/50 dark:hover:bg-amber-900/40 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400/30 dark:focus:ring-amber-600/30 opacity-60 group-hover:opacity-100"
+                  aria-label="Bildirimi kapat"
+                  style={{ touchAction: 'manipulation' }}
+                >
+                  <X size={12} className="text-amber-700 dark:text-amber-300" />
+                </button>
               </div>
+              {/* Industry Standard: Subtle Glow Effect */}
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-400/5 to-orange-400/5 dark:from-amber-400/10 dark:to-orange-400/10 pointer-events-none"></div>
             </div>
           </motion.div>
         )}

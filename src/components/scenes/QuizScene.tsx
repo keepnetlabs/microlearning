@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import {
   CheckCircle,
   XCircle,
@@ -6,376 +6,125 @@ import {
   RotateCcw,
   Move,
   Zap,
-  Timer,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { QuizIcon } from "../icons/CyberSecurityIcons";
 import { Button } from "../ui/button";
 import { Slider } from "../ui/slider";
+import {
+  QuizSceneConfig,
+  quizSceneConfig,
+  QuestionType,
+  MultipleChoiceQuestion,
+  TrueFalseQuestion,
+  MultiSelectQuestion,
+  DragDropQuestion,
+  SliderScaleQuestion
+} from "../configs/educationConfigs";
 
 interface QuizSceneProps {
+  config?: QuizSceneConfig;
   onQuizCompleted: () => void;
   onTimerStart: () => void;
   onTimerStop: () => void;
   onTimerUpdate: (timeLeft: number) => void;
+
+  // Quiz state props
+  currentQuestionIndex: number;
+  setCurrentQuestionIndex: (index: number | ((prev: number) => number)) => void;
+  answers: Map<string, any>;
+  setAnswers: (answers: Map<string, any> | ((prev: Map<string, any>) => Map<string, any>)) => void;
+  showResult: boolean;
+  setShowResult: (show: boolean) => void;
+  timeLeft: number;
+  setTimeLeft: (time: number | ((prev: number) => number)) => void;
+  isTimerActive: boolean;
+  setIsTimerActive: (active: boolean) => void;
+  attempts: number;
+  setAttempts: (attempts: number | ((prev: number) => number)) => void;
+  isAnswerLocked: boolean;
+  setIsAnswerLocked: (locked: boolean) => void;
+  isLoading: boolean;
+  setIsLoading: (loading: boolean) => void;
+  multiSelectAnswers: string[];
+  setMultiSelectAnswers: (answers: string[] | ((prev: string[]) => string[])) => void;
+  sliderValue: number;
+  setSliderValue: (value: number) => void;
+  draggedItems: Map<string, string>;
+  setDraggedItems: (items: Map<string, string> | ((prev: Map<string, string>) => Map<string, string>)) => void;
+  selectedItem: string | null;
+  setSelectedItem: (item: string | null) => void;
 }
 
-// Question Types
-enum QuestionType {
-  MULTIPLE_CHOICE = "multiple_choice",
-  TRUE_FALSE = "true_false",
-  MULTI_SELECT = "multi_select",
-  DRAG_DROP = "drag_drop",
-  SLIDER_SCALE = "slider_scale",
-}
-
-// Enhanced Question Interfaces
-interface BaseQuestion {
-  id: string;
-  type: QuestionType;
-  title: string;
-  description?: string;
-  explanation: string;
-  tips?: string[];
-  difficulty: "easy" | "medium" | "hard";
-  category: string;
-  timeLimit?: number;
-}
-
-interface MultipleChoiceQuestion extends BaseQuestion {
-  type: QuestionType.MULTIPLE_CHOICE;
-  options: Array<{
-    id: string;
-    text: string;
-    isCorrect: boolean;
-    explanation?: string;
-    strength?: string;
-    color?: "green" | "yellow" | "red";
-  }>;
-}
-
-interface TrueFalseQuestion extends BaseQuestion {
-  type: QuestionType.TRUE_FALSE;
-  statement: string;
-  correctAnswer: boolean;
-}
-
-interface MultiSelectQuestion extends BaseQuestion {
-  type: QuestionType.MULTI_SELECT;
-  options: Array<{
-    id: string;
-    text: string;
-    isCorrect: boolean;
-    explanation?: string;
-  }>;
-  minCorrect: number;
-  maxCorrect?: number;
-}
-
-interface DragDropQuestion extends BaseQuestion {
-  type: QuestionType.DRAG_DROP;
-  items: Array<{
-    id: string;
-    text: string;
-    category: string;
-  }>;
-  categories: Array<{
-    id: string;
-    name: string;
-    description?: string;
-    color: "blue" | "green" | "orange" | "purple";
-  }>;
-}
-
-interface SliderScaleQuestion extends BaseQuestion {
-  type: QuestionType.SLIDER_SCALE;
-  statement: string;
-  min: number;
-  max: number;
-  correctRange: { min: number; max: number };
-  labels: { min: string; max: string };
-  unit?: string;
-}
-
-type Question =
-  | MultipleChoiceQuestion
-  | TrueFalseQuestion
-  | MultiSelectQuestion
-  | DragDropQuestion
-  | SliderScaleQuestion;
-
-const QUESTIONS: Question[] = [
-  {
-    id: "pwd-strength",
-    type: QuestionType.MULTIPLE_CHOICE,
-    title: "Parola Güvenliği Değerlendirmesi",
-    description:
-      "Aşağıdaki parolalardan hangisi en güvenli seçenektir?",
-    difficulty: "easy",
-    category: "Parola Güvenli��i",
-    options: [
-      {
-        id: "weak-1",
-        text: "password123",
-        isCorrect: false,
-        explanation: "Çok basit ve tahmin edilebilir",
-        strength: "Çok Zayıf",
-        color: "red",
-      },
-      {
-        id: "medium-1",
-        text: "P@ssw0rd!",
-        isCorrect: false,
-        explanation: "Yaygın kullanılan bir pattern",
-        strength: "Orta",
-        color: "yellow",
-      },
-      {
-        id: "strong-1",
-        text: "Kah7e#Içer8Ken*Mutluyum",
-        isCorrect: true,
-        explanation: "Uzun, karmaşık ve anlamlı",
-        strength: "Çok Güçlü",
-        color: "green",
-      },
-      {
-        id: "weak-2",
-        text: "123456789",
-        isCorrect: false,
-        explanation: "Sadece sayılardan oluşuyor",
-        strength: "Çok Zayıf",
-        color: "red",
-      },
-    ],
-    explanation:
-      "Güvenli parolalar uzun, karmaşık ve kişisel bilgiler içermemelidir.",
-    tips: [
-      "En az 12 karakter kullanın",
-      "Büyük-küçük harf, sayı ve sembol karışımı",
-      "Kişisel bilgilerden kaçının",
-      "Her hesap için farklı parola",
-    ],
-  },
-  {
-    id: "phishing-detection",
-    type: QuestionType.TRUE_FALSE,
-    title: "Phishing Saldırısı Tespiti",
-    statement:
-      "Phishing saldırılarında saldırganlar her zaman bilinmeyen e-posta adreslerini kullanır.",
-    correctAnswer: false,
-    difficulty: "medium",
-    category: "E-posta Güvenliği",
-    explanation:
-      "Phishing saldırıları genellikle tanıdık görünen e-posta adreslerini taklit eder.",
-    tips: [
-      "E-posta adresini dikkatli kontrol edin",
-      "Şüpheli linklere tıklamayın",
-      "Doğrudan resmi web sitesine gidin",
-      "IT departmanına bildirin",
-    ],
-  },
-  {
-    id: "password-best-practices",
-    type: QuestionType.MULTI_SELECT,
-    title: "Parola En İyi Uygulamaları",
-    description:
-      "Güvenli parola oluşturmak için hangi kuralları takip etmelisiniz?",
-    difficulty: "easy",
-    category: "Parola Güvenliği",
-    minCorrect: 3,
-    options: [
-      {
-        id: "length",
-        text: "En az 12 karakter kullanmak",
-        isCorrect: true,
-        explanation: "Uzun parolalar daha güvenlidir",
-      },
-      {
-        id: "personal-info",
-        text: "Doğum tarihi kullanmak",
-        isCorrect: false,
-        explanation: "Kişisel bilgiler tahmin edilebilir",
-      },
-      {
-        id: "mixed-case",
-        text: "Büyük ve küçük harf karışımı",
-        isCorrect: true,
-        explanation: "Karmaşıklığı artırır",
-      },
-      {
-        id: "reuse",
-        text: "Aynı parolayı her yerde kullanmak",
-        isCorrect: false,
-        explanation: "Risk yaratır",
-      },
-      {
-        id: "special-chars",
-        text: "Özel karakterler eklemek",
-        isCorrect: true,
-        explanation: "Güvenliği artırır",
-      },
-      {
-        id: "avoid-personal",
-        text: "Kişisel bilgilerden kaçınmak",
-        isCorrect: true,
-        explanation: "Tahmin edilmesini zorlaştırır",
-      },
-    ],
-    explanation:
-      "Güvenli parola en az 12 karakter, karmaşık yapı ve kişisel bilgilerden kaçınma gerektirir.",
-    tips: [
-      "Her hesap için farklı parola",
-      "Parola yöneticisi kullanın",
-      "Düzenli olarak güncelleyin",
-      "İki faktörlü doğrulama aktif edin",
-    ],
-  },
-  {
-    id: "email-risk-assessment",
-    type: QuestionType.SLIDER_SCALE,
-    title: "E-posta Risk Değerlendirmesi",
-    statement:
-      '"ACİL! Hesabınız askıya alındı, hemen şifreyi güncelleyin: bit.ly/update-pass"',
-    description: "Bu e-postanın risk seviyesini değerlendirin",
-    min: 1,
-    max: 10,
-    correctRange: { min: 8, max: 10 },
-    labels: { min: "Güvenli", max: "Çok Riskli" },
-    difficulty: "medium",
-    category: "E-posta Güvenliği",
-    explanation:
-      "Bu e-posta yüksek risk içerir: Acil dil, belirsiz gönderen, kısaltılmış link.",
-    tips: [
-      "Acil dil kullanımına dikkat edin",
-      "Kısaltılmış linklere güvenmeyin",
-      "Doğrudan resmi siteye gidin",
-      "IT departmanına bildirin",
-    ],
-  },
-  {
-    id: "security-framework",
-    type: QuestionType.DRAG_DROP,
-    title: "Siber Güvenlik Çerçevesi",
-    description:
-      "Güvenlik uygulamalarını doğru kategorilere yerleştirin",
-    difficulty: "hard",
-    category: "Güvenlik Yönetimi",
-    items: [
-      {
-        id: "strong-password",
-        text: "Güçlü parola kullanmak",
-        category: "prevention",
-      },
-      {
-        id: "report-suspicious",
-        text: "Şüpheli e-postayı bildirmek",
-        category: "response",
-      },
-      {
-        id: "software-update",
-        text: "Yazılımları güncel tutmak",
-        category: "prevention",
-      },
-      {
-        id: "virus-scan",
-        text: "Virüs taraması yapmak",
-        category: "detection",
-      },
-      {
-        id: "log-monitoring",
-        text: "Sistem loglarını kontrol etmek",
-        category: "detection",
-      },
-      {
-        id: "account-lockdown",
-        text: "Etkilenen hesapları kapatmak",
-        category: "response",
-      },
-    ],
-    categories: [
-      {
-        id: "prevention",
-        name: "Önleme",
-        description: "Saldırıları engelleyen önlemler",
-        color: "green",
-      },
-      {
-        id: "detection",
-        name: "Tespit",
-        description: "Tehditleri fark etme",
-        color: "blue",
-      },
-      {
-        id: "response",
-        name: "Müdahale",
-        description: "Olaylara karşı verilen tepki",
-        color: "orange",
-      },
-    ],
-    explanation:
-      "Siber güvenlik üç ana aşamada ele alınır: Önleme, Tespit ve Müdahale.",
-    tips: [
-      "Önleme her zaman en etkili yöntemdir",
-      "Erken tespit kritik öneme sahiptir",
-      "Hızlı m��dahale zararı azaltır",
-      "Sürekli eğitim gereklidir",
-    ],
-  },
-];
-
-export function QuizScene({
+export const QuizScene = React.memo(function QuizScene({
+  config = quizSceneConfig,
   onQuizCompleted,
   onTimerStart,
   onTimerStop,
   onTimerUpdate,
+
+  // Quiz state props
+  currentQuestionIndex,
+  setCurrentQuestionIndex,
+  answers,
+  setAnswers,
+  showResult,
+  setShowResult,
+  timeLeft,
+  setTimeLeft,
+  isTimerActive,
+  setIsTimerActive,
+  attempts,
+  setAttempts,
+  isAnswerLocked,
+  setIsAnswerLocked,
+  isLoading,
+  setIsLoading,
+  multiSelectAnswers,
+  setMultiSelectAnswers,
+  sliderValue,
+  setSliderValue,
+  draggedItems,
+  setDraggedItems,
+  selectedItem,
+  setSelectedItem,
 }: QuizSceneProps) {
-  // State Management
-  const [currentQuestionIndex, setCurrentQuestionIndex] =
-    useState(0);
-  const [answers, setAnswers] = useState<Map<string, any>>(
-    new Map(),
-  );
-  const [showResult, setShowResult] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(30);
-  const [isTimerActive, setIsTimerActive] = useState(true);
-  const [attempts, setAttempts] = useState(0);
-  const [isAnswerLocked, setIsAnswerLocked] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  // State Management - Now handled by props from parent component
 
-  // Question-specific states
-  const [multiSelectAnswers, setMultiSelectAnswers] = useState<
-    string[]
-  >([]);
-  const [sliderValue, setSliderValue] = useState(5);
-  const [draggedItems, setDraggedItems] = useState<
-    Map<string, string>
-  >(new Map());
+  // Refs for auto-scroll
+  const resultPanelRef = useRef<HTMLDivElement>(null);
 
-  // Mobile drag & drop states
-  const [selectedItem, setSelectedItem] = useState<string | null>(null);
+  // Check if device is mobile
+  const isMobile = useMemo(() => {
+    return typeof window !== 'undefined' && window.innerWidth < 768;
+  }, []);
 
-  const maxAttempts = 2;
-  const currentQuestion = QUESTIONS[currentQuestionIndex];
-  const currentAnswer = answers.get(currentQuestion.id);
-  const progress =
-    ((currentQuestionIndex + 1) / QUESTIONS.length) * 100;
+  // Get questions from config
+  const questions = useMemo(() => config.questions?.list || [], [config.questions?.list]);
+
+  // Memoized constants
+  const maxAttempts = useMemo(() => config.questions?.maxAttempts || 2, [config.questions?.maxAttempts]);
+  const currentQuestion = useMemo(() => questions[currentQuestionIndex], [questions, currentQuestionIndex]);
+  const currentAnswer = useMemo(() => answers.get(currentQuestion?.id), [answers, currentQuestion?.id]);
+  const progress = useMemo(() => ((currentQuestionIndex + 1) / questions.length) * 100, [currentQuestionIndex, questions.length]);
 
   // Timer Effects
   useEffect(() => {
-    if (!isAnswerLocked && isTimerActive) {
+    // Start timer when question changes and timer is active
+    if (isTimerActive && !showResult && !isAnswerLocked) {
       onTimerStart();
-    } else if (isAnswerLocked) {
-      onTimerStop();
     }
-    return () => onTimerStop();
-  }, [
-    onTimerStart,
-    onTimerStop,
-    isAnswerLocked,
-    isTimerActive,
-  ]);
+  }, [currentQuestionIndex, isTimerActive, showResult, isAnswerLocked, onTimerStart]);
 
   useEffect(() => {
+    // Stop timer when answer is locked or result is shown
+    if (isAnswerLocked || showResult) {
+      onTimerStop();
+    }
+  }, [isAnswerLocked, showResult, onTimerStop]);
+
+  useEffect(() => {
+    // Countdown timer
     if (
       isTimerActive &&
       timeLeft > 0 &&
@@ -393,7 +142,16 @@ export function QuizScene({
       !showResult &&
       !isAnswerLocked
     ) {
-      handleTimeUp();
+      // Timer expired - show result
+      setShowResult(true);
+
+      // Auto-scroll to result panel after a short delay
+      setTimeout(() => {
+        resultPanelRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: isMobile ? 'start' : 'center',
+        });
+      }, 100);
     }
   }, [
     timeLeft,
@@ -401,12 +159,15 @@ export function QuizScene({
     showResult,
     isAnswerLocked,
     onTimerUpdate,
+    setTimeLeft,
+    setShowResult,
+    isMobile,
   ]);
 
   // Answer Validation
   const validateAnswer = useCallback(
     (answer: any): boolean => {
-      switch (currentQuestion.type) {
+      switch (currentQuestion?.type) {
         case QuestionType.MULTIPLE_CHOICE:
           const mcQuestion =
             currentQuestion as MultipleChoiceQuestion;
@@ -466,26 +227,7 @@ export function QuizScene({
     [currentQuestion],
   );
 
-  // Event Handlers
-  const handleTimeUp = useCallback(() => {
-    if (isAnswerLocked) return;
 
-    setIsTimerActive(false);
-    setShowResult(true);
-    onTimerStop();
-
-    const isCorrect = currentAnswer
-      ? validateAnswer(currentAnswer)
-      : false;
-    if (isCorrect) {
-      setIsAnswerLocked(true);
-    }
-  }, [
-    currentAnswer,
-    validateAnswer,
-    isAnswerLocked,
-    onTimerStop,
-  ]);
 
   const handleAnswer = useCallback(
     async (answer: any) => {
@@ -496,41 +238,43 @@ export function QuizScene({
       // Simulate processing time for better UX
       await new Promise((resolve) => setTimeout(resolve, 300));
 
-      setAnswers((prev) =>
-        new Map(prev).set(currentQuestion.id, answer),
+      setAnswers((prev: Map<string, any>) =>
+        new Map(prev).set(currentQuestion?.id, answer),
       );
-      setIsTimerActive(false);
       setShowResult(true);
       setAttempts((prev) => prev + 1);
       setIsLoading(false);
-      onTimerStop();
 
       const isCorrect = validateAnswer(answer);
       if (isCorrect) {
         setIsAnswerLocked(true);
       }
+
+      // Auto-scroll to result panel after a short delay
+      setTimeout(() => {
+        resultPanelRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: isMobile ? 'start' : 'center',
+        });
+      }, 100);
     },
     [
       showResult,
       isAnswerLocked,
-      currentQuestion.id,
+      currentQuestion?.id,
       validateAnswer,
-      onTimerStop,
+      isMobile,
+      setAnswers,
+      setShowResult,
+      setAttempts,
+      setIsAnswerLocked,
+      setIsLoading,
     ],
   );
 
-  const handleNextQuestion = useCallback(() => {
-    if (currentQuestionIndex < QUESTIONS.length - 1) {
-      setCurrentQuestionIndex((prev) => prev + 1);
-      resetQuestionState();
-    } else {
-      onQuizCompleted();
-    }
-  }, [currentQuestionIndex, onQuizCompleted]);
-
   const resetQuestionState = useCallback(() => {
     setShowResult(false);
-    setTimeLeft(30);
+    setTimeLeft(config.timer?.duration || 30);
     setIsTimerActive(true);
     setAttempts(0);
     setIsAnswerLocked(false);
@@ -539,17 +283,35 @@ export function QuizScene({
     setSliderValue(5);
     setDraggedItems(new Map());
     setSelectedItem(null);
-    onTimerStart();
-    onTimerUpdate(30);
-  }, [onTimerStart, onTimerUpdate]);
+    // Timer will be started by the effect when isTimerActive becomes true
+  }, [setShowResult, setTimeLeft, setIsTimerActive, setAttempts, setIsAnswerLocked, setIsLoading, setMultiSelectAnswers, setSliderValue, setDraggedItems, setSelectedItem, config.timer?.duration]);
+
+  const handleNextQuestion = useCallback(() => {
+    setCurrentQuestionIndex((prev) => prev + 1);
+    resetQuestionState();
+  }, [setCurrentQuestionIndex, resetQuestionState]);
 
   const retryQuestion = useCallback(() => {
     if (isAnswerLocked) return;
     resetQuestionState();
   }, [isAnswerLocked, resetQuestionState]);
 
+  // Memoized event handlers for better performance
+  const handleSliderChange = useCallback((value: number[]) => {
+    setSliderValue(value[0]);
+  }, []);
+
+  const handleMultiSelectToggle = useCallback((optionId: string) => {
+    if (showResult || isLoading) return;
+    setMultiSelectAnswers((prev) =>
+      prev.includes(optionId)
+        ? prev.filter((id) => id !== optionId)
+        : [...prev, optionId],
+    );
+  }, [showResult, isLoading]);
+
   // Render Functions
-  const renderMultipleChoice = () => {
+  const renderMultipleChoice = useCallback(() => {
     const question = currentQuestion as MultipleChoiceQuestion;
     const userAnswer = currentAnswer;
 
@@ -662,9 +424,9 @@ export function QuizScene({
         })}
       </div>
     );
-  };
+  }, [currentQuestion, currentAnswer, showResult, isLoading, handleAnswer]);
 
-  const renderTrueFalse = () => {
+  const renderTrueFalse = useCallback(() => {
     const question = currentQuestion as TrueFalseQuestion;
     const userAnswer = currentAnswer;
 
@@ -806,9 +568,9 @@ export function QuizScene({
         </div>
       </div>
     );
-  };
+  }, [currentQuestion, currentAnswer, showResult, isLoading, handleAnswer]);
 
-  const renderMultiSelect = () => {
+  const renderMultiSelect = useCallback(() => {
     const question = currentQuestion as MultiSelectQuestion;
 
     return (
@@ -834,15 +596,7 @@ export function QuizScene({
                   duration: 0.3,
                   delay: index * 0.05,
                 }}
-                onClick={() => {
-                  if (showResult || isLoading) return;
-
-                  setMultiSelectAnswers((prev) =>
-                    prev.includes(option.id)
-                      ? prev.filter((id) => id !== option.id)
-                      : [...prev, option.id],
-                  );
-                }}
+                onClick={() => handleMultiSelectToggle(option.id)}
                 disabled={showResult || isLoading}
                 className="w-full p-2.5 text-left rounded-lg transition-all duration-200"
                 style={{
@@ -920,18 +674,18 @@ export function QuizScene({
             {isLoading ? (
               <div className="flex items-center space-x-2">
                 <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                <span>Kontrol ediliyor...</span>
+                <span>{config.texts?.checkAnswer || "Kontrol ediliyor..."}</span>
               </div>
             ) : (
-              `Cevabı Kontrol Et (${multiSelectAnswers.length}/${question.minCorrect})`
+              `${config.texts?.checkAnswer || "Cevabı Kontrol Et"} (${multiSelectAnswers.length}/${question.minCorrect})`
             )}
           </Button>
         </div>
       </div>
     );
-  };
+  }, [currentQuestion, multiSelectAnswers, showResult, isLoading, handleMultiSelectToggle, handleAnswer]);
 
-  const renderSliderScale = () => {
+  const renderSliderScale = useCallback(() => {
     const question = currentQuestion as SliderScaleQuestion;
 
     return (
@@ -964,9 +718,7 @@ export function QuizScene({
             <div className="relative">
               <Slider
                 value={[sliderValue]}
-                onValueChange={(value) =>
-                  setSliderValue(value[0])
-                }
+                onValueChange={handleSliderChange}
                 max={question.max}
                 min={question.min}
                 step={1}
@@ -1021,18 +773,18 @@ export function QuizScene({
             {isLoading ? (
               <div className="flex items-center space-x-2">
                 <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                <span>Değerlendiriliyor...</span>
+                <span>{config.texts?.evaluating || "Değerlendiriliyor..."}</span>
               </div>
             ) : (
-              "Değerlendirmeyi Tamamla"
+              config.texts?.completeEvaluation || "Değerlendirmeyi Tamamla"
             )}
           </Button>
         </div>
       </div>
     );
-  };
+  }, [currentQuestion, sliderValue, showResult, isLoading, handleSliderChange, handleAnswer]);
 
-  const renderDragDrop = () => {
+  const renderDragDrop = useCallback(() => {
     const question = currentQuestion as DragDropQuestion;
     const availableItems = question.items.filter((item) => !draggedItems.has(item.id));
 
@@ -1130,10 +882,10 @@ export function QuizScene({
           }}
         >
           <p className="text-sm font-medium text-foreground mb-1">
-            📱 Mobil: Önce öğeyi seçin, sonra kategoriye dokunun
+            {config.texts?.mobileInstructions || "📱 Mobil: Önce öğeyi seçin, sonra kategoriye dokunun"}
           </p>
           <p className="text-xs text-muted-foreground">
-            🖥️ Masaüstü: Öğeleri sürükleyip kategorilere bırakın
+            {config.texts?.desktopInstructions || "🖥️ Masaüstü: Öğeleri sürükleyip kategorilere bırakın"}
           </p>
         </div>
 
@@ -1142,7 +894,7 @@ export function QuizScene({
           <div>
             <h4 className="font-medium mb-3 text-foreground flex items-center">
               <Move className="w-4 h-4 mr-2 text-muted-foreground" />
-              Seçenekler
+              {config.texts?.options || "Seçenekler"}
             </h4>
 
             <div className="grid grid-cols-1 gap-2">
@@ -1229,7 +981,7 @@ export function QuizScene({
 
         {/* Categories */}
         <div>
-          <h4 className="font-medium mb-3 text-foreground">Kategoriler</h4>
+          <h4 className="font-medium mb-3 text-foreground">{config.texts?.categories || "Kategoriler"}</h4>
 
           <div className="grid gap-3 md:grid-cols-3">
             {question.categories.map((category, index) => {
@@ -1304,7 +1056,7 @@ export function QuizScene({
                       }}
                     >
                       <span className="text-xs text-muted-foreground">
-                        Buraya dokunun
+                        {config.texts?.tapHere || "Buraya dokunun"}
                       </span>
                     </div>
                   )}
@@ -1362,12 +1114,12 @@ export function QuizScene({
               {isLoading ? (
                 <div className="flex items-center space-x-2">
                   <div className="w-4 h-4 border-2 border-background/30 border-t-background rounded-full animate-spin" />
-                  <span>Kontrol ediliyor...</span>
+                  <span>{config.texts?.checkAnswer || "Kontrol ediliyor..."}</span>
                 </div>
               ) : (
                 <div className="flex items-center space-x-2">
                   <Zap className="w-4 h-4" />
-                  <span>Cevabı Kontrol Et</span>
+                  <span>{config.texts?.checkAnswerButton || "Cevabı Kontrol Et"}</span>
                 </div>
               )}
             </Button>
@@ -1375,10 +1127,10 @@ export function QuizScene({
         )}
       </div>
     );
-  };
+  }, [currentQuestion, draggedItems, selectedItem, showResult, isLoading, setSelectedItem, setDraggedItems, handleAnswer]);
 
-  const renderQuestion = () => {
-    switch (currentQuestion.type) {
+  const renderQuestion = useCallback(() => {
+    switch (currentQuestion?.type) {
       case QuestionType.MULTIPLE_CHOICE:
         return renderMultipleChoice();
       case QuestionType.TRUE_FALSE:
@@ -1392,20 +1144,78 @@ export function QuizScene({
       default:
         return null;
     }
-  };
+  }, [currentQuestion?.type, renderMultipleChoice, renderTrueFalse, renderMultiSelect, renderSliderScale, renderDragDrop]);
 
-  const isAnswerCorrect = currentAnswer
-    ? validateAnswer(currentAnswer)
-    : false;
+  const isAnswerCorrect = useMemo(() =>
+    currentAnswer ? validateAnswer(currentAnswer) : false,
+    [currentAnswer, validateAnswer]
+  );
+
+  // Auto-complete quiz when last question is answered correctly
+  useEffect(() => {
+    if (currentQuestionIndex === questions.length - 1 &&
+      showResult &&
+      isAnswerCorrect &&
+      isAnswerLocked) {
+      // Small delay to show the result before completing
+      const timer = setTimeout(() => {
+        onQuizCompleted();
+      }, 2000); // 2 seconds to show the final result
+
+      return () => clearTimeout(timer);
+    }
+  }, [currentQuestionIndex, showResult, isAnswerCorrect, isAnswerLocked, onQuizCompleted, questions.length]);
+
+  // Memoized style objects
+  const cardStyle = useMemo(() => ({
+    background: config.styling?.cardStyle?.background || "linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card) / 0.95) 25%, hsl(var(--card) / 0.85) 50%, hsl(var(--card) / 0.75) 75%, hsl(var(--card) / 0.65) 100%)",
+    backdropFilter: "blur(36px) saturate(240%)",
+    WebkitBackdropFilter: "blur(36px) saturate(240%)",
+    border: config.styling?.cardStyle?.border || "0.5px solid rgba(255, 255, 255, 0.4)",
+    boxShadow: config.styling?.cardStyle?.shadow || `
+      0 12px 40px rgba(0, 0, 0, 0.08),
+      0 6px 20px rgba(0, 0, 0, 0.06),
+      0 2px 8px rgba(0, 0, 0, 0.03),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.06)
+    `,
+  }), [config.styling?.cardStyle]);
+
+  const resultPanelStyle = useMemo(() => ({
+    background: config.styling?.resultPanelStyle?.background || "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 25%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.65) 75%, rgba(255, 255, 255, 0.55) 100%)",
+    backdropFilter: "blur(28px) saturate(220%)",
+    WebkitBackdropFilter: "blur(28px) saturate(220%)",
+    border: config.styling?.resultPanelStyle?.border || "0.5px solid rgba(255, 255, 255, 0.4)",
+    boxShadow: config.styling?.resultPanelStyle?.shadow || `
+      0 8px 32px rgba(0, 0, 0, 0.08),
+      0 4px 16px rgba(0, 0, 0, 0.06),
+      0 2px 8px rgba(0, 0, 0, 0.03),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.06)
+    `,
+  }), [config.styling?.resultPanelStyle]);
+
+  // Safety check for currentQuestion
+  if (!currentQuestion) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <p className="text-muted-foreground">Soru yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center p-4 relative">
       {/* Progress Bar */}
-      <motion.div
-        initial={{ width: 0 }}
-        animate={{ width: `${progress}%` }}
-        className="fixed top-0 left-0 h-1 bg-gradient-to-r from-primary to-primary/60 z-50"
-      />
+      {config.ui?.showProgressBar && (
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${progress}%` }}
+          className="fixed top-0 left-0 h-1 bg-gradient-to-r from-primary to-primary/60 z-50"
+        />
+      )}
 
       {/* Header */}
       <motion.div
@@ -1422,29 +1232,37 @@ export function QuizScene({
         </div>
 
         <h1 className="mb-2 text-foreground">
-          Siber Güvenlik Quiz
+          {config.title || "Siber Güvenlik Quiz"}
         </h1>
 
         <div className="flex items-center justify-center space-x-4 text-sm text-muted-foreground">
           <span>
-            Soru {currentQuestionIndex + 1}/{QUESTIONS.length}
+            Soru {currentQuestionIndex + 1}/{questions.length}
           </span>
-          <span>•</span>
-          <span
-            className={`px-2 py-1 rounded-full text-xs ${currentQuestion.difficulty === "easy" &&
-              "bg-chart-4/20 text-chart-4"
-              } ${currentQuestion.difficulty === "medium" &&
-              "bg-chart-5/20 text-chart-5"
-              } ${currentQuestion.difficulty === "hard" &&
-              "bg-destructive/20 text-destructive"
-              }`}
-          >
-            {currentQuestion.difficulty === "easy" && "Kolay"}
-            {currentQuestion.difficulty === "medium" && "Orta"}
-            {currentQuestion.difficulty === "hard" && "Zor"}
-          </span>
-          <span>•</span>
-          <span>{currentQuestion.category}</span>
+          {config.ui?.showDifficulty && (
+            <>
+              <span>•</span>
+              <span
+                className={`px-2 py-1 rounded-full text-xs ${currentQuestion?.difficulty === "easy" &&
+                  "bg-chart-4/20 text-chart-4"
+                  } ${currentQuestion?.difficulty === "medium" &&
+                  "bg-chart-5/20 text-chart-5"
+                  } ${currentQuestion?.difficulty === "hard" &&
+                  "bg-destructive/20 text-destructive"
+                  }`}
+              >
+                {currentQuestion?.difficulty === "easy" && (config.difficulty?.easy || "Kolay")}
+                {currentQuestion?.difficulty === "medium" && (config.difficulty?.medium || "Orta")}
+                {currentQuestion?.difficulty === "hard" && (config.difficulty?.hard || "Zor")}
+              </span>
+            </>
+          )}
+          {config.ui?.showCategory && (
+            <>
+              <span>•</span>
+              <span>{currentQuestion?.category}</span>
+            </>
+          )}
         </div>
       </motion.div>
 
@@ -1456,29 +1274,16 @@ export function QuizScene({
       >
         <div
           className="p-5 md:p-6 rounded-2xl shadow-xl"
-          style={{
-            background:
-              "linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card) / 0.95) 25%, hsl(var(--card) / 0.85) 50%, hsl(var(--card) / 0.75) 75%, hsl(var(--card) / 0.65) 100%)",
-            backdropFilter: "blur(36px) saturate(240%)",
-            WebkitBackdropFilter: "blur(36px) saturate(240%)",
-            border: "0.5px solid rgba(255, 255, 255, 0.4)",
-            boxShadow: `
-              0 12px 40px rgba(0, 0, 0, 0.08),
-              0 6px 20px rgba(0, 0, 0, 0.06),
-              0 2px 8px rgba(0, 0, 0, 0.03),
-              inset 0 1px 0 rgba(255, 255, 255, 0.9),
-              inset 0 -1px 0 rgba(0, 0, 0, 0.06)
-            `,
-          }}
+          style={cardStyle}
         >
           {/* Question Header */}
-          <div className="text-center mb-4">
+          <div className="text-center mb-2">
             <h2 className="mb-1.5 text-foreground">
-              {currentQuestion.title}
+              {currentQuestion?.title}
             </h2>
-            {currentQuestion.description && (
+            {currentQuestion?.description && (
               <p className="text-muted-foreground">
-                {currentQuestion.description}
+                {currentQuestion?.description}
               </p>
             )}
           </div>
@@ -1490,24 +1295,12 @@ export function QuizScene({
           <AnimatePresence>
             {showResult && (
               <motion.div
+                ref={resultPanelRef}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 className="mt-4 p-4 rounded-xl border-2 border-border/60"
-                style={{
-                  background:
-                    "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 25%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.65) 75%, rgba(255, 255, 255, 0.55) 100%)",
-                  backdropFilter: "blur(28px) saturate(220%)",
-                  WebkitBackdropFilter: "blur(28px) saturate(220%)",
-                  border: "0.5px solid rgba(255, 255, 255, 0.4)",
-                  boxShadow: `
-                    0 8px 32px rgba(0, 0, 0, 0.08),
-                    0 4px 16px rgba(0, 0, 0, 0.06),
-                    0 2px 8px rgba(0, 0, 0, 0.03),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-                    inset 0 -1px 0 rgba(0, 0, 0, 0.06)
-                  `,
-                }}
+                style={resultPanelStyle}
               >
                 <div className="flex items-start space-x-3 mb-2.5">
                   <div className="p-1.5 bg-chart-2/20 rounded-lg">
@@ -1515,22 +1308,22 @@ export function QuizScene({
                   </div>
                   <div className="flex-1">
                     <p className="font-medium mb-1.5 text-foreground">
-                      Açıklama
+                      {config.texts?.explanation || "Açıklama"}
                     </p>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      {currentQuestion.explanation}
+                      {currentQuestion?.explanation}
                     </p>
                   </div>
                 </div>
 
                 {/* Tips */}
-                {currentQuestion.tips && (
+                {currentQuestion?.tips && (
                   <div className="mb-4">
                     <h4 className="font-medium mb-1.5 text-foreground">
-                      💡 İpuçları
+                      {config.texts?.tips || "💡 İpuçları"}
                     </h4>
                     <div className="grid gap-1.5 md:grid-cols-2">
-                      {currentQuestion.tips.map(
+                      {currentQuestion?.tips.map(
                         (tip, index) => (
                           <motion.div
                             key={index}
@@ -1553,7 +1346,27 @@ export function QuizScene({
                 {/* Action Buttons */}
                 <div className="flex items-center justify-between pt-2.5 border-t-2 border-border/60">
                   <div className="flex items-center space-x-2">
-                    {isAnswerCorrect ? (
+                    {currentQuestionIndex === questions.length - 1 && isAnswerCorrect ? (
+                      <div
+                        className="flex items-center space-x-2 px-4 py-2.5 rounded-lg"
+                        style={{
+                          background: "linear-gradient(135deg, rgba(34, 197, 94, 0.25) 0%, rgba(34, 197, 94, 0.18) 30%, rgba(34, 197, 94, 0.12) 70%, rgba(34, 197, 94, 0.08) 100%)",
+                          border: "0.5px solid rgba(34, 197, 94, 0.6)",
+                          backdropFilter: "blur(16px) saturate(200%)",
+                          WebkitBackdropFilter: "blur(16px) saturate(200%)",
+                          boxShadow: `
+                            0 4px 16px rgba(34, 197, 94, 0.15),
+                            0 2px 8px rgba(34, 197, 94, 0.1),
+                            inset 0 1px 0 rgba(255, 255, 255, 0.2)
+                          `
+                        }}
+                      >
+                        <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+                        <span className="font-medium text-green-700 dark:text-green-300">
+                          {config.texts?.quizCompleted || "Quiz Tamamlandı! 🎉"}
+                        </span>
+                      </div>
+                    ) : isAnswerCorrect ? (
                       <div
                         className="flex items-center space-x-2 px-3 py-2 rounded-lg"
                         style={{
@@ -1570,26 +1383,24 @@ export function QuizScene({
                       >
                         <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
                         <span className="font-medium text-green-700 dark:text-green-300">
-                          Doğru! 🎉
+                          {config.texts?.correctAnswer || "Doğru! 🎉"}
                         </span>
                       </div>
-                    ) : attempts < maxAttempts &&
-                      !isAnswerLocked ? (
-                      <>
-                        <XCircle className="w-5 h-5 text-chart-5" />
-                        <span className="text-chart-5">
-                          {maxAttempts - attempts} deneme
-                          hakkınız kaldı
-                        </span>
-                      </>
-                    ) : (
+                    ) : !isAnswerCorrect && attempts >= maxAttempts ? (
                       <>
                         <XCircle className="w-5 h-5 text-destructive" />
                         <span className="text-destructive">
-                          Deneme hakkınız bitti
+                          {config.texts?.noAttemptsLeft || "Deneme hakkınız bitti"}
                         </span>
                       </>
-                    )}
+                    ) : !isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked ? (
+                      <>
+                        <XCircle className="w-5 h-5 text-chart-5" />
+                        <span className="text-chart-5">
+                          {maxAttempts - attempts} {config.texts?.attemptsLeft || "deneme hakkınız kaldı"}
+                        </span>
+                      </>
+                    ) : null}
                   </div>
 
                   <div className="flex space-x-3">
@@ -1602,41 +1413,32 @@ export function QuizScene({
                           className="flex items-center space-x-2"
                         >
                           <RotateCcw className="w-4 h-4" />
-                          <span>Tekrar Dene</span>
+                          <span>{config.texts?.retryQuestion || "Tekrar Dene"}</span>
                         </Button>
                       )}
 
                     {(isAnswerCorrect ||
-                      attempts >= maxAttempts ||
-                      isAnswerLocked) && (
+                      (!isAnswerCorrect && attempts >= maxAttempts) ||
+                      isAnswerLocked) &&
+                      currentQuestionIndex < questions.length - 1 && (
                         <Button
                           onClick={handleNextQuestion}
-                          className="flex items-center space-x-2"
+                          className="flex items-center space-x-2 bg-primary hover:bg-primary/90 transition-all duration-300"
                         >
-                          {currentQuestionIndex <
-                            QUESTIONS.length - 1 ? (
-                            <>
-                              <span>Sonraki Soru</span>
-                              <svg
-                                className="w-4 h-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M9 5l7 7-7 7"
-                                />
-                              </svg>
-                            </>
-                          ) : (
-                            <>
-                              <span>Quiz'i Tamamla</span>
-                              <CheckCircle className="w-4 h-4" />
-                            </>
-                          )}
+                          <span>{config.texts?.nextQuestion || "Sonraki Soru"}</span>
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 5l7 7-7 7"
+                            />
+                          </svg>
                         </Button>
                       )}
                   </div>
@@ -1655,11 +1457,11 @@ export function QuizScene({
         className="md:hidden mt-4 text-center"
       >
         <p className="text-xs text-muted-foreground">
-          💡 En iyi deneyim için soruları dikkatle okuyun
+          {config.texts?.mobileHint || "💡 En iyi deneyim için soruları dikkatle okuyun"}
         </p>
       </motion.div>
 
 
     </div>
   );
-}
+});

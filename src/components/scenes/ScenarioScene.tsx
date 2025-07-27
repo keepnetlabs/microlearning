@@ -91,7 +91,7 @@ export function ScenarioScene({
         initial={config.animations.title.initial}
         animate={config.animations.title.animate}
         transition={config.animations.title.transition}
-        className="mb-3 sm:mb-5 text-center text-gray-900 dark:text-white text-lg sm:text-xl md:text-2xl"
+        className="mb-3 sm:mb-1 text-center text-gray-900 dark:text-white text-lg sm:text-xl md:text-2xl"
       >
         {config.title}
       </motion.h1>

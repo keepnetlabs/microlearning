@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { 
-  IntroIcon, 
-  GoalsIcon, 
-  ScenarioIcon, 
-  ActionsIcon, 
-  QuizIcon, 
-  SurveyIcon, 
-  SummaryIcon, 
-  NudgeIcon 
+import {
+  IntroIcon,
+  GoalsIcon,
+  ScenarioIcon,
+  ActionsIcon,
+  QuizIcon,
+  SurveyIcon,
+  SummaryIcon,
+  NudgeIcon
 } from "./CyberSecurityIcons";
 
 interface IconDemoProps {
@@ -19,7 +19,7 @@ interface IconDemoProps {
 
 const IconDemo = ({ name, Icon, description }: IconDemoProps) => {
   const [state, setState] = useState<'passive' | 'active' | 'completed'>('passive');
-  
+
   const stateConfig = {
     passive: { isActive: false, isCompleted: false },
     active: { isActive: true, isCompleted: false },
@@ -35,7 +35,7 @@ const IconDemo = ({ name, Icon, description }: IconDemoProps) => {
       {/* Icon Display */}
       <div className="flex justify-center mb-4">
         <div className="relative">
-          <Icon 
+          <Icon
             {...stateConfig[state]}
             size={48}
           />
@@ -43,7 +43,7 @@ const IconDemo = ({ name, Icon, description }: IconDemoProps) => {
       </div>
 
       {/* Icon Info */}
-      <div className="text-center mb-4">
+      <div className="text-center mb-2">
         <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{name}</h3>
         <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">{description}</p>
       </div>
@@ -54,11 +54,10 @@ const IconDemo = ({ name, Icon, description }: IconDemoProps) => {
           <button
             key={stateOption}
             onClick={() => setState(stateOption as any)}
-            className={`px-3 py-1 text-xs rounded-lg transition-all duration-200 ${
-              state === stateOption
+            className={`px-3 py-1 text-xs rounded-lg transition-all duration-200 ${state === stateOption
                 ? 'bg-blue-500 text-white shadow-sm'
                 : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-            }`}
+              }`}
           >
             {stateOption.charAt(0).toUpperCase() + stateOption.slice(1)}
           </button>
@@ -76,7 +75,7 @@ export const IconShowcase = () => {
       description: "Dijital Hoşgeldin Badge - Güvenlik tarayıcı çizgileri"
     },
     {
-      name: "Hedefler", 
+      name: "Hedefler",
       Icon: GoalsIcon,
       description: "Güvenlik Hedef Sistemi - Radar halkaları ve crosshair"
     },

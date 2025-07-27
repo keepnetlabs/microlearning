@@ -12,6 +12,153 @@ export enum ColorType {
     EMERALD = 'emerald'
 }
 
+// Question Types
+export enum QuestionType {
+    MULTIPLE_CHOICE = "multiple_choice",
+    TRUE_FALSE = "true_false",
+    MULTI_SELECT = "multi_select",
+    DRAG_DROP = "drag_drop",
+    SLIDER_SCALE = "slider_scale",
+}
+
+// Enhanced Question Interfaces
+export interface BaseQuestion {
+    id: string;
+    type: QuestionType;
+    title: string;
+    description?: string;
+    explanation: string;
+    tips?: string[];
+    difficulty: "easy" | "medium" | "hard";
+    category: string;
+    timeLimit?: number;
+}
+
+export interface MultipleChoiceQuestion extends BaseQuestion {
+    type: QuestionType.MULTIPLE_CHOICE;
+    options: Array<{
+        id: string;
+        text: string;
+        isCorrect: boolean;
+        explanation?: string;
+        strength?: string;
+        color?: "green" | "yellow" | "red";
+    }>;
+}
+
+export interface TrueFalseQuestion extends BaseQuestion {
+    type: QuestionType.TRUE_FALSE;
+    statement: string;
+    correctAnswer: boolean;
+}
+
+export interface MultiSelectQuestion extends BaseQuestion {
+    type: QuestionType.MULTI_SELECT;
+    options: Array<{
+        id: string;
+        text: string;
+        isCorrect: boolean;
+        explanation?: string;
+    }>;
+    minCorrect: number;
+    maxCorrect?: number;
+}
+
+export interface DragDropQuestion extends BaseQuestion {
+    type: QuestionType.DRAG_DROP;
+    items: Array<{
+        id: string;
+        text: string;
+        category: string;
+    }>;
+    categories: Array<{
+        id: string;
+        name: string;
+        description?: string;
+        color: "blue" | "green" | "orange" | "purple";
+    }>;
+}
+
+export interface SliderScaleQuestion extends BaseQuestion {
+    type: QuestionType.SLIDER_SCALE;
+    statement: string;
+    min: number;
+    max: number;
+    correctRange: { min: number; max: number };
+    labels: { min: string; max: string };
+    unit?: string;
+}
+
+export type Question =
+    | MultipleChoiceQuestion
+    | TrueFalseQuestion
+    | MultiSelectQuestion
+    | DragDropQuestion
+    | SliderScaleQuestion;
+
+// Quiz Scene Config Interface
+export interface QuizSceneConfig {
+    // Content
+    title?: string;
+    subtitle?: string;
+    difficulty?: {
+        easy?: string;
+        medium?: string;
+        hard?: string;
+    };
+    timer?: {
+        enabled?: boolean;
+        duration?: number;
+        warningThreshold?: number;
+    };
+    questions?: {
+        totalCount?: number;
+        maxAttempts?: number;
+        list?: Question[]; // Dinamik soru listesi
+    };
+    ui?: {
+        showProgressBar?: boolean;
+        showTimer?: boolean;
+        showDifficulty?: boolean;
+        showCategory?: boolean;
+    };
+    styling?: {
+        primaryColor?: ColorType;
+        cardStyle?: {
+            background?: string;
+            border?: string;
+            shadow?: string;
+        };
+        resultPanelStyle?: {
+            background?: string;
+            border?: string;
+            shadow?: string;
+        };
+    };
+    // Text configurations
+    texts?: {
+        nextQuestion?: string;
+        retryQuestion?: string;
+        quizCompleted?: string;
+        correctAnswer?: string;
+        wrongAnswer?: string;
+        attemptsLeft?: string;
+        noAttemptsLeft?: string;
+        checkAnswer?: string;
+        evaluating?: string;
+        completeEvaluation?: string;
+        mobileInstructions?: string;
+        desktopInstructions?: string;
+        options?: string;
+        categories?: string;
+        tapHere?: string;
+        checkAnswerButton?: string;
+        explanation?: string;
+        tips?: string;
+        mobileHint?: string;
+    };
+}
+
 // Smishing Eğitimi Config
 const smishingIntroConfig = {
     // Content
@@ -1008,6 +1155,275 @@ export const educationConfigs = {
         actionableContentSceneConfig: socialEngineeringActionableContentConfig
     }
     // Diğer eğitim türleri buraya eklenebilir...
+};
+
+// Quiz Scene Config - Tüm eğitimler için ortak
+export const quizSceneConfig: QuizSceneConfig = {
+    // Content
+    title: "Siber Güvenlik Quiz",
+    subtitle: "Bilgilerinizi test edin",
+    difficulty: {
+        easy: "Kolay",
+        medium: "Orta",
+        hard: "Zor"
+    },
+    timer: {
+        enabled: true,
+        duration: 30,
+        warningThreshold: 10
+    },
+    questions: {
+        totalCount: 5,
+        maxAttempts: 2,
+        list: [
+            {
+                id: "pwd-strength",
+                type: QuestionType.MULTIPLE_CHOICE,
+                title: "Parola Güvenliği Değerlendirmesi",
+                description: "Aşağıdaki parolalardan hangisi en güvenli seçenektir?",
+                difficulty: "easy",
+                category: "Parola Güvenliği",
+                options: [
+                    {
+                        id: "weak-1",
+                        text: "password123",
+                        isCorrect: false,
+                        explanation: "Çok basit ve tahmin edilebilir",
+                        strength: "Çok Zayıf",
+                        color: "red",
+                    },
+                    {
+                        id: "medium-1",
+                        text: "P@ssw0rd!",
+                        isCorrect: false,
+                        explanation: "Yaygın kullanılan bir pattern",
+                        strength: "Orta",
+                        color: "yellow",
+                    },
+                    {
+                        id: "strong-1",
+                        text: "Kah7e#Içer8Ken*Mutluyum",
+                        isCorrect: true,
+                        explanation: "Uzun, karmaşık ve anlamlı",
+                        strength: "Çok Güçlü",
+                        color: "green",
+                    },
+                    {
+                        id: "weak-2",
+                        text: "123456789",
+                        isCorrect: false,
+                        explanation: "Sadece sayılardan oluşuyor",
+                        strength: "Çok Zayıf",
+                        color: "red",
+                    },
+                ],
+                explanation: "Güvenli parolalar uzun, karmaşık ve kişisel bilgiler içermemelidir.",
+                tips: [
+                    "En az 12 karakter kullanın",
+                    "Büyük-küçük harf, sayı ve sembol karışımı",
+                    "Kişisel bilgilerden kaçının",
+                    "Her hesap için farklı parola",
+                ],
+            },
+            {
+                id: "phishing-detection",
+                type: QuestionType.TRUE_FALSE,
+                title: "Phishing Saldırısı Tespiti",
+                statement: "Phishing saldırılarında saldırganlar her zaman bilinmeyen e-posta adreslerini kullanır.",
+                correctAnswer: false,
+                difficulty: "medium",
+                category: "E-posta Güvenliği",
+                explanation: "Phishing saldırıları genellikle tanıdık görünen e-posta adreslerini taklit eder.",
+                tips: [
+                    "E-posta adresini dikkatli kontrol edin",
+                    "Şüpheli linklere tıklamayın",
+                    "Doğrudan resmi web sitesine gidin",
+                    "IT departmanına bildirin",
+                ],
+            },
+            {
+                id: "password-best-practices",
+                type: QuestionType.MULTI_SELECT,
+                title: "Parola En İyi Uygulamaları",
+                description: "Güvenli parola oluşturmak için hangi kuralları takip etmelisiniz?",
+                difficulty: "easy",
+                category: "Parola Güvenliği",
+                minCorrect: 3,
+                options: [
+                    {
+                        id: "length",
+                        text: "En az 12 karakter kullanmak",
+                        isCorrect: true,
+                        explanation: "Uzun parolalar daha güvenlidir",
+                    },
+                    {
+                        id: "personal-info",
+                        text: "Doğum tarihi kullanmak",
+                        isCorrect: false,
+                        explanation: "Kişisel bilgiler tahmin edilebilir",
+                    },
+                    {
+                        id: "mixed-case",
+                        text: "Büyük ve küçük harf karışımı",
+                        isCorrect: true,
+                        explanation: "Karmaşıklığı artırır",
+                    },
+                    {
+                        id: "reuse",
+                        text: "Aynı parolayı her yerde kullanmak",
+                        isCorrect: false,
+                        explanation: "Risk yaratır",
+                    },
+                    {
+                        id: "special-chars",
+                        text: "Özel karakterler eklemek",
+                        isCorrect: true,
+                        explanation: "Güvenliği artırır",
+                    },
+                    {
+                        id: "avoid-personal",
+                        text: "Kişisel bilgilerden kaçınmak",
+                        isCorrect: true,
+                        explanation: "Tahmin edilmesini zorlaştırır",
+                    },
+                ],
+                explanation: "Güvenli parola en az 12 karakter, karmaşık yapı ve kişisel bilgilerden kaçınma gerektirir.",
+                tips: [
+                    "Her hesap için farklı parola",
+                    "Parola yöneticisi kullanın",
+                    "Düzenli olarak güncelleyin",
+                    "İki faktörlü doğrulama aktif edin",
+                ],
+            },
+            {
+                id: "email-risk-assessment",
+                type: QuestionType.SLIDER_SCALE,
+                title: "E-posta Risk Değerlendirmesi",
+                statement: '"ACİL! Hesabınız askıya alındı, hemen şifreyi güncelleyin: bit.ly/update-pass"',
+                description: "Bu e-postanın risk seviyesini değerlendirin",
+                min: 1,
+                max: 10,
+                correctRange: { min: 8, max: 10 },
+                labels: { min: "Güvenli", max: "Çok Riskli" },
+                difficulty: "medium",
+                category: "E-posta Güvenliği",
+                explanation: "Bu e-posta yüksek risk içerir: Acil dil, belirsiz gönderen, kısaltılmış link.",
+                tips: [
+                    "Acil dil kullanımına dikkat edin",
+                    "Kısaltılmış linklere güvenmeyin",
+                    "Doğrudan resmi siteye gidin",
+                    "IT departmanına bildirin",
+                ],
+            },
+            {
+                id: "security-framework",
+                type: QuestionType.DRAG_DROP,
+                title: "Siber Güvenlik Çerçevesi",
+                description: "Güvenlik uygulamalarını doğru kategorilere yerleştirin",
+                difficulty: "hard",
+                category: "Güvenlik Yönetimi",
+                items: [
+                    {
+                        id: "strong-password",
+                        text: "Güçlü parola kullanmak",
+                        category: "prevention",
+                    },
+                    {
+                        id: "report-suspicious",
+                        text: "Şüpheli e-postayı bildirmek",
+                        category: "response",
+                    },
+                    {
+                        id: "software-update",
+                        text: "Yazılımları güncel tutmak",
+                        category: "prevention",
+                    },
+                    {
+                        id: "virus-scan",
+                        text: "Virüs taraması yapmak",
+                        category: "detection",
+                    },
+                    {
+                        id: "log-monitoring",
+                        text: "Sistem loglarını kontrol etmek",
+                        category: "detection",
+                    },
+                    {
+                        id: "account-lockdown",
+                        text: "Etkilenen hesapları kapatmak",
+                        category: "response",
+                    },
+                ],
+                categories: [
+                    {
+                        id: "prevention",
+                        name: "Önleme",
+                        description: "Saldırıları engelleyen önlemler",
+                        color: "green",
+                    },
+                    {
+                        id: "detection",
+                        name: "Tespit",
+                        description: "Tehditleri fark etme",
+                        color: "blue",
+                    },
+                    {
+                        id: "response",
+                        name: "Müdahale",
+                        description: "Olaylara karşı verilen tepki",
+                        color: "orange",
+                    },
+                ],
+                explanation: "Siber güvenlik üç ana aşamada ele alınır: Önleme, Tespit ve Müdahale.",
+                tips: [
+                    "Önleme her zaman en etkili yöntemdir",
+                    "Erken tespit kritik öneme sahiptir",
+                    "Hızlı müdahale zararı azaltır",
+                    "Sürekli eğitim gereklidir",
+                ],
+            },
+        ]
+    },
+    ui: {
+        showProgressBar: true,
+        showTimer: true,
+        showDifficulty: true,
+        showCategory: true
+    },
+    styling: {
+        primaryColor: ColorType.BLUE,
+        cardStyle: {
+            background: "linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card) / 0.95) 25%, hsl(var(--card) / 0.85) 50%, hsl(var(--card) / 0.75) 75%, hsl(var(--card) / 0.65) 100%)",
+            border: "0.5px solid rgba(255, 255, 255, 0.4)",
+            shadow: "0 12px 40px rgba(0, 0, 0, 0.08), 0 6px 20px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 rgba(0, 0, 0, 0.06)"
+        },
+        resultPanelStyle: {
+            background: "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 25%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.65) 75%, rgba(255, 255, 255, 0.55) 100%)",
+            border: "0.5px solid rgba(255, 255, 255, 0.4)",
+            shadow: "0 8px 32px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 rgba(0, 0, 0, 0.06)"
+        }
+    },
+    texts: {
+        nextQuestion: "Sonraki Soru",
+        retryQuestion: "Tekrar Dene",
+        quizCompleted: "Quiz Tamamlandı! 🎉",
+        correctAnswer: "Doğru! 🎉",
+        wrongAnswer: "Yanlış",
+        attemptsLeft: "deneme hakkınız kaldı",
+        noAttemptsLeft: "Deneme hakkınız bitti",
+        checkAnswer: "Cevabı Kontrol Et",
+        evaluating: "Değerlendiriliyor...",
+        completeEvaluation: "Değerlendirmeyi Tamamla",
+        mobileInstructions: "📱 Mobil: Önce öğeyi seçin, sonra kategoriye dokunun",
+        desktopInstructions: "🖥️ Masaüstü: Öğeleri sürükleyip kategorilere bırakın",
+        options: "Seçenekler",
+        categories: "Kategoriler",
+        tapHere: "Buraya dokunun",
+        checkAnswerButton: "Cevabı Kontrol Et",
+        explanation: "Açıklama",
+        tips: "💡 İpuçları",
+        mobileHint: "💡 En iyi deneyim için soruları dikkatle okuyun"
+    }
 };
 
 export type EducationType = keyof typeof educationConfigs;
