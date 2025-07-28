@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Toaster } from "./components/ui/sonner";
+import { Toaster } from "sonner";
 import { ProgressBar } from "./components/ProgressBar";
 import { NavButton } from "./components/NavButton";
 import { IntroScene } from "./components/scenes/IntroScene";
@@ -13,6 +13,235 @@ import { SummaryScene } from "./components/scenes/SummaryScene";
 import { NudgeScene } from "./components/scenes/NudgeScene";
 import { ChevronDown, Search, Loader2, ChevronDown as ChevronDownIcon, Star, X, Moon, Sun, Award, Timer } from "lucide-react";
 import { educationConfigs, quizSceneConfig } from "./components/configs/educationConfigs";
+import ReactCountryFlag from "react-country-flag";
+
+// Helper function to convert language codes to country codes
+const getCountryCode = (languageCode: string): string => {
+  const languageToCountry: { [key: string]: string } = {
+    'tr': 'TR',
+    'en': 'US',
+    'en-gb': 'GB',
+    'es': 'ES',
+    'es-mx': 'MX',
+    'fr': 'FR',
+    'de': 'DE',
+    'it': 'IT',
+    'pt': 'PT',
+    'pt-br': 'BR',
+    'ru': 'RU',
+    'zh': 'CN',
+    'zh-tw': 'TW',
+    'ja': 'JP',
+    'ko': 'KR',
+    'ar': 'SA',
+    'hi': 'IN',
+    'bn': 'BD',
+    'ur': 'PK',
+    'fa': 'IR',
+    'th': 'TH',
+    'vi': 'VN',
+    'id': 'ID',
+    'ms': 'MY',
+    'nl': 'NL',
+    'pl': 'PL',
+    'sv': 'SE',
+    'da': 'DK',
+    'no': 'NO',
+    'fi': 'FI',
+    'cs': 'CZ',
+    'sk': 'SK',
+    'hu': 'HU',
+    'ro': 'RO',
+    'bg': 'BG',
+    'hr': 'HR',
+    'sl': 'SI',
+    'et': 'EE',
+    'lv': 'LV',
+    'lt': 'LT',
+    'el': 'GR',
+    'mt': 'MT',
+    'ga': 'IE',
+    'cy': 'GB',
+    'eu': 'ES',
+    'ca': 'ES',
+    'gl': 'ES',
+    'af': 'ZA',
+    'sq': 'AL',
+    'am': 'ET',
+    'hy': 'AM',
+    'az': 'AZ',
+    'be': 'BY',
+    'bs': 'BA',
+    'ceb': 'PH',
+    'ny': 'MW',
+    'co': 'FR',
+    'eo': 'UN',
+    'tl': 'PH',
+    'fy': 'NL',
+    'ka': 'GE',
+    'gu': 'IN',
+    'ht': 'HT',
+    'ha': 'NG',
+    'haw': 'US',
+    'iw': 'IL',
+    'hmn': 'LA',
+    'is': 'IS',
+    'ig': 'NG',
+    'jw': 'ID',
+    'kn': 'IN',
+    'kk': 'KZ',
+    'km': 'KH',
+    'ku': 'TR',
+    'ky': 'KG',
+    'lo': 'LA',
+    'la': 'VA',
+    'lb': 'LU',
+    'mk': 'MK',
+    'mg': 'MG',
+    'ml': 'IN',
+    'mi': 'NZ',
+    'mr': 'IN',
+    'mn': 'MN',
+    'my': 'MM',
+    'ne': 'NP',
+    'ps': 'AF',
+    'sm': 'WS',
+    'gd': 'GB',
+    'sr': 'RS',
+    'st': 'LS',
+    'sn': 'ZW',
+    'sd': 'PK',
+    'si': 'LK',
+    'so': 'SO',
+    'su': 'ID',
+    'sw': 'KE',
+    'tg': 'TJ',
+    'ta': 'IN',
+    'te': 'IN',
+    'uk': 'UA',
+    'uz': 'UZ',
+    'xh': 'ZA',
+    'yi': 'IL',
+    'yo': 'NG',
+    'zu': 'ZA'
+  };
+
+  return languageToCountry[languageCode] || 'UN';
+};
+
+// Helper function to get localized search placeholder
+const getSearchPlaceholder = (languageCode: string): string => {
+  const placeholders: { [key: string]: string } = {
+    'tr': 'Dil ara...',
+    'en': 'Search language...',
+    'en-gb': 'Search language...',
+    'es': 'Buscar idioma...',
+    'es-mx': 'Buscar idioma...',
+    'fr': 'Rechercher une langue...',
+    'de': 'Sprache suchen...',
+    'it': 'Cerca lingua...',
+    'pt': 'Pesquisar idioma...',
+    'pt-br': 'Pesquisar idioma...',
+    'ru': 'Поиск языка...',
+    'zh': '搜索语言...',
+    'zh-tw': '搜尋語言...',
+    'ja': '言語を検索...',
+    'ko': '언어 검색...',
+    'ar': 'البحث عن لغة...',
+    'hi': 'भाषा खोजें...',
+    'bn': 'ভাষা অনুসন্ধান...',
+    'ur': 'زبان تلاش کریں...',
+    'fa': 'جستجوی زبان...',
+    'th': 'ค้นหาภาษา...',
+    'vi': 'Tìm kiếm ngôn ngữ...',
+    'id': 'Cari bahasa...',
+    'ms': 'Cari bahasa...',
+    'nl': 'Taal zoeken...',
+    'pl': 'Szukaj języka...',
+    'sv': 'Sök språk...',
+    'da': 'Søg sprog...',
+    'no': 'Søk språk...',
+    'fi': 'Etsi kieltä...',
+    'cs': 'Hledat jazyk...',
+    'sk': 'Hľadať jazyk...',
+    'hu': 'Nyelv keresése...',
+    'ro': 'Caută limba...',
+    'bg': 'Търсене на език...',
+    'hr': 'Pretraži jezik...',
+    'sl': 'Iskanje jezika...',
+    'et': 'Otsi keelt...',
+    'lv': 'Meklēt valodu...',
+    'lt': 'Ieškoti kalbos...',
+    'el': 'Αναζήτηση γλώσσας...',
+    'mt': 'Fittex lingwa...',
+    'ga': 'Cuardaigh teanga...',
+    'cy': 'Chwilio am iaith...',
+    'eu': 'Bilatu hizkuntza...',
+    'ca': 'Cerca idioma...',
+    'gl': 'Buscar idioma...',
+    'af': 'Soek taal...',
+    'sq': 'Kërko gjuhë...',
+    'am': 'ቋንቋ ፈልግ...',
+    'hy': 'Որոնել լեզու...',
+    'az': 'Dil axtar...',
+    'be': 'Пошук мовы...',
+    'bs': 'Pretraži jezik...',
+    'ceb': 'Pangita og pinulongan...',
+    'ny': 'Sakani chilankhulo...',
+    'co': 'Circà lingua...',
+    'eo': 'Serĉi lingvon...',
+    'tl': 'Maghanap ng wika...',
+    'fy': 'Sykje taal...',
+    'ka': 'ენის ძიება...',
+    'gu': 'ભાષા શોધો...',
+    'ht': 'Chèche lang...',
+    'ha': 'Nemo harshe...',
+    'haw': 'ʻImi ʻōlelo...',
+    'iw': 'חפש שפה...',
+    'hmn': 'Nrhiav lus...',
+    'is': 'Leita að tungumáli...',
+    'ig': 'Chọọ asụsụ...',
+    'jw': 'Golek basa...',
+    'kn': 'ಭಾಷೆಯನ್ನು ಹುಡುಕಿ...',
+    'kk': 'Тіл іздеу...',
+    'km': 'ស្វែងរកភាសា...',
+    'ku': 'Ziman bigere...',
+    'ky': 'Тил изде...',
+    'lo': 'ຄົ້ນຫາພາສາ...',
+    'la': 'Quaere linguam...',
+    'lb': 'Sprooch sichen...',
+    'mk': 'Пребарај јазик...',
+    'mg': 'Mitady fiteny...',
+    'ml': 'ഭാഷ തിരയുക...',
+    'mi': 'Rapu reo...',
+    'mr': 'भाषा शोधा...',
+    'mn': 'Хэл хайх...',
+    'my': 'ဘာသာစကား ရှာဖွေရန်...',
+    'ne': 'भाषा खोज्नुहोस्...',
+    'ps': 'ژبه ولټول...',
+    'sm': 'Sa\'ili gagana...',
+    'gd': 'Lorg cànan...',
+    'sr': 'Претражи језик...',
+    'st': 'Batla puo...',
+    'sn': 'Tsvaga mutauro...',
+    'sd': 'ٻولي ڳوليو...',
+    'si': 'භාෂාව සොයන්න...',
+    'so': 'Raadi luqadda...',
+    'su': 'Milarian basa...',
+    'sw': 'Tafuta lugha...',
+    'tg': 'Забон ҷустуҷӯ кунед...',
+    'ta': 'மொழியைத் தேடுங்கள்...',
+    'te': 'భాషను వెతకండి...',
+    'uk': 'Пошук мови...',
+    'uz': 'Til qidirish...',
+    'xh': 'Khangela ulwimi...',
+    'yi': 'זוך שפּראַך...',
+    'yo': 'Wa èdè...',
+    'zu': 'Sesha ulimi...'
+  };
+
+  return placeholders[languageCode] || 'Search language...';
+};
 
 const scenes = [
   {
@@ -77,7 +306,7 @@ const languages = [
   { code: 'hmn', name: 'Hmong', flag: '🇱🇦' },
   { code: 'hu', name: 'Hungarian', flag: '🇭🇺' },
   { code: 'is', name: 'Icelandic', flag: '🇮🇸' },
-  { code: 'ig', name: 'Igbo', flag: '�����🇬' },
+  { code: 'ig', name: 'Igbo', flag: '🇳🇬' },
   { code: 'id', name: 'Indonesian', flag: '🇮🇩' },
   { code: 'ga', name: 'Irish', flag: '🇮🇪' },
   { code: 'it', name: 'Italian', flag: '🇮🇹' },
@@ -101,16 +330,8 @@ const languages = [
   { code: 'mr', name: 'Marathi', flag: '🇮🇳' },
   { code: 'mn', name: 'Mongolian', flag: '🇲🇳' },
   { code: 'my', name: 'Myanmar (Burmese)', flag: '🇲🇲' },
-  { code: 'ne', name: 'Nepali', flag: '🇳���' },
-  { code: 'no', name: 'Norwegian', flag: '🇳🇴' },
-  { code: 'ps', name: 'Pashto', flag: '🇦��' },
-  { code: 'fa', name: 'Persian', flag: '🇮🇷' },
-  { code: 'pl', name: 'Polish', flag: '🇵🇱' },
-  { code: 'pt', name: 'Portuguese', flag: '🇵🇹' },
-  { code: 'pt-br', name: 'Portuguese (Brazil)', flag: '🇧🇷' },
-  { code: 'pa', name: 'Punjabi', flag: '🇮🇳' },
-  { code: 'ro', name: 'Romanian', flag: '🇷🇴' },
-  { code: 'ru', name: 'Russian', flag: '🇷🇺' },
+  { code: 'ne', name: 'Nepali', flag: '🇳🇵' },
+  { code: 'ps', name: 'Pashto', flag: '🇦🇫' },
   { code: 'sm', name: 'Samoan', flag: '🇼🇸' },
   { code: 'gd', name: 'Scots Gaelic', flag: '🏴󠁧󠁢󠁳󠁣󠁴󠁿' },
   { code: 'sr', name: 'Serbian', flag: '🇷🇸' },
@@ -201,6 +422,10 @@ export default function App() {
   const [quizSliderValue, setQuizSliderValue] = useState(5);
   const [quizDraggedItems, setQuizDraggedItems] = useState<Map<string, string>>(new Map());
   const [quizSelectedItem, setQuizSelectedItem] = useState<string | null>(null);
+
+  // Dropdown refs for click outside handling
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Stabilized state setters with useCallback to prevent unnecessary re-renders
   const setQuizAnswersStable = useCallback((answers: Map<string, any> | ((prev: Map<string, any>) => Map<string, any>)) => {
@@ -575,6 +800,31 @@ export default function App() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentScene, canProceedNext, nextScene, prevScene, isLanguageDropdownOpen]);
+
+  // Click outside handling for dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsLanguageDropdownOpen(false);
+        setLanguageSearchTerm('');
+      }
+    };
+
+    if (isLanguageDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isLanguageDropdownOpen]);
+
+  // Focus management for dropdown
+  useEffect(() => {
+    if (isLanguageDropdownOpen && searchInputRef.current) {
+      // Small delay to ensure dropdown is rendered
+      setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 100);
+    }
+  }, [isLanguageDropdownOpen]);
 
   const handleQuizCompleted = useCallback(() => {
     setQuizCompleted(true);
@@ -1120,7 +1370,7 @@ export default function App() {
               </motion.button>
 
               {/* ENHANCED LIQUID GLASS LANGUAGE SELECTOR - Mobile Optimized */}
-              <div className="relative">
+              <div className="relative" ref={dropdownRef}>
                 <motion.button
                   onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
                   className="relative flex items-center space-x-0.5 sm:space-x-1 md:space-x-2 px-1 sm:px-1.5 md:px-3 py-1 sm:py-1.5 md:py-2 rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20"
@@ -1187,9 +1437,13 @@ export default function App() {
 
                   {/* Content */}
                   <div className="relative z-10 flex items-center space-x-0.5 sm:space-x-1 md:space-x-2">
-                    <span className="text-[10px] sm:text-xs md:text-sm">{currentLanguage?.flag}</span>
-                    <span className="text-[8px] sm:text-xs text-gray-800 dark:text-gray-200 font-medium hidden lg:block transition-colors duration-300">
-                      {currentLanguage?.code.toUpperCase()}
+                    <ReactCountryFlag
+                      countryCode={getCountryCode(currentLanguage?.code || 'tr')}
+                      svg
+                      style={{ fontSize: '0.75rem' }}
+                    />
+                    <span className="text-[8px] sm:text-xs text-gray-800 dark:text-gray-200 font-medium hidden sm:block transition-colors duration-300">
+                      {getCountryCode(currentLanguage?.code || 'tr')}
                     </span>
                     <ChevronDown
                       size={8}
@@ -1214,14 +1468,17 @@ export default function App() {
                       {/* Enhanced Search Input */}
                       <div className="relative p-2.5 border-b border-gray-200/50 dark:border-gray-600/50 transition-colors duration-300">
                         <div className="relative">
-                          <Search size={12} className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400" />
+                          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 pointer-events-none z-10">
+                            <Search size={12} />
+                          </span>
                           <input
+                            ref={searchInputRef}
                             type="text"
-                            placeholder="Dil ara..."
+                            placeholder={getSearchPlaceholder(currentLanguage?.code || 'tr')}
                             value={languageSearchTerm}
                             onChange={(e) => setLanguageSearchTerm(e.target.value)}
-                            className={`w-full pl-8 pr-3 py-1.5 text-xs bg-white/60 dark:bg-gray-800/80 border border-white/40 dark:border-gray-600/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 focus:border-blue-300/50 dark:focus:border-blue-500/50 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-xl'}`}
-                            aria-label="Dil arama"
+                            className={`w-full pl-6 pr-3 py-1.5 text-xs bg-white/60 dark:bg-gray-800/80 border border-white/40 dark:border-gray-600/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 focus:border-blue-300/50 dark:focus:border-blue-500/50 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-xl'}`}
+                            aria-label={getSearchPlaceholder(currentLanguage?.code || 'tr')}
                           />
                         </div>
                       </div>
@@ -1264,12 +1521,16 @@ export default function App() {
                                     role="option"
                                     aria-selected={selectedLanguage === language.code}
                                   >
-                                    <span className="text-xs">{language.flag}</span>
+                                    <ReactCountryFlag
+                                      countryCode={getCountryCode(language.code)}
+                                      svg
+                                      style={{ fontSize: '0.75rem' }}
+                                    />
                                     <span className="text-xs text-gray-900 dark:text-white font-medium flex-1 min-w-0 truncate transition-colors duration-300">
                                       {language.name}
                                     </span>
                                     <span className="text-xs text-gray-600 dark:text-gray-300 flex-shrink-0 transition-colors duration-300">
-                                      {language.code.toUpperCase()}
+                                      {getCountryCode(language.code)}
                                     </span>
                                     {selectedLanguage === language.code && (
                                       <div className="w-1 h-1 bg-blue-500 dark:bg-blue-400 rounded-full flex-shrink-0"></div>
@@ -1335,12 +1596,16 @@ export default function App() {
                                   role="option"
                                   aria-selected={selectedLanguage === language.code}
                                 >
-                                  <span className="text-xs">{language.flag}</span>
+                                  <ReactCountryFlag
+                                    countryCode={getCountryCode(language.code)}
+                                    svg
+                                    style={{ fontSize: '0.75rem' }}
+                                  />
                                   <span className="text-xs text-gray-900 dark:text-white font-medium flex-1 min-w-0 truncate transition-colors duration-300">
                                     {language.name}
                                   </span>
                                   <span className="text-xs text-gray-600 dark:text-gray-300 flex-shrink-0 transition-colors duration-300">
-                                    {language.code.toUpperCase()}
+                                    {getCountryCode(language.code)}
                                   </span>
                                   {selectedLanguage === language.code && (
                                     <div className="w-1 h-1 bg-blue-500 dark:bg-blue-400 rounded-full flex-shrink-0"></div>
@@ -1956,18 +2221,7 @@ export default function App() {
         </div>
       )}
 
-      {/* Click outside to close dropdowns */}
-      {isLanguageDropdownOpen && (
-        <div
-          className="fixed inset-0 z-40"
-          onClick={() => {
-            setIsLanguageDropdownOpen(false);
-            setLanguageSearchTerm('');
-          }}
-          style={{ touchAction: 'manipulation' }}
-          aria-label="Dil seçiciyi kapat"
-        />
-      )}
+
 
       {/* Toast Container */}
       <Toaster />
