@@ -1755,7 +1755,8 @@ export default function App() {
             className="absolute left-0 top-0 bottom-0 w-20 pointer-events-auto"
             style={{
               touchAction: 'pan-x',
-              background: 'transparent'
+              background: 'transparent',
+              pointerEvents: currentScene === 2 ? 'none' : 'auto' // Disable on video scene
             }}
             onTouchStart={(e) => {
               const startX = e.touches[0].clientX;
@@ -1804,7 +1805,8 @@ export default function App() {
             className="absolute right-0 top-0 bottom-0 w-20 pointer-events-auto"
             style={{
               touchAction: 'pan-x',
-              background: 'transparent'
+              background: 'transparent',
+              pointerEvents: currentScene === 2 ? 'none' : 'auto' // Disable on video scene
             }}
             onTouchStart={(e) => {
               const startX = e.touches[0].clientX;

@@ -192,6 +192,7 @@ export interface QuizSceneConfig {
         mobileHint?: string;
         clearCategory?: string;
         removeItem?: string;
+        previousQuestion?: string;
     };
 }
 
@@ -1500,7 +1501,8 @@ export const quizSceneConfig: QuizSceneConfig = {
         checkAnswerButton: "Cevabı Kontrol Et",
         explanation: "Açıklama",
         tips: "💡 İpuçları",
-        mobileHint: "💡 En iyi deneyim için soruları dikkatle okuyun"
+        mobileHint: "💡 En iyi deneyim için soruları dikkatle okuyun",
+        previousQuestion: "Önceki Soru"
     }
 };
 

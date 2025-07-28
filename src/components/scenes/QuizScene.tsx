@@ -163,17 +163,17 @@ export const QuizScene = React.memo(function QuizScene({
           icon: "text-blue-400"
         }
       },
-      // Varsayılan durum - Nötr tonlar
+      // Varsayılan durum - Nötr tonlar (Enhanced Apple Liquid Glass)
       default: {
         light: {
-          background: "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 25%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.65) 75%, rgba(255, 255, 255, 0.55) 100%)",
-          border: "1.5px solid rgba(255, 255, 255, 0.6)",
+          background: "linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.92) 20%, rgba(255, 255, 255, 0.85) 40%, rgba(255, 255, 255, 0.78) 60%, rgba(255, 255, 255, 0.70) 80%, rgba(255, 255, 255, 0.62) 100%)",
+          border: "1.5px solid rgba(255, 255, 255, 0.7)",
           text: "text-gray-900 dark:text-gray-100",
           icon: "text-gray-600 dark:text-gray-400"
         },
         dark: {
-          background: "linear-gradient(135deg, rgba(55, 65, 81, 0.95) 0%, rgba(55, 65, 81, 0.85) 25%, rgba(55, 65, 81, 0.75) 50%, rgba(55, 65, 81, 0.65) 75%, rgba(55, 65, 81, 0.55) 100%)",
-          border: "1.5px solid rgba(75, 85, 99, 0.6)",
+          background: "linear-gradient(135deg, rgba(31, 41, 55, 0.98) 0%, rgba(31, 41, 55, 0.92) 20%, rgba(31, 41, 55, 0.85) 40%, rgba(31, 41, 55, 0.78) 60%, rgba(31, 41, 55, 0.70) 80%, rgba(31, 41, 55, 0.62) 100%)",
+          border: "1.5px solid rgba(75, 85, 99, 0.7)",
           text: "text-gray-100",
           icon: "text-gray-400"
         }
@@ -210,11 +210,11 @@ export const QuizScene = React.memo(function QuizScene({
         backdropFilter: "blur(28px) saturate(220%)",
         WebkitBackdropFilter: "blur(28px) saturate(220%)",
         boxShadow: `
-          0 6px 20px rgba(0, 0, 0, 0.06),
-          0 3px 10px rgba(0, 0, 0, 0.04),
-          0 1px 4px rgba(0, 0, 0, 0.02),
-          inset 0 1px 0 rgba(255, 255, 255, 0.8),
-          inset 0 -1px 0 rgba(0, 0, 0, 0.04)
+          0 8px 32px rgba(0, 0, 0, 0.08),
+          0 4px 16px rgba(0, 0, 0, 0.06),
+          0 2px 8px rgba(0, 0, 0, 0.04),
+          inset 0 1px 0 rgba(255, 255, 255, 0.9),
+          inset 0 -1px 0 rgba(0, 0, 0, 0.06)
         `,
       },
       iconClassName: currentStyle.icon
@@ -394,11 +394,20 @@ export const QuizScene = React.memo(function QuizScene({
     setIsLoading(false);
     setMultiSelectAnswers([]);
 
-    // Set slider value based on current question type
+    // Check if there's a saved answer for the current question
+    const savedAnswer = answers.get(currentQuestion?.id);
+
+    // Set slider value based on current question type and saved answer
     if (currentQuestion?.type === QuestionType.SLIDER_SCALE) {
       const sliderQuestion = currentQuestion as SliderScaleQuestion;
-      const midValue = Math.floor((sliderQuestion.min + sliderQuestion.max) / 2);
-      setSliderValue(midValue);
+      if (savedAnswer !== undefined) {
+        // Restore saved slider value
+        setSliderValue(savedAnswer);
+      } else {
+        // Use midpoint for new questions
+        const midValue = Math.floor((sliderQuestion.min + sliderQuestion.max) / 2);
+        setSliderValue(midValue);
+      }
     } else {
       setSliderValue(5);
     }
@@ -406,7 +415,7 @@ export const QuizScene = React.memo(function QuizScene({
     setDraggedItems(new Map());
     setSelectedItem(null);
     // Timer will be started by the effect when isTimerActive becomes true
-  }, [setShowResult, setTimeLeft, setIsTimerActive, setAttempts, setIsAnswerLocked, setIsLoading, setMultiSelectAnswers, setSliderValue, setDraggedItems, setSelectedItem, timerDuration, config.timer?.duration, currentQuestion]);
+  }, [setShowResult, setTimeLeft, setIsTimerActive, setAttempts, setIsAnswerLocked, setIsLoading, setMultiSelectAnswers, setSliderValue, setDraggedItems, setSelectedItem, timerDuration, config.timer?.duration, currentQuestion, answers]);
 
   const handleNextQuestion = useCallback(() => {
     setCurrentQuestionIndex((prev) => prev + 1);
@@ -1448,18 +1457,18 @@ export const QuizScene = React.memo(function QuizScene({
     const resultPanelStyle = config.styling?.resultPanelStyle; // Backward compatibility
 
     return {
-      background: resultPanelStyle?.background || "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 25%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.65) 75%, rgba(255, 255, 255, 0.55) 100%)",
-      backdropFilter: "blur(28px) saturate(220%)",
-      WebkitBackdropFilter: "blur(28px) saturate(220%)",
-      border: resultPanelStyle?.border || "0.5px solid rgba(255, 255, 255, 0.4)",
+      background: resultPanelStyle?.background || "linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.92) 20%, rgba(255, 255, 255, 0.85) 40%, rgba(255, 255, 255, 0.78) 60%, rgba(255, 255, 255, 0.70) 80%, rgba(255, 255, 255, 0.62) 100%)",
+      backdropFilter: "blur(32px) saturate(240%)",
+      WebkitBackdropFilter: "blur(32px) saturate(240%)",
+      border: resultPanelStyle?.border || "1px solid rgba(255, 255, 255, 0.6)",
       boxShadow: `
-        0 8px 32px rgba(0, 0, 0, 0.08),
-        0 4px 16px rgba(0, 0, 0, 0.06),
-        0 2px 8px rgba(0, 0, 0, 0.03),
-        inset 0 1px 0 rgba(255, 255, 255, 0.9),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.06)
+        0 12px 40px rgba(0, 0, 0, 0.1),
+        0 6px 20px rgba(0, 0, 0, 0.08),
+        0 3px 12px rgba(0, 0, 0, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.08)
       `,
-      borderRadius: resultPanel?.borderRadius || "rounded-xl",
+      borderRadius: resultPanel?.borderRadius || "rounded-2xl",
       gradientFrom: resultPanel?.gradientFrom,
       gradientTo: resultPanel?.gradientTo,
       // Yeni lightweight props'ları ayrı tut
@@ -1565,6 +1574,73 @@ export const QuizScene = React.memo(function QuizScene({
             </>
           )}
         </div>
+
+        {/* Navigation Buttons - Only show when quiz is completed */}
+        {isAnswerLocked && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center justify-center space-x-3 mt-4"
+          >
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentQuestionIndex(Math.max(0, currentQuestionIndex - 1))}
+              disabled={currentQuestionIndex === 0}
+              className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95"
+              style={{
+                background: currentQuestionIndex === 0
+                  ? "linear-gradient(135deg, rgba(156, 163, 175, 0.1) 0%, rgba(156, 163, 175, 0.05) 100%)"
+                  : "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 25%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.65) 75%, rgba(255, 255, 255, 0.55) 100%)",
+                backdropFilter: "blur(20px) saturate(200%)",
+                WebkitBackdropFilter: "blur(20px) saturate(200%)",
+                border: currentQuestionIndex === 0
+                  ? "1px solid rgba(156, 163, 175, 0.3)"
+                  : "1px solid rgba(255, 255, 255, 0.6)",
+                boxShadow: `
+                  0 4px 12px rgba(0, 0, 0, 0.08),
+                  0 2px 6px rgba(0, 0, 0, 0.04),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.8)
+                `,
+              }}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span className="hidden sm:inline">{config.texts?.previousQuestion || "Önceki"}</span>
+              <span className="sm:hidden">Önceki</span>
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentQuestionIndex(Math.min(questions.length - 1, currentQuestionIndex + 1))}
+              disabled={currentQuestionIndex === questions.length - 1}
+              className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95"
+              style={{
+                background: currentQuestionIndex === questions.length - 1
+                  ? "linear-gradient(135deg, rgba(156, 163, 175, 0.1) 0%, rgba(156, 163, 175, 0.05) 100%)"
+                  : "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 25%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.65) 75%, rgba(255, 255, 255, 0.55) 100%)",
+                backdropFilter: "blur(20px) saturate(200%)",
+                WebkitBackdropFilter: "blur(20px) saturate(200%)",
+                border: currentQuestionIndex === questions.length - 1
+                  ? "1px solid rgba(156, 163, 175, 0.3)"
+                  : "1px solid rgba(255, 255, 255, 0.6)",
+                boxShadow: `
+                  0 4px 12px rgba(0, 0, 0, 0.08),
+                  0 2px 6px rgba(0, 0, 0, 0.04),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.8)
+                `,
+              }}
+            >
+              <span className="hidden sm:inline">{config.texts?.nextQuestion || "Sonraki"}</span>
+              <span className="sm:hidden">Sonraki</span>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Button>
+          </motion.div>
+        )}
       </motion.div>
 
       {/* Question Card */}
@@ -1618,12 +1694,20 @@ export const QuizScene = React.memo(function QuizScene({
                   boxShadow: resultPanelStyle.boxShadow,
                 }}
               >
-                <div className="flex items-start space-x-3 mb-2.5">
-                  <div className="p-1.5 bg-chart-2/20 rounded-lg">
-                    <Lightbulb className="w-4 h-4 text-chart-2" />
+                <div className="flex items-start space-x-3 mb-3">
+                  <div
+                    className="p-2 rounded-xl flex items-center justify-center"
+                    style={{
+                      background: "linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.08) 100%)",
+                      border: "1px solid rgba(59, 130, 246, 0.3)",
+                      backdropFilter: "blur(12px) saturate(180%)",
+                      boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.2)"
+                    }}
+                  >
+                    <Lightbulb className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                   </div>
-                  <div className="flex-1">
-                    <p className="font-medium mb-1.5 text-foreground">
+                  <div className="flex-1 space-y-2">
+                    <p className="font-semibold text-foreground text-base">
                       {config.texts?.explanation || "Açıklama"}
                     </p>
                     <p className="text-sm text-muted-foreground leading-relaxed">
@@ -1634,11 +1718,19 @@ export const QuizScene = React.memo(function QuizScene({
 
                 {/* Tips */}
                 {currentQuestion?.tips && (
-                  <div className="mb-4">
-                    <h4 className="font-medium mb-1.5 text-foreground">
-                      {config.texts?.tips || "💡 İpuçları"}
+                  <div className="mb-4 p-3 rounded-xl"
+                    style={{
+                      background: "linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(34, 197, 94, 0.04) 100%)",
+                      border: "1px solid rgba(34, 197, 94, 0.2)",
+                      backdropFilter: "blur(16px) saturate(180%)",
+                      boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.1)"
+                    }}
+                  >
+                    <h4 className="font-semibold mb-2 text-foreground flex items-center space-x-2">
+                      <span className="text-lg">💡</span>
+                      <span>{config.texts?.tips || "İpuçları"}</span>
                     </h4>
-                    <div className="grid gap-1.5 md:grid-cols-2">
+                    <div className="grid gap-2 md:grid-cols-2">
                       {currentQuestion?.tips.map(
                         (tip, index) => (
                           <motion.div
@@ -1646,10 +1738,14 @@ export const QuizScene = React.memo(function QuizScene({
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.1 * index }}
-                            className="flex items-start space-x-2"
+                            className="flex items-start space-x-2 p-2 rounded-lg"
+                            style={{
+                              background: "rgba(255, 255, 255, 0.05)",
+                              border: "1px solid rgba(255, 255, 255, 0.1)"
+                            }}
                           >
-                            <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5 flex-shrink-0" />
-                            <span className="text-sm text-muted-foreground">
+                            <div className="w-2 h-2 bg-green-500 rounded-full mt-1.5 flex-shrink-0" />
+                            <span className="text-sm text-muted-foreground leading-relaxed">
                               {tip}
                             </span>
                           </motion.div>
