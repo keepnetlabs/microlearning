@@ -794,15 +794,33 @@ export const QuizScene = React.memo(function QuizScene({
               isLoading ||
               multiSelectAnswers.length < question.minCorrect
             }
-            className="min-w-[200px]"
+            className={`transition-all duration-300 ${config.styling?.buttons?.checkAnswer?.padding || 'px-4 py-2.5'} ${config.styling?.buttons?.checkAnswer?.fontSize || 'text-sm'} ${config.styling?.buttons?.checkAnswer?.fontWeight || 'font-medium'} ${config.styling?.buttons?.checkAnswer?.borderRadius || 'rounded-lg'}`}
+            style={{
+              background: config.styling?.buttons?.checkAnswer?.gradientFrom && config.styling?.buttons?.checkAnswer?.gradientTo
+                ? `linear-gradient(135deg, ${config.styling?.buttons?.checkAnswer?.gradientFrom} 0%, ${config.styling?.buttons?.checkAnswer?.gradientTo} 100%)`
+                : config.styling?.buttons?.checkAnswer?.backgroundColor || "linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.08) 100%)",
+              border: config.styling?.buttons?.checkAnswer?.borderColor || "1px solid rgba(59, 130, 246, 0.3)",
+              backdropFilter: "blur(16px) saturate(160%)",
+              WebkitBackdropFilter: "blur(16px) saturate(160%)",
+              boxShadow: config.styling?.buttons?.checkAnswer?.shadow || `
+                0 4px 16px rgba(59, 130, 246, 0.2),
+                0 2px 8px rgba(59, 130, 246, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.05)
+              `
+            }}
           >
             {isLoading ? (
               <div className="flex items-center space-x-2">
                 <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                <span>{config.texts?.checkAnswer || "Kontrol ediliyor..."}</span>
+                <span className={config.styling?.buttons?.checkAnswer?.textColor || 'text-white dark:text-blue-100'}>
+                  {config.texts?.checkAnswer || "Kontrol ediliyor..."}
+                </span>
               </div>
             ) : (
-              `${config.texts?.checkAnswer || "Cevabı Kontrol Et"} (${multiSelectAnswers.length}/${question.minCorrect})`
+              <span className={config.styling?.buttons?.checkAnswer?.textColor || 'text-blue-800 dark:text-white'}>
+                {`${config.texts?.checkAnswer || "Cevabı Kontrol Et"} (${multiSelectAnswers.length}/${question.minCorrect})`}
+              </span>
             )}
           </Button>
         </div>
@@ -900,15 +918,33 @@ export const QuizScene = React.memo(function QuizScene({
           <Button
             onClick={() => handleAnswer(sliderValue)}
             disabled={showResult || isLoading}
-            className="min-w-[200px]"
+            className={`transition-all duration-300 ${config.styling?.buttons?.checkAnswer?.padding || 'px-4 py-2.5'} ${config.styling?.buttons?.checkAnswer?.fontSize || 'text-sm'} ${config.styling?.buttons?.checkAnswer?.fontWeight || 'font-medium'} ${config.styling?.buttons?.checkAnswer?.borderRadius || 'rounded-lg'}`}
+            style={{
+              background: config.styling?.buttons?.checkAnswer?.gradientFrom && config.styling?.buttons?.checkAnswer?.gradientTo
+                ? `linear-gradient(135deg, ${config.styling?.buttons?.checkAnswer?.gradientFrom} 0%, ${config.styling?.buttons?.checkAnswer?.gradientTo} 100%)`
+                : config.styling?.buttons?.checkAnswer?.backgroundColor || "linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.08) 100%)",
+              border: config.styling?.buttons?.checkAnswer?.borderColor || "1px solid rgba(59, 130, 246, 0.3)",
+              backdropFilter: "blur(16px) saturate(160%)",
+              WebkitBackdropFilter: "blur(16px) saturate(160%)",
+              boxShadow: config.styling?.buttons?.checkAnswer?.shadow || `
+                0 4px 16px rgba(59, 130, 246, 0.2),
+                0 2px 8px rgba(59, 130, 246, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.05)
+              `
+            }}
           >
             {isLoading ? (
               <div className="flex items-center space-x-2">
                 <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                <span>{config.texts?.evaluating || "Değerlendiriliyor..."}</span>
+                <span className={config.styling?.buttons?.checkAnswer?.textColor || 'text-white dark:text-blue-100'}>
+                  {config.texts?.evaluating || "Değerlendiriliyor..."}
+                </span>
               </div>
             ) : (
-              config.texts?.completeEvaluation || "Değerlendirmeyi Tamamla"
+              <span className={config.styling?.buttons?.checkAnswer?.textColor || 'text-blue-800 dark:text-white'}>
+                {config.texts?.completeEvaluation || "Değerlendirmeyi Tamamla"}
+              </span>
             )}
           </Button>
         </div>
@@ -1308,28 +1344,36 @@ export const QuizScene = React.memo(function QuizScene({
           >
             <Button
               onClick={() => handleAnswer(draggedItems)}
-              className="w-full py-3 font-semibold"
+              className={`w-full transition-all duration-300 ${config.styling?.buttons?.checkAnswer?.padding || 'py-3'} ${config.styling?.buttons?.checkAnswer?.fontSize || 'text-sm'} ${config.styling?.buttons?.checkAnswer?.fontWeight || 'font-semibold'} ${config.styling?.buttons?.checkAnswer?.borderRadius || 'rounded-lg'}`}
               disabled={isLoading}
               style={{
-                background: "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.9) 100%)",
-                border: "1px solid hsl(var(--primary) / 0.8)",
-                backdropFilter: "blur(16px) saturate(180%)",
-                boxShadow: `
-                  0 4px 16px hsl(var(--primary) / 0.3),
-                  0 2px 8px hsl(var(--primary) / 0.2),
-                  inset 0 1px 0 hsl(var(--background) / 0.1)
+                background: config.styling?.buttons?.checkAnswer?.gradientFrom && config.styling?.buttons?.checkAnswer?.gradientTo
+                  ? `linear-gradient(135deg, ${config.styling?.buttons?.checkAnswer?.gradientFrom} 0%, ${config.styling?.buttons?.checkAnswer?.gradientTo} 100%)`
+                  : config.styling?.buttons?.checkAnswer?.backgroundColor || "linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.08) 100%)",
+                border: config.styling?.buttons?.checkAnswer?.borderColor || "1px solid rgba(59, 130, 246, 0.3)",
+                backdropFilter: "blur(16px) saturate(160%)",
+                WebkitBackdropFilter: "blur(16px) saturate(160%)",
+                boxShadow: config.styling?.buttons?.checkAnswer?.shadow || `
+                  0 4px 16px rgba(59, 130, 246, 0.2),
+                  0 2px 8px rgba(59, 130, 246, 0.1),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                  inset 0 -1px 0 rgba(0, 0, 0, 0.05)
                 `
               }}
             >
               {isLoading ? (
                 <div className="flex items-center space-x-2">
                   <div className="w-4 h-4 border-2 border-background/30 border-t-background rounded-full animate-spin" />
-                  <span>{config.texts?.checkAnswer || "Kontrol ediliyor..."}</span>
+                  <span className={config.styling?.buttons?.checkAnswer?.textColor || 'text-blue-800 dark:text-white'}>
+                    {config.texts?.checkAnswer || "Kontrol ediliyor..."}
+                  </span>
                 </div>
               ) : (
                 <div className="flex items-center space-x-2">
-                  <Zap className="w-4 h-4" />
-                  <span>{config.texts?.checkAnswerButton || "Cevabı Kontrol Et"}</span>
+                  <Zap className={`w-4 h-4 ${config.styling?.buttons?.checkAnswer?.iconColor || 'text-blue-600 dark:text-blue-200'}`} />
+                  <span className={config.styling?.buttons?.checkAnswer?.textColor || 'text-blue-800 dark:text-white'}>
+                    {config.texts?.checkAnswerButton || "Cevabı Kontrol Et"}
+                  </span>
                 </div>
               )}
             </Button>
@@ -1431,16 +1475,16 @@ export const QuizScene = React.memo(function QuizScene({
 
     return {
       // Yeni lightweight props'ları kullan, yoksa eski cardStyle'ı kullan
-      background: card?.backgroundColor || cardStyle?.background || "linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card) / 0.95) 25%, hsl(var(--card) / 0.85) 50%, hsl(var(--card) / 0.75) 75%, hsl(var(--card) / 0.65) 100%)",
-      backdropFilter: "blur(36px) saturate(240%)",
-      WebkitBackdropFilter: "blur(36px) saturate(240%)",
-      border: cardStyle?.border || "0.5px solid rgba(255, 255, 255, 0.4)", // Eski border kullan
+      background: card?.backgroundColor || cardStyle?.background || "linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.88) 20%, rgba(255, 255, 255, 0.84) 40%, rgba(255, 255, 255, 0.80) 60%, rgba(255, 255, 255, 0.76) 80%, rgba(255, 255, 255, 0.72) 100%)",
+      backdropFilter: "blur(28px) saturate(200%)",
+      WebkitBackdropFilter: "blur(28px) saturate(200%)",
+      border: cardStyle?.border || "1px solid rgba(255, 255, 255, 0.25)", // Eski border kullan
       boxShadow: `
-        0 12px 40px rgba(0, 0, 0, 0.08),
+        0 12px 40px rgba(0, 0, 0, 0.1),
         0 6px 20px rgba(0, 0, 0, 0.06),
-        0 2px 8px rgba(0, 0, 0, 0.03),
-        inset 0 1px 0 rgba(255, 255, 255, 0.9),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.06)
+        0 3px 12px rgba(0, 0, 0, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.85),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.08)
       `,
       borderRadius: card?.borderRadius || "rounded-2xl",
       gradientFrom: card?.gradientFrom,
@@ -1457,16 +1501,16 @@ export const QuizScene = React.memo(function QuizScene({
     const resultPanelStyle = config.styling?.resultPanelStyle; // Backward compatibility
 
     return {
-      background: resultPanelStyle?.background || "linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.92) 20%, rgba(255, 255, 255, 0.85) 40%, rgba(255, 255, 255, 0.78) 60%, rgba(255, 255, 255, 0.70) 80%, rgba(255, 255, 255, 0.62) 100%)",
-      backdropFilter: "blur(32px) saturate(240%)",
-      WebkitBackdropFilter: "blur(32px) saturate(240%)",
-      border: resultPanelStyle?.border || "1px solid rgba(255, 255, 255, 0.6)",
+      background: resultPanelStyle?.background || "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.90) 20%, rgba(255, 255, 255, 0.85) 40%, rgba(255, 255, 255, 0.80) 60%, rgba(255, 255, 255, 0.75) 80%, rgba(255, 255, 255, 0.70) 100%)",
+      backdropFilter: "blur(24px) saturate(180%)",
+      WebkitBackdropFilter: "blur(24px) saturate(180%)",
+      border: resultPanelStyle?.border || "1px solid rgba(255, 255, 255, 0.3)",
       boxShadow: `
-        0 12px 40px rgba(0, 0, 0, 0.1),
-        0 6px 20px rgba(0, 0, 0, 0.08),
-        0 3px 12px rgba(0, 0, 0, 0.05),
-        inset 0 1px 0 rgba(255, 255, 255, 0.95),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.08)
+        0 8px 32px rgba(0, 0, 0, 0.12),
+        0 4px 16px rgba(0, 0, 0, 0.08),
+        0 2px 8px rgba(0, 0, 0, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.05)
       `,
       borderRadius: resultPanel?.borderRadius || "rounded-2xl",
       gradientFrom: resultPanel?.gradientFrom,
@@ -1698,10 +1742,16 @@ export const QuizScene = React.memo(function QuizScene({
                   <div
                     className="p-2 rounded-xl flex items-center justify-center"
                     style={{
-                      background: "linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.08) 100%)",
-                      border: "1px solid rgba(59, 130, 246, 0.3)",
-                      backdropFilter: "blur(12px) saturate(180%)",
-                      boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.2)"
+                      background: "linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(59, 130, 246, 0.08) 50%, rgba(59, 130, 246, 0.04) 100%)",
+                      border: "1px solid rgba(59, 130, 246, 0.25)",
+                      backdropFilter: "blur(16px) saturate(160%)",
+                      WebkitBackdropFilter: "blur(16px) saturate(160%)",
+                      boxShadow: `
+                        0 4px 16px rgba(59, 130, 246, 0.15),
+                        0 2px 8px rgba(59, 130, 246, 0.08),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                        inset 0 -1px 0 rgba(0, 0, 0, 0.05)
+                      `
                     }}
                   >
                     <Lightbulb className="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -1720,10 +1770,16 @@ export const QuizScene = React.memo(function QuizScene({
                 {currentQuestion?.tips && (
                   <div className="mb-4 p-3 rounded-xl"
                     style={{
-                      background: "linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(34, 197, 94, 0.04) 100%)",
+                      background: "linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(34, 197, 94, 0.06) 30%, rgba(34, 197, 94, 0.04) 70%, rgba(34, 197, 94, 0.02) 100%)",
                       border: "1px solid rgba(34, 197, 94, 0.2)",
-                      backdropFilter: "blur(16px) saturate(180%)",
-                      boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.1)"
+                      backdropFilter: "blur(20px) saturate(160%)",
+                      WebkitBackdropFilter: "blur(20px) saturate(160%)",
+                      boxShadow: `
+                        0 4px 16px rgba(34, 197, 94, 0.1),
+                        0 2px 8px rgba(34, 197, 94, 0.05),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                        inset 0 -1px 0 rgba(0, 0, 0, 0.03)
+                      `
                     }}
                   >
                     <h4 className="font-semibold mb-2 text-foreground flex items-center space-x-2">
@@ -1740,8 +1796,15 @@ export const QuizScene = React.memo(function QuizScene({
                             transition={{ delay: 0.1 * index }}
                             className="flex items-start space-x-2 p-2 rounded-lg"
                             style={{
-                              background: "rgba(255, 255, 255, 0.05)",
-                              border: "1px solid rgba(255, 255, 255, 0.1)"
+                              background: "linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%)",
+                              border: "1px solid rgba(255, 255, 255, 0.15)",
+                              backdropFilter: "blur(12px) saturate(140%)",
+                              WebkitBackdropFilter: "blur(12px) saturate(140%)",
+                              boxShadow: `
+                                0 2px 8px rgba(0, 0, 0, 0.04),
+                                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                                inset 0 -1px 0 rgba(0, 0, 0, 0.02)
+                              `
                             }}
                           >
                             <div className="w-2 h-2 bg-green-500 rounded-full mt-1.5 flex-shrink-0" />
@@ -1822,10 +1885,26 @@ export const QuizScene = React.memo(function QuizScene({
                         <Button
                           variant="outline"
                           onClick={retryQuestion}
-                          className="flex items-center space-x-2"
+                          className={`flex items-center space-x-2 transition-all duration-300 ${config.styling?.buttons?.retryQuestion?.padding || 'px-4 py-2.5'} ${config.styling?.buttons?.retryQuestion?.borderRadius || 'rounded-lg'} ${config.styling?.buttons?.retryQuestion?.fontSize || 'text-sm'} ${config.styling?.buttons?.retryQuestion?.fontWeight || 'font-medium'}`}
+                          style={{
+                            background: config.styling?.buttons?.retryQuestion?.gradientFrom && config.styling?.buttons?.retryQuestion?.gradientTo
+                              ? `linear-gradient(135deg, ${config.styling?.buttons?.retryQuestion?.gradientFrom} 0%, ${config.styling?.buttons?.retryQuestion?.gradientTo} 100%)`
+                              : config.styling?.buttons?.retryQuestion?.backgroundColor || "linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%)",
+                            border: config.styling?.buttons?.retryQuestion?.borderColor || "1px solid rgba(0, 0, 0, 0.1)",
+                            backdropFilter: "blur(16px) saturate(160%)",
+                            WebkitBackdropFilter: "blur(16px) saturate(160%)",
+                            boxShadow: config.styling?.buttons?.retryQuestion?.shadow || `
+                              0 4px 16px rgba(0, 0, 0, 0.1),
+                              0 2px 8px rgba(0, 0, 0, 0.05),
+                              inset 0 1px 0 rgba(255, 255, 255, 0.8),
+                              inset 0 -1px 0 rgba(0, 0, 0, 0.02)
+                            `
+                          }}
                         >
-                          <RotateCcw className="w-4 h-4" />
-                          <span>{config.texts?.retryQuestion || "Tekrar Dene"}</span>
+                          <RotateCcw className={`w-4 h-4 ${config.styling?.buttons?.retryQuestion?.iconColor || 'text-gray-600 dark:text-gray-300'}`} />
+                          <span className={config.styling?.buttons?.retryQuestion?.textColor || 'text-gray-800 dark:text-gray-200'}>
+                            {config.texts?.retryQuestion || "Tekrar Dene"}
+                          </span>
                         </Button>
                       )}
 
@@ -1835,11 +1914,27 @@ export const QuizScene = React.memo(function QuizScene({
                       currentQuestionIndex < questions.length - 1 && (
                         <Button
                           onClick={handleNextQuestion}
-                          className="flex items-center space-x-2 bg-primary hover:bg-primary/90 transition-all duration-300"
+                          className={`flex items-center space-x-2 transition-all duration-300 ${config.styling?.buttons?.nextQuestion?.padding || 'px-4 py-2.5'} ${config.styling?.buttons?.nextQuestion?.borderRadius || 'rounded-lg'} ${config.styling?.buttons?.nextQuestion?.fontSize || 'text-sm'} ${config.styling?.buttons?.nextQuestion?.fontWeight || 'font-medium'}`}
+                          style={{
+                            background: config.styling?.buttons?.nextQuestion?.gradientFrom && config.styling?.buttons?.nextQuestion?.gradientTo
+                              ? `linear-gradient(135deg, ${config.styling?.buttons?.nextQuestion?.gradientFrom} 0%, ${config.styling?.buttons?.nextQuestion?.gradientTo} 100%)`
+                              : config.styling?.buttons?.nextQuestion?.backgroundColor || "linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.08) 100%)",
+                            border: config.styling?.buttons?.nextQuestion?.borderColor || "1px solid rgba(59, 130, 246, 0.3)",
+                            backdropFilter: "blur(16px) saturate(160%)",
+                            WebkitBackdropFilter: "blur(16px) saturate(160%)",
+                            boxShadow: config.styling?.buttons?.nextQuestion?.shadow || `
+                              0 4px 16px rgba(59, 130, 246, 0.2),
+                              0 2px 8px rgba(59, 130, 246, 0.1),
+                              inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                              inset 0 -1px 0 rgba(0, 0, 0, 0.05)
+                            `
+                          }}
                         >
-                          <span>{config.texts?.nextQuestion || "Sonraki Soru"}</span>
+                          <span className={config.styling?.buttons?.nextQuestion?.textColor || 'text-blue-800 dark:text-white'}>
+                            {config.texts?.nextQuestion || "Sonraki Soru"}
+                          </span>
                           <svg
-                            className="w-4 h-4"
+                            className={`w-4 h-4 ${config.styling?.buttons?.nextQuestion?.iconColor || 'text-blue-600 dark:text-blue-400'}`}
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"

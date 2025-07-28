@@ -168,6 +168,48 @@ export interface QuizSceneConfig {
             border?: string;
             shadow?: string;
         };
+        // Button configurations
+        buttons?: {
+            nextQuestion?: {
+                backgroundColor?: string;    // "rgba(59, 130, 246, 0.15)"
+                borderColor?: string;       // "rgba(59, 130, 246, 0.25)"
+                textColor?: string;         // "text-blue-800 dark:text-blue-300"
+                iconColor?: string;         // "text-blue-600 dark:text-blue-400"
+                gradientFrom?: string;      // "rgba(59, 130, 246, 0.15)"
+                gradientTo?: string;        // "rgba(59, 130, 246, 0.08)"
+                shadow?: string;            // Custom shadow
+                borderRadius?: string;      // "rounded-lg"
+                padding?: string;           // "px-4 py-2.5"
+                fontSize?: string;          // "text-sm"
+                fontWeight?: string;        // "font-medium"
+            };
+            retryQuestion?: {
+                backgroundColor?: string;    // "rgba(255, 255, 255, 0.08)"
+                borderColor?: string;       // "rgba(255, 255, 255, 0.15)"
+                textColor?: string;         // "text-muted-foreground"
+                iconColor?: string;         // "text-muted-foreground"
+                gradientFrom?: string;      // "rgba(255, 255, 255, 0.08)"
+                gradientTo?: string;        // "rgba(255, 255, 255, 0.04)"
+                shadow?: string;            // Custom shadow
+                borderRadius?: string;      // "rounded-lg"
+                padding?: string;           // "px-4 py-2.5"
+                fontSize?: string;          // "text-sm"
+                fontWeight?: string;        // "font-medium"
+            };
+            checkAnswer?: {
+                backgroundColor?: string;    // "rgba(59, 130, 246, 0.15)"
+                borderColor?: string;       // "rgba(59, 130, 246, 0.25)"
+                textColor?: string;         // "text-blue-800 dark:text-blue-300"
+                iconColor?: string;         // "text-blue-600 dark:text-blue-400"
+                gradientFrom?: string;      // "rgba(59, 130, 246, 0.15)"
+                gradientTo?: string;        // "rgba(59, 130, 246, 0.08)"
+                shadow?: string;            // Custom shadow
+                borderRadius?: string;      // "rounded-lg"
+                padding?: string;           // "px-4 py-2.5"
+                fontSize?: string;          // "text-sm"
+                fontWeight?: string;        // "font-medium"
+            };
+        };
     };
     // Text configurations
     texts?: {
@@ -193,6 +235,71 @@ export interface QuizSceneConfig {
         clearCategory?: string;
         removeItem?: string;
         previousQuestion?: string;
+    };
+}
+
+export interface SurveySceneConfig {
+    texts?: {
+        title?: string;
+        ratingQuestion?: string;
+        topicsQuestion?: string;
+        feedbackQuestion?: string;
+        feedbackPlaceholder?: string;
+        submitButton?: string;
+        submittingText?: string;
+        ratingRequiredText?: string;
+        dataSecurityNotice?: string;
+        successTitle?: string;
+        successMessage1?: string;
+        successMessage2?: string;
+        successMessage3?: string;
+        thankYouMessage?: string;
+    };
+    topics?: string[];
+    icon?: {
+        name?: string;
+        size?: number;
+        color?: string;
+        isActive?: boolean;
+        isCompleted?: boolean;
+    };
+    styling?: {
+        container?: {
+            backgroundColor?: string;
+            borderColor?: string;
+            borderRadius?: string;
+            padding?: string;
+            shadow?: string;
+        };
+        rating?: {
+            starColor?: string;
+            starSize?: string;
+            hoverColor?: string;
+        };
+        topics?: {
+            checkboxColor?: string;
+            textColor?: string;
+            hoverColor?: string;
+        };
+        feedback?: {
+            backgroundColor?: string;
+            borderColor?: string;
+            textColor?: string;
+            placeholderColor?: string;
+        };
+        submitButton?: {
+            backgroundColor?: string;
+            textColor?: string;
+            disabledColor?: string;
+            borderRadius?: string;
+            padding?: string;
+        };
+        successCard?: {
+            backgroundColor?: string;
+            borderColor?: string;
+            iconColor?: string;
+            textColor?: string;
+        };
     };
 }
 
@@ -1480,6 +1587,48 @@ export const quizSceneConfig: QuizSceneConfig = {
             background: "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 25%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.65) 75%, rgba(255, 255, 255, 0.55) 100%)",
             border: "0.5px solid rgba(255, 255, 255, 0.4)",
             shadow: "0 8px 32px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 rgba(0, 0, 0, 0.06)"
+        },
+        // Button configurations
+        buttons: {
+            nextQuestion: {
+                backgroundColor: "rgba(59, 130, 246, 0.15)",
+                borderColor: "rgba(59, 130, 246, 0.3)",
+                textColor: "text-blue-800 dark:text-white",
+                iconColor: "text-blue-600 dark:text-blue-200",
+                gradientFrom: "rgba(59, 130, 246, 0.15)",
+                gradientTo: "rgba(59, 130, 246, 0.08)",
+                shadow: "0 4px 16px rgba(59, 130, 246, 0.2), 0 2px 8px rgba(59, 130, 246, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 -1px 0 rgba(0, 0, 0, 0.05)",
+                borderRadius: "rounded-lg",
+                padding: "px-4 py-2.5",
+                fontSize: "text-sm",
+                fontWeight: "font-medium"
+            },
+            retryQuestion: {
+                backgroundColor: "rgba(255, 255, 255, 0.8)",
+                borderColor: "rgba(0, 0, 0, 0.1)",
+                textColor: "text-gray-800 dark:text-gray-200",
+                iconColor: "text-gray-600 dark:text-gray-300",
+                gradientFrom: "rgba(255, 255, 255, 0.8)",
+                gradientTo: "rgba(255, 255, 255, 0.6)",
+                shadow: "0 4px 16px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 0 rgba(0, 0, 0, 0.02)",
+                borderRadius: "rounded-lg",
+                padding: "px-4 py-2.5",
+                fontSize: "text-sm",
+                fontWeight: "font-medium"
+            },
+            checkAnswer: {
+                backgroundColor: "rgba(59, 130, 246, 0.15)",
+                borderColor: "rgba(59, 130, 246, 0.3)",
+                textColor: "text-blue-800 dark:text-white",
+                iconColor: "text-blue-600 dark:text-blue-200",
+                gradientFrom: "rgba(59, 130, 246, 0.15)",
+                gradientTo: "rgba(59, 130, 246, 0.08)",
+                shadow: "0 4px 16px rgba(59, 130, 246, 0.2), 0 2px 8px rgba(59, 130, 246, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 -1px 0 rgba(0, 0, 0, 0.05)",
+                borderRadius: "rounded-lg",
+                padding: "px-4 py-2.5",
+                fontSize: "text-sm",
+                fontWeight: "font-medium"
+            }
         }
     },
     texts: {
@@ -1503,6 +1652,76 @@ export const quizSceneConfig: QuizSceneConfig = {
         tips: "💡 İpuçları",
         mobileHint: "💡 En iyi deneyim için soruları dikkatle okuyun",
         previousQuestion: "Önceki Soru"
+    }
+};
+
+export const surveySceneConfig: SurveySceneConfig = {
+    texts: {
+        title: "Geri Bildiriminiz",
+        ratingQuestion: "Bu eğitimi nasıl değerlendiriyorsunuz?",
+        topicsQuestion: "Hangi konuyu daha detaylı öğrenmek istersiniz?",
+        feedbackQuestion: "Ek yorumlarınız:",
+        feedbackPlaceholder: "İyileştirme önerilerinizi paylaşın...",
+        submitButton: "Geri Bildirimi Gönder",
+        submittingText: "Gönderiliyor...",
+        ratingRequiredText: "Göndermek için lütfen bir puan verin",
+        dataSecurityNotice: "🔒 Geri bildirimleriniz güvenli bir şekilde saklanır ve sadece eğitim kalitesini artırmak için kullanılır.",
+        successTitle: "Geri Bildiriminiz Alındı!",
+        successMessage1: "✅ Değerlendirmeniz başarıyla kaydedildi",
+        successMessage2: "📧 Ekibimiz geri bildirimlerinizi inceleyecek",
+        successMessage3: "🔒 Tüm verileriniz güvenli bir şekilde saklanmaktadır",
+        thankYouMessage: "Teşekkürler! Görüşleriniz bizim için çok değerli."
+    },
+    topics: [
+        "Parola yöneticisi kullanımı",
+        "Çok faktörlü kimlik doğrulama",
+        "Phishing saldırılarından korunma",
+        "Kurumsal güvenlik politikaları"
+    ],
+    icon: {
+        name: "message-square",
+        size: 48,
+        color: "text-blue-500",
+        isActive: true,
+        isCompleted: false
+    },
+    styling: {
+        container: {
+            backgroundColor: "rgba(255, 255, 255, 0.6)",
+            borderColor: "rgba(255, 255, 255, 0.3)",
+            borderRadius: "rounded-2xl",
+            padding: "p-4 sm:p-6",
+            shadow: "shadow-xl"
+        },
+        rating: {
+            starColor: "text-yellow-400",
+            starSize: "20",
+            hoverColor: "hover:bg-white/40 dark:hover:bg-gray-700/50"
+        },
+        topics: {
+            checkboxColor: "bg-blue-500 border-blue-500",
+            textColor: "text-gray-700 dark:text-gray-200",
+            hoverColor: "hover:bg-white/30 dark:hover:bg-gray-700/40"
+        },
+        feedback: {
+            backgroundColor: "bg-white/80 dark:bg-gray-700/60",
+            borderColor: "border-gray-200 dark:border-gray-600/50",
+            textColor: "text-gray-900 dark:text-white",
+            placeholderColor: "placeholder-gray-500 dark:placeholder-gray-400"
+        },
+        submitButton: {
+            backgroundColor: "bg-gradient-to-r from-blue-500 to-indigo-600",
+            textColor: "text-white",
+            disabledColor: "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400",
+            borderRadius: "rounded-xl",
+            padding: "py-3"
+        },
+        successCard: {
+            backgroundColor: "bg-emerald-50/60 dark:bg-emerald-900/40",
+            borderColor: "border-emerald-200/50 dark:border-emerald-600/60",
+            iconColor: "text-emerald-500 dark:text-emerald-400",
+            textColor: "text-emerald-800 dark:text-emerald-100"
+        }
     }
 };
 

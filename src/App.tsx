@@ -14,234 +14,7 @@ import { NudgeScene } from "./components/scenes/NudgeScene";
 import { ChevronDown, Search, Loader2, ChevronDown as ChevronDownIcon, Star, X, Moon, Sun, Award, Timer } from "lucide-react";
 import { educationConfigs, quizSceneConfig } from "./components/configs/educationConfigs";
 import ReactCountryFlag from "react-country-flag";
-
-// Helper function to convert language codes to country codes
-const getCountryCode = (languageCode: string): string => {
-  const languageToCountry: { [key: string]: string } = {
-    'tr': 'TR',
-    'en': 'US',
-    'en-gb': 'GB',
-    'es': 'ES',
-    'es-mx': 'MX',
-    'fr': 'FR',
-    'de': 'DE',
-    'it': 'IT',
-    'pt': 'PT',
-    'pt-br': 'BR',
-    'ru': 'RU',
-    'zh': 'CN',
-    'zh-tw': 'TW',
-    'ja': 'JP',
-    'ko': 'KR',
-    'ar': 'SA',
-    'hi': 'IN',
-    'bn': 'BD',
-    'ur': 'PK',
-    'fa': 'IR',
-    'th': 'TH',
-    'vi': 'VN',
-    'id': 'ID',
-    'ms': 'MY',
-    'nl': 'NL',
-    'pl': 'PL',
-    'sv': 'SE',
-    'da': 'DK',
-    'no': 'NO',
-    'fi': 'FI',
-    'cs': 'CZ',
-    'sk': 'SK',
-    'hu': 'HU',
-    'ro': 'RO',
-    'bg': 'BG',
-    'hr': 'HR',
-    'sl': 'SI',
-    'et': 'EE',
-    'lv': 'LV',
-    'lt': 'LT',
-    'el': 'GR',
-    'mt': 'MT',
-    'ga': 'IE',
-    'cy': 'GB',
-    'eu': 'ES',
-    'ca': 'ES',
-    'gl': 'ES',
-    'af': 'ZA',
-    'sq': 'AL',
-    'am': 'ET',
-    'hy': 'AM',
-    'az': 'AZ',
-    'be': 'BY',
-    'bs': 'BA',
-    'ceb': 'PH',
-    'ny': 'MW',
-    'co': 'FR',
-    'eo': 'UN',
-    'tl': 'PH',
-    'fy': 'NL',
-    'ka': 'GE',
-    'gu': 'IN',
-    'ht': 'HT',
-    'ha': 'NG',
-    'haw': 'US',
-    'iw': 'IL',
-    'hmn': 'LA',
-    'is': 'IS',
-    'ig': 'NG',
-    'jw': 'ID',
-    'kn': 'IN',
-    'kk': 'KZ',
-    'km': 'KH',
-    'ku': 'TR',
-    'ky': 'KG',
-    'lo': 'LA',
-    'la': 'VA',
-    'lb': 'LU',
-    'mk': 'MK',
-    'mg': 'MG',
-    'ml': 'IN',
-    'mi': 'NZ',
-    'mr': 'IN',
-    'mn': 'MN',
-    'my': 'MM',
-    'ne': 'NP',
-    'ps': 'AF',
-    'sm': 'WS',
-    'gd': 'GB',
-    'sr': 'RS',
-    'st': 'LS',
-    'sn': 'ZW',
-    'sd': 'PK',
-    'si': 'LK',
-    'so': 'SO',
-    'su': 'ID',
-    'sw': 'KE',
-    'tg': 'TJ',
-    'ta': 'IN',
-    'te': 'IN',
-    'uk': 'UA',
-    'uz': 'UZ',
-    'xh': 'ZA',
-    'yi': 'IL',
-    'yo': 'NG',
-    'zu': 'ZA'
-  };
-
-  return languageToCountry[languageCode] || 'UN';
-};
-
-// Helper function to get localized search placeholder
-const getSearchPlaceholder = (languageCode: string): string => {
-  const placeholders: { [key: string]: string } = {
-    'tr': 'Dil ara...',
-    'en': 'Search language...',
-    'en-gb': 'Search language...',
-    'es': 'Buscar idioma...',
-    'es-mx': 'Buscar idioma...',
-    'fr': 'Rechercher une langue...',
-    'de': 'Sprache suchen...',
-    'it': 'Cerca lingua...',
-    'pt': 'Pesquisar idioma...',
-    'pt-br': 'Pesquisar idioma...',
-    'ru': 'Поиск языка...',
-    'zh': '搜索语言...',
-    'zh-tw': '搜尋語言...',
-    'ja': '言語を検索...',
-    'ko': '언어 검색...',
-    'ar': 'البحث عن لغة...',
-    'hi': 'भाषा खोजें...',
-    'bn': 'ভাষা অনুসন্ধান...',
-    'ur': 'زبان تلاش کریں...',
-    'fa': 'جستجوی زبان...',
-    'th': 'ค้นหาภาษา...',
-    'vi': 'Tìm kiếm ngôn ngữ...',
-    'id': 'Cari bahasa...',
-    'ms': 'Cari bahasa...',
-    'nl': 'Taal zoeken...',
-    'pl': 'Szukaj języka...',
-    'sv': 'Sök språk...',
-    'da': 'Søg sprog...',
-    'no': 'Søk språk...',
-    'fi': 'Etsi kieltä...',
-    'cs': 'Hledat jazyk...',
-    'sk': 'Hľadať jazyk...',
-    'hu': 'Nyelv keresése...',
-    'ro': 'Caută limba...',
-    'bg': 'Търсене на език...',
-    'hr': 'Pretraži jezik...',
-    'sl': 'Iskanje jezika...',
-    'et': 'Otsi keelt...',
-    'lv': 'Meklēt valodu...',
-    'lt': 'Ieškoti kalbos...',
-    'el': 'Αναζήτηση γλώσσας...',
-    'mt': 'Fittex lingwa...',
-    'ga': 'Cuardaigh teanga...',
-    'cy': 'Chwilio am iaith...',
-    'eu': 'Bilatu hizkuntza...',
-    'ca': 'Cerca idioma...',
-    'gl': 'Buscar idioma...',
-    'af': 'Soek taal...',
-    'sq': 'Kërko gjuhë...',
-    'am': 'ቋንቋ ፈልግ...',
-    'hy': 'Որոնել լեզու...',
-    'az': 'Dil axtar...',
-    'be': 'Пошук мовы...',
-    'bs': 'Pretraži jezik...',
-    'ceb': 'Pangita og pinulongan...',
-    'ny': 'Sakani chilankhulo...',
-    'co': 'Circà lingua...',
-    'eo': 'Serĉi lingvon...',
-    'tl': 'Maghanap ng wika...',
-    'fy': 'Sykje taal...',
-    'ka': 'ენის ძიება...',
-    'gu': 'ભાષા શોધો...',
-    'ht': 'Chèche lang...',
-    'ha': 'Nemo harshe...',
-    'haw': 'ʻImi ʻōlelo...',
-    'iw': 'חפש שפה...',
-    'hmn': 'Nrhiav lus...',
-    'is': 'Leita að tungumáli...',
-    'ig': 'Chọọ asụsụ...',
-    'jw': 'Golek basa...',
-    'kn': 'ಭಾಷೆಯನ್ನು ಹುಡುಕಿ...',
-    'kk': 'Тіл іздеу...',
-    'km': 'ស្វែងរកភាសា...',
-    'ku': 'Ziman bigere...',
-    'ky': 'Тил изде...',
-    'lo': 'ຄົ້ນຫາພາສາ...',
-    'la': 'Quaere linguam...',
-    'lb': 'Sprooch sichen...',
-    'mk': 'Пребарај јазик...',
-    'mg': 'Mitady fiteny...',
-    'ml': 'ഭാഷ തിരയുക...',
-    'mi': 'Rapu reo...',
-    'mr': 'भाषा शोधा...',
-    'mn': 'Хэл хайх...',
-    'my': 'ဘာသာစကား ရှာဖွေရန်...',
-    'ne': 'भाषा खोज्नुहोस्...',
-    'ps': 'ژبه ولټول...',
-    'sm': 'Sa\'ili gagana...',
-    'gd': 'Lorg cànan...',
-    'sr': 'Претражи језик...',
-    'st': 'Batla puo...',
-    'sn': 'Tsvaga mutauro...',
-    'sd': 'ٻولي ڳوليو...',
-    'si': 'භාෂාව සොයන්න...',
-    'so': 'Raadi luqadda...',
-    'su': 'Milarian basa...',
-    'sw': 'Tafuta lugha...',
-    'tg': 'Забон ҷустуҷӯ кунед...',
-    'ta': 'மொழியைத் தேடுங்கள்...',
-    'te': 'భాషను వెతకండి...',
-    'uk': 'Пошук мови...',
-    'uz': 'Til qidirish...',
-    'xh': 'Khangela ulwimi...',
-    'yi': 'זוך שפּראַך...',
-    'yo': 'Wa èdè...',
-    'zu': 'Sesha ulimi...'
-  };
-
-  return placeholders[languageCode] || 'Search language...';
-};
+import { getCountryCode, getSearchPlaceholder, detectBrowserLanguage, useIsMobile, priorityLanguages, languages } from "./utils/languageUtils";
 
 const scenes = [
   {
@@ -258,138 +31,290 @@ const scenes = [
   { component: NudgeScene, title: "Harekete Geç", points: 40 }
 ];
 
-// Priority languages that appear at the top
-const priorityLanguages = [
-  'tr', 'en', 'en-gb', 'es', 'fr', 'de', 'pt', 'it', 'nl', 'ru', 'zh', 'ja', 'ko', 'ar'
-];
-
-const languages = [
-  { code: 'af', name: 'Afrikaans', flag: '🇿🇦' },
-  { code: 'sq', name: 'Albanian', flag: '🇦🇱' },
-  { code: 'am', name: 'Amharic', flag: '🇪🇹' },
-  { code: 'ar', name: 'Arabic', flag: '🇸🇦' },
-  { code: 'hy', name: 'Armenian', flag: '🇦🇲' },
-  { code: 'az', name: 'Azerbaijani', flag: '🇦🇿' },
-  { code: 'eu', name: 'Basque', flag: '🇪🇸' },
-  { code: 'be', name: 'Belarusian', flag: '🇧🇾' },
-  { code: 'bn', name: 'Bengali', flag: '🇧🇩' },
-  { code: 'bs', name: 'Bosnian', flag: '🇧🇦' },
-  { code: 'bg', name: 'Bulgarian', flag: '🇧🇬' },
-  { code: 'ca', name: 'Catalan', flag: '🇪🇸' },
-  { code: 'ceb', name: 'Cebuano', flag: '🇵🇭' },
-  { code: 'ny', name: 'Chichewa', flag: '🇲🇼' },
-  { code: 'zh', name: 'Chinese (Simplified)', flag: '🇨🇳' },
-  { code: 'zh-tw', name: 'Chinese (Traditional)', flag: '🇹🇼' },
-  { code: 'co', name: 'Corsican', flag: '🇫🇷' },
-  { code: 'hr', name: 'Croatian', flag: '🇭🇷' },
-  { code: 'cs', name: 'Czech', flag: '🇨🇿' },
-  { code: 'da', name: 'Danish', flag: '🇩🇰' },
-  { code: 'nl', name: 'Dutch', flag: '🇳🇱' },
-  { code: 'en', name: 'English', flag: '🇺🇸' },
-  { code: 'en-gb', name: 'English (UK)', flag: '🇬🇧' },
-  { code: 'eo', name: 'Esperanto', flag: '🌍' },
-  { code: 'et', name: 'Estonian', flag: '🇪🇪' },
-  { code: 'tl', name: 'Filipino', flag: '🇵🇭' },
-  { code: 'fi', name: 'Finnish', flag: '🇫🇮' },
-  { code: 'fr', name: 'French', flag: '🇫🇷' },
-  { code: 'fy', name: 'Frisian', flag: '🇳🇱' },
-  { code: 'gl', name: 'Galician', flag: '🇪🇸' },
-  { code: 'ka', name: 'Georgian', flag: '🇬🇪' },
-  { code: 'de', name: 'German', flag: '🇩🇪' },
-  { code: 'el', name: 'Greek', flag: '🇬🇷' },
-  { code: 'gu', name: 'Gujarati', flag: '🇮🇳' },
-  { code: 'ht', name: 'Haitian Creole', flag: '🇭🇹' },
-  { code: 'ha', name: 'Hausa', flag: '🇳🇬' },
-  { code: 'haw', name: 'Hawaiian', flag: '🇺🇸' },
-  { code: 'iw', name: 'Hebrew', flag: '🇮🇱' },
-  { code: 'hi', name: 'Hindi', flag: '🇮🇳' },
-  { code: 'hmn', name: 'Hmong', flag: '🇱🇦' },
-  { code: 'hu', name: 'Hungarian', flag: '🇭🇺' },
-  { code: 'is', name: 'Icelandic', flag: '🇮🇸' },
-  { code: 'ig', name: 'Igbo', flag: '🇳🇬' },
-  { code: 'id', name: 'Indonesian', flag: '🇮🇩' },
-  { code: 'ga', name: 'Irish', flag: '🇮🇪' },
-  { code: 'it', name: 'Italian', flag: '🇮🇹' },
-  { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
-  { code: 'jw', name: 'Javanese', flag: '🇮🇩' },
-  { code: 'kn', name: 'Kannada', flag: '🇮🇳' },
-  { code: 'kk', name: 'Kazakh', flag: '🇰🇿' },
-  { code: 'km', name: 'Khmer', flag: '🇰🇭' },
-  { code: 'ko', name: 'Korean', flag: '🇰🇷' },
-  { code: 'ku', name: 'Kurdish (Kurmanji)', flag: '🇹🇷' },
-  { code: 'ky', name: 'Kyrgyz', flag: '🇰🇬' },
-  { code: 'lo', name: 'Lao', flag: '🇱🇦' },
-  { code: 'la', name: 'Latin', flag: '🇻🇦' },
-  { code: 'lb', name: 'Luxembourgish', flag: '🇱🇺' },
-  { code: 'mk', name: 'Macedonian', flag: '🇲🇰' },
-  { code: 'mg', name: 'Malagasy', flag: '🇲🇬' },
-  { code: 'ms', name: 'Malay', flag: '🇲🇾' },
-  { code: 'ml', name: 'Malayalam', flag: '🇮🇳' },
-  { code: 'mt', name: 'Maltese', flag: '🇲🇹' },
-  { code: 'mi', name: 'Maori', flag: '🇳🇿' },
-  { code: 'mr', name: 'Marathi', flag: '🇮🇳' },
-  { code: 'mn', name: 'Mongolian', flag: '🇲🇳' },
-  { code: 'my', name: 'Myanmar (Burmese)', flag: '🇲🇲' },
-  { code: 'ne', name: 'Nepali', flag: '🇳🇵' },
-  { code: 'ps', name: 'Pashto', flag: '🇦🇫' },
-  { code: 'sm', name: 'Samoan', flag: '🇼🇸' },
-  { code: 'gd', name: 'Scots Gaelic', flag: '🏴󠁧󠁢󠁳󠁣󠁴󠁿' },
-  { code: 'sr', name: 'Serbian', flag: '🇷🇸' },
-  { code: 'st', name: 'Sesotho', flag: '🇱🇸' },
-  { code: 'sn', name: 'Shona', flag: '🇿🇼' },
-  { code: 'sd', name: 'Sindhi', flag: '🇵🇰' },
-  { code: 'si', name: 'Sinhala', flag: '🇱🇰' },
-  { code: 'sk', name: 'Slovak', flag: '🇸🇰' },
-  { code: 'sl', name: 'Slovenian', flag: '🇸🇮' },
-  { code: 'so', name: 'Somali', flag: '🇸🇴' },
-  { code: 'es', name: 'Spanish', flag: '🇪🇸' },
-  { code: 'es-mx', name: 'Spanish (Mexico)', flag: '🇲🇽' },
-  { code: 'su', name: 'Sundanese', flag: '🇮🇩' },
-  { code: 'sw', name: 'Swahili', flag: '🇰🇪' },
-  { code: 'sv', name: 'Swedish', flag: '🇸🇪' },
-  { code: 'tg', name: 'Tajik', flag: '🇹🇯' },
-  { code: 'ta', name: 'Tamil', flag: '🇮🇳' },
-  { code: 'te', name: 'Telugu', flag: '🇮🇳' },
-  { code: 'th', name: 'Thai', flag: '🇹🇭' },
-  { code: 'tr', name: 'Turkish', flag: '🇹🇷' },
-  { code: 'uk', name: 'Ukrainian', flag: '🇺🇦' },
-  { code: 'ur', name: 'Urdu', flag: '🇵🇰' },
-  { code: 'uz', name: 'Uzbek', flag: '🇺🇿' },
-  { code: 'vi', name: 'Vietnamese', flag: '🇻🇳' },
-  { code: 'cy', name: 'Welsh', flag: '🏴󠁧󠁢󠁷󠁬󠁳󠁿' },
-  { code: 'xh', name: 'Xhosa', flag: '🇿🇦' },
-  { code: 'yi', name: 'Yiddish', flag: '🇮🇱' },
-  { code: 'yo', name: 'Yoruba', flag: '🇳🇬' },
-  { code: 'zu', name: 'Zulu', flag: '🇿🇦' }
-];
-
-// Force Turkish as default language
-const detectBrowserLanguage = () => {
-  return 'tr'; // Always return Turkish as default
-};
-
-// Mobile detection hook
-const useIsMobile = () => {
-  const [isMobile, setIsMobile] = useState(() => {
+export default function App() {
+  // Backend'den gelecek tema config'i için state
+  const [themeConfig, setThemeConfig] = useState(() => {
+    // LocalStorage'dan kaydedilmiş tema config'ini yükle
     if (typeof window !== 'undefined') {
-      return window.innerWidth < 768;
+      const savedConfig = localStorage.getItem('theme-config');
+      if (savedConfig) {
+        try {
+          return JSON.parse(savedConfig);
+        } catch (error) {
+          console.error('Error loading theme config:', error);
+        }
+      }
     }
-    return false;
+
+
+    return {
+      colors: {
+        primary: 'blue',
+        secondary: 'indigo',
+        accent: 'purple',
+        background: 'slate',
+        surface: 'white',
+        border: 'gray',
+        badge: {
+          points: {
+            background: 'amber',
+            text: 'amber-900',
+            textDark: 'amber-100',
+            gradient: {
+              from: 'rgba(245, 158, 11, 0.15)',
+              via1: 'rgba(251, 146, 60, 0.12)',
+              via2: 'rgba(249, 115, 22, 0.10)',
+              to: 'rgba(234, 88, 12, 0.08)'
+            },
+            border: 'rgba(245, 158, 11, 0.25)',
+            shadow: {
+              primary: 'rgba(245, 158, 11, 0.12)',
+              secondary: 'rgba(251, 146, 60, 0.08)'
+            }
+          },
+          timer: {
+            background: 'red',
+            text: 'red-700',
+            textDark: 'red-300',
+            icon: 'red-600',
+            iconDark: 'red-400'
+          }
+        }
+      },
+      logo: {
+        src: "https://keepnetlabs.com/keepnet-logo.svg",
+        darkSrc: "https://imagedelivery.net/KxWh-mxPGDbsqJB3c5_fmA/74b2b289-fe69-4e14-ef7d-f15e2ad3bb00/public",
+        alt: "Keepnet Labs"
+      },
+      effects: {
+        borderRadius: 'rounded-xl',
+        shadow: 'shadow-lg',
+        backdropBlur: 'backdrop-blur-xl',
+        glassOpacity: '60',
+        borderOpacity: '25'
+      }
+    };
   });
 
-  useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    window.addEventListener('resize', checkIsMobile);
-    return () => window.removeEventListener('resize', checkIsMobile);
+  // Backend'den tema config'ini güncelleme fonksiyonu
+  const updateThemeConfig = useCallback((newConfig: any) => {
+    setThemeConfig(newConfig);
+    localStorage.setItem('theme-config', JSON.stringify(newConfig));
   }, []);
 
-  return isMobile;
-};
+  // Backend'den tema config'ini yükleme (örnek)
+  useEffect(() => {
+    // Bu kısım backend'den JSON gelecek şekilde değiştirilecek
+    const loadThemeFromBackend = async () => {
+      try {
+        // const response = await fetch('/api/theme-config');
+        // const backendConfig = await response.json();
+        // updateThemeConfig(backendConfig);
 
-export default function App() {
+        // Şimdilik varsayılan config kullanılıyor
+        console.log('Theme config loaded:', themeConfig);
+      } catch (error) {
+        console.error('Error loading theme from backend:', error);
+      }
+    };
+
+    loadThemeFromBackend();
+  }, [updateThemeConfig]);
+
+
+
+  // Mevcut CSS'leri değişkenlere çekme - Tema parametrelerine göre dinamik (PERFORMANS OPTİMİZE)
+  const cssClasses = useMemo(() => ({
+    // Ana container
+    mainContainer: `min-h-screen bg-gradient-to-br from-${themeConfig.colors?.background || 'slate'}-100/90 via-${themeConfig.colors?.primary || 'blue'}-50/60 to-${themeConfig.colors?.secondary || 'indigo'}-100/75 dark:from-gray-800 dark:via-gray-850 dark:to-gray-900 flex flex-col relative overflow-hidden font-['Open_Sans'] transition-colors duration-300`,
+
+    // Loading overlay
+    loadingOverlay: "fixed inset-0 bg-white/50 dark:bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center transition-colors duration-300",
+    loadingContainer: `flex items-center space-x-3 px-6 py-4 bg-${themeConfig.colors?.surface || 'white'}/90 dark:bg-gray-900/90 ${themeConfig.effects?.backdropBlur || 'backdrop-blur-xl'} ${themeConfig.effects?.borderRadius || 'rounded-2xl'} border border-${themeConfig.colors?.surface || 'white'}/${themeConfig.effects?.borderOpacity || '60'} dark:border-gray-600/60 ${themeConfig.effects?.shadow || 'shadow-xl'} transition-colors duration-300`,
+    loadingSpinner: `animate-spin text-${themeConfig.colors?.primary || 'blue'}-600 dark:text-${themeConfig.colors?.primary || 'blue'}-400`,
+    loadingText: "text-sm font-medium text-gray-900 dark:text-white",
+
+    // Theme hint notification
+    themeHintContainer: "fixed top-20 left-1/2 transform -translate-x-1/2 z-40",
+    themeHintContent: `relative px-5 py-4 bg-${themeConfig.colors?.primary || 'blue'}-50/98 dark:bg-gray-900/98 ${themeConfig.effects?.backdropBlur || 'backdrop-blur-2xl'} border-2 border-${themeConfig.colors?.primary || 'blue'}-200/80 dark:border-gray-600/80 ${themeConfig.effects?.borderRadius || 'rounded-2xl'} ${themeConfig.effects?.shadow || 'shadow-xl'} shadow-${themeConfig.colors?.primary || 'blue'}-500/20 dark:shadow-black/40 transition-colors duration-300 max-w-sm`,
+    themeHintIcon: `flex-shrink-0 p-1.5 bg-${themeConfig.colors?.primary || 'blue'}-100/80 dark:bg-${themeConfig.colors?.primary || 'blue'}-900/60 ${themeConfig.effects?.borderRadius || 'rounded-lg'}`,
+    themeHintTitle: `text-sm text-${themeConfig.colors?.primary || 'blue'}-900 dark:text-white font-medium mb-2`,
+    themeHintDescription: `text-xs text-${themeConfig.colors?.primary || 'blue'}-800 dark:text-gray-200 leading-relaxed`,
+    themeHintClose: `ml-2 p-1 ${themeConfig.effects?.borderRadius || 'rounded-full'} hover:bg-${themeConfig.colors?.primary || 'blue'}-200/50 dark:hover:bg-gray-700/50 transition-colors focus:outline-none focus:ring-2 focus:ring-${themeConfig.colors?.primary || 'blue'}-400/30 dark:focus:ring-${themeConfig.colors?.primary || 'blue'}-600/30`,
+
+    // Background
+    backgroundContainer: "fixed inset-0 pointer-events-none overflow-hidden",
+    backgroundGradient1: `absolute -top-60 -left-60 w-96 h-96 bg-gradient-to-br from-${themeConfig.colors?.primary || 'blue'}-200/40 via-${themeConfig.colors?.secondary || 'indigo'}-100/30 to-transparent dark:from-${themeConfig.colors?.primary || 'blue'}-900/25 dark:via-${themeConfig.colors?.secondary || 'indigo'}-800/18 dark:to-transparent ${themeConfig.effects?.borderRadius || 'rounded-full'} blur-3xl animate-pulse transition-colors duration-500`,
+    backgroundGradient2: `absolute -bottom-60 -right-60 w-[500px] h-[500px] bg-gradient-to-tl from-${themeConfig.colors?.accent || 'purple'}-100/35 via-pink-100/25 to-transparent dark:from-${themeConfig.colors?.accent || 'purple'}-900/20 dark:via-pink-900/15 dark:to-transparent ${themeConfig.effects?.borderRadius || 'rounded-full'} blur-3xl animate-pulse transition-colors duration-500`,
+    backgroundGradient3: "absolute top-1/3 right-1/5 w-40 h-40 bg-gradient-radial from-cyan-100/25 to-transparent dark:from-cyan-900/15 dark:to-transparent rounded-full blur-2xl",
+    backgroundGradient4: "absolute bottom-1/4 left-1/4 w-32 h-32 bg-gradient-radial from-emerald-100/30 to-transparent dark:from-emerald-900/18 dark:to-transparent rounded-full blur-xl",
+
+    // Header
+    headerContainer: "relative shrink-0",
+    headerBackground: "absolute inset-0 bg-gradient-to-b from-white/95 via-white/90 to-white/85 dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-900/85 transition-colors duration-300",
+    headerBorder: "absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gray-200/60 dark:via-gray-600/60 to-transparent transition-colors duration-300",
+    headerContent: "relative z-10 px-1.5 py-1.5 sm:px-2 sm:py-2 md:px-4 md:py-3 lg:px-16 xl:px-20 2xl:px-24",
+
+    // Logo
+    logoContainer: "flex-shrink-0 z-20",
+    logoGlass: `relative p-1 sm:p-1.5 md:p-2 ${themeConfig.effects?.borderRadius || 'rounded-lg'} sm:rounded-xl md:rounded-2xl overflow-hidden transition-all duration-500 ease-out group`,
+    logoNoise: "absolute inset-0 opacity-[0.015] dark:opacity-[0.008] rounded-lg sm:rounded-xl md:rounded-2xl mix-blend-overlay pointer-events-none",
+    logoGradient: "absolute inset-0 bg-gradient-to-br from-slate-50/20 via-slate-100/10 to-slate-200/5 dark:from-slate-800/15 dark:via-slate-700/8 dark:to-slate-600/4 rounded-lg sm:rounded-xl md:rounded-2xl transition-colors duration-500",
+    logoHighlight: "absolute inset-0 rounded-lg sm:rounded-xl md:rounded-2xl pointer-events-none",
+    logoImage: "h-3.5 w-auto sm:h-4 md:h-6 lg:h-7 transition-opacity duration-300",
+
+    // Title
+    titleContainer: "absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 max-w-[120px] sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg px-1 sm:px-2",
+    titleText: "text-[10px] sm:text-xs md:text-base lg:text-lg font-semibold text-gray-900 dark:text-white tracking-tight transition-colors duration-300 text-center truncate",
+
+    // Controls
+    controlsContainer: "flex items-center space-x-1 sm:space-x-1.5 md:space-x-3 flex-shrink-0 z-20",
+
+    // Points badge
+    pointsBadge: `relative flex items-center space-x-1 sm:space-x-1.5 md:space-x-2 px-1.5 sm:px-2 md:px-3 py-1 sm:py-1.5 md:py-2 ${themeConfig.effects?.borderRadius || 'rounded-md'} sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group`,
+    pointsBadgeNoise: "absolute inset-0 opacity-[0.020] dark:opacity-[0.012] rounded-lg sm:rounded-xl mix-blend-overlay pointer-events-none",
+    pointsText: `text-[8px] sm:text-xs md:text-sm font-semibold text-${themeConfig.colors?.badge?.points?.text || 'amber-900'} dark:text-${themeConfig.colors?.badge?.points?.textDark || 'amber-100'} transition-colors duration-300`,
+
+    // Theme button
+    themeButton: `relative flex items-center justify-center p-1 sm:p-1.5 md:p-2 ${themeConfig.effects?.borderRadius || 'rounded-md'} sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group focus:outline-none focus:ring-2 focus:ring-${themeConfig.colors?.primary || 'blue'}-500/20 dark:focus:ring-${themeConfig.colors?.primary || 'blue'}-400/20`,
+    themeButtonIcon: `w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 text-gray-600 dark:text-gray-300 transition-colors duration-300`,
+
+    // Language button
+    languageButton: `relative flex items-center space-x-0.5 sm:space-x-1 md:space-x-2 px-1 sm:px-1.5 md:px-3 py-1 sm:py-1.5 md:py-2 ${themeConfig.effects?.borderRadius || 'rounded-md'} sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group focus:outline-none focus:ring-2 focus:ring-${themeConfig.colors?.primary || 'blue'}-500/20 dark:focus:ring-${themeConfig.colors?.primary || 'blue'}-400/20`,
+    languageFlag: "w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 rounded-sm transition-opacity duration-300",
+    languageChevron: "w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4 text-gray-500 dark:text-gray-400 transition-colors duration-300",
+
+    // Language dropdown
+    languageDropdown: `absolute top-full right-0 mt-1 w-64 bg-${themeConfig.colors?.surface || 'white'}/95 dark:bg-gray-900/95 ${themeConfig.effects?.backdropBlur || 'backdrop-blur-xl'} border border-${themeConfig.colors?.surface || 'white'}/60 dark:border-gray-600/60 ${themeConfig.effects?.borderRadius || 'rounded-xl'} ${themeConfig.effects?.shadow || 'shadow-xl'} shadow-black/10 dark:shadow-black/30 transition-all duration-300 z-50`,
+    languageSearch: "w-full px-3 py-2 text-sm bg-transparent border-0 focus:outline-none focus:ring-0 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400",
+    languageList: "max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent",
+    languageItem: "flex items-center space-x-2 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 cursor-pointer",
+    languageItemText: "text-sm text-gray-900 dark:text-white",
+    languageItemFlag: "w-4 h-4 rounded-sm",
+
+    // Content area
+    contentContainer: "flex-1 relative z-10 overflow-hidden",
+    contentCard: `absolute inset-0 w-full h-full ${themeConfig.effects?.borderRadius || 'rounded-2xl'} sm:rounded-3xl overflow-hidden transition-colors duration-300`,
+
+    // Achievement notification
+    achievementContainer: "fixed top-24 right-4 z-40",
+    achievementContent: `relative px-4 py-3 bg-gradient-to-r from-yellow-50/98 to-orange-50/95 dark:from-gray-900/98 dark:to-gray-800/95 border border-yellow-200/70 dark:border-yellow-400/80 ${themeConfig.effects?.borderRadius || 'rounded-2xl'} ${themeConfig.effects?.shadow || 'shadow-xl'} shadow-yellow-500/10 dark:shadow-black/40 transition-colors duration-300`,
+    achievementClose: `ml-2 p-1 ${themeConfig.effects?.borderRadius || 'rounded-full'} hover:bg-yellow-200/50 dark:hover:bg-yellow-900/40 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-400/30 dark:focus:ring-yellow-600/30`,
+
+    // Navigation
+    navContainer: "fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30",
+    navButton: `relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 ${themeConfig.effects?.borderRadius || 'rounded-full'} ${themeConfig.effects?.backdropBlur || 'backdrop-blur-xl'} border border-${themeConfig.colors?.surface || 'white'}/60 dark:border-gray-600/60 ${themeConfig.effects?.shadow || 'shadow-lg'} transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-${themeConfig.colors?.primary || 'blue'}-500/20 dark:focus:ring-${themeConfig.colors?.primary || 'blue'}-400/20`,
+    navButtonIcon: "w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-gray-600 dark:text-gray-300 transition-colors duration-300",
+
+    // ProgressBar Config
+    progressBarConfig: {
+      // Container colors
+      containerBackground: `linear-gradient(135deg, 
+        rgba(148, 163, 184, 0.18) 0%, 
+        rgba(148, 163, 184, 0.15) 50%, 
+        rgba(148, 163, 184, 0.12) 100%
+      )`,
+      containerBorder: '1px solid rgba(148, 163, 184, 0.25)',
+      containerBoxShadow: `
+        0 2px 8px rgba(148, 163, 184, 0.12),
+        0 1px 4px rgba(148, 163, 184, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.20)
+      `,
+
+      // Background gradients
+      backgroundGradient: 'bg-gradient-to-br from-slate-100/20 via-slate-200/12 to-slate-300/8',
+      backgroundGradientDark: 'dark:from-slate-700/18 dark:via-slate-600/12 dark:to-slate-500/8',
+
+      // Progress fill colors
+      progressFillBackground: `linear-gradient(135deg, 
+        rgba(59, 130, 246, 0.95) 0%, 
+        rgba(59, 130, 246, 0.90) 50%,
+        rgba(59, 130, 246, 0.85) 100%
+      )`,
+      progressFillBorder: '0.5px solid rgba(59, 130, 246, 0.40)',
+      progressFillBoxShadow: `
+        0 2px 8px rgba(59, 130, 246, 0.30),
+        0 1px 4px rgba(59, 130, 246, 0.20),
+        inset 0 1px 0 rgba(255, 255, 255, 0.30)
+      `,
+
+      // Dot colors
+      dotCompletedBackground: `linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.95) 0%, 
+        rgba(255, 255, 255, 0.90) 50%, 
+        rgba(255, 255, 255, 0.85) 100%
+      )`,
+      dotActiveBackground: `linear-gradient(135deg, 
+        rgba(59, 130, 246, 0.90) 0%, 
+        rgba(59, 130, 246, 0.85) 50%, 
+        rgba(59, 130, 246, 0.80) 100%
+      )`,
+      dotInactiveBackground: `linear-gradient(135deg, 
+        rgba(148, 163, 184, 0.50) 0%, 
+        rgba(148, 163, 184, 0.40) 50%, 
+        rgba(148, 163, 184, 0.30) 100%
+      )`,
+      dotCompletedBorder: '0.5px solid rgba(255, 255, 255, 0.70)',
+      dotActiveBorder: '0.5px solid rgba(59, 130, 246, 0.60)',
+      dotInactiveBorder: '0.5px solid rgba(148, 163, 184, 0.40)',
+      dotCompletedBoxShadow: `
+        0 2px 6px rgba(255, 255, 255, 0.25),
+        0 1px 3px rgba(255, 255, 255, 0.20),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35)
+      `,
+      dotActiveBoxShadow: `
+        0 2px 6px rgba(59, 130, 246, 0.30),
+        0 1px 3px rgba(59, 130, 246, 0.20),
+        inset 0 1px 0 rgba(255, 255, 255, 0.30)
+      `,
+      dotInactiveBoxShadow: `
+        0 1px 3px rgba(148, 163, 184, 0.20),
+        inset 0 1px 0 rgba(255, 255, 255, 0.20)
+      `,
+
+      // Text colors
+      textBackground: `linear-gradient(135deg, 
+        rgba(71, 85, 105, 0.08) 0%, 
+        rgba(100, 116, 139, 0.06) 50%, 
+        rgba(148, 163, 184, 0.04) 100%
+      )`,
+      textBorder: '0.5px solid rgba(71, 85, 105, 0.15)',
+      textBoxShadow: `
+        0 1px 3px rgba(71, 85, 105, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.10)
+      `,
+      textColor: 'rgb(71, 85, 105)',
+
+      // Percentage colors
+      percentageBackground: `linear-gradient(135deg, 
+        rgba(59, 130, 246, 0.15) 0%, 
+        rgba(59, 130, 246, 0.12) 50%, 
+        rgba(59, 130, 246, 0.10) 100%
+      )`,
+      percentageBorder: '0.5px solid rgba(59, 130, 246, 0.20)',
+      percentageBoxShadow: `
+        0 1px 3px rgba(59, 130, 246, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15)
+      `,
+      percentageColor: 'rgb(59, 130, 246)'
+    },
+
+    // Quiz timer
+    timerContainer: "fixed top-4 right-4 z-30",
+    timerBadge: `flex items-center space-x-1.5 px-2.5 py-1.5 bg-${themeConfig.colors?.badge?.timer?.background || 'red'}-50/90 dark:bg-${themeConfig.colors?.badge?.timer?.background || 'red'}-900/90 ${themeConfig.effects?.backdropBlur || 'backdrop-blur-xl'} border border-${themeConfig.colors?.badge?.timer?.background || 'red'}-200/60 dark:border-${themeConfig.colors?.badge?.timer?.background || 'red'}-600/60 ${themeConfig.effects?.borderRadius || 'rounded-lg'} ${themeConfig.effects?.shadow || 'shadow-lg'} transition-colors duration-300`,
+    timerIcon: `w-4 h-4 text-${themeConfig.colors?.badge?.timer?.icon || 'red-600'} dark:text-${themeConfig.colors?.badge?.timer?.iconDark || 'red-400'}`,
+    timerText: `text-sm font-semibold text-${themeConfig.colors?.badge?.timer?.text || 'red-700'} dark:text-${themeConfig.colors?.badge?.timer?.textDark || 'red-300'}`,
+
+    // Quiz completion notification
+    quizNotificationContainer: "fixed z-30 bottom-4 right-4 sm:bottom-6 sm:right-6",
+    quizNotificationContent: `relative px-4 py-3 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-gray-800 dark:to-gray-900 border border-amber-200/60 dark:border-amber-600/60 ${themeConfig.effects?.borderRadius || 'rounded-xl'} ${themeConfig.effects?.shadow || 'shadow-lg'} shadow-amber-500/20 dark:shadow-black/40 transition-all duration-300 backdrop-blur-xl hover:shadow-xl hover:shadow-amber-500/30 dark:hover:shadow-black/50 group`,
+    quizNotificationClose: `ml-1 p-1 ${themeConfig.effects?.borderRadius || 'rounded-full'} hover:bg-amber-200/50 dark:hover:bg-amber-900/40 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400/30 dark:focus:ring-amber-600/30 opacity-60 group-hover:opacity-100`,
+
+    // Mobile navigation hint
+    mobileNavHintContainer: "md:hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 z-30",
+    mobileNavHintContent: `flex items-center px-3 py-2 bg-white/85 dark:bg-gray-900/85 ${themeConfig.effects?.borderRadius || 'rounded-full'} border border-white/40 dark:border-gray-600/40 ${themeConfig.effects?.shadow || 'shadow-lg'} transition-colors duration-300 backdrop-blur-xl`
+  }), [themeConfig]); // Sadece themeConfig değiştiğinde yeniden hesapla
+
   const [currentScene, setCurrentScene] = useState(0);
   const [direction, setDirection] = useState(0);
   const [selectedLanguage, setSelectedLanguage] = useState(() => detectBrowserLanguage());
@@ -989,7 +914,7 @@ export default function App() {
 
   return (
     <div
-      className="min-h-screen bg-gradient-to-br from-slate-100/90 via-blue-50/60 to-indigo-100/75 dark:from-gray-800 dark:via-gray-850 dark:to-gray-900 flex flex-col relative overflow-hidden font-['Open_Sans'] transition-colors duration-300"
+      className={cssClasses.mainContainer}
       style={{
         // Hardware acceleration for better mobile performance
         transform: 'translateZ(0)',
@@ -1006,11 +931,11 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-white/50 dark:bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center transition-colors duration-300"
+            className={cssClasses.loadingOverlay}
           >
-            <div className="flex items-center space-x-3 px-6 py-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-2xl border border-white/60 dark:border-gray-600/60 shadow-xl transition-colors duration-300">
-              <Loader2 size={20} className="animate-spin text-blue-600 dark:text-blue-400" />
-              <span className="text-sm font-medium text-gray-900 dark:text-white">Yükleniyor...</span>
+            <div className={cssClasses.loadingContainer}>
+              <Loader2 size={20} className={cssClasses.loadingSpinner} />
+              <span className={cssClasses.loadingText}>Yükleniyor...</span>
             </div>
           </motion.div>
         )}
@@ -1023,11 +948,11 @@ export default function App() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-20 left-1/2 transform -translate-x-1/2 z-40"
+            className={cssClasses.themeHintContainer}
           >
-            <div className="relative px-5 py-4 bg-blue-50/98 dark:bg-gray-900/98 backdrop-blur-2xl border-2 border-blue-200/80 dark:border-gray-600/80 rounded-2xl shadow-xl shadow-blue-500/20 dark:shadow-black/40 transition-colors duration-300 max-w-sm">
+            <div className={cssClasses.themeHintContent}>
               <div className="flex items-start space-x-3 relative z-10">
-                <div className="flex-shrink-0 p-1.5 bg-blue-100/80 dark:bg-blue-900/60 rounded-lg">
+                <div className={cssClasses.themeHintIcon}>
                   {isDarkMode ? (
                     <Moon size={16} className="text-blue-600 dark:text-blue-300" />
                   ) : (
@@ -1035,8 +960,8 @@ export default function App() {
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-blue-900 dark:text-white font-medium mb-2">Koyu/Açık Tema</p>
-                  <p className="text-xs text-blue-800 dark:text-gray-200 leading-relaxed">
+                  <p className={cssClasses.themeHintTitle}>Koyu/Açık Tema</p>
+                  <p className={cssClasses.themeHintDescription}>
                     Sağ üstteki ay/güneş simgesine tıklayarak temanı değiştirebilirsin
                   </p>
                 </div>
@@ -1045,7 +970,7 @@ export default function App() {
                     setShowThemeHint(false);
                     localStorage.setItem('theme-hint-dismissed', 'true');
                   }}
-                  className="ml-2 p-1 rounded-full hover:bg-blue-200/50 dark:hover:bg-gray-700/50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400/30 dark:focus:ring-blue-600/30"
+                  className={cssClasses.themeHintClose}
                   aria-label="İpucunu kapat"
                 >
                   <X size={12} className="text-blue-600 dark:text-gray-300" />
@@ -1058,7 +983,7 @@ export default function App() {
 
       {/* ENHANCED BACKGROUND - More depth and contrast for glass cards */}
       <motion.div
-        className="fixed inset-0 pointer-events-none overflow-hidden"
+        className={cssClasses.backgroundContainer}
         style={{
           // Background moves at slower speed when scrolling - creating proper parallax
           transform: `translateY(${scrollY * 0.3}px)`,
@@ -1069,7 +994,7 @@ export default function App() {
           <>
             {/* Deep layered background elements - Enhanced with more depth */}
             <motion.div
-              className="absolute -top-60 -left-60 w-96 h-96 bg-gradient-to-br from-blue-200/40 via-indigo-100/30 to-transparent dark:from-blue-900/25 dark:via-indigo-800/18 dark:to-transparent rounded-full blur-3xl animate-pulse transition-colors duration-500"
+              className={cssClasses.backgroundGradient1}
               style={{
                 animationDuration: '12s',
                 transform: `translateY(${scrollY * 0.4}px) translateX(${scrollY * 0.1}px)` // Different parallax speed
@@ -1077,7 +1002,7 @@ export default function App() {
             />
 
             <motion.div
-              className="absolute -bottom-60 -right-60 w-[500px] h-[500px] bg-gradient-to-tl from-purple-100/35 via-pink-100/25 to-transparent dark:from-purple-900/20 dark:via-pink-900/15 dark:to-transparent rounded-full blur-3xl animate-pulse transition-colors duration-500"
+              className={cssClasses.backgroundGradient2}
               style={{
                 animationDuration: '16s',
                 animationDelay: '3s',
@@ -1087,14 +1012,14 @@ export default function App() {
 
             {/* Additional depth layers - Enhanced contrast */}
             <motion.div
-              className="absolute top-1/3 right-1/5 w-40 h-40 bg-gradient-radial from-cyan-100/25 to-transparent dark:from-cyan-900/15 dark:to-transparent rounded-full blur-2xl"
+              className={cssClasses.backgroundGradient3}
               style={{
                 transform: `translateY(${scrollY * 0.5}px) translateX(${scrollY * 0.08}px) scale(${1 + scrollY * 0.0002})`
               }}
             />
 
             <motion.div
-              className="absolute bottom-1/4 left-1/4 w-32 h-32 bg-gradient-radial from-emerald-100/30 to-transparent dark:from-emerald-900/18 dark:to-transparent rounded-full blur-xl"
+              className={cssClasses.backgroundGradient4}
               style={{
                 transform: `translateY(${scrollY * -0.25}px) translateX(${scrollY * -0.04}px) scale(${1 + scrollY * 0.0001})`
               }}
@@ -1134,18 +1059,18 @@ export default function App() {
       </motion.div>
 
       {/* Optimized Mobile Header - Enhanced dark mode contrast */}
-      <div className="relative shrink-0" role="banner">
-        <div className={`absolute inset-0 bg-gradient-to-b from-white/95 via-white/90 to-white/85 dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-900/85 transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-3xl'}`}></div>
+      <div className={cssClasses.headerContainer}>
+        <div className={cssClasses.headerBackground}></div>
         <div className="absolute inset-0 bg-gradient-to-r from-blue-50/30 via-transparent to-purple-50/20 dark:from-blue-900/10 dark:via-transparent dark:to-purple-900/8 transition-colors duration-300"></div>
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gray-200/60 dark:via-gray-600/60 to-transparent transition-colors duration-300"></div>
+        <div className={cssClasses.headerBorder}></div>
 
-        <div className="relative z-10 px-1.5 py-1.5 sm:px-2 sm:py-2 md:px-4 md:py-3 lg:px-16 xl:px-20 2xl:px-24">
+        <div className={cssClasses.headerContent}>
           {/* Top Navigation Row - Mobile Optimized */}
           <div className="relative flex items-center justify-between mb-2 sm:mb-2.5 md:mb-3">
             {/* ENHANCED LIQUID GLASS LOGO CONTAINER - Mobile Optimized */}
-            <div className="flex-shrink-0 z-20">
+            <div className={cssClasses.logoContainer}>
               <motion.div
-                className="relative p-1 sm:p-1.5 md:p-2 rounded-lg sm:rounded-xl md:rounded-2xl overflow-hidden transition-all duration-500 ease-out group"
+                className={cssClasses.logoGlass}
                 whileHover={{
                   scale: 1.02,
                   y: -1
@@ -1171,7 +1096,7 @@ export default function App() {
               >
                 {/* Ultra-fine noise texture */}
                 <div
-                  className="absolute inset-0 opacity-[0.015] dark:opacity-[0.008] rounded-lg sm:rounded-xl md:rounded-2xl mix-blend-overlay pointer-events-none"
+                  className={cssClasses.logoNoise}
                   style={{
                     backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='logoNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23logoNoise)'/%3E%3C/svg%3E")`,
                     backgroundSize: '128px 128px'
@@ -1179,11 +1104,11 @@ export default function App() {
                 />
 
                 {/* Multi-layer gradients */}
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-50/20 via-slate-100/10 to-slate-200/5 dark:from-slate-800/15 dark:via-slate-700/8 dark:to-slate-600/4 rounded-lg sm:rounded-xl md:rounded-2xl transition-colors duration-500"></div>
+                <div className={cssClasses.logoGradient}></div>
 
                 {/* Apple-style highlight */}
                 <div
-                  className="absolute inset-0 rounded-lg sm:rounded-xl md:rounded-2xl pointer-events-none"
+                  className={cssClasses.logoHighlight}
                   style={{
                     background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.08) 30%, transparent 70%)`,
                     mixBlendMode: 'overlay'
@@ -1193,9 +1118,9 @@ export default function App() {
                 {/* Logo Image */}
                 <div className="relative z-10">
                   <img
-                    src="https://keepnetlabs.com/keepnet-logo.svg"
-                    alt="Keepnet Labs"
-                    className="h-3.5 w-auto sm:h-4 md:h-6 lg:h-7 transition-opacity duration-300"
+                    src={isDarkMode ? themeConfig.logo?.darkSrc : themeConfig.logo?.src}
+                    alt={themeConfig.logo?.alt || "Logo"}
+                    className={cssClasses.logoImage}
                     style={{ display: 'block' }}
                   />
                 </div>
@@ -1203,18 +1128,18 @@ export default function App() {
             </div>
 
             {/* PROPERLY CENTERED TITLE - Mobile Optimized */}
-            <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 max-w-[120px] sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg px-1 sm:px-2">
-              <h1 className="text-[10px] sm:text-xs md:text-base lg:text-lg font-semibold text-gray-900 dark:text-white tracking-tight transition-colors duration-300 text-center truncate">
+            <div className={cssClasses.titleContainer}>
+              <h1 className={cssClasses.titleText}>
                 <span className="hidden sm:inline">Siber Güvenlik Eğitimi</span>
                 <span className="sm:hidden">Güvenlik Eğitimi</span>
               </h1>
             </div>
 
             {/* Right Controls - Mobile Optimized */}
-            <div className="flex items-center space-x-1 sm:space-x-1.5 md:space-x-3 flex-shrink-0 z-20">
+            <div className={cssClasses.controlsContainer}>
               {/* ENHANCED LIQUID GLASS POINTS BADGE - Mobile Optimized */}
               <motion.div
-                className="relative flex items-center space-x-1 sm:space-x-1.5 md:space-x-2 px-1.5 sm:px-2 md:px-3 py-1 sm:py-1.5 md:py-2 rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group"
+                className={cssClasses.pointsBadge}
                 whileHover={{
                   scale: 1.02,
                   y: -1
@@ -1222,17 +1147,17 @@ export default function App() {
                 style={{
                   // LIQUID GLASS BACKGROUND for badge
                   background: `linear-gradient(135deg, 
-                    rgba(245, 158, 11, 0.15) 0%, 
-                    rgba(251, 146, 60, 0.12) 30%,
-                    rgba(249, 115, 22, 0.10) 70%,
-                    rgba(234, 88, 12, 0.08) 100%
+                    ${themeConfig.colors?.badge?.points?.gradient?.from || 'rgba(245, 158, 11, 0.15)'} 0%, 
+                    ${themeConfig.colors?.badge?.points?.gradient?.via1 || 'rgba(251, 146, 60, 0.12)'} 30%,
+                    ${themeConfig.colors?.badge?.points?.gradient?.via2 || 'rgba(249, 115, 22, 0.10)'} 70%,
+                    ${themeConfig.colors?.badge?.points?.gradient?.to || 'rgba(234, 88, 12, 0.08)'} 100%
                   )`,
                   backdropFilter: 'blur(20px) saturate(180%)',
                   WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                  border: '1px solid rgba(245, 158, 11, 0.25)',
+                  border: `1px solid ${themeConfig.colors?.badge?.points?.border || 'rgba(245, 158, 11, 0.25)'}`,
                   boxShadow: `
-                    0 4px 16px rgba(245, 158, 11, 0.12),
-                    0 2px 8px rgba(251, 146, 60, 0.08),
+                    0 4px 16px ${themeConfig.colors?.badge?.points?.shadow?.primary || 'rgba(245, 158, 11, 0.12)'},
+                    0 2px 8px ${themeConfig.colors?.badge?.points?.shadow?.secondary || 'rgba(251, 146, 60, 0.08)'},
                     inset 0 1px 0 rgba(255, 255, 255, 0.20)
                   `,
                   transform: 'translateZ(0)',
@@ -1241,7 +1166,7 @@ export default function App() {
               >
                 {/* Ultra-fine noise texture */}
                 <div
-                  className="absolute inset-0 opacity-[0.020] dark:opacity-[0.012] rounded-lg sm:rounded-xl mix-blend-overlay pointer-events-none"
+                  className={cssClasses.pointsBadgeNoise}
                   style={{
                     backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='badgeNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23badgeNoise)'/%3E%3C/svg%3E")`,
                     backgroundSize: '128px 128px'
@@ -1263,7 +1188,7 @@ export default function App() {
                 {/* Badge Content */}
                 <div className="relative z-10 flex items-center space-x-1 sm:space-x-1.5 md:space-x-2">
                   <Award size={10} className="text-yellow-700 dark:text-yellow-300 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5 transition-colors duration-300" />
-                  <span className="text-[10px] sm:text-xs font-semibold text-yellow-900 dark:text-white transition-colors duration-300">
+                  <span className={cssClasses.pointsText}>
                     {totalPoints}p
                   </span>
                 </div>
@@ -1272,7 +1197,7 @@ export default function App() {
               {/* ENHANCED LIQUID GLASS THEME TOGGLE BUTTON - Mobile Optimized */}
               <motion.button
                 onClick={toggleTheme}
-                className="relative flex items-center justify-center p-1 sm:p-1.5 md:p-2 rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20"
+                className={cssClasses.themeButton}
                 whileHover={{
                   scale: 1.05,
                   y: -2
@@ -1373,7 +1298,7 @@ export default function App() {
               <div className="relative" ref={dropdownRef}>
                 <motion.button
                   onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
-                  className="relative flex items-center space-x-0.5 sm:space-x-1 md:space-x-2 px-1 sm:px-1.5 md:px-3 py-1 sm:py-1.5 md:py-2 rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20"
+                  className={cssClasses.languageButton}
                   whileHover={{
                     scale: 1.02,
                     y: -1
@@ -1447,7 +1372,7 @@ export default function App() {
                     </span>
                     <ChevronDown
                       size={8}
-                      className="text-gray-600 dark:text-gray-300 transition-all duration-200 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3"
+                      className={cssClasses.languageChevron}
                       style={{ transform: isLanguageDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
                     />
                   </div>
@@ -1485,7 +1410,7 @@ export default function App() {
 
                       {/* Enhanced Language List */}
                       <div
-                        className="max-h-48 overflow-y-auto"
+                        className={cssClasses.languageList}
                         style={{
                           WebkitOverflowScrolling: 'touch',
                           touchAction: 'pan-y'
@@ -1629,7 +1554,11 @@ export default function App() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0 sm:space-x-3">
             {/* Progress Bar */}
             <div className="flex-1 min-w-0">
-              <ProgressBar currentScene={currentScene + 1} totalScenes={scenes.length} />
+              <ProgressBar
+                currentScene={currentScene + 1}
+                totalScenes={scenes.length}
+                config={cssClasses.progressBarConfig}
+              />
             </div>
 
             {/* APPLE LIQUID GLASS QUIZ TIMER - Industry Standard */}
@@ -1801,7 +1730,7 @@ export default function App() {
                     ease: [0.25, 0.46, 0.45, 0.94]
                   }
                 }}
-                className="absolute inset-0 w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden transition-colors duration-300"
+                className={cssClasses.contentCard}
                 onAnimationComplete={handleAnimationComplete}
                 whileHover={!isMobile ? {
                   y: -4,
@@ -2124,9 +2053,9 @@ export default function App() {
             initial={{ opacity: 0, x: 300 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 300 }}
-            className="fixed top-24 right-4 z-40"
+            className={cssClasses.achievementContainer}
           >
-            <div className={`relative px-4 py-3 bg-gradient-to-r from-yellow-50/98 to-orange-50/95 dark:from-gray-900/98 dark:to-gray-800/95 border border-yellow-200/70 dark:border-yellow-400/80 rounded-2xl shadow-xl shadow-yellow-500/10 dark:shadow-black/40 transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-2xl'}`}>
+            <div className={cssClasses.achievementContent}>
               <div className="flex items-center space-x-3 relative z-10">
                 <Award size={16} className="text-yellow-600 dark:text-yellow-300 flex-shrink-0" />
                 <span className="text-sm text-yellow-900 dark:text-yellow-100 font-medium transition-colors duration-300">
@@ -2134,7 +2063,7 @@ export default function App() {
                 </span>
                 <button
                   onClick={() => setShowAchievementNotification(false)}
-                  className="ml-2 p-1 rounded-full hover:bg-yellow-200/50 dark:hover:bg-yellow-900/40 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-400/30 dark:focus:ring-yellow-600/30"
+                  className={cssClasses.achievementClose}
                   aria-label="Bildirimi kapat"
                   style={{ touchAction: 'manipulation' }}
                 >
@@ -2153,9 +2082,9 @@ export default function App() {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className={`fixed z-30 ${isMobile ? 'bottom-4 right-4' : 'bottom-6 right-6'}`}
+            className={cssClasses.quizNotificationContainer}
           >
-            <div className={`relative px-4 py-3 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-gray-800 dark:to-gray-900 border border-amber-200/60 dark:border-amber-600/60 rounded-xl shadow-lg shadow-amber-500/20 dark:shadow-black/40 transition-all duration-300 ${isMobile ? '' : 'backdrop-blur-xl'} hover:shadow-xl hover:shadow-amber-500/30 dark:hover:shadow-black/50 group`}>
+            <div className={cssClasses.quizNotificationContent}>
               <div className="flex items-center space-x-2.5 relative z-10">
                 <div className="w-2 h-2 bg-amber-500 dark:bg-amber-400 rounded-full animate-pulse"></div>
                 <p className="text-sm text-amber-900 dark:text-amber-100 font-medium transition-colors duration-300">
@@ -2164,7 +2093,7 @@ export default function App() {
                 {/* Industry Standard: Close Button */}
                 <button
                   onClick={() => setQuizCompleted(true)}
-                  className="ml-1 p-1 rounded-full hover:bg-amber-200/50 dark:hover:bg-amber-900/40 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400/30 dark:focus:ring-amber-600/30 opacity-60 group-hover:opacity-100"
+                  className={cssClasses.quizNotificationClose}
                   aria-label="Bildirimi kapat"
                   style={{ touchAction: 'manipulation' }}
                 >
@@ -2180,7 +2109,7 @@ export default function App() {
 
       {/* Industry Standard Mobile Navigation Hint - Visual Only */}
       {currentScene === 0 && (
-        <div className="md:hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 z-30">
+        <div className={cssClasses.mobileNavHintContainer}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -2189,7 +2118,7 @@ export default function App() {
           >
             {/* Industry Standard: Visual Gesture Indicator Only */}
             <motion.div
-              className={`flex items-center px-3 py-2 bg-white/85 dark:bg-gray-900/85 rounded-full border border-white/40 dark:border-gray-600/40 shadow-lg transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-xl'}`}
+              className={cssClasses.mobileNavHintContent}
               animate={{
                 x: [0, 8, 0],
               }}
