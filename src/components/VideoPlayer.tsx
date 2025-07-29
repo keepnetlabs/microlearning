@@ -69,7 +69,6 @@ function parseTactiqTranscript(raw: string): TranscriptRow[] {
       transcript.push({
         start,
         text: text.trim(),
-        speaker: "Güvenlik Uzmanı",
       });
     }
   }
@@ -110,7 +109,7 @@ export function VideoPlayer({
       : transcript || [],
     [transcript]
   );
-
+  console.log("captions",captions)
   // Find current transcript row - useMemo ile optimize edildi
   const currentRowIndex = useMemo(() =>
     parsedTranscript.findIndex(
@@ -446,7 +445,8 @@ export function VideoPlayer({
         ],
         captions: {
           active: true,
-          update: true
+          update: true,
+          language: 'en'
         },
         keyboard: {
           focused: !disableForwardSeek,
@@ -674,28 +674,6 @@ export function VideoPlayer({
               : undefined
           }
         >
-          {captions.length > 0 ? (
-            captions.map((cap, idx) => (
-              <track
-                key={idx}
-                kind="captions"
-                label={cap.label}
-                src={cap.src}
-                srcLang={cap.language}
-                default={
-                  cap.default !== undefined ? cap.default : true
-                }
-              />
-            ))
-          ) : (
-            <track
-              kind="captions"
-              label="Türkçe"
-              src="/captions-tr.vtt"
-              srcLang="tr"
-              default
-            />
-          )}
         </video>
 
         {/* Transcript Toggle Icon */}
@@ -799,11 +777,9 @@ export function VideoPlayer({
                       duration: 0.2,
                     }}
                     whileHover={{
-                      backgroundColor: isActive
-                        ? "rgba(59, 130, 246, 0.15)"
-                        : canAccess
-                          ? "rgba(226, 232, 240, 0.5)"
-                          : "rgba(239, 68, 68, 0.08)",
+                      backgroundColor: canAccess
+                        ? "rgba(226, 232, 240, 0.3)"
+                        : "rgba(156, 163, 175, 0.08)",
                     }}
                     className={`transition-all duration-200 mx-3 my-1 rounded-lg ${canAccess
                       ? "cursor-pointer"
@@ -811,11 +787,9 @@ export function VideoPlayer({
                       }`}
                     style={{
                       padding: "8px 12px",
-                      backgroundColor: isActive
-                        ? "rgba(219, 234, 254, 0.8)"
-                        : "transparent",
+                      backgroundColor: "transparent",
                       border: isActive
-                        ? "1px solid rgba(59, 130, 246, 0.3)"
+                        ? "1px solid rgba(156, 163, 175, 0.5)"
                         : "1px solid transparent",
                       opacity: canAccess ? 1 : 0.5,
                     }}
@@ -827,11 +801,12 @@ export function VideoPlayer({
                           className="font-medium transition-colors duration-200"
                           style={{
                             color: isActive
-                              ? "rgb(37, 99, 235)"
+                              ? "rgb(102, 102, 102)" // Orta gri - nötr
                               : canAccess
-                                ? "rgb(59, 130, 246)"
-                                : "rgb(239, 68, 68)",
+                                ? "rgb(102, 102, 102)" // Orta gri - nötr
+                                : "rgb(156, 163, 175)", // Açık gri - disable durumu
                             fontSize: "12px",
+                            fontWeight: "500",
                           }}
                         >
                           {formatTime(row.start)}
@@ -847,11 +822,11 @@ export function VideoPlayer({
                             style={{
                               fontSize: "11px",
                               color: isActive
-                                ? "rgb(71, 85, 105)"
+                                ? "rgb(30, 64, 175)" // Koyu mavi - marka rengi
                                 : canAccess
-                                  ? "rgb(100, 116, 139)"
-                                  : "rgb(185, 28, 28)",
-                              fontWeight: "500",
+                                  ? "rgb(59, 130, 246)" // Orta mavi
+                                  : "rgb(156, 163, 175)", // Açık gri - disable durumu
+                              fontWeight: "600", // Bold yapıldı
                             }}
                           >
                           </div>
@@ -861,11 +836,12 @@ export function VideoPlayer({
                             style={{
                               fontSize: "13px",
                               color: isActive
-                                ? "rgb(15, 23, 42)"
+                                ? "rgb(0, 0, 0)" // Siyah - yüksek kontrast
                                 : canAccess
-                                  ? "rgb(51, 65, 85)"
-                                  : "rgb(127, 29, 29)",
+                                  ? "rgb(51, 51, 51)" // Koyu gri - WCAG uyumlu
+                                  : "rgb(156, 163, 175)", // Açık gri - disable durumu
                               lineHeight: "1.4",
+                              fontWeight: "400",
                             }}
                           >
                             {row.text}

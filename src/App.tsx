@@ -11,7 +11,7 @@ import { QuizScene } from "./components/scenes/QuizScene";
 import { SurveyScene } from "./components/scenes/SurveyScene";
 import { SummaryScene } from "./components/scenes/SummaryScene";
 import { NudgeScene } from "./components/scenes/NudgeScene";
-import { ChevronDown, Search, Loader2, ChevronDown as ChevronDownIcon, Star, X, Moon, Sun, Award, Timer } from "lucide-react";
+import { ChevronDown, Search, Loader2, ChevronDown as ChevronDownIcon, Star, X, Moon, Sun, Award } from "lucide-react";
 import ReactCountryFlag from "react-country-flag";
 import { getCountryCode, getSearchPlaceholder, detectBrowserLanguage, useIsMobile, priorityLanguages, languages } from "./utils/languageUtils";
 import { loadAppConfig, createConfigChangeEvent } from "./components/configs/appConfigLoader";
@@ -317,9 +317,9 @@ export default function App() {
   const [shownAchievements, setShownAchievements] = useState<string[]>([]);
   const [lastAchievementCount, setLastAchievementCount] = useState(0);
 
-  // Quiz timer state - moved to App level for header display
-  const [quizTimeLeft, setQuizTimeLeft] = useState(30);
-  const [isQuizTimerActive, setIsQuizTimerActive] = useState(false);
+  // Quiz completion hint state - show only once at first quiz start
+  const [showQuizCompletionHint, setShowQuizCompletionHint] = useState(true);
+  const [hasShownQuizHint, setHasShownQuizHint] = useState(false);
 
   // Quiz state management - moved to App level to persist across scene changes
   const [quizCurrentQuestionIndex, setQuizCurrentQuestionIndex] = useState(0);
@@ -549,6 +549,20 @@ export default function App() {
     }
   }, [showThemeHint]);
 
+  // Show quiz completion hint only once at first quiz start
+  useEffect(() => {
+    if (currentScene === 4 && !hasShownQuizHint && showQuizCompletionHint) {
+      setHasShownQuizHint(true);
+      
+      // Auto-hide after 5 seconds
+      const timer = setTimeout(() => {
+        setShowQuizCompletionHint(false);
+      },5000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [currentScene, hasShownQuizHint, showQuizCompletionHint]);
+
   // Reset scroll position when scene changes
   const resetScrollPosition = useCallback(() => {
     if (scrollContainerRef.current) {
@@ -738,34 +752,12 @@ export default function App() {
 
   const handleQuizCompleted = useCallback(() => {
     setQuizCompleted(true);
-    setIsQuizTimerActive(false);
     setAchievements(prev => [...prev, 'quiz-completed'].filter((a, i, arr) => arr.indexOf(a) === i));
-
-    // Don't reset quiz state - keep the final state for review
-    // Quiz state will be preserved until user navigates away from quiz scene
-    // No auto-advance - let user navigate manually
   }, []);
 
 
 
-  // Get timer duration from config
-  const getTimerDuration = useCallback(() => {
-    return (appConfig as any).quizSceneConfig?.timer?.duration || 30;
-  }, []);
 
-  // Quiz timer handlers
-  const handleQuizTimerStart = useCallback(() => {
-    setQuizTimeLeft(getTimerDuration());
-    setIsQuizTimerActive(true);
-  }, [getTimerDuration]);
-
-  const handleQuizTimerStop = useCallback(() => {
-    setIsQuizTimerActive(false);
-  }, []);
-
-  const handleQuizTimerUpdate = useCallback((timeLeft: number) => {
-    setQuizTimeLeft(timeLeft);
-  }, []);
 
   // Survey feedback submission handler
   const handleSurveySubmitted = useCallback(() => {
@@ -836,13 +828,7 @@ export default function App() {
   // Track previous scene to detect actual scene changes
   const [previousScene, setPreviousScene] = useState(currentScene);
 
-  // Start quiz timer when entering quiz scene for the first time
-  useEffect(() => {
-    if (currentScene === 4 && !isQuizTimerActive && !quizCompleted) {
-      setIsQuizTimerActive(true);
-      setQuizTimeLeft(getTimerDuration());
-    }
-  }, [currentScene, isQuizTimerActive, quizCompleted, getTimerDuration]);
+
 
   // Enhanced scene change handler with scroll reset
   const handleAnimationComplete = useCallback(() => {
@@ -851,15 +837,7 @@ export default function App() {
       handleSceneChange(currentScene);
       setPreviousScene(currentScene);
 
-      // Reset quiz timer when leaving quiz scene
-      if (currentScene !== 4) {
-        setIsQuizTimerActive(false);
-        setQuizTimeLeft(getTimerDuration());
-      } else {
-        // Start quiz timer when entering quiz scene
-        setIsQuizTimerActive(true);
-        setQuizTimeLeft(getTimerDuration());
-      }
+
 
       // Immediate scroll reset on mobile for better performance
       if (isMobile) {
@@ -870,7 +848,7 @@ export default function App() {
         }, 50);
       }
     }
-  }, [currentScene, previousScene, handleSceneChange, resetScrollPosition, isMobile, getTimerDuration]);
+  }, [currentScene, previousScene, handleSceneChange, resetScrollPosition, isMobile]);
 
   const CurrentSceneComponent = scenes[currentScene].component as React.ComponentType<any>;
   const currentLanguage = languages.find(lang => lang.code === selectedLanguage);
@@ -1548,128 +1526,7 @@ export default function App() {
               />
             </div>
 
-            {/* APPLE LIQUID GLASS QUIZ TIMER - Industry Standard */}
-            <AnimatePresence mode="wait">
-              {currentScene === 4 && isQuizTimerActive && !quizCompleted && (
-                <div className="flex-shrink-0 self-center sm:self-auto">
-                  <div
-                    className={`
-                      relative flex items-center space-x-1.5 sm:space-x-2 px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg sm:rounded-xl overflow-hidden 
-                      transition-all duration-500 ease-out cursor-default
-                      ${quizTimeLeft <= 6 ? 'animate-pulse' : quizTimeLeft <= 15 ? 'animate-bounce' : ''}
-                      hover:scale-105 active:scale-95
-                    `}
-                    style={{
-                      // APPLE LIQUID GLASS BACKGROUND - Industry Standard
-                      background: quizTimeLeft <= 6
-                        ? `linear-gradient(135deg, 
-                            rgba(239, 68, 68, 0.25) 0%, 
-                            rgba(220, 38, 38, 0.20) 50%, 
-                            rgba(185, 28, 28, 0.15) 100%
-                          )`
-                        : quizTimeLeft <= 15
-                          ? `linear-gradient(135deg, 
-                            rgba(251, 146, 60, 0.25) 0%, 
-                            rgba(245, 101, 101, 0.20) 50%, 
-                            rgba(217, 119, 6, 0.15) 100%
-                          )`
-                          : `linear-gradient(135deg, 
-                            rgba(59, 130, 246, 0.25) 0%, 
-                            rgba(37, 99, 235, 0.20) 50%, 
-                            rgba(29, 78, 216, 0.15) 100%
-                          )`,
-                      backdropFilter: 'blur(24px) saturate(200%)',
-                      WebkitBackdropFilter: 'blur(24px) saturate(200%)',
-                      border: quizTimeLeft <= 6
-                        ? '1.5px solid rgba(239, 68, 68, 0.40)'
-                        : quizTimeLeft <= 15
-                          ? '1.5px solid rgba(251, 146, 60, 0.40)'
-                          : '1.5px solid rgba(59, 130, 246, 0.40)',
-                      boxShadow: quizTimeLeft <= 6
-                        ? `
-                          0 8px 32px rgba(239, 68, 68, 0.25),
-                          0 4px 16px rgba(220, 38, 38, 0.15),
-                          inset 0 1px 0 rgba(255, 255, 255, 0.30),
-                          inset 0 -1px 0 rgba(0, 0, 0, 0.10)
-                        `
-                        : quizTimeLeft <= 15
-                          ? `
-                          0 8px 32px rgba(251, 146, 60, 0.25),
-                          0 4px 16px rgba(245, 101, 101, 0.15),
-                          inset 0 1px 0 rgba(255, 255, 255, 0.30),
-                          inset 0 -1px 0 rgba(0, 0, 0, 0.10)
-                        `
-                          : `
-                          0 8px 32px rgba(59, 130, 246, 0.25),
-                          0 4px 16px rgba(37, 99, 235, 0.15),
-                          inset 0 1px 0 rgba(255, 255, 255, 0.30),
-                          inset 0 -1px 0 rgba(0, 0, 0, 0.10)
-                        `,
-                      transform: 'translateZ(0)',
-                      willChange: 'transform'
-                    }}
-                  >
-                    {/* Ultra-fine noise texture */}
-                    <div
-                      className="absolute inset-0 opacity-[0.020] dark:opacity-[0.012] rounded-xl mix-blend-overlay pointer-events-none"
-                      style={{
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='headerTimerNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23headerTimerNoise)'/%3E%3C/svg%3E")`,
-                        backgroundSize: '128px 128px'
-                      }}
-                    />
 
-                    {/* Multi-layer gradients with color theming */}
-                    <div
-                      className="absolute inset-0 rounded-xl transition-colors duration-500"
-                      style={{
-                        background: quizTimeLeft <= 6
-                          ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.10) 50%, rgba(185, 28, 28, 0.08) 100%)'
-                          : quizTimeLeft <= 15
-                            ? 'linear-gradient(135deg, rgba(251, 146, 60, 0.15) 0%, rgba(245, 101, 101, 0.10) 50%, rgba(217, 119, 6, 0.08) 100%)'
-                            : 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.10) 50%, rgba(29, 78, 216, 0.08) 100%)'
-                      }}
-                    />
-
-                    {/* Apple-style highlight with color tinting */}
-                    <div
-                      className="absolute inset-0 rounded-xl pointer-events-none"
-                      style={{
-                        background: quizTimeLeft <= 6
-                          ? `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(239, 68, 68, 0.35) 0%, rgba(220, 38, 38, 0.20) 30%, rgba(255, 255, 255, 0.15) 60%, transparent 80%)`
-                          : quizTimeLeft <= 15
-                            ? `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(251, 146, 60, 0.35) 0%, rgba(245, 101, 101, 0.20) 30%, rgba(255, 255, 255, 0.15) 60%, transparent 80%)`
-                            : `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(59, 130, 246, 0.35) 0%, rgba(37, 99, 235, 0.20) 30%, rgba(255, 255, 255, 0.15) 60%, transparent 80%)`,
-                        mixBlendMode: 'overlay'
-                      }}
-                    />
-
-                    {/* Content */}
-                    <div className="relative z-10 flex items-center space-x-2">
-                      <Timer
-                        size={14}
-                        className={`transition-colors duration-300 ${quizTimeLeft <= 6 ? 'text-red-600 dark:text-red-300' :
-                          quizTimeLeft <= 15 ? 'text-orange-600 dark:text-orange-300' :
-                            'text-blue-600 dark:text-blue-300'
-                          }`}
-                      />
-                      <span className={`text-sm font-mono font-semibold transition-colors duration-300 min-w-[40px] text-center ${quizTimeLeft <= 6 ? 'text-red-700 dark:text-red-200' :
-                        quizTimeLeft <= 15 ? 'text-orange-700 dark:text-orange-200' :
-                          'text-blue-700 dark:text-blue-200'
-                        }`}>
-                        {Math.floor(quizTimeLeft / 60)}:{(quizTimeLeft % 60).toString().padStart(2, '0')}
-                      </span>
-                      {quizTimeLeft <= 6 && (
-                        <motion.div
-                          animate={{ scale: [1, 1.2, 1] }}
-                          transition={{ duration: 1, repeat: Infinity }}
-                          className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-red-500 rounded-full"
-                        />
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </AnimatePresence>
           </div>
         </div>
       </div>
@@ -1842,11 +1699,7 @@ export default function App() {
                       <div style={{ display: currentScene === 4 ? 'block' : 'none' }}>
                         <QuizScene
                           config={(appConfig as any).quizSceneConfig}
-                          timerDuration={getTimerDuration()}
                           onQuizCompleted={handleQuizCompleted}
-                          onTimerStart={handleQuizTimerStart}
-                          onTimerStop={handleQuizTimerStop}
-                          onTimerUpdate={handleQuizTimerUpdate}
 
                           // Quiz state props
                           currentQuestionIndex={quizCurrentQuestionIndex}
@@ -1855,10 +1708,6 @@ export default function App() {
                           setAnswers={setQuizAnswersStable}
                           showResult={quizShowResult}
                           setShowResult={setQuizShowResultStable}
-                          timeLeft={quizTimeLeft}
-                          setTimeLeft={setQuizTimeLeft}
-                          isTimerActive={isQuizTimerActive}
-                          setIsTimerActive={setIsQuizTimerActive}
                           attempts={quizAttempts}
                           setAttempts={setQuizAttemptsStable}
                           isAnswerLocked={quizIsAnswerLocked}
@@ -2067,7 +1916,7 @@ export default function App() {
 
       {/* Enhanced Quiz Completion Notification - Industry Standard Position */}
       <AnimatePresence>
-        {currentScene === 4 && !quizCompleted && (
+        {currentScene === 4 && !quizCompleted && showQuizCompletionHint && (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -2082,7 +1931,7 @@ export default function App() {
                 </p>
                 {/* Industry Standard: Close Button */}
                 <button
-                  onClick={() => setQuizCompleted(true)}
+                  onClick={() => setShowQuizCompletionHint(false)}
                   className={cssClasses.quizNotificationClose}
                   aria-label={themeConfig.texts?.closeNotification}
                   style={{ touchAction: 'manipulation' }}

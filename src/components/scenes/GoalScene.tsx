@@ -414,15 +414,28 @@ export const GoalScene = memo(({
   config = defaultConfig
 }: { config?: GoalSceneConfig }) => {
 
+  // Default values for removed config properties
+  const defaultContainerClassName = "flex flex-col items-center justify-center h-full text-center px-6";
+  const defaultCardSpacing = "space-y-4";
+  const defaultMaxWidth = "max-w-md w-full";
+  const defaultGlassEffect = {
+    blur: "blur(24px)",
+    saturation: "saturate(180%)",
+    border: "1px solid rgba(255, 255, 255, 0.30)",
+    shadow: "0 8px 32px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.20)"
+  };
+
   const {
     title,
     goals,
-    icon,
-    containerClassName,
-    cardSpacing,
-    maxWidth,
-    glassEffect
+    icon
   } = config;
+
+  // Use default values for removed properties
+  const containerClassName = defaultContainerClassName;
+  const cardSpacing = defaultCardSpacing;
+  const maxWidth = defaultMaxWidth;
+  const glassEffect = defaultGlassEffect;
 
   // Memoize the icon component
   const iconComponent = useMemo(() => {

@@ -65,7 +65,6 @@ interface ScenarioSceneConfig {
   title: string;
   subtitle: string;
   description: string;
-  transcript: string;
   video: {
     src: string;
     poster?: string;
@@ -73,6 +72,7 @@ interface ScenarioSceneConfig {
     showTranscript?: boolean;
     transcriptTitle?: string;
     transcriptLanguage?: string;
+    transcript?: string;
     captions?: {
       language: string;
       label: string;
@@ -125,6 +125,9 @@ interface ScenarioSceneProps {
 export function ScenarioScene({
   config,
 }: ScenarioSceneProps) {
+  // Default values for removed config properties
+  const defaultContainerClassName = "flex flex-col items-center justify-start h-full px-4 py-4 sm:px-6 overflow-y-auto";
+
   const [transcriptData, setTranscriptData] = useState<string>('');
   const [isLoadingTranscript, setIsLoadingTranscript] = useState(false);
   const [transcriptError, setTranscriptError] = useState<string | null>(null);
@@ -150,9 +153,9 @@ export function ScenarioScene({
   // Transcript'i dinamik olarak yükle (string veya URL'den)
   useEffect(() => {
     const loadTranscript = async () => {
-      if (!config.transcript) return;
+      if (!config.video?.transcript) return;
 
-      const transcriptValue = config.transcript;
+      const transcriptValue = config.video.transcript;
 
       // Transcript'in tipini dinamik olarak algıla
       if (typeof transcriptValue === 'string') {
@@ -185,7 +188,7 @@ export function ScenarioScene({
     };
 
     loadTranscript();
-  }, [config.transcript]);
+  }, [config.video?.transcript]);
 
   // Parse transcript from loaded data
   const tactiqTranscript = useMemo(
@@ -207,7 +210,7 @@ export function ScenarioScene({
   }, [config.icon?.component, config.icon?.sceneIconName, config.icon?.size, config.icon?.className]);
 
   return (
-    <div className={config.containerClassName}>
+    <div className={config.containerClassName || defaultContainerClassName}>
       {/* Header Icon */}
       <motion.div
         initial={config.animations?.headerIcon?.initial || { opacity: 0, scale: 0.8, y: -20 }}

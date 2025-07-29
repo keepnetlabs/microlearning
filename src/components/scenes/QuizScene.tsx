@@ -211,6 +211,7 @@ interface QuizSceneConfig {
     };
   };
   texts?: {
+    question?: string;
     nextQuestion?: string;
     retryQuestion?: string;
     quizCompleted?: string;
@@ -238,11 +239,7 @@ interface QuizSceneConfig {
 
 interface QuizSceneProps {
   config: QuizSceneConfig;
-  timerDuration?: number;
   onQuizCompleted: () => void;
-  onTimerStart: () => void;
-  onTimerStop: () => void;
-  onTimerUpdate: (timeLeft: number) => void;
 
   // Quiz state props
   currentQuestionIndex: number;
@@ -251,10 +248,6 @@ interface QuizSceneProps {
   setAnswers: (answers: Map<string, any> | ((prev: Map<string, any>) => Map<string, any>)) => void;
   showResult: boolean;
   setShowResult: (show: boolean) => void;
-  timeLeft: number;
-  setTimeLeft: (time: number | ((prev: number) => number)) => void;
-  isTimerActive: boolean;
-  setIsTimerActive: (active: boolean) => void;
   attempts: number;
   setAttempts: (attempts: number | ((prev: number) => number)) => void;
   isAnswerLocked: boolean;
@@ -274,11 +267,7 @@ interface QuizSceneProps {
 
 export const QuizScene = React.memo(function QuizScene({
   config,
-  timerDuration,
   onQuizCompleted,
-  onTimerStart,
-  onTimerStop,
-  onTimerUpdate,
 
   // Quiz state props
   currentQuestionIndex,
@@ -287,10 +276,6 @@ export const QuizScene = React.memo(function QuizScene({
   setAnswers,
   showResult,
   setShowResult,
-  timeLeft,
-  setTimeLeft,
-  isTimerActive,
-  setIsTimerActive,
   attempts,
   setAttempts,
   isAnswerLocked,
@@ -434,61 +419,7 @@ export const QuizScene = React.memo(function QuizScene({
     };
   }, [config.styling?.answerOptions]);
 
-  // Timer Effects
-  useEffect(() => {
-    // Start timer when question changes and timer is active
-    if (isTimerActive && !showResult && !isAnswerLocked) {
-      onTimerStart();
-    }
-  }, [currentQuestionIndex, isTimerActive, showResult, isAnswerLocked, onTimerStart]);
 
-  useEffect(() => {
-    // Stop timer when answer is locked or result is shown
-    if (isAnswerLocked || showResult) {
-      onTimerStop();
-    }
-  }, [isAnswerLocked, showResult, onTimerStop]);
-
-  useEffect(() => {
-    // Countdown timer
-    if (
-      isTimerActive &&
-      timeLeft > 0 &&
-      !showResult &&
-      !isAnswerLocked
-    ) {
-      const timer = setTimeout(() => {
-        const newTimeLeft = timeLeft - 1;
-        setTimeLeft(newTimeLeft);
-        onTimerUpdate(newTimeLeft);
-      }, 1000);
-      return () => clearTimeout(timer);
-    } else if (
-      timeLeft === 0 &&
-      !showResult &&
-      !isAnswerLocked
-    ) {
-      // Timer expired - show result
-      setShowResult(true);
-
-      // Auto-scroll to result panel after a short delay
-      setTimeout(() => {
-        resultPanelRef.current?.scrollIntoView({
-          behavior: 'smooth',
-          block: isMobile ? 'start' : 'center',
-        });
-      }, 100);
-    }
-  }, [
-    timeLeft,
-    isTimerActive,
-    showResult,
-    isAnswerLocked,
-    onTimerUpdate,
-    setTimeLeft,
-    setShowResult,
-    isMobile,
-  ]);
 
   // Answer Validation
   const validateAnswer = useCallback(
@@ -600,8 +531,6 @@ export const QuizScene = React.memo(function QuizScene({
 
   const resetQuestionState = useCallback(() => {
     setShowResult(false);
-    setTimeLeft(timerDuration || config.timer?.duration || 30);
-    setIsTimerActive(true);
     setAttempts(0);
     setIsAnswerLocked(false);
     setIsLoading(false);
@@ -627,8 +556,7 @@ export const QuizScene = React.memo(function QuizScene({
 
     setDraggedItems(new Map());
     setSelectedItem(null);
-    // Timer will be started by the effect when isTimerActive becomes true
-  }, [setShowResult, setTimeLeft, setIsTimerActive, setAttempts, setIsAnswerLocked, setIsLoading, setMultiSelectAnswers, setSliderValue, setDraggedItems, setSelectedItem, timerDuration, config.timer?.duration, currentQuestion, answers]);
+  }, [setShowResult, setAttempts, setIsAnswerLocked, setIsLoading, setMultiSelectAnswers, setSliderValue, setDraggedItems, setSelectedItem, currentQuestion, answers]);
 
   const handleNextQuestion = useCallback(() => {
     setCurrentQuestionIndex((prev) => prev + 1);
@@ -1806,32 +1734,8 @@ export const QuizScene = React.memo(function QuizScene({
 
         <div className="flex items-center justify-center space-x-4 text-sm text-muted-foreground">
           <span>
-            Soru {currentQuestionIndex + 1}/{questions.length}
+            {config.texts?.question || "Soru"} {currentQuestionIndex + 1}/{questions.length}
           </span>
-          {config.ui?.showDifficulty && (
-            <>
-              <span>•</span>
-              <span
-                className={`px-2 py-1 rounded-full text-xs ${currentQuestion?.difficulty === "easy" &&
-                  "bg-chart-4/20 text-chart-4"
-                  } ${currentQuestion?.difficulty === "medium" &&
-                  "bg-chart-5/20 text-chart-5"
-                  } ${currentQuestion?.difficulty === "hard" &&
-                  "bg-destructive/20 text-destructive"
-                  }`}
-              >
-                {currentQuestion?.difficulty === "easy" && (config.difficulty?.easy || "Kolay")}
-                {currentQuestion?.difficulty === "medium" && (config.difficulty?.medium || "Orta")}
-                {currentQuestion?.difficulty === "hard" && (config.difficulty?.hard || "Zor")}
-              </span>
-            </>
-          )}
-          {config.ui?.showCategory && (
-            <>
-              <span>•</span>
-              <span>{currentQuestion?.category}</span>
-            </>
-          )}
         </div>
 
         {/* Navigation Buttons - Only show when quiz is completed */}

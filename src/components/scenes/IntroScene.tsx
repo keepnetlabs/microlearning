@@ -24,7 +24,7 @@ const getIconComponent = (iconName: string): LucideIcon => {
 
 // Props interfaces
 interface HighlightItem {
-  iconName: string; // "book-open", "users", "target" gibi
+  iconName: string;
   text: string;
   colorType: ColorType;
 }
@@ -407,6 +407,20 @@ export const IntroScene = React.memo(({
   config
 }: { config: IntroSceneConfig }) => {
 
+  // Default values for removed config properties
+  const defaultParticles = { enabled: true, count: 15, color: "bg-red-400/60", baseDuration: 5 };
+  const defaultSparkles = {
+    enabled: true,
+    ambient: { count: 6, opacity: 30, size: 0.5, duration: 10, delay: 1 },
+    floating: { count: 8, opacity: 25, size: 0.5, duration: 12, delay: 2 },
+    twinkling: { count: 10, opacity: 20, size: 0.5, duration: 8, delay: 3 },
+    gradient: { count: 4, opacity: 18, size: 1, duration: 15, delay: 4 },
+    drifting: { count: 6, opacity: 15, size: 0.5, duration: 18, delay: 5 },
+    breathing: { count: 7, opacity: 12, size: 0.5, duration: 11, delay: 6 }
+  };
+  const defaultContainerClassName = "flex flex-col items-center justify-center h-full text-center relative font-['Open_Sans'] overflow-hidden px-2 sm:px-4";
+  const defaultAnimationDelays = { welcomeDelay: 1.0, iconDelay: 0.2, titleDelay: 0.3, subtitleDelay: 1.0, cardDelay: 0.5, statsDelay: 0.8, ctaDelay: 1.0 };
+
   const {
     title,
     subtitle,
@@ -415,13 +429,15 @@ export const IntroScene = React.memo(({
     duration,
     level,
     callToActionText,
-    particles,
     icon,
-    sparkles,
-    card,
-    containerClassName,
-    animationDelays
+    card
   } = config;
+
+  // Use default values for removed properties
+  const particles = defaultParticles;
+  const sparkles = defaultSparkles;
+  const containerClassName = defaultContainerClassName;
+  const animationDelays = defaultAnimationDelays;
 
   // Memoize getIconComponent function
   const memoizedGetIconComponent = useCallback(getIconComponent, []);
