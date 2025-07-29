@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Star, MessageSquare, CheckCircle, Send, LucideIcon } from "lucide-react";
+import { Star, CheckCircle, Send, LucideIcon } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { motion } from "framer-motion";
 import { SurveySceneConfig, surveySceneConfig } from "../configs/educationConfigs";
@@ -136,8 +136,8 @@ export function SurveyScene({
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="mb-4 relative"
       >
-        <div className="relative p-3 rounded-2xl from-blue-500/10 to-indigo-500/10 dark:from-blue-900/30 dark:to-indigo-900/30 backdrop-blur-xl border border-white/20 dark:border-gray-600/40 shadow-xl mx-auto w-fit">
-          <div className="absolute inset-0 from-white/20 to-transparent dark:from-gray-800/20 dark:to-transparent rounded-2xl"></div>
+        <div className="relative p-3 rounded-2xl mx-auto w-fit">
+          <div className="absolute inset-0 rounded-2xl"></div>
           <IconComponent
             size={config.icon?.size || 40}
             className={`${config.icon?.color || 'text-blue-500 dark:text-blue-400'} relative z-10`}

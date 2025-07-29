@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import * as LucideIcons from "lucide-react";
 import { LucideIcon } from "lucide-react";
 import { VideoPlayer } from "../VideoPlayer";
-import { educationConfigs } from "../configs/educationConfigs";
 
 export interface TranscriptRow {
   start: number;
@@ -62,12 +61,63 @@ async function fetchTranscriptFromUrl(url: string): Promise<string> {
   }
 }
 
+interface ScenarioSceneConfig {
+  title: string;
+  subtitle: string;
+  description: string;
+  transcript: string;
+  video: {
+    src: string;
+    poster?: string;
+    disableForwardSeek?: boolean;
+    showTranscript?: boolean;
+    transcriptTitle?: string;
+    transcriptLanguage?: string;
+  };
+  icon?: {
+    component?: React.ReactNode;
+    size?: number;
+    sceneIconName?: string;
+    className?: string;
+  };
+  containerClassName?: string;
+  videoContainerClassName?: string;
+  animations?: {
+    headerIcon?: {
+      initial: any;
+      animate: any;
+      transition: any;
+    };
+    title?: {
+      initial: any;
+      animate: any;
+      transition: any;
+    };
+    videoPlayer?: {
+      initial: any;
+      animate: any;
+      transition: any;
+    };
+    mobileHint?: {
+      initial: any;
+      animate: any;
+      transition: any;
+    };
+  };
+  mobileHint?: {
+    text: string;
+    className: string;
+  };
+  texts?: {
+    transcriptLoading?: string;
+  };
+}
 interface ScenarioSceneProps {
-  config?: typeof educationConfigs.smishing.scenarioSceneConfig;
+  config: ScenarioSceneConfig;
 }
 
 export function ScenarioScene({
-  config = educationConfigs.smishing.scenarioSceneConfig
+  config,
 }: ScenarioSceneProps) {
   const [transcriptData, setTranscriptData] = useState<string>('');
   const [isLoadingTranscript, setIsLoadingTranscript] = useState(false);
@@ -154,20 +204,20 @@ export function ScenarioScene({
     <div className={config.containerClassName}>
       {/* Header Icon */}
       <motion.div
-        initial={config.animations.headerIcon.initial}
-        animate={config.animations.headerIcon.animate}
-        transition={config.animations.headerIcon.transition}
-        className="mb-2 sm:mb-4 relative"
+        initial={config.animations?.headerIcon?.initial || { opacity: 0, scale: 0.8, y: -20 }}
+        animate={config.animations?.headerIcon?.animate || { opacity: 1, scale: 1, y: 0 }}
+        transition={config.animations?.headerIcon?.transition || { duration: 0.8, ease: "easeOut" }}
+        className="mb-4"
       >
         {iconComponent}
       </motion.div>
 
       {/* Title */}
       <motion.h1
-        initial={config.animations.title.initial}
-        animate={config.animations.title.animate}
-        transition={config.animations.title.transition}
-        className="mb-3 sm:mb-1 text-center text-gray-900 dark:text-white text-lg sm:text-xl md:text-2xl"
+        initial={config.animations?.title?.initial || { opacity: 0, y: 20 }}
+        animate={config.animations?.title?.animate || { opacity: 1, y: 0 }}
+        transition={config.animations?.title?.transition || { duration: 0.8, delay: 0.2 }}
+        className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white text-center mb-2"
       >
         {config.title}
       </motion.h1>
@@ -181,7 +231,9 @@ export function ScenarioScene({
         >
           <div className="inline-flex items-center space-x-2">
             <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-            <span className="text-gray-600 dark:text-gray-400">Transcript yükleniyor...</span>
+            <span className="text-gray-600 dark:text-gray-400">
+              {config.texts?.transcriptLoading || "Transcript yükleniyor..."}
+            </span>
           </div>
         </motion.div>
       )}
@@ -202,10 +254,10 @@ export function ScenarioScene({
       {/* Video Player */}
       {!isLoadingTranscript && !transcriptError && (
         <motion.div
-          initial={config.animations.videoPlayer.initial}
-          animate={config.animations.videoPlayer.animate}
-          transition={config.animations.videoPlayer.transition}
-          className={config.videoContainerClassName}
+          initial={config.animations?.videoPlayer?.initial || { opacity: 0, y: 40, scale: 0.95 }}
+          animate={config.animations?.videoPlayer?.animate || { opacity: 1, y: 0, scale: 1 }}
+          transition={config.animations?.videoPlayer?.transition || { duration: 0.8, delay: 0.4 }}
+          className={config.videoContainerClassName || "w-full max-w-sm sm:max-w-md lg:max-w-lg mb-6 sm:mb-8"}
         >
           <VideoPlayer
             src={config.video.src}
@@ -222,13 +274,13 @@ export function ScenarioScene({
 
       {/* Mobile Hint */}
       <motion.div
-        initial={config.animations.mobileHint.initial}
-        animate={config.animations.mobileHint.animate}
-        transition={config.animations.mobileHint.transition}
-        className={config.mobileHint.className}
+        initial={config.animations?.mobileHint?.initial || { opacity: 0 }}
+        animate={config.animations?.mobileHint?.animate || { opacity: 1 }}
+        transition={config.animations?.mobileHint?.transition || { delay: 1.2 }}
+        className={config.mobileHint?.className || "sm:hidden mt-2"}
       >
         <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-          {config.mobileHint.text}
+          {config.mobileHint?.text || "💡 Videoyu izleyip transkripti inceleyin"}
         </p>
       </motion.div>
     </div>

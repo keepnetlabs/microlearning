@@ -12,21 +12,232 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "../ui/button";
 import { Slider } from "../ui/slider";
-import {
-  QuizSceneConfig,
-  quizSceneConfig,
-  QuestionType,
-  MultipleChoiceQuestion,
-  TrueFalseQuestion,
-  MultiSelectQuestion,
-  DragDropQuestion,
-  SliderScaleQuestion
-} from "../configs/educationConfigs";
 import * as LucideIcons from "lucide-react";
 import { LucideIcon } from "lucide-react";
 
+// Question Types
+enum QuestionType {
+  MULTIPLE_CHOICE = "multiple_choice",
+  TRUE_FALSE = "true_false",
+  MULTI_SELECT = "multi_select",
+  DRAG_DROP = "drag_drop",
+  SLIDER_SCALE = "slider_scale",
+}
+
+// Enhanced Question Interfaces
+interface BaseQuestion {
+  id: string;
+  type: QuestionType;
+  title: string;
+  description?: string;
+  explanation: string;
+  tips?: string[];
+  difficulty: "easy" | "medium" | "hard";
+  category: string;
+  timeLimit?: number;
+}
+
+interface MultipleChoiceQuestion extends BaseQuestion {
+  type: QuestionType.MULTIPLE_CHOICE;
+  options: Array<{
+    id: string;
+    text: string;
+    isCorrect: boolean;
+    explanation?: string;
+    strength?: string;
+    color?: "green" | "yellow" | "red";
+  }>;
+}
+
+interface TrueFalseQuestion extends BaseQuestion {
+  type: QuestionType.TRUE_FALSE;
+  statement: string;
+  correctAnswer: boolean;
+}
+
+interface MultiSelectQuestion extends BaseQuestion {
+  type: QuestionType.MULTI_SELECT;
+  options: Array<{
+    id: string;
+    text: string;
+    isCorrect: boolean;
+    explanation?: string;
+  }>;
+  minCorrect: number;
+  maxCorrect?: number;
+}
+
+interface DragDropQuestion extends BaseQuestion {
+  type: QuestionType.DRAG_DROP;
+  items: Array<{
+    id: string;
+    text: string;
+    category: string;
+  }>;
+  categories: Array<{
+    id: string;
+    name: string;
+    description?: string;
+    color: "blue" | "green" | "orange" | "purple";
+  }>;
+}
+
+interface SliderScaleQuestion extends BaseQuestion {
+  type: QuestionType.SLIDER_SCALE;
+  statement: string;
+  min: number;
+  max: number;
+  correctRange: { min: number; max: number };
+  labels: { min: string; max: string };
+  unit?: string;
+}
+
+type Question =
+  | MultipleChoiceQuestion
+  | TrueFalseQuestion
+  | MultiSelectQuestion
+  | DragDropQuestion
+  | SliderScaleQuestion;
+
+// Quiz Scene Config Interface
+interface QuizSceneConfig {
+  title?: string;
+  subtitle?: string;
+  difficulty?: {
+    easy?: string;
+    medium?: string;
+    hard?: string;
+  };
+  timer?: {
+    enabled?: boolean;
+    duration?: number;
+    warningThreshold?: number;
+  };
+  questions?: {
+    totalCount?: number;
+    maxAttempts?: number;
+    list?: Question[];
+  };
+  ui?: {
+    showProgressBar?: boolean;
+    showTimer?: boolean;
+    showDifficulty?: boolean;
+    showCategory?: boolean;
+  };
+  icon?: {
+    component?: React.ReactNode;
+    sceneIconName?: string;
+    size?: number;
+    className?: string;
+    strokeWidth?: number;
+    color?: string;
+  };
+  styling?: {
+    primaryColor?: string;
+    card?: {
+      backgroundColor?: string;
+      borderColor?: string;
+      gradientFrom?: string;
+      gradientTo?: string;
+      shadow?: string;
+      borderRadius?: string;
+    };
+    resultPanel?: {
+      backgroundColor?: string;
+      borderColor?: string;
+      gradientFrom?: string;
+      gradientTo?: string;
+      shadow?: string;
+      borderRadius?: string;
+    };
+    answerOptions?: {
+      backgroundColor?: string;
+      borderColor?: string;
+      selectedColor?: string;
+      correctColor?: string;
+      incorrectColor?: string;
+      hoverColor?: string;
+    };
+    cardStyle?: {
+      background?: string;
+      border?: string;
+      shadow?: string;
+    };
+    resultPanelStyle?: {
+      background?: string;
+      border?: string;
+      shadow?: string;
+    };
+    buttons?: {
+      nextQuestion?: {
+        backgroundColor?: string;
+        borderColor?: string;
+        textColor?: string;
+        iconColor?: string;
+        gradientFrom?: string;
+        gradientTo?: string;
+        shadow?: string;
+        borderRadius?: string;
+        padding?: string;
+        fontSize?: string;
+        fontWeight?: string;
+      };
+      retryQuestion?: {
+        backgroundColor?: string;
+        borderColor?: string;
+        textColor?: string;
+        iconColor?: string;
+        gradientFrom?: string;
+        gradientTo?: string;
+        shadow?: string;
+        borderRadius?: string;
+        padding?: string;
+        fontSize?: string;
+        fontWeight?: string;
+      };
+      checkAnswer?: {
+        backgroundColor?: string;
+        borderColor?: string;
+        textColor?: string;
+        iconColor?: string;
+        gradientFrom?: string;
+        gradientTo?: string;
+        shadow?: string;
+        borderRadius?: string;
+        padding?: string;
+        fontSize?: string;
+        fontWeight?: string;
+      };
+    };
+  };
+  texts?: {
+    nextQuestion?: string;
+    retryQuestion?: string;
+    quizCompleted?: string;
+    correctAnswer?: string;
+    wrongAnswer?: string;
+    attemptsLeft?: string;
+    noAttemptsLeft?: string;
+    checkAnswer?: string;
+    evaluating?: string;
+    completeEvaluation?: string;
+    mobileInstructions?: string;
+    desktopInstructions?: string;
+    options?: string;
+    categories?: string;
+    tapHere?: string;
+    checkAnswerButton?: string;
+    explanation?: string;
+    tips?: string;
+    mobileHint?: string;
+    clearCategory?: string;
+    removeItem?: string;
+    previousQuestion?: string;
+  };
+}
+
 interface QuizSceneProps {
-  config?: QuizSceneConfig;
+  config: QuizSceneConfig;
   timerDuration?: number;
   onQuizCompleted: () => void;
   onTimerStart: () => void;
@@ -58,10 +269,11 @@ interface QuizSceneProps {
   setDraggedItems: (items: Map<string, string> | ((prev: Map<string, string>) => Map<string, string>)) => void;
   selectedItem: string | null;
   setSelectedItem: (item: string | null) => void;
+  questionLoadingText?: string;
 }
 
 export const QuizScene = React.memo(function QuizScene({
-  config = quizSceneConfig,
+  config,
   timerDuration,
   onQuizCompleted,
   onTimerStart,
@@ -93,6 +305,7 @@ export const QuizScene = React.memo(function QuizScene({
   setDraggedItems,
   selectedItem,
   setSelectedItem,
+  questionLoadingText,
 }: QuizSceneProps) {
   // State Management - Now handled by props from parent component
 
@@ -106,10 +319,10 @@ export const QuizScene = React.memo(function QuizScene({
   }, []);
 
   // Get questions from config
-  const questions = useMemo(() => config.questions?.list || [], [config.questions?.list]);
-
+  const questions = useMemo(() => config?.questions?.list || [], [config?.questions?.list]);
+  console.log(questions);
   // Memoized constants
-  const maxAttempts = useMemo(() => config.questions?.maxAttempts || 2, [config.questions?.maxAttempts]);
+  const maxAttempts = useMemo(() => config?.questions?.maxAttempts || 2, [config?.questions?.maxAttempts]);
   const currentQuestion = useMemo(() => questions[currentQuestionIndex], [questions, currentQuestionIndex]);
   const currentAnswer = useMemo(() => answers.get(currentQuestion?.id), [answers, currentQuestion?.id]);
   const progress = useMemo(() => ((currentQuestionIndex + 1) / questions.length) * 100, [currentQuestionIndex, questions.length]);
@@ -1558,7 +1771,9 @@ export const QuizScene = React.memo(function QuizScene({
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <p className="text-muted-foreground">Soru yükleniyor...</p>
+          <p className="text-muted-foreground">
+            {questionLoadingText || "Soru yükleniyor..."}
+          </p>
         </div>
       </div>
     );

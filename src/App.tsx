@@ -12,7 +12,7 @@ import { SurveyScene } from "./components/scenes/SurveyScene";
 import { SummaryScene } from "./components/scenes/SummaryScene";
 import { NudgeScene } from "./components/scenes/NudgeScene";
 import { ChevronDown, Search, Loader2, ChevronDown as ChevronDownIcon, Star, X, Moon, Sun, Award, Timer } from "lucide-react";
-import { educationConfigs, quizSceneConfig } from "./components/configs/educationConfigs";
+import appConfig from "./components/configs/appConfig.json";
 import ReactCountryFlag from "react-country-flag";
 import { getCountryCode, getSearchPlaceholder, detectBrowserLanguage, useIsMobile, priorityLanguages, languages } from "./utils/languageUtils";
 
@@ -20,15 +20,15 @@ const scenes = [
   {
     component: IntroScene,
     points: 10,
-    config: educationConfigs.smishing.introSceneConfig
+    config: (appConfig as any).introSceneConfig
   },
-  { component: GoalScene, points: 15, config: educationConfigs.smishing.goalSceneConfig },
-  { component: ScenarioScene, points: 20, config: educationConfigs.smishing.scenarioSceneConfig },
-  { component: ActionableContentScene, points: 25, config: educationConfigs.smishing.actionableContentSceneConfig },
-  { component: QuizScene, points: 50, config: quizSceneConfig },
-  { component: SurveyScene, title: "Anket", points: 20 },
-  { component: SummaryScene, title: "Özet", points: 30 },
-  { component: NudgeScene, title: "Harekete Geç", points: 40 }
+  { component: GoalScene, points: 15, config: (appConfig as any).goalSceneConfig },
+  { component: ScenarioScene, points: 20, config: (appConfig as any).scenarioSceneConfig },
+  { component: ActionableContentScene, points: 25, config: (appConfig as any).actionableContentSceneConfig },
+  { component: QuizScene, points: 50, config: (appConfig as any).quizSceneConfig },
+  { component: SurveyScene, title: "Anket", points: 20, config: (appConfig as any).surveySceneConfig },
+  { component: SummaryScene, title: "Özet", points: 30, config: (appConfig as any).summarySceneConfig },
+  { component: NudgeScene, title: "Harekete Geç", points: 40, config: (appConfig as any).nudgeSceneConfig }
 ];
 
 export default function App() {
@@ -47,53 +47,7 @@ export default function App() {
     }
 
 
-    return {
-      colors: {
-        primary: 'blue',
-        secondary: 'indigo',
-        accent: 'purple',
-        background: 'slate',
-        surface: 'white',
-        border: 'gray',
-        badge: {
-          points: {
-            background: 'amber',
-            text: 'amber-900',
-            textDark: 'amber-100',
-            gradient: {
-              from: 'rgba(245, 158, 11, 0.15)',
-              via1: 'rgba(251, 146, 60, 0.12)',
-              via2: 'rgba(249, 115, 22, 0.10)',
-              to: 'rgba(234, 88, 12, 0.08)'
-            },
-            border: 'rgba(245, 158, 11, 0.25)',
-            shadow: {
-              primary: 'rgba(245, 158, 11, 0.12)',
-              secondary: 'rgba(251, 146, 60, 0.08)'
-            }
-          },
-          timer: {
-            background: 'red',
-            text: 'red-700',
-            textDark: 'red-300',
-            icon: 'red-600',
-            iconDark: 'red-400'
-          }
-        }
-      },
-      logo: {
-        src: "https://keepnetlabs.com/keepnet-logo.svg",
-        darkSrc: "https://imagedelivery.net/KxWh-mxPGDbsqJB3c5_fmA/74b2b289-fe69-4e14-ef7d-f15e2ad3bb00/public",
-        alt: "Keepnet Labs"
-      },
-      effects: {
-        borderRadius: 'rounded-xl',
-        shadow: 'shadow-lg',
-        backdropBlur: 'backdrop-blur-xl',
-        glassOpacity: '60',
-        borderOpacity: '25'
-      }
-    };
+    return (appConfig as any).theme;
   });
 
   // Backend'den tema config'ini güncelleme fonksiyonu
@@ -765,7 +719,7 @@ export default function App() {
 
   // Get timer duration from config
   const getTimerDuration = useCallback(() => {
-    return quizSceneConfig.timer?.duration || 30;
+    return (appConfig as any).quizSceneConfig?.timer?.duration || 30;
   }, []);
 
   // Quiz timer handlers
@@ -935,7 +889,9 @@ export default function App() {
           >
             <div className={cssClasses.loadingContainer}>
               <Loader2 size={20} className={cssClasses.loadingSpinner} />
-              <span className={cssClasses.loadingText}>Yükleniyor...</span>
+              <span className={cssClasses.loadingText}>
+                {(appConfig as any).quizSceneConfig?.texts?.loading || "Yükleniyor..."}
+              </span>
             </div>
           </motion.div>
         )}
@@ -1854,7 +1810,7 @@ export default function App() {
                       {/* Quiz Scene - Always mounted to preserve state */}
                       <div style={{ display: currentScene === 4 ? 'block' : 'none' }}>
                         <QuizScene
-                          config={quizSceneConfig}
+                          config={(appConfig as any).quizSceneConfig}
                           timerDuration={getTimerDuration()}
                           onQuizCompleted={handleQuizCompleted}
                           onTimerStart={handleQuizTimerStart}
@@ -1886,6 +1842,7 @@ export default function App() {
                           setDraggedItems={setQuizDraggedItems}
                           selectedItem={quizSelectedItem}
                           setSelectedItem={setQuizSelectedItem}
+                          questionLoadingText={(appConfig as any).quizSceneConfig?.texts?.questionLoading}
                         />
                       </div>
 
@@ -1914,7 +1871,9 @@ export default function App() {
                       className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20 pointer-events-none"
                     >
                       <div className={`flex items-center space-x-2 px-3 py-2 bg-white/90 dark:bg-gray-900/90 rounded-full border border-white/40 dark:border-gray-600/60 shadow-lg transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-xl'}`}>
-                        <span className="text-xs text-blue-800 dark:text-blue-200 font-medium transition-colors duration-300">Aşağı kaydır</span>
+                        <span className="text-xs text-blue-800 dark:text-blue-200 font-medium transition-colors duration-300">
+                          {(appConfig as any).quizSceneConfig?.texts?.scrollHint || "Aşağı kaydır"}
+                        </span>
                         <ChevronDownIcon size={14} className="text-blue-700 dark:text-blue-300 animate-bounce" style={{ animationDuration: '2s' }} />
                       </div>
                     </motion.div>
@@ -1932,7 +1891,7 @@ export default function App() {
               direction="next"
               onClick={nextScene}
               disabled={!canProceedNext()}
-              label="Sonraki bölüm"
+              label={(appConfig as any).quizSceneConfig?.texts?.nextSection || "Sonraki bölüm"}
             />
           </div>
         )}
@@ -2059,12 +2018,12 @@ export default function App() {
               <div className="flex items-center space-x-3 relative z-10">
                 <Award size={16} className="text-yellow-600 dark:text-yellow-300 flex-shrink-0" />
                 <span className="text-sm text-yellow-900 dark:text-yellow-100 font-medium transition-colors duration-300">
-                  Başarım kazandınız! 🎉
+                  {(appConfig as any).quizSceneConfig?.texts?.achievementNotification || "Başarım kazandınız! 🎉"}
                 </span>
                 <button
                   onClick={() => setShowAchievementNotification(false)}
                   className={cssClasses.achievementClose}
-                  aria-label="Bildirimi kapat"
+                  aria-label={(appConfig as any).quizSceneConfig?.texts?.closeNotification || "Bildirimi kapat"}
                   style={{ touchAction: 'manipulation' }}
                 >
                   <X size={14} className="text-yellow-800 dark:text-yellow-200" />
@@ -2088,13 +2047,13 @@ export default function App() {
               <div className="flex items-center space-x-2.5 relative z-10">
                 <div className="w-2 h-2 bg-amber-500 dark:bg-amber-400 rounded-full animate-pulse"></div>
                 <p className="text-sm text-amber-900 dark:text-amber-100 font-medium transition-colors duration-300">
-                  Quiz'i tamamlayın ve devam edin
+                  {(appConfig as any).quizSceneConfig?.texts?.quizCompletionHint || "Quiz'i tamamlayın ve devam edin"}
                 </p>
                 {/* Industry Standard: Close Button */}
                 <button
                   onClick={() => setQuizCompleted(true)}
                   className={cssClasses.quizNotificationClose}
-                  aria-label="Bildirimi kapat"
+                  aria-label={(appConfig as any).quizSceneConfig?.texts?.closeNotification || "Bildirimi kapat"}
                   style={{ touchAction: 'manipulation' }}
                 >
                   <X size={12} className="text-amber-700 dark:text-amber-300" />
