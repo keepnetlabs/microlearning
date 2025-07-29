@@ -327,76 +327,76 @@ export const QuizScene = React.memo(function QuizScene({
   const currentAnswer = useMemo(() => answers.get(currentQuestion?.id), [answers, currentQuestion?.id]);
   const progress = useMemo(() => ((currentQuestionIndex + 1) / questions.length) * 100, [currentQuestionIndex, questions.length]);
 
-  // Answer options style helper - Endüstri standartlarına uygun dark mod desteği
+  // Answer options style helper - Mobile-first with proper dark mode support
   const getAnswerOptionStyle = useCallback((isSelected: boolean, isCorrect?: boolean, showResult?: boolean) => {
-    // Endüstri standartlarına uygun renk paleti (WCAG 2.1 AA uyumlu)
+    // Mobile-first color palette with proper dark mode support
     const colorStyles = {
-      // Doğru cevap - Yeşil tonları
+      // Correct answer - Green tones
       correct: {
         light: {
-          background: "linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.08) 100%)",
-          border: "1.5px solid rgba(34, 197, 94, 0.4)",
-          text: "text-green-800 dark:text-green-300",
-          icon: "text-green-600 dark:text-green-400"
+          background: "linear-gradient(135deg, rgba(34, 197, 94, 0.12) 0%, rgba(34, 197, 94, 0.08) 50%, rgba(34, 197, 94, 0.04) 100%)",
+          border: "1px solid rgba(34, 197, 94, 0.3)",
+          text: "text-green-700",
+          icon: "text-green-600"
         },
         dark: {
-          background: "linear-gradient(135deg, rgba(34, 197, 94, 0.12) 0%, rgba(34, 197, 94, 0.06) 100%)",
-          border: "1.5px solid rgba(34, 197, 94, 0.3)",
+          background: "linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.10) 50%, rgba(34, 197, 94, 0.05) 100%)",
+          border: "1px solid rgba(34, 197, 94, 0.4)",
           text: "text-green-300",
           icon: "text-green-400"
         }
       },
-      // Yanlış cevap - Kırmızı tonları
+      // Incorrect answer - Red tones
       incorrect: {
         light: {
-          background: "linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.08) 100%)",
-          border: "1.5px solid rgba(239, 68, 68, 0.4)",
-          text: "text-red-800 dark:text-red-300",
-          icon: "text-red-600 dark:text-red-400"
+          background: "linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(239, 68, 68, 0.08) 50%, rgba(239, 68, 68, 0.04) 100%)",
+          border: "1px solid rgba(239, 68, 68, 0.3)",
+          text: "text-red-700",
+          icon: "text-red-600"
         },
         dark: {
-          background: "linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(239, 68, 68, 0.06) 100%)",
-          border: "1.5px solid rgba(239, 68, 68, 0.3)",
+          background: "linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.10) 50%, rgba(239, 68, 68, 0.05) 100%)",
+          border: "1px solid rgba(239, 68, 68, 0.4)",
           text: "text-red-300",
           icon: "text-red-400"
         }
       },
-      // Seçili cevap - Mavi tonları
+      // Selected answer - Blue tones
       selected: {
         light: {
-          background: "linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.08) 100%)",
-          border: "1.5px solid rgba(59, 130, 246, 0.4)",
-          text: "text-blue-800 dark:text-blue-300",
-          icon: "text-blue-600 dark:text-blue-400"
+          background: "linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(59, 130, 246, 0.08) 50%, rgba(59, 130, 246, 0.04) 100%)",
+          border: "1px solid rgba(59, 130, 246, 0.3)",
+          text: "text-blue-700",
+          icon: "text-blue-600"
         },
         dark: {
-          background: "linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(59, 130, 246, 0.06) 100%)",
-          border: "1.5px solid rgba(59, 130, 246, 0.3)",
+          background: "linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.10) 50%, rgba(59, 130, 246, 0.05) 100%)",
+          border: "1px solid rgba(59, 130, 246, 0.4)",
           text: "text-blue-300",
           icon: "text-blue-400"
         }
       },
-      // Varsayılan durum - Nötr tonlar (Enhanced Apple Liquid Glass)
+      // Default state - Neutral tones (Mobile-optimized glass morphism)
       default: {
         light: {
-          background: "linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.92) 20%, rgba(255, 255, 255, 0.85) 40%, rgba(255, 255, 255, 0.78) 60%, rgba(255, 255, 255, 0.70) 80%, rgba(255, 255, 255, 0.62) 100%)",
-          border: "1.5px solid rgba(255, 255, 255, 0.7)",
-          text: "text-gray-900 dark:text-gray-100",
-          icon: "text-gray-600 dark:text-gray-400"
+          background: "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.90) 25%, rgba(255, 255, 255, 0.85) 50%, rgba(255, 255, 255, 0.80) 75%, rgba(255, 255, 255, 0.75) 100%)",
+          border: "1px solid rgba(255, 255, 255, 0.6)",
+          text: "text-gray-900",
+          icon: "text-gray-600"
         },
         dark: {
-          background: "linear-gradient(135deg, rgba(31, 41, 55, 0.98) 0%, rgba(31, 41, 55, 0.92) 20%, rgba(31, 41, 55, 0.85) 40%, rgba(31, 41, 55, 0.78) 60%, rgba(31, 41, 55, 0.70) 80%, rgba(31, 41, 55, 0.62) 100%)",
-          border: "1.5px solid rgba(75, 85, 99, 0.7)",
+          background: "linear-gradient(135deg, rgba(31, 41, 55, 0.95) 0%, rgba(31, 41, 55, 0.90) 25%, rgba(31, 41, 55, 0.85) 50%, rgba(31, 41, 55, 0.80) 75%, rgba(31, 41, 55, 0.75) 100%)",
+          border: "1px solid rgba(75, 85, 99, 0.6)",
           text: "text-gray-100",
           icon: "text-gray-400"
         }
       }
     };
 
-    // Dark mod algılama
-    const isDarkMode = typeof window !== 'undefined' &&
+    // Simple dark mode detection for mobile compatibility
+    const isDarkMode = typeof window !== 'undefined' && 
       (document.documentElement.classList.contains('dark') ||
-        window.matchMedia('(prefers-color-scheme: dark)').matches);
+       window.matchMedia('(prefers-color-scheme: dark)').matches);
 
     let styleType: keyof typeof colorStyles;
     let colorVariant: 'light' | 'dark';
@@ -420,14 +420,14 @@ export const QuizScene = React.memo(function QuizScene({
       style: {
         background: currentStyle.background,
         border: currentStyle.border,
-        backdropFilter: "blur(28px) saturate(220%)",
-        WebkitBackdropFilter: "blur(28px) saturate(220%)",
+        backdropFilter: "blur(20px) saturate(180%)",
+        WebkitBackdropFilter: "blur(20px) saturate(180%)",
         boxShadow: `
-          0 8px 32px rgba(0, 0, 0, 0.08),
           0 4px 16px rgba(0, 0, 0, 0.06),
           0 2px 8px rgba(0, 0, 0, 0.04),
-          inset 0 1px 0 rgba(255, 255, 255, 0.9),
-          inset 0 -1px 0 rgba(0, 0, 0, 0.06)
+          0 1px 4px rgba(0, 0, 0, 0.02),
+          inset 0 1px 0 rgba(255, 255, 255, 0.8),
+          inset 0 -1px 0 rgba(0, 0, 0, 0.04)
         `,
       },
       iconClassName: currentStyle.icon
@@ -2033,137 +2033,153 @@ export const QuizScene = React.memo(function QuizScene({
                   </div>
                 )}
 
-                {/* Action Buttons */}
-                <div className="flex items-center justify-between pt-2.5 border-t-2 border-border/60">
-                  <div className="flex items-center space-x-2">
-                    {currentQuestionIndex === questions.length - 1 && isAnswerCorrect ? (
-                      <div
-                        className="flex items-center space-x-2 px-4 py-2.5 rounded-lg"
-                        style={{
-                          background: "linear-gradient(135deg, rgba(34, 197, 94, 0.25) 0%, rgba(34, 197, 94, 0.18) 30%, rgba(34, 197, 94, 0.12) 70%, rgba(34, 197, 94, 0.08) 100%)",
-                          border: "0.5px solid rgba(34, 197, 94, 0.6)",
-                          backdropFilter: "blur(16px) saturate(200%)",
-                          WebkitBackdropFilter: "blur(16px) saturate(200%)",
-                          boxShadow: `
-                            0 4px 16px rgba(34, 197, 94, 0.15),
-                            0 2px 8px rgba(34, 197, 94, 0.1),
-                            inset 0 1px 0 rgba(255, 255, 255, 0.2)
-                          `
-                        }}
-                      >
-                        <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
-                        <span className="font-medium text-green-700 dark:text-green-300">
-                          {config.texts?.quizCompleted || "Quiz Tamamlandı! 🎉"}
-                        </span>
-                      </div>
-                    ) : isAnswerCorrect ? (
-                      <div
-                        className="flex items-center space-x-2 px-3 py-2 rounded-lg"
-                        style={{
-                          background: "linear-gradient(135deg, rgba(34, 197, 94, 0.25) 0%, rgba(34, 197, 94, 0.18) 30%, rgba(34, 197, 94, 0.12) 70%, rgba(34, 197, 94, 0.08) 100%)",
-                          border: "0.5px solid rgba(34, 197, 94, 0.6)",
-                          backdropFilter: "blur(16px) saturate(200%)",
-                          WebkitBackdropFilter: "blur(16px) saturate(200%)",
-                          boxShadow: `
-                            0 4px 16px rgba(34, 197, 94, 0.15),
-                            0 2px 8px rgba(34, 197, 94, 0.1),
-                            inset 0 1px 0 rgba(255, 255, 255, 0.2)
-                          `
-                        }}
-                      >
-                        <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
-                        <span className="font-medium text-green-700 dark:text-green-300">
-                          {config.texts?.correctAnswer || "Doğru! 🎉"}
-                        </span>
-                      </div>
-                    ) : !isAnswerCorrect && attempts >= maxAttempts ? (
-                      <>
-                        <XCircle className="w-5 h-5 text-destructive" />
-                        <span className="text-destructive">
-                          {config.texts?.noAttemptsLeft || "Deneme hakkınız bitti"}
-                        </span>
-                      </>
-                    ) : !isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked ? (
-                      <>
-                        <XCircle className="w-5 h-5 text-chart-5" />
-                        <span className="text-chart-5">
-                          {maxAttempts - attempts} {config.texts?.attemptsLeft || "deneme hakkınız kaldı"}
-                        </span>
-                      </>
-                    ) : null}
-                  </div>
-
-                  <div className="flex space-x-3">
-                    {!isAnswerCorrect &&
-                      attempts < maxAttempts &&
-                      !isAnswerLocked && (
-                        <Button
-                          variant="outline"
-                          onClick={retryQuestion}
-                          className={`flex items-center space-x-2 transition-all duration-300 ${config.styling?.buttons?.retryQuestion?.padding || 'px-4 py-2.5'} ${config.styling?.buttons?.retryQuestion?.borderRadius || 'rounded-lg'} ${config.styling?.buttons?.retryQuestion?.fontSize || 'text-sm'} ${config.styling?.buttons?.retryQuestion?.fontWeight || 'font-medium'}`}
+                {/* Action Buttons - Industry Standard Mobile Layout */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4 border-t-2 border-border/60">
+                  {/* Status Message - Simplified and Reliable */}
+                  {showResult && (
+                    <div className="flex items-center space-x-2">
+                      {/* Quiz Completed Message */}
+                      {currentQuestionIndex === questions.length - 1 && isAnswerCorrect && (
+                        <div
+                          className="flex items-center space-x-2 px-4 py-3 rounded-lg"
                           style={{
-                            background: config.styling?.buttons?.retryQuestion?.gradientFrom && config.styling?.buttons?.retryQuestion?.gradientTo
-                              ? `linear-gradient(135deg, ${config.styling?.buttons?.retryQuestion?.gradientFrom} 0%, ${config.styling?.buttons?.retryQuestion?.gradientTo} 100%)`
-                              : config.styling?.buttons?.retryQuestion?.backgroundColor || "linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%)",
-                            border: config.styling?.buttons?.retryQuestion?.borderColor || "1px solid rgba(0, 0, 0, 0.1)",
-                            backdropFilter: "blur(16px) saturate(160%)",
-                            WebkitBackdropFilter: "blur(16px) saturate(160%)",
-                            boxShadow: config.styling?.buttons?.retryQuestion?.shadow || `
-                              0 4px 16px rgba(0, 0, 0, 0.1),
-                              0 2px 8px rgba(0, 0, 0, 0.05),
-                              inset 0 1px 0 rgba(255, 255, 255, 0.8),
-                              inset 0 -1px 0 rgba(0, 0, 0, 0.02)
+                            background: "linear-gradient(135deg, rgba(34, 197, 94, 0.25) 0%, rgba(34, 197, 94, 0.18) 30%, rgba(34, 197, 94, 0.12) 70%, rgba(34, 197, 94, 0.08) 100%)",
+                            border: "0.5px solid rgba(34, 197, 94, 0.6)",
+                            backdropFilter: "blur(16px) saturate(200%)",
+                            WebkitBackdropFilter: "blur(16px) saturate(200%)",
+                            boxShadow: `
+                              0 4px 16px rgba(34, 197, 94, 0.15),
+                              0 2px 8px rgba(34, 197, 94, 0.1),
+                              inset 0 1px 0 rgba(255, 255, 255, 0.2)
                             `
                           }}
                         >
-                          <RotateCcw className={`w-4 h-4 ${config.styling?.buttons?.retryQuestion?.iconColor || 'text-gray-600 dark:text-gray-300'}`} />
-                          <span className={config.styling?.buttons?.retryQuestion?.textColor || 'text-gray-800 dark:text-gray-200'}>
-                            {config.texts?.retryQuestion || "Tekrar Dene"}
+                          <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+                          <span className="font-medium text-green-700 dark:text-green-300">
+                            {config.texts?.quizCompleted || "Quiz Tamamlandı! 🎉"}
                           </span>
-                        </Button>
+                        </div>
                       )}
 
-                    {(isAnswerCorrect ||
-                      (!isAnswerCorrect && attempts >= maxAttempts) ||
-                      isAnswerLocked) &&
-                      currentQuestionIndex < questions.length - 1 && (
-                        <Button
-                          onClick={handleNextQuestion}
-                          className={`flex items-center space-x-2 transition-all duration-300 ${config.styling?.buttons?.nextQuestion?.padding || 'px-4 py-2.5'} ${config.styling?.buttons?.nextQuestion?.borderRadius || 'rounded-lg'} ${config.styling?.buttons?.nextQuestion?.fontSize || 'text-sm'} ${config.styling?.buttons?.nextQuestion?.fontWeight || 'font-medium'}`}
+                      {/* Correct Answer Message - Always show if correct */}
+                      {isAnswerCorrect && currentQuestionIndex < questions.length - 1 && (
+                        <div
+                          className="flex items-center space-x-2 px-4 py-3 rounded-lg"
                           style={{
-                            background: config.styling?.buttons?.nextQuestion?.gradientFrom && config.styling?.buttons?.nextQuestion?.gradientTo
-                              ? `linear-gradient(135deg, ${config.styling?.buttons?.nextQuestion?.gradientFrom} 0%, ${config.styling?.buttons?.nextQuestion?.gradientTo} 100%)`
-                              : config.styling?.buttons?.nextQuestion?.backgroundColor || "linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.08) 100%)",
-                            border: config.styling?.buttons?.nextQuestion?.borderColor || "1px solid rgba(59, 130, 246, 0.3)",
-                            backdropFilter: "blur(16px) saturate(160%)",
-                            WebkitBackdropFilter: "blur(16px) saturate(160%)",
-                            boxShadow: config.styling?.buttons?.nextQuestion?.shadow || `
-                              0 4px 16px rgba(59, 130, 246, 0.2),
-                              0 2px 8px rgba(59, 130, 246, 0.1),
-                              inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                              inset 0 -1px 0 rgba(0, 0, 0, 0.05)
+                            background: "linear-gradient(135deg, rgba(34, 197, 94, 0.25) 0%, rgba(34, 197, 94, 0.18) 30%, rgba(34, 197, 94, 0.12) 70%, rgba(34, 197, 94, 0.08) 100%)",
+                            border: "0.5px solid rgba(34, 197, 94, 0.6)",
+                            backdropFilter: "blur(16px) saturate(200%)",
+                            WebkitBackdropFilter: "blur(16px) saturate(200%)",
+                            boxShadow: `
+                              0 4px 16px rgba(34, 197, 94, 0.15),
+                              0 2px 8px rgba(34, 197, 94, 0.1),
+                              inset 0 1px 0 rgba(255, 255, 255, 0.2)
                             `
                           }}
                         >
-                          <span className={config.styling?.buttons?.nextQuestion?.textColor || 'text-blue-800 dark:text-white'}>
-                            {config.texts?.nextQuestion || "Sonraki Soru"}
+                          <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+                          <span className="font-medium text-green-700 dark:text-green-300">
+                            {config.texts?.correctAnswer || "Doğru! 🎉"}
                           </span>
-                          <svg
-                            className={`w-4 h-4 ${config.styling?.buttons?.nextQuestion?.iconColor || 'text-blue-600 dark:text-blue-400'}`}
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
+                        </div>
+                      )}
+
+                      {/* No Attempts Left Message */}
+                      {!isAnswerCorrect && attempts >= maxAttempts && (
+                        <div className="flex items-center space-x-2 px-4 py-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                          <XCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
+                          <span className="text-red-700 dark:text-red-300 font-medium">
+                            {config.texts?.noAttemptsLeft || "Deneme hakkınız bitti"}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Attempts Left Message */}
+                      {!isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked && (
+                        <div className="flex items-center space-x-2 px-4 py-3 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800">
+                          <XCircle className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                          <span className="text-orange-700 dark:text-orange-300 font-medium">
+                            {maxAttempts - attempts} {config.texts?.attemptsLeft || "deneme hakkınız kaldı"}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Action Buttons - Enhanced with proper conditions */}
+                  {showResult && (
+                    <div className="flex flex-col sm:flex-row gap-3 sm:space-x-3">
+                      {!isAnswerCorrect &&
+                        attempts < maxAttempts &&
+                        !isAnswerLocked && (
+                          <Button
+                            variant="outline"
+                            onClick={retryQuestion}
+                            className={`flex items-center space-x-2 transition-all duration-300 ${config.styling?.buttons?.retryQuestion?.padding || 'px-4 py-2.5'} ${config.styling?.buttons?.retryQuestion?.borderRadius || 'rounded-lg'} ${config.styling?.buttons?.retryQuestion?.fontSize || 'text-sm'} ${config.styling?.buttons?.retryQuestion?.fontWeight || 'font-medium'}`}
+                            style={{
+                              background: config.styling?.buttons?.retryQuestion?.gradientFrom && config.styling?.buttons?.retryQuestion?.gradientTo
+                                ? `linear-gradient(135deg, ${config.styling?.buttons?.retryQuestion?.gradientFrom} 0%, ${config.styling?.buttons?.retryQuestion?.gradientTo} 100%)`
+                                : config.styling?.buttons?.retryQuestion?.backgroundColor || "linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%)",
+                              border: config.styling?.buttons?.retryQuestion?.borderColor || "1px solid rgba(0, 0, 0, 0.1)",
+                              backdropFilter: "blur(16px) saturate(160%)",
+                              WebkitBackdropFilter: "blur(16px) saturate(160%)",
+                              boxShadow: config.styling?.buttons?.retryQuestion?.shadow || `
+                                0 4px 16px rgba(0, 0, 0, 0.1),
+                                0 2px 8px rgba(0, 0, 0, 0.05),
+                                inset 0 1px 0 rgba(255, 255, 255, 0.8),
+                                inset 0 -1px 0 rgba(0, 0, 0, 0.02)
+                              `
+                            }}
                           >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9 5l7 7-7 7"
-                            />
-                          </svg>
-                        </Button>
-                      )}
-                  </div>
+                            <RotateCcw className={`w-4 h-4 ${config.styling?.buttons?.retryQuestion?.iconColor || 'text-gray-600 dark:text-gray-300'}`} />
+                            <span className={config.styling?.buttons?.retryQuestion?.textColor || 'text-gray-800 dark:text-gray-200'}>
+                              {config.texts?.retryQuestion || "Tekrar Dene"}
+                            </span>
+                          </Button>
+                        )}
+
+                      {(isAnswerCorrect ||
+                        (!isAnswerCorrect && attempts >= maxAttempts) ||
+                        isAnswerLocked) &&
+                        currentQuestionIndex < questions.length - 1 && (
+                          <Button
+                            onClick={handleNextQuestion}
+                            className={`flex items-center space-x-2 transition-all duration-300 ${config.styling?.buttons?.nextQuestion?.padding || 'px-4 py-2.5'} ${config.styling?.buttons?.nextQuestion?.borderRadius || 'rounded-lg'} ${config.styling?.buttons?.nextQuestion?.fontSize || 'text-sm'} ${config.styling?.buttons?.nextQuestion?.fontWeight || 'font-medium'}`}
+                            style={{
+                              background: config.styling?.buttons?.nextQuestion?.gradientFrom && config.styling?.buttons?.nextQuestion?.gradientTo
+                                ? `linear-gradient(135deg, ${config.styling?.buttons?.nextQuestion?.gradientFrom} 0%, ${config.styling?.buttons?.nextQuestion?.gradientTo} 100%)`
+                                : config.styling?.buttons?.nextQuestion?.backgroundColor || "linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.08) 100%)",
+                              border: config.styling?.buttons?.nextQuestion?.borderColor || "1px solid rgba(59, 130, 246, 0.3)",
+                              backdropFilter: "blur(16px) saturate(160%)",
+                              WebkitBackdropFilter: "blur(16px) saturate(160%)",
+                              boxShadow: config.styling?.buttons?.nextQuestion?.shadow || `
+                                0 4px 16px rgba(59, 130, 246, 0.2),
+                                0 2px 8px rgba(59, 130, 246, 0.1),
+                                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                                inset 0 -1px 0 rgba(0, 0, 0, 0.05)
+                              `
+                            }}
+                          >
+                            <span className={config.styling?.buttons?.nextQuestion?.textColor || 'text-blue-800 dark:text-white'}>
+                              {config.texts?.nextQuestion || "Sonraki Soru"}
+                            </span>
+                            <svg
+                              className={`w-4 h-4 ${config.styling?.buttons?.nextQuestion?.iconColor || 'text-blue-600 dark:text-blue-400'}`}
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 5l7 7-7 7"
+                              />
+                            </svg>
+                          </Button>
+                        )}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )}

@@ -9,7 +9,7 @@ import Plyr from "plyr";
 import "plyr/dist/plyr.css";
 import Hls from "hls.js";
 import { motion } from "framer-motion";
-import { ChevronDown, FileText } from "lucide-react";
+import { FileText } from "lucide-react";
 
 // HTMLVideoElement'e _lastTime özelliği ekle
 interface VideoWithLastTime extends HTMLVideoElement {
@@ -446,8 +446,7 @@ export function VideoPlayer({
         ],
         captions: {
           active: true,
-          update: true,
-          language: captions[0]?.language || "tr",
+          update: true
         },
         keyboard: {
           focused: !disableForwardSeek,
@@ -855,8 +854,6 @@ export function VideoPlayer({
                               fontWeight: "500",
                             }}
                           >
-                            Konuşmacı:{" "}
-                            {row.speaker || "Güvenlik Uzmanı"}
                           </div>
 
                           <p

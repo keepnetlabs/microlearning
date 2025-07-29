@@ -12,26 +12,17 @@ import { SurveyScene } from "./components/scenes/SurveyScene";
 import { SummaryScene } from "./components/scenes/SummaryScene";
 import { NudgeScene } from "./components/scenes/NudgeScene";
 import { ChevronDown, Search, Loader2, ChevronDown as ChevronDownIcon, Star, X, Moon, Sun, Award, Timer } from "lucide-react";
-import appConfig from "./components/configs/appConfig.json";
 import ReactCountryFlag from "react-country-flag";
 import { getCountryCode, getSearchPlaceholder, detectBrowserLanguage, useIsMobile, priorityLanguages, languages } from "./utils/languageUtils";
-
-const scenes = [
-  {
-    component: IntroScene,
-    points: 10,
-    config: (appConfig as any).introSceneConfig
-  },
-  { component: GoalScene, points: 15, config: (appConfig as any).goalSceneConfig },
-  { component: ScenarioScene, points: 20, config: (appConfig as any).scenarioSceneConfig },
-  { component: ActionableContentScene, points: 25, config: (appConfig as any).actionableContentSceneConfig },
-  { component: QuizScene, points: 50, config: (appConfig as any).quizSceneConfig },
-  { component: SurveyScene, title: "Anket", points: 20, config: (appConfig as any).surveySceneConfig },
-  { component: SummaryScene, title: "Özet", points: 30, config: (appConfig as any).summarySceneConfig },
-  { component: NudgeScene, title: "Harekete Geç", points: 40, config: (appConfig as any).nudgeSceneConfig }
-];
+import { loadAppConfig, createConfigChangeEvent } from "./components/configs/appConfigLoader";
 
 export default function App() {
+  // Dinamik appConfig state'i - ileride API'den gelecek
+  const [appConfig, setAppConfig] = useState(() => {
+    const detectedLanguage = detectBrowserLanguage();
+    return loadAppConfig(detectedLanguage);
+  });
+
   // Backend'den gelecek tema config'i için state
   const [themeConfig, setThemeConfig] = useState(() => {
     // LocalStorage'dan kaydedilmiş tema config'ini yükle
@@ -46,9 +37,24 @@ export default function App() {
       }
     }
 
-
-    return (appConfig as any).theme;
+    return appConfig.theme;
   });
+
+  // Scenes array'ini appConfig'e bağlı olarak oluştur
+  const scenes = useMemo(() => [
+    {
+      component: IntroScene,
+      points: 10,
+      config: appConfig.introSceneConfig
+    },
+    { component: GoalScene, points: 15, config: appConfig.goalSceneConfig },
+    { component: ScenarioScene, points: 20, config: appConfig.scenarioSceneConfig },
+    { component: ActionableContentScene, points: 25, config: appConfig.actionableContentSceneConfig },
+    { component: QuizScene, points: 50, config: appConfig.quizSceneConfig },
+    { component: SurveyScene, points: 20, config: appConfig.surveySceneConfig },
+    { component: SummaryScene, points: 30, config: appConfig.summarySceneConfig },
+    { component: NudgeScene, points: 40, config: appConfig.nudgeSceneConfig }
+  ], [appConfig]);
 
   // Backend'den tema config'ini güncelleme fonksiyonu
   const updateThemeConfig = useCallback((newConfig: any) => {
@@ -74,6 +80,11 @@ export default function App() {
 
     loadThemeFromBackend();
   }, [updateThemeConfig]);
+
+  // appConfig değiştiğinde themeConfig'i güncelle
+  useEffect(() => {
+    setThemeConfig(appConfig.theme);
+  }, [appConfig]);
 
 
 
@@ -250,7 +261,13 @@ export default function App() {
         0 1px 3px rgba(59, 130, 246, 0.08),
         inset 0 1px 0 rgba(255, 255, 255, 0.15)
       `,
-      percentageColor: 'rgb(59, 130, 246)'
+      percentageColor: 'rgb(59, 130, 246)',
+      
+      // Text labels
+      startLabel: themeConfig.texts?.startLabel,
+      completedLabel: themeConfig.texts?.completedLabel ,
+      progressLabel: themeConfig.texts?.progressLabel,
+      ariaLabel: 'Training progress'
     },
 
     // Quiz timer
@@ -267,11 +284,25 @@ export default function App() {
     // Mobile navigation hint
     mobileNavHintContainer: "md:hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 z-30",
     mobileNavHintContent: `flex items-center px-3 py-2 bg-white/85 dark:bg-gray-900/85 ${themeConfig.effects?.borderRadius || 'rounded-full'} border border-white/40 dark:border-gray-600/40 ${themeConfig.effects?.shadow || 'shadow-lg'} transition-colors duration-300 backdrop-blur-xl`
-  }), [themeConfig]); // Sadece themeConfig değiştiğinde yeniden hesapla
-
+  }), [themeConfig]);
+  console.log("cssClasses",cssClasses)
   const [currentScene, setCurrentScene] = useState(0);
   const [direction, setDirection] = useState(0);
   const [selectedLanguage, setSelectedLanguage] = useState(() => detectBrowserLanguage());
+
+  // Dil değişikliği handler'ı - appConfig'i günceller
+  const handleLanguageChange = useCallback((newLanguage: string) => {
+    setSelectedLanguage(newLanguage);
+    const newConfig = loadAppConfig(newLanguage);
+    console.log(newConfig)
+    setAppConfig(newConfig);
+    createConfigChangeEvent(newLanguage);
+    
+    // LocalStorage'a kaydet
+    localStorage.setItem('selected-language', newLanguage);
+    
+    console.log(`Language changed to: ${newLanguage}, config updated`);
+  }, []);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [languageSearchTerm, setLanguageSearchTerm] = useState('');
   const [quizCompleted, setQuizCompleted] = useState(false);
@@ -889,9 +920,9 @@ export default function App() {
           >
             <div className={cssClasses.loadingContainer}>
               <Loader2 size={20} className={cssClasses.loadingSpinner} />
-              <span className={cssClasses.loadingText}>
-                {(appConfig as any).quizSceneConfig?.texts?.loading || "Yükleniyor..."}
-              </span>
+                              <span className={cssClasses.loadingText}>
+                  {themeConfig.texts?.loading}
+                </span>
             </div>
           </motion.div>
         )}
@@ -916,9 +947,9 @@ export default function App() {
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className={cssClasses.themeHintTitle}>Koyu/Açık Tema</p>
+                  <p className={cssClasses.themeHintTitle}>{themeConfig.hint?.title}</p>
                   <p className={cssClasses.themeHintDescription}>
-                    Sağ üstteki ay/güneş simgesine tıklayarak temanı değiştirebilirsin
+                    {themeConfig.hint?.description}
                   </p>
                 </div>
                 <button
@@ -1084,12 +1115,12 @@ export default function App() {
             </div>
 
             {/* PROPERLY CENTERED TITLE - Mobile Optimized */}
-            <div className={cssClasses.titleContainer}>
-              <h1 className={cssClasses.titleText}>
-                <span className="hidden sm:inline">Siber Güvenlik Eğitimi</span>
-                <span className="sm:hidden">Güvenlik Eğitimi</span>
-              </h1>
-            </div>
+              <div className={cssClasses.titleContainer}>
+                <h1 className={cssClasses.titleText}>
+                  <span className="hidden sm:inline">{appConfig.header?.title?.desktop}</span>
+                  <span className="sm:hidden">{appConfig.header?.title?.mobile}</span>
+                </h1>
+              </div>
 
             {/* Right Controls - Mobile Optimized */}
             <div className={cssClasses.controlsContainer}>
@@ -1159,8 +1190,8 @@ export default function App() {
                   y: -2
                 }}
                 whileTap={{ scale: 0.95 }}
-                aria-label={isDarkMode ? "Açık temaya geç" : "Koyu temaya geç"}
-                title={isDarkMode ? "Açık temaya geç" : "Koyu temaya geç"}
+                aria-label={isDarkMode ? themeConfig.toggleButton?.title?.lightMode : themeConfig.toggleButton?.title?.darkMode}
+                title={isDarkMode ? themeConfig.toggleButton?.title?.lightMode : themeConfig.toggleButton?.title?.darkMode}
                 style={{
                   // LIQUID GLASS BACKGROUND for theme toggle
                   background: `linear-gradient(135deg, 
@@ -1344,7 +1375,7 @@ export default function App() {
                       transition={{ duration: 0.2, ease: "easeOut" }}
                       className={`absolute top-full right-0 mt-2 w-64 sm:w-72 bg-white/95 dark:bg-gray-900/95 border border-white/50 dark:border-gray-600/60 rounded-2xl shadow-2xl shadow-black/10 dark:shadow-black/30 z-50 overflow-hidden transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-3xl'}`}
                       role="listbox"
-                      aria-label="Dil seçenekleri"
+                      aria-label="Language Selector"
                     >
                       {/* Enhanced Search Input */}
                       <div className="relative p-2.5 border-b border-gray-200/50 dark:border-gray-600/50 transition-colors duration-300">
@@ -1374,7 +1405,7 @@ export default function App() {
                       >
                         {filteredLanguages.length === 0 ? (
                           <div className="px-3 py-2 text-xs text-gray-600 dark:text-gray-300 text-center transition-colors duration-300">
-                            Dil bulunamadı
+                            {themeConfig.texts?.languageNotFound}
                           </div>
                         ) : (
                           <>
@@ -1392,7 +1423,7 @@ export default function App() {
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: index * 0.02 }}
                                     onClick={() => {
-                                      setSelectedLanguage(language.code);
+                                      handleLanguageChange(language.code);
                                       setIsLanguageDropdownOpen(false);
                                       setLanguageSearchTerm('');
                                     }}
@@ -1436,7 +1467,7 @@ export default function App() {
                                   animate={{ opacity: 1, x: 0 }}
                                   transition={{ delay: Math.min(index * 0.01, 0.2) }}
                                   onClick={() => {
-                                    setSelectedLanguage(language.code);
+                                    handleLanguageChange(language.code);
                                     setIsLanguageDropdownOpen(false);
                                     setLanguageSearchTerm('');
                                   }}
@@ -1467,7 +1498,7 @@ export default function App() {
                                   animate={{ opacity: 1, x: 0 }}
                                   transition={{ delay: (priorityLangs.length + index) * 0.01 }}
                                   onClick={() => {
-                                    setSelectedLanguage(language.code);
+                                    handleLanguageChange(language.code);
                                     setIsLanguageDropdownOpen(false);
                                     setLanguageSearchTerm('');
                                   }}
@@ -1842,7 +1873,7 @@ export default function App() {
                           setDraggedItems={setQuizDraggedItems}
                           selectedItem={quizSelectedItem}
                           setSelectedItem={setQuizSelectedItem}
-                          questionLoadingText={(appConfig as any).quizSceneConfig?.texts?.questionLoading}
+                          questionLoadingText={themeConfig.texts?.questionLoading}
                         />
                       </div>
 
@@ -1872,7 +1903,7 @@ export default function App() {
                     >
                       <div className={`flex items-center space-x-2 px-3 py-2 bg-white/90 dark:bg-gray-900/90 rounded-full border border-white/40 dark:border-gray-600/60 shadow-lg transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-xl'}`}>
                         <span className="text-xs text-blue-800 dark:text-blue-200 font-medium transition-colors duration-300">
-                          {(appConfig as any).quizSceneConfig?.texts?.scrollHint || "Aşağı kaydır"}
+                          {themeConfig.texts?.scrollHint}
                         </span>
                         <ChevronDownIcon size={14} className="text-blue-700 dark:text-blue-300 animate-bounce" style={{ animationDuration: '2s' }} />
                       </div>
@@ -1891,7 +1922,7 @@ export default function App() {
               direction="next"
               onClick={nextScene}
               disabled={!canProceedNext()}
-              label={(appConfig as any).quizSceneConfig?.texts?.nextSection || "Sonraki bölüm"}
+              label={themeConfig.texts?.nextSection}
             />
           </div>
         )}
@@ -2018,12 +2049,12 @@ export default function App() {
               <div className="flex items-center space-x-3 relative z-10">
                 <Award size={16} className="text-yellow-600 dark:text-yellow-300 flex-shrink-0" />
                 <span className="text-sm text-yellow-900 dark:text-yellow-100 font-medium transition-colors duration-300">
-                  {(appConfig as any).quizSceneConfig?.texts?.achievementNotification || "Başarım kazandınız! 🎉"}
+                  {themeConfig.texts?.achievementNotification}
                 </span>
                 <button
                   onClick={() => setShowAchievementNotification(false)}
                   className={cssClasses.achievementClose}
-                  aria-label={(appConfig as any).quizSceneConfig?.texts?.closeNotification || "Bildirimi kapat"}
+                  aria-label={themeConfig.texts?.closeNotification}
                   style={{ touchAction: 'manipulation' }}
                 >
                   <X size={14} className="text-yellow-800 dark:text-yellow-200" />
@@ -2047,13 +2078,13 @@ export default function App() {
               <div className="flex items-center space-x-2.5 relative z-10">
                 <div className="w-2 h-2 bg-amber-500 dark:bg-amber-400 rounded-full animate-pulse"></div>
                 <p className="text-sm text-amber-900 dark:text-amber-100 font-medium transition-colors duration-300">
-                  {(appConfig as any).quizSceneConfig?.texts?.quizCompletionHint || "Quiz'i tamamlayın ve devam edin"}
+                  {(appConfig as any).quizSceneConfig?.texts?.quizCompletionHint}
                 </p>
                 {/* Industry Standard: Close Button */}
                 <button
                   onClick={() => setQuizCompleted(true)}
                   className={cssClasses.quizNotificationClose}
-                  aria-label={(appConfig as any).quizSceneConfig?.texts?.closeNotification || "Bildirimi kapat"}
+                  aria-label={themeConfig.texts?.closeNotification}
                   style={{ touchAction: 'manipulation' }}
                 >
                   <X size={12} className="text-amber-700 dark:text-amber-300" />
@@ -2108,9 +2139,6 @@ export default function App() {
           </motion.div>
         </div>
       )}
-
-
-
       {/* Toast Container */}
       <Toaster />
     </div>

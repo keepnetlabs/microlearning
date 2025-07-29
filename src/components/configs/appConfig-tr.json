@@ -1,8 +1,8 @@
 {
   "header": {
     "title": {
-      "desktop": "Cybersecurity Training",
-      "mobile": "Security Training"
+      "desktop": "Siber Güvenlik Eğitimi",
+      "mobile": "Güvenlik Eğitimi"
     }
   },
   "theme": {
@@ -53,80 +53,122 @@
     },
     "toggleButton": {
       "title": {
-        "lightMode": "Switch to light theme",
-        "darkMode": "Switch to dark theme"
+        "lightMode": "Açık temaya geç",
+        "darkMode": "Koyu temaya geç"
       }
     },
     "hint": {
-      "title": "Dark/Light Theme",
-      "description": "Click the moon/sun icon in the top right to change your theme"
+      "title": "Koyu/Açık Tema",
+      "description": "Sağ üstteki ay/güneş simgesine tıklayarak temanı değiştirebilirsin"
     },
     "texts": {
-      "loading": "Loading...",
-      "languageNotFound": "Language not found",
-      "scrollHint": "Scroll down",
-      "nextSection": "Next section",
-      "achievementNotification": "Achievement unlocked! 🎉",
-      "closeNotification": "Close notification",
-      "startLabel": "Start",
-      "completedLabel": "Completed",
-      "progressLabel": "completed"
+      "loading": "Yükleniyor...",
+      "languageNotFound": "Dil bulunamadı",
+      "scrollHint": "Aşağı kaydır",
+      "nextSection": "Sonraki bölüm",
+      "achievementNotification": "Başarım kazandınız! 🎉",
+      "closeNotification": "Bildirimi kapat",
+      "startLabel": "Başlangıç",
+      "completedLabel": "Tamamlandı",
+      "progressLabel": "tamamlandı"
     }
   },
-  "introSceneConfig": {
-    "title": {
-      "words": ["SMS", "Phishing", "Protection"],
-      "highlightLastWord": true,
-      "gradientClasses": "bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent"
-    },
-    "subtitle": "Recognize SMS-based phishing attacks and protection methods",
-    "sectionTitle": "What You'll Learn in This Training:",
-    "highlights": [
-      { "iconName": "smartphone", "text": "Recognize SMS phishing attacks", "colorType": "red" },
-      { "iconName": "shield", "text": "Protection strategies", "colorType": "green" },
-      { "iconName": "alert-triangle", "text": "Detect suspicious messages", "colorType": "orange" },
-      { "iconName": "users", "text": "Build team awareness", "colorType": "blue" }
-    ],
-    "duration": "~10 minutes",
-    "level": "All Levels",
-    "callToActionText": "Swipe to learn SMS security",
-    "particles": { "enabled": true, "count": 15, "color": "bg-red-400/60", "baseDuration": 5 },
-    "icon": { "component": null, "size": 48, "sparkleCount": 8, "sparkleEnabled": true, "sparkleIconName": "alert-triangle", "sceneIconName": "smartphone", "className": "text-red-500" },
-    "card": { "backgroundColor": "bg-red-50/60 dark:bg-red-900/80", "borderColor": "border-red-200/60 dark:border-red-600/60", "gradientFrom": "from-red-50/50", "gradientTo": "to-red-100/20" },
-    "sparkles": {
-      "enabled": true,
-      "ambient": { "count": 6, "opacity": 30, "size": 0.5, "duration": 10, "delay": 1 },
-      "floating": { "count": 8, "opacity": 25, "size": 0.5, "duration": 12, "delay": 2 },
-      "twinkling": { "count": 10, "opacity": 20, "size": 0.5, "duration": 8, "delay": 3 },
-      "gradient": { "count": 4, "opacity": 18, "size": 1, "duration": 15, "delay": 4 },
-      "drifting": { "count": 6, "opacity": 15, "size": 0.5, "duration": 18, "delay": 5 },
-      "breathing": { "count": 7, "opacity": 12, "size": 0.5, "duration": 11, "delay": 6 }
-    },
-    "containerClassName": "flex flex-col items-center justify-center h-full text-center relative font-['Open_Sans'] overflow-hidden px-2 sm:px-4",
-    "animationDelays": { "welcomeDelay": 1.0, "iconDelay": 0.2, "titleDelay": 0.3, "subtitleDelay": 1.0, "cardDelay": 0.5, "statsDelay": 0.8, "ctaDelay": 1.0 }
-  },
-"goalSceneConfig": {
-"title": "SMS Security Goals",
-"goals": [
+"introSceneConfig": {
+"title": {
+"words": ["SMS", "Phishing", "Korunma"],
+"highlightLastWord": true,
+"gradientClasses": "bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent"
+},
+"subtitle": "SMS tabanlı dolandırıcılık saldırılarını tanıma ve korunma yöntemleri",
+"sectionTitle": "Bu Eğitimde Öğrenecekleriniz:",
+"highlights": [
 {
 "iconName": "smartphone",
-"title": "Recognize SMS Threats",
-"subtitle": "Awareness",
-"description": "Quickly recognize and identify SMS-based phishing attacks",
+"text": "SMS phishing saldırılarını tanıma",
 "colorType": "red"
 },
 {
 "iconName": "shield",
-"title": "Protection Strategies",
-"subtitle": "Defense",
-"description": "Develop effective methods to protect against SMS attacks",
+"text": "Korunma stratejileri",
 "colorType": "green"
 },
 {
 "iconName": "alert-triangle",
-"title": "Detect Suspicious Messages",
+"text": "Şüpheli mesajları tespit etme",
+"colorType": "orange"
+},
+{
+"iconName": "users",
+"text": "Ekip farkındalığı oluşturma",
+"colorType": "blue"
+}
+],
+"duration": "~10 dakika",
+"level": "Tüm Seviyeler",
+"callToActionText": "SMS güvenliğini öğrenmek için kaydırın",
+"particles": {
+"enabled": true,
+"count": 15,
+"color": "bg-red-400/60",
+"baseDuration": 5
+},
+"icon": {
+"component": null,
+"size": 48,
+"sparkleCount": 8,
+"sparkleEnabled": true,
+"sparkleIconName": "alert-triangle",
+"sceneIconName": "smartphone",
+"className": "text-red-500"
+},
+"card": {
+"backgroundColor": "bg-red-50/60 dark:bg-red-900/80",
+"borderColor": "border-red-200/60 dark:border-red-600/60",
+"gradientFrom": "from-red-50/50",
+"gradientTo": "to-red-100/20"
+},
+"sparkles": {
+"enabled": true,
+"ambient": { "count": 6, "opacity": 30, "size": 0.5, "duration": 10, "delay": 1 },
+"floating": { "count": 8, "opacity": 25, "size": 0.5, "duration": 12, "delay": 2 },
+"twinkling": { "count": 10, "opacity": 20, "size": 0.5, "duration": 8, "delay": 3 },
+"gradient": { "count": 4, "opacity": 18, "size": 1, "duration": 15, "delay": 4 },
+"drifting": { "count": 6, "opacity": 15, "size": 0.5, "duration": 18, "delay": 5 },
+"breathing": { "count": 7, "opacity": 12, "size": 0.5, "duration": 11, "delay": 6 }
+},
+"containerClassName": "flex flex-col items-center justify-center h-full text-center relative font-['Open_Sans'] overflow-hidden px-2 sm:px-4",
+"animationDelays": {
+"welcomeDelay": 1.0,
+"iconDelay": 0.2,
+"titleDelay": 0.3,
+"subtitleDelay": 1.0,
+"cardDelay": 0.5,
+"statsDelay": 0.8,
+"ctaDelay": 1.0
+}
+},
+  "goalSceneConfig": {
+"title": "SMS Güvenlik Hedefleri",
+"goals": [
+{
+"iconName": "smartphone",
+"title": "SMS Tehditleri Tanıma",
+"subtitle": "Farkındalık",
+"description": "SMS tabanlı phishing saldırılarını hızlıca tanıma ve tespit etme",
+"colorType": "red"
+},
+{
+"iconName": "shield",
+"title": "Korunma Stratejileri",
+"subtitle": "Savunma",
+"description": "SMS saldırılarına karşı etkili korunma yöntemleri geliştirme",
+"colorType": "green"
+},
+{
+"iconName": "alert-triangle",
+"title": "Şüpheli Mesaj Tespiti",
 "subtitle": "Vigilance",
-"description": "Analyze and verify suspicious SMS messages",
+"description": "Şüpheli SMS mesajlarını analiz etme ve doğrulama",
 "colorType": "orange"
 }
 ],
@@ -159,15 +201,15 @@
       "transcriptLanguage": "Türkçe",
       "captions": [
         {
-          "language": "en",
-          "label": "English",
-          "src": "https://customer-0lll6yc8omc23rbm.cloudflarestream.com/5fdb12ff1436c991f50b698a02e2faa1/captions/en",
-          "default": true
-        },
-        {
           "language": "tr",
           "label": "Türkçe",
           "src": "https://customer-0lll6yc8omc23rbm.cloudflarestream.com/5fdb12ff1436c991f50b698a02e2faa1/captions/tr",
+          "default": true
+        },
+        {
+          "language": "en",
+          "label": "English",
+          "src": "https://customer-0lll6yc8omc23rbm.cloudflarestream.com/5fdb12ff1436c991f50b698a02e2faa1/captions/en",
           "default": false
         }
       ]
@@ -212,29 +254,29 @@
     }
   },
   "actionableContentSceneConfig": {
-    "title": "Actionable Steps",
+    "title": "Hemen Uygulanabilir Adımlar",
     "actions": [
       {
         "iconName": "key",
-        "title": "Create Strong Password",
-        "description": "At least 12 characters, uppercase and lowercase letters, numbers, and symbols",
-        "tip": "Example: 'Coffee!very7Good#2024'",
+        "title": "Güçlü Parola Oluşturun",
+        "description": "En az 12 karakter, büyük-küçük harf, sayı ve sembol",
+        "tip": "Örnek: 'Kahve!çok7Güzel#2024'",
         "colorType": "blue",
         "bgColorType": "blue"
       },
       {
         "iconName": "smartphone",
-        "title": "Enable 2FA",
-        "description": "Enable multi-factor authentication on all critical accounts",
-        "tip": "Use Google Authenticator or Authy",
+        "title": "2FA Aktifleştirin",
+        "description": "Tüm kritik hesaplarınızda çok faktörlü kimlik doğrulama",
+        "tip": "Google Authenticator veya Authy kullanın",
         "colorType": "green",
         "bgColorType": "green"
       },
       {
         "iconName": "database",
-        "title": "Password Manager",
-        "description": "Use unique and complex passwords for each account",
-        "tip": "1Password, Bitwarden, or LastPass",
+        "title": "Parola Yöneticisi",
+        "description": "Her hesap için farklı ve karmaşık parolalar",
+        "tip": "1Password, Bitwarden veya LastPass",
         "colorType": "purple",
         "bgColorType": "purple"
       }

@@ -73,6 +73,12 @@ interface ScenarioSceneConfig {
     showTranscript?: boolean;
     transcriptTitle?: string;
     transcriptLanguage?: string;
+    captions?: {
+      language: string;
+      label: string;
+      src: string;
+      default?: boolean;
+    }[];
   };
   icon?: {
     component?: React.ReactNode;
