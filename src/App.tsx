@@ -136,16 +136,16 @@ export default function App() {
     controlsContainer: "flex items-center space-x-1 sm:space-x-1.5 md:space-x-3 flex-shrink-0 z-20",
 
     // Points badge
-    pointsBadge: `relative flex items-center space-x-1 sm:space-x-1.5 md:space-x-2 px-1.5 sm:px-2 md:px-3 py-1 sm:py-1.5 md:py-2 ${themeConfig.effects?.borderRadius || 'rounded-md'} sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group`,
+    pointsBadge: `relative flex items-center space-x-1 sm:space-x-1.5 md:space-x-2 px-1.5 sm:px-2 md:px-3 h-8 sm:h-10 ${themeConfig.effects?.borderRadius || 'rounded-md'} sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group`,
     pointsBadgeNoise: "absolute inset-0 opacity-[0.020] dark:opacity-[0.012] rounded-lg sm:rounded-xl mix-blend-overlay pointer-events-none",
     pointsText: `text-[8px] sm:text-xs md:text-sm font-semibold text-${themeConfig.colors?.badge?.points?.text || 'amber-900'} dark:text-${themeConfig.colors?.badge?.points?.textDark || 'amber-100'} transition-colors duration-300`,
 
     // Theme button
-    themeButton: `relative flex items-center justify-center p-1 sm:p-1.5 md:p-2 ${themeConfig.effects?.borderRadius || 'rounded-md'} sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group focus:outline-none focus:ring-2 focus:ring-${themeConfig.colors?.primary || 'blue'}-500/20 dark:focus:ring-${themeConfig.colors?.primary || 'blue'}-400/20`,
-    themeButtonIcon: `w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 text-gray-600 dark:text-gray-300 transition-colors duration-300`,
+    themeButton: `relative flex items-center justify-center p-1 sm:p-1.5 md:p-2  max-h-[32px] sm:max-h-[40px] ${themeConfig.effects?.borderRadius || 'rounded-md'} sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group focus:outline-none focus:ring-2 focus:ring-${themeConfig.colors?.primary || 'blue'}-500/20 dark:focus:ring-${themeConfig.colors?.primary || 'blue'}-400/20`,
+    themeButtonIcon: `w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 text-[#8E8E93] dark:text-gray-300 transition-colors duration-300`,
 
     // Language button
-    languageButton: `relative flex items-center space-x-0.5 sm:space-x-1 md:space-x-2 px-1 sm:px-1.5 md:px-3 py-1 sm:py-1.5 md:py-2 ${themeConfig.effects?.borderRadius || 'rounded-md'} sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group focus:outline-none focus:ring-2 focus:ring-${themeConfig.colors?.primary || 'blue'}-500/20 dark:focus:ring-${themeConfig.colors?.primary || 'blue'}-400/20`,
+    languageButton: `relative flex items-center space-x-0.5 bg-[white] border-[#C7C7CC] sm:space-x-1 md:space-x-2 px-1 sm:px-1.5 md:px-3 h-8 sm:h-10 sm:w-[100px] ${themeConfig.effects?.borderRadius || 'rounded-md'} sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group focus:outline-none focus:ring-2 focus:ring-${themeConfig.colors?.primary || 'blue'}-500/20 dark:focus:ring-${themeConfig.colors?.primary || 'blue'}-400/20`,
     languageFlag: "w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 rounded-sm transition-opacity duration-300",
     languageChevron: "w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4 text-gray-500 dark:text-gray-400 transition-colors duration-300",
 
@@ -1030,77 +1030,44 @@ export default function App() {
         <div className={cssClasses.headerBorder}></div>
 
         <div className={cssClasses.headerContent}>
-          {/* Top Navigation Row - Mobile Optimized */}
-          <div className="relative flex items-center justify-between mb-2 sm:mb-2.5 md:mb-3">
-            {/* ENHANCED LIQUID GLASS LOGO CONTAINER - Mobile Optimized */}
-            <div className={cssClasses.logoContainer}>
+          {/* Header Layout - Logo Left, Progress Center, Controls Right */}
+          <div className="flex items-center justify-between">
+            {/* Left - Logo */}
+            <div className="flex items-center">
               <motion.div
-                className={cssClasses.logoGlass}
+                className="flex items-center"
                 whileHover={{
                   scale: 1.02,
                   y: -1
                 }}
-                style={{
-                  // LIQUID GLASS BACKGROUND for logo
-                  background: `linear-gradient(135deg, 
-                    rgba(71, 85, 105, 0.12) 0%, 
-                    rgba(100, 116, 139, 0.08) 50%, 
-                    rgba(148, 163, 184, 0.06) 100%
-                  )`,
-                  backdropFilter: 'blur(20px) saturate(180%)',
-                  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                  border: '1px solid rgba(71, 85, 105, 0.20)',
-                  boxShadow: `
-                    0 4px 16px rgba(71, 85, 105, 0.08),
-                    0 2px 8px rgba(71, 85, 105, 0.06),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.15)
-                  `,
-                  transform: 'translateZ(0)',
-                  willChange: 'transform'
-                }}
+                transition={{ duration: 0.2 }}
               >
-                {/* Ultra-fine noise texture */}
-                <div
-                  className={cssClasses.logoNoise}
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='logoNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23logoNoise)'/%3E%3C/svg%3E")`,
-                    backgroundSize: '128px 128px'
+                {/* Logo Image - Industry Standard */}
+                <img
+                  src={isDarkMode ? themeConfig.logo?.darkSrc : themeConfig.logo?.src}
+                  alt={themeConfig.logo?.alt || "Logo"}
+                  className="h-8 sm:h-10 md:h-12 w-auto max-h-12 object-contain"
+                  style={{ 
+                    display: 'block',
+                    maxWidth: '120px',
+                    height: 'auto'
                   }}
                 />
-
-                {/* Multi-layer gradients */}
-                <div className={cssClasses.logoGradient}></div>
-
-                {/* Apple-style highlight */}
-                <div
-                  className={cssClasses.logoHighlight}
-                  style={{
-                    background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.08) 30%, transparent 70%)`,
-                    mixBlendMode: 'overlay'
-                  }}
-                />
-
-                {/* Logo Image */}
-                <div className="relative z-10">
-                  <img
-                    src={isDarkMode ? themeConfig.logo?.darkSrc : themeConfig.logo?.src}
-                    alt={themeConfig.logo?.alt || "Logo"}
-                    className={cssClasses.logoImage}
-                    style={{ display: 'block' }}
-                  />
-                </div>
               </motion.div>
             </div>
 
-            {/* PROPERLY CENTERED TITLE - Mobile Optimized */}
-              <div className={cssClasses.titleContainer}>
-                <h1 className={cssClasses.titleText}>
-                  <span className="hidden sm:inline">{appConfig.header?.title?.desktop}</span>
-                  <span className="sm:hidden">{appConfig.header?.title?.mobile}</span>
-                </h1>
+            {/* Center - Progress Bar */}
+            <div className="flex-1 max-w-md mx-8">
+              <div className="relative">
+                <ProgressBar
+                  currentScene={currentScene + 1}
+                  totalScenes={scenes.length}
+                  config={cssClasses.progressBarConfig}
+                />
               </div>
+            </div>
 
-            {/* Right Controls - Mobile Optimized */}
+            {/* Right - Controls */}
             <div className={cssClasses.controlsContainer}>
               {/* ENHANCED LIQUID GLASS POINTS BADGE - Mobile Optimized */}
               <motion.div
@@ -1110,51 +1077,15 @@ export default function App() {
                   y: -1
                 }}
                 style={{
-                  // LIQUID GLASS BACKGROUND for badge
-                  background: `linear-gradient(135deg, 
-                    ${themeConfig.colors?.badge?.points?.gradient?.from || 'rgba(245, 158, 11, 0.15)'} 0%, 
-                    ${themeConfig.colors?.badge?.points?.gradient?.via1 || 'rgba(251, 146, 60, 0.12)'} 30%,
-                    ${themeConfig.colors?.badge?.points?.gradient?.via2 || 'rgba(249, 115, 22, 0.10)'} 70%,
-                    ${themeConfig.colors?.badge?.points?.gradient?.to || 'rgba(234, 88, 12, 0.08)'} 100%
-                  )`,
-                  backdropFilter: 'blur(20px) saturate(180%)',
-                  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                  border: `1px solid ${themeConfig.colors?.badge?.points?.border || 'rgba(245, 158, 11, 0.25)'}`,
-                  boxShadow: `
-                    0 4px 16px ${themeConfig.colors?.badge?.points?.shadow?.primary || 'rgba(245, 158, 11, 0.12)'},
-                    0 2px 8px ${themeConfig.colors?.badge?.points?.shadow?.secondary || 'rgba(251, 146, 60, 0.08)'},
-                    inset 0 1px 0 rgba(255, 255, 255, 0.20)
-                  `,
-                  transform: 'translateZ(0)',
-                  willChange: 'transform'
+                  background: "white",
+                  border:"1px solid #F59E0B"
                 }}
               >
-                {/* Ultra-fine noise texture */}
-                <div
-                  className={cssClasses.pointsBadgeNoise}
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='badgeNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23badgeNoise)'/%3E%3C/svg%3E")`,
-                    backgroundSize: '128px 128px'
-                  }}
-                />
-
-                {/* Multi-layer gradients */}
-                <div className="absolute inset-0 bg-gradient-to-br from-yellow-50/25 via-orange-50/15 to-amber-50/10 dark:from-yellow-900/20 dark:via-orange-900/12 dark:to-amber-900/8 rounded-lg sm:rounded-xl transition-colors duration-500"></div>
-
-                {/* Apple-style highlight */}
-                <div
-                  className="absolute inset-0 rounded-lg sm:rounded-xl pointer-events-none"
-                  style={{
-                    background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(245, 158, 11, 0.25) 0%, rgba(251, 146, 60, 0.15) 30%, rgba(255, 255, 255, 0.10) 60%, transparent 80%)`,
-                    mixBlendMode: 'overlay'
-                  }}
-                />
-
                 {/* Badge Content */}
                 <div className="relative z-10 flex items-center space-x-1 sm:space-x-1.5 md:space-x-2">
-                  <Award size={10} className="text-yellow-700 dark:text-yellow-300 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5 transition-colors duration-300" />
+                  <Award size={isMobile ? 16 : 20} className="text-[#F59E0B] dark:text-[#F59E0B] sm:w-3 sm:h-3 md:w-3.5 md:h-3.5 transition-colors duration-300" />
                   <span className={cssClasses.pointsText}>
-                    {totalPoints}p
+                    {totalPoints}
                   </span>
                 </div>
               </motion.div>
@@ -1171,24 +1102,8 @@ export default function App() {
                 aria-label={isDarkMode ? themeConfig.toggleButton?.title?.lightMode : themeConfig.toggleButton?.title?.darkMode}
                 title={isDarkMode ? themeConfig.toggleButton?.title?.lightMode : themeConfig.toggleButton?.title?.darkMode}
                 style={{
-                  // LIQUID GLASS BACKGROUND for theme toggle
-                  background: `linear-gradient(135deg, 
-                    rgba(59, 130, 246, 0.15) 0%, 
-                    rgba(99, 102, 241, 0.12) 30%,
-                    rgba(139, 92, 246, 0.10) 70%,
-                    rgba(168, 85, 247, 0.08) 100%
-                  )`,
-                  backdropFilter: 'blur(20px) saturate(180%)',
-                  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                  border: '1px solid rgba(59, 130, 246, 0.25)',
-                  boxShadow: `
-                    0 4px 16px rgba(59, 130, 246, 0.12),
-                    0 2px 8px rgba(99, 102, 241, 0.08),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.20)
-                  `,
-                  transform: 'translateZ(0)',
-                  willChange: 'transform',
-                  touchAction: 'manipulation'
+                  background: "white",
+                  border: '1px solid #C7C7CC'
                 }}
               >
                 {/* Ultra-fine noise texture */}
@@ -1237,8 +1152,8 @@ export default function App() {
                         transition={{ duration: 0.3, ease: "easeOut" }}
                       >
                         <Sun
-                          size={14}
-                          className="text-yellow-600 group-hover:text-yellow-700 transition-colors duration-300 sm:w-4 sm:h-4"
+                          size={40}
+                          className="text-yellow-600 group-hover:text-yellow-700 transition-colors duration-300 w-6 h-6 sm:w-6 sm:h-6"
                         />
                       </motion.div>
                     ) : (
@@ -1250,8 +1165,8 @@ export default function App() {
                         transition={{ duration: 0.3, ease: "easeOut" }}
                       >
                         <Moon
-                          size={14}
-                          className="text-blue-700 dark:text-blue-300 group-hover:text-blue-800 dark:group-hover:text-blue-200 transition-colors duration-300 sm:w-4 sm:h-4"
+                          size={40}
+                          className="text-[#8E8E93] dark:text-[#8E8E93]transition-colors duration-300 w-6 h-6 sm:w-6 sm:h-6"
                         />
                       </motion.div>
                     )}
@@ -1272,20 +1187,7 @@ export default function App() {
                   aria-label="Dil seçici"
                   aria-expanded={isLanguageDropdownOpen}
                   style={{
-                    // LIQUID GLASS BACKGROUND for language selector
-                    background: `linear-gradient(135deg, 
-                      rgba(71, 85, 105, 0.12) 0%, 
-                      rgba(100, 116, 139, 0.08) 50%, 
-                      rgba(148, 163, 184, 0.06) 100%
-                    )`,
-                    backdropFilter: 'blur(20px) saturate(180%)',
-                    WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                    border: '1px solid rgba(71, 85, 105, 0.20)',
-                    boxShadow: `
-                      0 4px 16px rgba(71, 85, 105, 0.08),
-                      0 2px 8px rgba(71, 85, 105, 0.06),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.15)
-                    `,
+                    background: '#C7C7CC',
                     transform: 'translateZ(0)',
                     willChange: 'transform',
                     touchAction: 'manipulation'
@@ -1300,17 +1202,6 @@ export default function App() {
                     }}
                   />
 
-                  {/* Multi-layer gradients */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-slate-50/20 via-slate-100/10 to-slate-200/5 dark:from-slate-800/15 dark:via-slate-700/8 dark:to-slate-600/4 rounded-lg sm:rounded-xl transition-colors duration-500"></div>
-
-                  {/* Apple-style highlight */}
-                  <div
-                    className="absolute inset-0 rounded-lg sm:rounded-xl pointer-events-none"
-                    style={{
-                      background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.08) 30%, transparent 70%)`,
-                      mixBlendMode: 'overlay'
-                    }}
-                  />
 
                   {/* Hover glow effect */}
                   <motion.div
@@ -1515,19 +1406,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* Progress Bar and Quiz Timer Row - Mobile Optimized */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0 sm:space-x-3">
-            {/* Progress Bar */}
-            <div className="flex-1 min-w-0">
-              <ProgressBar
-                currentScene={currentScene + 1}
-                totalScenes={scenes.length}
-                config={cssClasses.progressBarConfig}
-              />
-            </div>
 
-
-          </div>
         </div>
       </div>
 

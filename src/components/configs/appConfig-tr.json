@@ -70,7 +70,8 @@
       "closeNotification": "Bildirimi kapat",
       "startLabel": "Başlangıç",
       "completedLabel": "Tamamlandı",
-      "progressLabel": "tamamlandı"
+      "progressLabel": "tamamlandı",
+      "points": "puan"
     }
   },
 "introSceneConfig": {

@@ -70,7 +70,8 @@
       "closeNotification": "Close notification",
       "startLabel": "Start",
       "completedLabel": "Completed",
-      "progressLabel": "completed"
+      "progressLabel": "completed",
+      "points": "points"
     }
   },
   "introSceneConfig": {
