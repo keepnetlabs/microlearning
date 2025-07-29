@@ -71,7 +71,8 @@
       "startLabel": "Başlangıç",
       "completedLabel": "Tamamlandı",
       "progressLabel": "tamamlandı",
-      "points": "puan"
+      "points": "puan",
+      "popularLanguages": "Popüler Diller"
     }
   },
 "introSceneConfig": {

@@ -71,7 +71,8 @@
       "startLabel": "Start",
       "completedLabel": "Completed",
       "progressLabel": "completed",
-      "points": "points"
+      "points": "points",
+      "popularLanguages": "Popular Languages"
     }
   },
   "introSceneConfig": {

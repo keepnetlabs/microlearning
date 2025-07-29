@@ -105,7 +105,7 @@ export default function App() {
     themeHintIcon: `flex-shrink-0 p-1.5 bg-${themeConfig.colors?.primary || 'blue'}-100/80 dark:bg-${themeConfig.colors?.primary || 'blue'}-900/60 ${themeConfig.effects?.borderRadius || 'rounded-lg'}`,
     themeHintTitle: `text-sm text-${themeConfig.colors?.primary || 'blue'}-900 dark:text-white font-medium mb-2`,
     themeHintDescription: `text-xs text-${themeConfig.colors?.primary || 'blue'}-800 dark:text-gray-200 leading-relaxed`,
-    themeHintClose: `ml-2 p-1 ${themeConfig.effects?.borderRadius || 'rounded-full'} hover:bg-${themeConfig.colors?.primary || 'blue'}-200/50 dark:hover:bg-gray-700/50 transition-colors focus:outline-none focus:ring-2 focus:ring-${themeConfig.colors?.primary || 'blue'}-400/30 dark:focus:ring-${themeConfig.colors?.primary || 'blue'}-600/30`,
+    themeHintClose: `ml-2 p-1 rounded-full hover:bg-${themeConfig.colors?.primary || 'blue'}-200/50 dark:hover:bg-gray-700/50 transition-colors focus:outline-none focus:ring-2 focus:ring-${themeConfig.colors?.primary || 'blue'}-400/30 dark:focus:ring-${themeConfig.colors?.primary || 'blue'}-600/30`,
 
     // Background
     backgroundContainer: "fixed inset-0 pointer-events-none overflow-hidden",
@@ -118,11 +118,11 @@ export default function App() {
     headerContainer: "relative shrink-0",
     headerBackground: "absolute inset-0 bg-gradient-to-b from-white/95 via-white/90 to-white/85 dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-900/85 transition-colors duration-300",
     headerBorder: "absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gray-200/60 dark:via-gray-600/60 to-transparent transition-colors duration-300",
-    headerContent: "relative z-10 px-1.5 py-1.5 sm:px-2 sm:py-2 md:px-4 md:py-3 lg:px-16 xl:px-20 2xl:px-24",
+    headerContent: "relative z-10 px-4 py-4 bg-white dark:bg-gray-900 lg:px-16 xl:px-20 2xl:px-24",
 
     // Logo
     logoContainer: "flex-shrink-0 z-20",
-    logoGlass: `relative p-1 sm:p-1.5 md:p-2 ${themeConfig.effects?.borderRadius || 'rounded-lg'} sm:rounded-xl md:rounded-2xl overflow-hidden transition-all duration-500 ease-out group`,
+    logoGlass: `relative p-1 sm:p-1.5 md:p-2 rounded-lg sm:rounded-xl md:rounded-2xl overflow-hidden transition-all duration-500 ease-out group`,
     logoNoise: "absolute inset-0 opacity-[0.015] dark:opacity-[0.008] rounded-lg sm:rounded-xl md:rounded-2xl mix-blend-overlay pointer-events-none",
     logoGradient: "absolute inset-0 bg-gradient-to-br from-slate-50/20 via-slate-100/10 to-slate-200/5 dark:from-slate-800/15 dark:via-slate-700/8 dark:to-slate-600/4 rounded-lg sm:rounded-xl md:rounded-2xl transition-colors duration-500",
     logoHighlight: "absolute inset-0 rounded-lg sm:rounded-xl md:rounded-2xl pointer-events-none",
@@ -136,21 +136,21 @@ export default function App() {
     controlsContainer: "flex items-center space-x-1 sm:space-x-1.5 md:space-x-3 flex-shrink-0 z-20",
 
     // Points badge
-    pointsBadge: `relative flex items-center space-x-1 sm:space-x-1.5 md:space-x-2 px-1.5 sm:px-2 md:px-3 h-8 sm:h-10 ${themeConfig.effects?.borderRadius || 'rounded-md'} sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group`,
+    pointsBadge: `relative flex items-center space-x-1 sm:space-x-1.5 md:space-x-1.5 px-1.5 sm:px-2 md:px-3 h-8 sm:h-10 rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 dark:bg-black dark:border-white border-[#F59E0B] border-[1px] ease-out group`,
     pointsBadgeNoise: "absolute inset-0 opacity-[0.020] dark:opacity-[0.012] rounded-lg sm:rounded-xl mix-blend-overlay pointer-events-none",
-    pointsText: `text-[8px] sm:text-xs md:text-sm font-semibold text-${themeConfig.colors?.badge?.points?.text || 'amber-900'} dark:text-${themeConfig.colors?.badge?.points?.textDark || 'amber-100'} transition-colors duration-300`,
+    pointsText: `text-[8px] sm:text-xs md:text-sm font-semibold text-[#D97706] dark:text-[#D97706] transition-colors duration-300`,
 
     // Theme button
-    themeButton: `relative flex items-center justify-center p-1 sm:p-1.5 md:p-2  max-h-[32px] sm:max-h-[40px] ${themeConfig.effects?.borderRadius || 'rounded-md'} sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group focus:outline-none focus:ring-2 focus:ring-${themeConfig.colors?.primary || 'blue'}-500/20 dark:focus:ring-${themeConfig.colors?.primary || 'blue'}-400/20`,
+    themeButton: `relative dark:bg-black dark:border-white border-[#C7C7CC] border-[1px] flex items-center justify-center p-1 sm:p-1.5 md:p-2 max-h-[32px] sm:max-h-[40px] rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group `,
     themeButtonIcon: `w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 text-[#8E8E93] dark:text-gray-300 transition-colors duration-300`,
 
     // Language button
-    languageButton: `relative flex items-center space-x-0.5 bg-[white] border-[#C7C7CC] sm:space-x-1 md:space-x-2 px-1 sm:px-1.5 md:px-3 h-8 sm:h-10 sm:w-[100px] ${themeConfig.effects?.borderRadius || 'rounded-md'} sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group focus:outline-none focus:ring-2 focus:ring-${themeConfig.colors?.primary || 'blue'}-500/20 dark:focus:ring-${themeConfig.colors?.primary || 'blue'}-400/20`,
+    languageButton: `relative flex items-center justify-center space-x-0.5 bg-[white] border-[#C7C7CC] dark:bg-black dark:border-white border-[#C7C7CC] border-[1px] sm:space-x-1 md:space-x-2 px-1 sm:px-1.5 md:px-3 h-8 sm:h-10 sm:w-[100px] rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group`,
     languageFlag: "w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 rounded-sm transition-opacity duration-300",
-    languageChevron: "w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4 text-gray-500 dark:text-gray-400 transition-colors duration-300",
+    languageChevron: "w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4 text-gray-500 dark:text-white transition-colors duration-300",
 
     // Language dropdown
-    languageDropdown: `absolute top-full right-0 mt-1 w-64 bg-${themeConfig.colors?.surface || 'white'}/95 dark:bg-gray-900/95 ${themeConfig.effects?.backdropBlur || 'backdrop-blur-xl'} border border-${themeConfig.colors?.surface || 'white'}/60 dark:border-gray-600/60 ${themeConfig.effects?.borderRadius || 'rounded-xl'} ${themeConfig.effects?.shadow || 'shadow-xl'} shadow-black/10 dark:shadow-black/30 transition-all duration-300 z-50`,
+    languageDropdown: `absolute top-full right-0 mt-1 w-64 bg-${themeConfig.colors?.surface || 'white'}/95 dark:bg-gray-900/95 backdrop-blur-xl border border-${themeConfig.colors?.surface || 'white'}/60 dark:border-gray-600/60 rounded-xl shadow-xl shadow-black/10 dark:shadow-black/30 transition-all duration-300 z-50`,
     languageSearch: "w-full px-3 py-2 text-sm bg-transparent border-0 focus:outline-none focus:ring-0 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400",
     languageList: "max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent",
     languageItem: "flex items-center space-x-2 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 cursor-pointer",
@@ -163,23 +163,19 @@ export default function App() {
 
     // Achievement notification
     achievementContainer: "fixed top-24 right-4 z-40",
-    achievementContent: `relative px-4 py-3 bg-gradient-to-r from-yellow-50/98 to-orange-50/95 dark:from-gray-900/98 dark:to-gray-800/95 border border-yellow-200/70 dark:border-yellow-400/80 ${themeConfig.effects?.borderRadius || 'rounded-2xl'} ${themeConfig.effects?.shadow || 'shadow-xl'} shadow-yellow-500/10 dark:shadow-black/40 transition-colors duration-300`,
-    achievementClose: `ml-2 p-1 ${themeConfig.effects?.borderRadius || 'rounded-full'} hover:bg-yellow-200/50 dark:hover:bg-yellow-900/40 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-400/30 dark:focus:ring-yellow-600/30`,
+    achievementContent: `relative px-4 py-3 bg-gradient-to-r from-yellow-50/98 to-orange-50/95 dark:from-gray-900/98 dark:to-gray-800/95 border border-yellow-200/70 dark:border-yellow-400/80 rounded-2xl shadow-xl shadow-yellow-500/10 dark:shadow-black/40 transition-colors duration-300`,
+    achievementClose: `ml-2 p-1 rounded-full hover:bg-yellow-200/50 dark:hover:bg-yellow-900/40 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-400/30 dark:focus:ring-yellow-600/30`,
 
     // Navigation
     navContainer: "fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30",
-    navButton: `relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 ${themeConfig.effects?.borderRadius || 'rounded-full'} ${themeConfig.effects?.backdropBlur || 'backdrop-blur-xl'} border border-${themeConfig.colors?.surface || 'white'}/60 dark:border-gray-600/60 ${themeConfig.effects?.shadow || 'shadow-lg'} transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-${themeConfig.colors?.primary || 'blue'}-500/20 dark:focus:ring-${themeConfig.colors?.primary || 'blue'}-400/20`,
+    navButton: `relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full backdrop-blur-xl border border-${themeConfig.colors?.surface || 'white'}/60 dark:border-gray-600/60 shadow-lg transition-all duration-300 focus:outline-none`,
     navButtonIcon: "w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-gray-600 dark:text-gray-300 transition-colors duration-300",
 
     // ProgressBar Config
     progressBarConfig: {
       // Container colors
-      containerBackground: `linear-gradient(135deg, 
-        rgba(148, 163, 184, 0.18) 0%, 
-        rgba(148, 163, 184, 0.15) 50%, 
-        rgba(148, 163, 184, 0.12) 100%
-      )`,
-      containerBorder: '1px solid rgba(148, 163, 184, 0.25)',
+      containerBackground: `white`,
+      containerBorder: '1px solid #C7C7CC',
       containerBoxShadow: `
         0 2px 8px rgba(148, 163, 184, 0.12),
         0 1px 4px rgba(148, 163, 184, 0.08),
@@ -192,9 +188,9 @@ export default function App() {
 
       // Progress fill colors
       progressFillBackground: `linear-gradient(135deg, 
-        rgba(59, 130, 246, 0.95) 0%, 
-        rgba(59, 130, 246, 0.90) 50%,
-        rgba(59, 130, 246, 0.85) 100%
+        #3B82F6 0%, 
+        #3B82F6 50%,
+        #3B82F6 100%
       )`,
       progressFillBorder: '0.5px solid rgba(59, 130, 246, 0.40)',
       progressFillBoxShadow: `
@@ -262,10 +258,10 @@ export default function App() {
         inset 0 1px 0 rgba(255, 255, 255, 0.15)
       `,
       percentageColor: 'rgb(59, 130, 246)',
-      
+
       // Text labels
       startLabel: themeConfig.texts?.startLabel,
-      completedLabel: themeConfig.texts?.completedLabel ,
+      completedLabel: themeConfig.texts?.completedLabel,
       progressLabel: themeConfig.texts?.progressLabel,
       ariaLabel: 'Training progress'
     },
@@ -279,13 +275,12 @@ export default function App() {
     // Quiz completion notification
     quizNotificationContainer: "fixed z-30 bottom-4 right-4 sm:bottom-6 sm:right-6",
     quizNotificationContent: `relative px-4 py-3 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-gray-800 dark:to-gray-900 border border-amber-200/60 dark:border-amber-600/60 ${themeConfig.effects?.borderRadius || 'rounded-xl'} ${themeConfig.effects?.shadow || 'shadow-lg'} shadow-amber-500/20 dark:shadow-black/40 transition-all duration-300 backdrop-blur-xl hover:shadow-xl hover:shadow-amber-500/30 dark:hover:shadow-black/50 group`,
-    quizNotificationClose: `ml-1 p-1 ${themeConfig.effects?.borderRadius || 'rounded-full'} hover:bg-amber-200/50 dark:hover:bg-amber-900/40 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400/30 dark:focus:ring-amber-600/30 opacity-60 group-hover:opacity-100`,
+    quizNotificationClose: `ml-1 p-1 ${themeConfig.effects?.borderRadius || 'rounded-full'} hover:bg-amber-200/50 dark:hover:bg-amber-900/40 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400/30 dark:focus:ring-amber-600/30 opacity-60`,
 
     // Mobile navigation hint
     mobileNavHintContainer: "md:hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 z-30",
     mobileNavHintContent: `flex items-center px-3 py-2 bg-white/85 dark:bg-gray-900/85 ${themeConfig.effects?.borderRadius || 'rounded-full'} border border-white/40 dark:border-gray-600/40 ${themeConfig.effects?.shadow || 'shadow-lg'} transition-colors duration-300 backdrop-blur-xl`
   }), [themeConfig]);
-  console.log("cssClasses",cssClasses)
   const [currentScene, setCurrentScene] = useState(0);
   const [direction, setDirection] = useState(0);
   const [selectedLanguage, setSelectedLanguage] = useState(() => detectBrowserLanguage());
@@ -297,10 +292,10 @@ export default function App() {
     console.log(newConfig)
     setAppConfig(newConfig);
     createConfigChangeEvent(newLanguage);
-    
+
     // LocalStorage'a kaydet
     localStorage.setItem('selected-language', newLanguage);
-    
+
     console.log(`Language changed to: ${newLanguage}, config updated`);
   }, []);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
@@ -544,7 +539,7 @@ export default function App() {
       const timer = setTimeout(() => {
         setShowThemeHint(false);
         localStorage.setItem('theme-hint-dismissed', 'true');
-      }, 6000); // Reduced from 8 seconds
+      }, 5000); // Reduced from 8 seconds
       return () => clearTimeout(timer);
     }
   }, [showThemeHint]);
@@ -553,12 +548,12 @@ export default function App() {
   useEffect(() => {
     if (currentScene === 4 && !hasShownQuizHint && showQuizCompletionHint) {
       setHasShownQuizHint(true);
-      
+
       // Auto-hide after 5 seconds
       const timer = setTimeout(() => {
         setShowQuizCompletionHint(false);
-      },5000);
-      
+      }, 5000);
+
       return () => clearTimeout(timer);
     }
   }, [currentScene, hasShownQuizHint, showQuizCompletionHint]);
@@ -898,9 +893,9 @@ export default function App() {
           >
             <div className={cssClasses.loadingContainer}>
               <Loader2 size={20} className={cssClasses.loadingSpinner} />
-                              <span className={cssClasses.loadingText}>
-                  {themeConfig.texts?.loading}
-                </span>
+              <span className={cssClasses.loadingText}>
+                {themeConfig.texts?.loading}
+              </span>
             </div>
           </motion.div>
         )}
@@ -919,9 +914,9 @@ export default function App() {
               <div className="flex items-start space-x-3 relative z-10">
                 <div className={cssClasses.themeHintIcon}>
                   {isDarkMode ? (
-                    <Moon size={16} className="text-blue-600 dark:text-blue-300" />
+                    <Moon size={16} />
                   ) : (
-                    <Sun size={16} className="text-blue-600 dark:text-blue-300" />
+                    <Sun size={16} />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -1047,7 +1042,7 @@ export default function App() {
                   src={isDarkMode ? themeConfig.logo?.darkSrc : themeConfig.logo?.src}
                   alt={themeConfig.logo?.alt || "Logo"}
                   className="h-8 sm:h-10 md:h-12 w-auto max-h-12 object-contain"
-                  style={{ 
+                  style={{
                     display: 'block',
                     maxWidth: '120px',
                     height: 'auto'
@@ -1057,7 +1052,7 @@ export default function App() {
             </div>
 
             {/* Center - Progress Bar */}
-            <div className="flex-1 max-w-md mx-8">
+            <div className="flex-1 hidden md:block">
               <div className="relative">
                 <ProgressBar
                   currentScene={currentScene + 1}
@@ -1076,14 +1071,10 @@ export default function App() {
                   scale: 1.02,
                   y: -1
                 }}
-                style={{
-                  background: "white",
-                  border:"1px solid #F59E0B"
-                }}
               >
                 {/* Badge Content */}
-                <div className="relative z-10 flex items-center space-x-1 sm:space-x-1.5 md:space-x-2">
-                  <Award size={isMobile ? 16 : 20} className="text-[#F59E0B] dark:text-[#F59E0B] sm:w-3 sm:h-3 md:w-3.5 md:h-3.5 transition-colors duration-300" />
+                <div className="relative z-10 flex items-center space-x-1 sm:space-x-1.5 md:space-x-1.5">
+                  <Award size={isMobile ? 16 : 20} className="text-[#F59E0B] dark:text-[#F59E0B] sm:w-4 sm:h-4 md:w-5 md:h-5 transition-colors duration-300" />
                   <span className={cssClasses.pointsText}>
                     {totalPoints}
                   </span>
@@ -1101,35 +1092,12 @@ export default function App() {
                 whileTap={{ scale: 0.95 }}
                 aria-label={isDarkMode ? themeConfig.toggleButton?.title?.lightMode : themeConfig.toggleButton?.title?.darkMode}
                 title={isDarkMode ? themeConfig.toggleButton?.title?.lightMode : themeConfig.toggleButton?.title?.darkMode}
-                style={{
-                  background: "white",
-                  border: '1px solid #C7C7CC'
-                }}
               >
-                {/* Ultra-fine noise texture */}
-                <div
-                  className="absolute inset-0 opacity-[0.020] dark:opacity-[0.012] rounded-lg sm:rounded-xl mix-blend-overlay pointer-events-none"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='themeNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23themeNoise)'/%3E%3C/svg%3E")`,
-                    backgroundSize: '128px 128px'
-                  }}
-                />
 
-                {/* Multi-layer gradients */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-50/25 via-indigo-50/15 to-purple-50/10 dark:from-blue-900/20 dark:via-indigo-900/12 dark:to-purple-900/8 rounded-lg sm:rounded-xl transition-colors duration-500"></div>
-
-                {/* Apple-style highlight */}
-                <div
-                  className="absolute inset-0 rounded-lg sm:rounded-xl pointer-events-none"
-                  style={{
-                    background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(59, 130, 246, 0.25) 0%, rgba(99, 102, 241, 0.15) 30%, rgba(255, 255, 255, 0.10) 60%, transparent 80%)`,
-                    mixBlendMode: 'overlay'
-                  }}
-                />
 
                 {/* Hover glow effect */}
                 <motion.div
-                  className="absolute inset-0 rounded-lg sm:rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none"
+                  className="absolute inset-0 rounded-lg sm:rounded-xl opacity-0 pointer-events-none"
                   style={{
                     background: `linear-gradient(135deg, 
                       rgba(59, 130, 246, 0.20) 0%, 
@@ -1153,7 +1121,7 @@ export default function App() {
                       >
                         <Sun
                           size={40}
-                          className="text-yellow-600 group-hover:text-yellow-700 transition-colors duration-300 w-6 h-6 sm:w-6 sm:h-6"
+                          className="text-yellow-600 group-hover:text-yellow-700 dark:text-white dark:group-hover:text-white transition-colors duration-300 w-6 h-6 sm:w-6 sm:h-6"
                         />
                       </motion.div>
                     ) : (
@@ -1166,7 +1134,7 @@ export default function App() {
                       >
                         <Moon
                           size={40}
-                          className="text-[#8E8E93] dark:text-[#8E8E93]transition-colors duration-300 w-6 h-6 sm:w-6 sm:h-6"
+                          className="text-[#8E8E93] dark:text-[#8E8E93] transition-colors duration-300 w-6 h-6 sm:w-6 sm:h-6"
                         />
                       </motion.div>
                     )}
@@ -1187,48 +1155,25 @@ export default function App() {
                   aria-label="Dil seçici"
                   aria-expanded={isLanguageDropdownOpen}
                   style={{
-                    background: '#C7C7CC',
                     transform: 'translateZ(0)',
                     willChange: 'transform',
                     touchAction: 'manipulation'
                   }}
                 >
-                  {/* Ultra-fine noise texture */}
-                  <div
-                    className="absolute inset-0 opacity-[0.015] dark:opacity-[0.008] rounded-lg sm:rounded-xl mix-blend-overlay pointer-events-none"
-                    style={{
-                      backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='langNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23langNoise)'/%3E%3C/svg%3E")`,
-                      backgroundSize: '128px 128px'
-                    }}
-                  />
-
-
-                  {/* Hover glow effect */}
-                  <motion.div
-                    className="absolute inset-0 rounded-lg sm:rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none"
-                    style={{
-                      background: `linear-gradient(135deg, 
-                        rgba(71, 85, 105, 0.15) 0%, 
-                        rgba(100, 116, 139, 0.12) 50%, 
-                        rgba(148, 163, 184, 0.10) 100%
-                      )`
-                    }}
-                    transition={{ duration: 0.4, ease: "easeOut" }}
-                  />
 
                   {/* Content */}
                   <div className="relative z-10 flex items-center space-x-0.5 sm:space-x-1 md:space-x-2">
                     <ReactCountryFlag
                       countryCode={getCountryCode(currentLanguage?.code || 'tr')}
                       svg
-                      style={{ fontSize: '0.75rem' }}
+                      style={{ fontSize: '1rem' }}
                     />
-                    <span className="text-[8px] sm:text-xs text-gray-800 dark:text-gray-200 font-medium hidden sm:block transition-colors duration-300">
+                    <span className="text-[8px] sm:text-xs text-gray-800 dark:text-gray-200 font-medium transition-colors duration-300">
                       {getCountryCode(currentLanguage?.code || 'tr')}
                     </span>
                     <ChevronDown
                       size={8}
-                      className={cssClasses.languageChevron}
+                      className={`${cssClasses.languageChevron} hidden sm:block`}
                       style={{ transform: isLanguageDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
                     />
                   </div>
@@ -1258,7 +1203,7 @@ export default function App() {
                             placeholder={getSearchPlaceholder(currentLanguage?.code || 'tr')}
                             value={languageSearchTerm}
                             onChange={(e) => setLanguageSearchTerm(e.target.value)}
-                            className={`w-full pl-6 pr-3 py-1.5 text-xs bg-white/60 dark:bg-gray-800/80 border border-white/40 dark:border-gray-600/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 focus:border-blue-300/50 dark:focus:border-blue-500/50 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-xl'}`}
+                            className={`w-full pl-6 pr-3 py-1.5 text-xs bg-white/60 dark:bg-gray-800/80 border border-white/40 dark:border-gray-600/60 rounded-lg  placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-xl'}`}
                             aria-label={getSearchPlaceholder(currentLanguage?.code || 'tr')}
                           />
                         </div>
@@ -1283,7 +1228,7 @@ export default function App() {
                               <>
                                 <div className="px-3 py-1.5 text-xs font-medium text-blue-800 dark:text-blue-300 bg-blue-50/50 dark:bg-blue-900/40 border-b border-blue-100/50 dark:border-blue-800/50 flex items-center transition-colors duration-300">
                                   <Star size={10} className="mr-1.5" />
-                                  Popüler Diller
+                                  {themeConfig.texts?.popularLanguages || "Popüler Diller"}
                                 </div>
                                 {priorityLangs.map((language, index) => (
                                   <motion.button
@@ -1405,6 +1350,15 @@ export default function App() {
 
             </div>
           </div>
+          {isMobile && (
+            <div className="flex-1 relative flex items-center">
+              <ProgressBar
+                currentScene={currentScene + 1}
+                totalScenes={scenes.length}
+                config={cssClasses.progressBarConfig}
+              />
+            </div>
+          )}
 
 
         </div>
@@ -1425,7 +1379,7 @@ export default function App() {
         )}
 
         {/* APPLE VISIONOS FLOATING GLASS CARD - Enhanced prominence with darker background */}
-        <div className="flex-1 mx-2 sm:mx-4 md:mx-16 lg:mx-20 xl:mx-24 my-1 sm:my-3 md:my-6 flex items-center justify-center">
+        <div className="flex-1 mx-2 sm:mx-4 md:mx-16 lg:mx-20 xl:mx-24 sm:my-3 md:my-6 flex items-center justify-center">
           <div className="w-full h-[calc(100vh-160px)] relative">
             <AnimatePresence initial={false} custom={direction} mode="wait">
               <motion.div
@@ -1805,7 +1759,7 @@ export default function App() {
             <div className={cssClasses.quizNotificationContent}>
               <div className="flex items-center space-x-2.5 relative z-10">
                 <div className="w-2 h-2 bg-amber-500 dark:bg-amber-400 rounded-full animate-pulse"></div>
-                <p className="text-sm text-amber-900 dark:text-amber-100 font-medium transition-colors duration-300">
+                <p className="text-sm text-[#D97706] dark:text-[#D97706] font-medium transition-colors duration-300">
                   {(appConfig as any).quizSceneConfig?.texts?.quizCompletionHint}
                 </p>
                 {/* Industry Standard: Close Button */}
