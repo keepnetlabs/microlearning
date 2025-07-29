@@ -266,7 +266,6 @@ export function ScenarioScene({
             transcript={tactiqTranscript}
             showTranscript={config.video.showTranscript}
             transcriptTitle={config.video.transcriptTitle}
-            transcriptLanguage={config.video.transcriptLanguage}
             className="w-full"
           />
         </motion.div>

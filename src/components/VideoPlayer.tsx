@@ -39,7 +39,6 @@ interface VideoPlayerProps {
   transcript?: TranscriptRow[] | string;
   showTranscript?: boolean;
   transcriptTitle?: string;
-  transcriptLanguage?: string;
 }
 
 // Transcript parsing function
@@ -95,7 +94,6 @@ export function VideoPlayer({
   transcript,
   showTranscript = true,
   transcriptTitle = "Video Transkripti",
-  transcriptLanguage = "Türkçe",
 }: VideoPlayerProps) {
   const videoRef = useRef<VideoWithLastTime>(null);
   const playerRef = useRef<Plyr | null>(null);
@@ -768,16 +766,7 @@ export function VideoPlayer({
                   </h3>
                 </div>
 
-                {/* Language Selector */}
-                <div className="flex items-center space-x-2">
-                  <div className="flex items-center space-x-1.5 px-2 py-1 bg-slate-50/80 dark:bg-slate-800/80 border border-slate-200/50 dark:border-slate-600/50 rounded-lg">
-                    <span className="text-xs">🇹🇷</span>
-                    <span className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                      {transcriptLanguage}
-                    </span>
-                    <ChevronDown className="w-3 h-3 text-slate-500 dark:text-slate-400" />
-                  </div>
-                </div>
+
               </div>
             </div>
 
