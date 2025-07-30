@@ -410,8 +410,8 @@ export function NudgeScene({ config = nudgeSceneConfig, completionData }: NudgeS
             />
 
             <Download size={16} className={`sm:w-5 sm:h-5 relative z-10 ${config.styling?.downloadButton?.iconColor || 'text-white'}`} />
-            <span className={`${config.styling?.downloadButton?.fontSize || 'text-sm sm:text-base'} ${config.styling?.downloadButton?.fontWeight || 'font-medium'} relative z-10`}>
-              {showCertificate ? (config.texts?.downloadingText || 'İndiriliyor...') : (config.texts?.downloadButton || 'Sertifikayı İndir')}
+            <span className={`text-sm sm:text-base font-medium relative z-10`}>
+              {showCertificate ? (config.texts?.downloadingText || "") : (config.texts?.downloadButton || "")}
             </span>
 
             {showCertificate && (
@@ -434,7 +434,7 @@ export function NudgeScene({ config = nudgeSceneConfig, completionData }: NudgeS
       >
         <h2 className="text-sm sm:text-base font-semibold text-gray-800 dark:text-white mb-3 flex items-center">
           <Award size={16} className="mr-2 text-yellow-600 dark:text-yellow-400" />
-          {config.texts?.achievementsTitle || "Kazandığınız Başarımlar"}
+          {config.texts?.achievementsTitle || ""}
         </h2>
         <div className="grid grid-cols-3 gap-2 sm:gap-3">
           {(config.achievements || []).map((achievement, index) => {
@@ -490,7 +490,7 @@ export function NudgeScene({ config = nudgeSceneConfig, completionData }: NudgeS
                 >
                   <IconComponent size={14} className={`${achievement.color} ${achievement.color.includes('yellow') ? 'dark:text-yellow-400' : achievement.color.includes('green') ? 'dark:text-green-400' : 'dark:text-blue-400'} relative z-10`} />
                 </motion.div>
-                <span className={`text-xs text-center ${config.styling?.achievements?.textColor || 'text-gray-700 dark:text-gray-200'} leading-tight relative z-10 group-${config.styling?.achievements?.hoverColor || 'hover:text-gray-900 dark:hover:text-white'} transition-colors`}>
+                <span className={`text-xs text-center ${config.styling?.achievements?.textColor || 'text-gray-700 dark:text-gray-200'} leading-tight relative z-10 transition-colors`}>
                   {achievement.name}
                 </span>
               </motion.div>
@@ -508,7 +508,7 @@ export function NudgeScene({ config = nudgeSceneConfig, completionData }: NudgeS
       >
         <h2 className="text-sm sm:text-base font-semibold text-gray-800 dark:text-white mb-2 flex items-center">
           <ArrowRight size={16} className="mr-2 text-blue-600 dark:text-blue-400" />
-          {config.texts?.actionPlanTitle || "Şimdi Ne Yapmalısınız?"}
+          {config.texts?.actionPlanTitle || ""}
         </h2>
 
         <div className="space-y-2">
@@ -573,7 +573,7 @@ export function NudgeScene({ config = nudgeSceneConfig, completionData }: NudgeS
                                 ease: "easeInOut"
                               }}
                             >
-                              {config.texts?.urgentLabel || "Acil"}
+                              {config.texts?.urgentLabel || ""}
                             </motion.span>
                           )}
                         </h3>
@@ -602,7 +602,7 @@ export function NudgeScene({ config = nudgeSceneConfig, completionData }: NudgeS
       >
         <h2 className="text-sm sm:text-base font-semibold text-gray-800 dark:text-white mb-2 flex items-center">
           <BookOpen size={16} className="mr-2 text-purple-600 dark:text-purple-400" />
-          {config.texts?.resourcesTitle || "Ek Kaynaklar"}
+          {config.texts?.resourcesTitle || ""}
         </h2>
 
         <div className="space-y-2">
@@ -620,6 +620,8 @@ export function NudgeScene({ config = nudgeSceneConfig, completionData }: NudgeS
                 x: 5,
                 scale: 1.02
               }}
+              target="_blank"
+              rel="noopener noreferrer"
               href={resource.url}
               className={`relative flex items-center justify-between p-3 ${config.styling?.resourceCards?.backgroundColor || 'bg-white/50 dark:bg-gray-800/60'} backdrop-blur-xl border ${config.styling?.resourceCards?.borderColor || 'border-white/30 dark:border-gray-600/50'} rounded-lg hover:bg-white/70 dark:hover:bg-gray-700/70 hover:border-white/50 dark:hover:border-gray-600/70 transition-all group overflow-hidden`}
             >
@@ -637,7 +639,7 @@ export function NudgeScene({ config = nudgeSceneConfig, completionData }: NudgeS
                   <ExternalLink size={12} className={`${config.styling?.resourceCards?.iconColor || 'text-blue-600 dark:text-blue-400'}`} />
                 </motion.div>
                 <div>
-                  <div className={`text-xs font-medium ${config.styling?.resourceCards?.textColor || 'text-gray-800 dark:text-white'} group-${config.styling?.resourceCards?.hoverColor || 'hover:text-blue-700 dark:hover:text-blue-300'} transition-colors`}>
+                  <div className={`text-xs font-medium ${config.styling?.resourceCards?.textColor || 'text-gray-800 dark:text-white'} transition-colors`}>
                     {resource.title}
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400">
@@ -676,10 +678,10 @@ export function NudgeScene({ config = nudgeSceneConfig, completionData }: NudgeS
           <div className="relative z-10">
             <h3 className={`text-sm font-semibold ${config.styling?.motivationalCard?.titleColor || 'text-emerald-800 dark:text-emerald-200'} mb-2 flex items-center justify-center`}>
               <Shield size={16} className={`mr-2 ${config.styling?.motivationalCard?.iconColor || 'text-emerald-600 dark:text-emerald-400'}`} />
-              {config.texts?.motivationalTitle || "Siber Güvenlik Yolculuğunuz Devam Ediyor"}
+              {config.texts?.motivationalTitle || ""}
             </h3>
             <p className={`text-xs ${config.styling?.motivationalCard?.textColor || 'text-emerald-700 dark:text-emerald-300'} leading-relaxed`}>
-              {config.texts?.motivationalMessage || "Bu eğitimi tamamlayarak organizasyonunuzun güvenliğine önemli bir katkı sağladınız. Öğrendiklerinizi uygulamaya devam edin ve ekibinizi de bilinçlendirin."}
+              {config.texts?.motivationalMessage || ""}
             </p>
           </div>
         </motion.div>

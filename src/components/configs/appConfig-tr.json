@@ -642,16 +642,11 @@
       "downloadingText": "İndiriliyor...",
       "urgentLabel": "Acil"
     },
-    "completionData": {
-      "totalPoints": 210,
-      "timeSpent": "8 dakika",
-      "completionDate": "2024-01-15",
-      "achievements": [
-        { "id": "quiz-master", "name": "Quiz Ustası", "iconName": "award", "color": "text-yellow-600" },
-        { "id": "fast-learner", "name": "Hızlı Öğrenen", "iconName": "trending-up", "color": "text-green-600" },
-        { "id": "security-champion", "name": "Güvenlik Şampiyonu", "iconName": "shield", "color": "text-blue-600" }
-      ]
-    },
+    "achievements": [
+      { "id": "quiz-master", "name": "Quiz Ustası", "iconName": "award", "color": "text-yellow-600" },
+      { "id": "fast-learner", "name": "Hızlı Öğrenen", "iconName": "trending-up", "color": "text-green-600" },
+      { "id": "security-champion", "name": "Güvenlik Şampiyonu", "iconName": "shield", "color": "text-blue-600" }
+    ],
     "immediateActions": [
       {
         "iconName": "smartphone",
@@ -691,19 +686,19 @@
       {
         "title": "NIST Parola Rehberi",
         "type": "PDF",
-        "url": "#",
+        "url": "https://www.nist.gov/cybersecurity/nist-password-guidelines",
         "description": "Kapsamlı parola güvenliği kılavuzu"
       },
       {
         "title": "2FA Kurulum Videoları",
         "type": "Video",
-        "url": "#",
+        "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
         "description": "Adım adım iki faktörlü doğrulama"
       },
       {
         "title": "Phishing Test Araçları",
         "type": "Tool",
-        "url": "#",
+        "url": "https://www.google.com",
         "description": "Ekibinizi test etmek için araçlar"
       }
     ],
@@ -729,33 +724,25 @@
         "textColor": "text-white",
         "iconColor": "text-white",
         "gradientFrom": "from-blue-500",
-        "gradientTo": "to-indigo-600",
-        "shadow": "shadow-lg hover:shadow-xl",
-        "borderRadius": "rounded-xl",
-        "padding": "px-4 py-2 sm:px-6 sm:py-3",
-        "fontSize": "text-sm sm:text-base",
-        "fontWeight": "font-medium"
+        "gradientTo": "to-indigo-600"
       },
       "achievements": {
         "backgroundColor": "bg-white/60 dark:bg-gray-800/80",
         "borderColor": "border-white/40 dark:border-gray-600/60",
         "iconColor": "text-yellow-600 dark:text-yellow-400",
-        "textColor": "text-gray-700 dark:text-gray-200",
-        "hoverColor": "hover:text-gray-900 dark:hover:text-white"
+        "textColor": "text-gray-700 dark:text-gray-200"
       },
       "actionCards": {
         "backgroundColor": "bg-white/50 dark:bg-gray-800/60",
         "borderColor": "border-white/30 dark:border-gray-600/50",
         "iconColor": "text-gray-600 dark:text-gray-300",
-        "textColor": "text-gray-700 dark:text-gray-200",
-        "hoverColor": "hover:text-gray-900 dark:hover:text-white"
+        "textColor": "text-gray-700 dark:text-gray-200"
       },
       "resourceCards": {
         "backgroundColor": "bg-white/50 dark:bg-gray-800/60",
         "borderColor": "border-white/30 dark:border-gray-600/50",
         "iconColor": "text-blue-600 dark:text-blue-400",
-        "textColor": "text-gray-800 dark:text-white",
-        "hoverColor": "hover:text-blue-700 dark:hover:text-blue-300"
+        "textColor": "text-gray-800 dark:text-white"
       },
       "motivationalCard": {
         "backgroundColor": "from-emerald-50/80 to-green-50/60 dark:from-emerald-900/40 dark:to-green-900/30",
