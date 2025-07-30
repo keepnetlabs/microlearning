@@ -29,13 +29,6 @@
             "primary": "rgba(245, 158, 11, 0.12)",
             "secondary": "rgba(251, 146, 60, 0.08)"
           }
-        },
-        "timer": {
-          "background": "red",
-          "text": "red-700",
-          "textDark": "red-300",
-          "icon": "red-600",
-          "iconDark": "red-400"
         }
       }
     },
@@ -306,6 +299,18 @@
         "correctAnswer": false,
         "difficulty": "medium",
         "category": "Email Security",
+        "options": {
+          "true": {
+            "label": "Yes",
+            "icon": "check",
+            "color": "green"
+          },
+          "false": {
+            "label": "No",
+            "icon": "x",
+            "color": "red"
+          }
+        },
         "explanation": "Phishers often spoof familiar-looking addresses.",
         "tips": [
           "Check the sender’s address carefully",
@@ -472,153 +477,120 @@
         "fontSize": "text-sm",
         "fontWeight": "font-medium"
       }
-    },
-    "texts": {
-      "question": "Question",
-      "nextQuestion": "Next Question",
-      "retryQuestion": "Retry",
-      "quizCompleted": "Quiz Completed! 🎉",
-      "correctAnswer": "Correct! 🎉",
-      "wrongAnswer": "Incorrect",
-      "attemptsLeft": "attempts left",
-      "noAttemptsLeft": "no attempts left",
-      "checkAnswer": "Check Answer",
-      "evaluating": "Evaluating...",
-      "completeEvaluation": "Complete Evaluation",
-      "mobileInstructions": "📱 Mobile: select the item, then tap a category",
-      "desktopInstructions": "🖥️ Desktop: drag items into categories",
-      "options": "Options",
-      "categories": "Categories",
-      "tapHere": "Tap here",
-      "checkAnswerButton": "Check Answer",
-      "explanation": "Explanation",
-      "tips": "💡 Tips",
-      "mobileHint": "💡 Read questions carefully for best experience",
-      "previousQuestion": "Previous Question",
-      "quizCompletionHint": "Finish the quiz to continue",
-      "achievementNotification": "Achievement Unlocked! 🎉",
-      "scrollHint": "Scroll down",
-      "nextSection": "Next Section",
-      "loading": "Loading...",
-      "questionLoading": "Loading question...",
-      "transcriptLoading": "Loading transcript...",
-      "closeNotification": "Close notification",
-      "languageNotFound": "Language not found"
+    }
+  },
+  "texts": {
+    "question": "Question",
+    "nextQuestion": "Next Question",
+    "retryQuestion": "Retry",
+    "quizCompleted": "Quiz Completed! 🎉",
+    "correctAnswer": "Correct! 🎉",
+    "wrongAnswer": "Incorrect",
+    "attemptsLeft": "attempts left",
+    "noAttemptsLeft": "no attempts left",
+    "checkAnswer": "Check Answer",
+    "evaluating": "Evaluating...",
+    "completeEvaluation": "Complete Evaluation",
+    "mobileInstructions": "📱 Mobile: select the item, then tap a category",
+    "desktopInstructions": "🖥️ Desktop: drag items into categories",
+    "options": "Options",
+    "categories": "Categories",
+    "tapHere": "Tap here",
+    "checkAnswerButton": "Check Answer",
+    "explanation": "Explanation",
+    "tips": "💡 Tips",
+    "mobileHint": "💡 Read questions carefully for best experience",
+    "previousQuestion": "Previous Question",
+    "quizCompletionHint": "Finish the quiz to continue",
+    "achievementNotification": "Achievement Unlocked! 🎉",
+    "scrollHint": "Scroll down",
+    "nextSection": "Next Section",
+    "loading": "Loading...",
+    "questionLoading": "Loading question...",
+    "transcriptLoading": "Loading transcript...",
+    "closeNotification": "Close notification",
+    "languageNotFound": "Language not found"
+  }
+},
+ "surveySceneConfig": {
+  "texts": {
+    "title": "Training Evaluation",
+    "ratingQuestion": "How would you rate this training?",
+    "topicsQuestion": "Which topics would you like to learn in more detail?",
+    "feedbackQuestion": "Additional feedback:",
+    "feedbackPlaceholder": "Share your experience...",
+    "submitButton": "Submit",
+    "submittingText": "Submitting...",
+    "ratingRequiredText": "Please provide a rating",
+    "dataSecurityNotice": "Your data is securely protected",
+    "successTitle": "Thank you!",
+    "successMessage1": "Thank you for your feedback.",
+    "successMessage2": "Your evaluation will help us improve our trainings.",
+    "successMessage3": "Continue enhancing your security awareness!",
+    "thankYouMessage": "Stay secure! 🛡️"
+  },
+  "topics": [
+    "SMS Security",
+    "Email Security",
+    "Password Management",
+    "Two-Factor Authentication",
+    "Social Engineering",
+    "Network Security",
+    "Mobile Security",
+    "Data Protection"
+  ],
+  "icon": {
+    "name": "clipboard-list",
+    "size": 48,
+    "color": "text-blue-500 dark:text-blue-400",
+    "isActive": true,
+    "isCompleted": false
+  },
+  "styling": {
+    "successCard": {
+      "backgroundColor": "bg-green-50 dark:bg-green-900/20",
+      "borderColor": "border-green-200 dark:border-green-600",
+      "iconColor": "text-green-600 dark:text-green-400",
+      "textColor": "text-green-800 dark:text-green-200"
     }
   }
 },
-  "surveySceneConfig": {
-    "texts": {
-      "title": "Eğitim Değerlendirmesi",
-      "ratingQuestion": "Bu eğitimi nasıl değerlendirirsiniz?",
-      "topicsQuestion": "Hangi konuları daha detaylı öğrenmek istersiniz?",
-      "feedbackQuestion": "Ek geri bildirimleriniz:",
-      "feedbackPlaceholder": "Deneyiminizi paylaşın...",
-      "submitButton": "Gönder",
-      "submittingText": "Gönderiliyor...",
-      "ratingRequiredText": "Lütfen bir değerlendirme yapın",
-      "dataSecurityNotice": "Verileriniz güvenle korunmaktadır",
-      "successTitle": "Teşekkürler!",
-      "successMessage1": "Geri bildiriminiz için teşekkür ederiz.",
-      "successMessage2": "Değerlendirmeniz eğitimlerimizi geliştirmemize yardımcı olacak.",
-      "successMessage3": "Güvenlik farkındalığınızı artırmaya devam edin!",
-      "thankYouMessage": "Güvenli kalın! 🛡️"
-    },
-    "topics": [
-      "SMS Güvenliği",
-      "E-posta Güvenliği",
-      "Parola Yönetimi",
-      "İki Faktörlü Doğrulama",
-      "Sosyal Mühendislik",
-      "Ağ Güvenliği",
-      "Mobil Güvenlik",
-      "Veri Koruma"
-    ],
-    "icon": {
-      "name": "clipboard-list",
-      "size": 48,
-      "color": "#3b82f6",
-      "isActive": true,
-      "isCompleted": false
-    },
-    "styling": {
-      "container": {
-        "backgroundColor": "bg-white/80 dark:bg-gray-800/80",
-        "borderColor": "border-gray-200/60 dark:border-gray-600/60",
-        "borderRadius": "rounded-xl",
-        "padding": "p-6",
-        "shadow": "shadow-lg"
-      },
-      "rating": {
-        "starColor": "text-yellow-500",
-        "starSize": "w-8 h-8",
-        "hoverColor": "text-yellow-400"
-      },
-      "topics": {
-        "checkboxColor": "text-blue-600",
-        "textColor": "text-gray-700 dark:text-gray-300",
-        "hoverColor": "hover:bg-blue-50 dark:hover:bg-blue-900/20"
-      },
-      "feedback": {
-        "backgroundColor": "bg-gray-50 dark:bg-gray-700",
-        "borderColor": "border-gray-300 dark:border-gray-600",
-        "textColor": "text-gray-900 dark:text-gray-100",
-        "placeholderColor": "placeholder-gray-500 dark:placeholder-gray-400"
-      },
-      "submitButton": {
-        "backgroundColor": "bg-blue-600 hover:bg-blue-700",
-        "textColor": "text-white",
-        "disabledColor": "bg-gray-400",
-        "borderRadius": "rounded-lg",
-        "padding": "px-6 py-3"
-      },
-      "successCard": {
-        "backgroundColor": "bg-green-50 dark:bg-green-900/20",
-        "borderColor": "border-green-200 dark:border-green-600",
-        "iconColor": "text-green-600 dark:text-green-400",
-        "textColor": "text-green-800 dark:text-green-200"
-      }
-    }
+"summarySceneConfig": {
+  "texts": {
+    "title": "You’re More Secure Now!",
+    "subtitle": "Time to share this knowledge with your team and start applying it",
+    "achievementsTitle": "What You’ve Learned:",
+    "progressMessage": "Your security level increased by 85%!"
   },
-  "summarySceneConfig": {
-    "texts": {
-      "title": "Artık Daha Güvenlisiniz!",
-      "subtitle": "Bu bilgileri ekibinizle paylaşma ve uygulamaya başlama zamanı",
-      "achievementsTitle": "Öğrendikleriniz:",
-      "progressMessage": "Güvenlik seviyeniz %85 arttı!"
-    },
-    "achievements": [
-      "Güçlü parola oluşturma teknikleri",
-      "2FA kurulumu ve önemi",
-      "Parola yöneticisi kullanımı",
-      "Phishing saldırılarını tanıma"
-    ],
-    "icon": {
-      "name": "award",
-      "size": 48,
-      "color": "text-yellow-500 dark:text-yellow-400"
-    },
-    "styling": {
-      "container": {
-        "padding": "p-6",
-        "borderRadius": "rounded-2xl",
-        "backgroundColor": "bg-white/90 dark:bg-gray-800/80",
-        "borderColor": "border-gray-200/60 dark:border-gray-600/60",
-        "shadow": "shadow-xl"
-      },
-      "achievements": {
-        "iconColor": "from-green-500 to-emerald-600",
-        "textColor": "text-gray-800 dark:text-gray-200",
-        "hoverColor": "hover:text-gray-900 dark:hover:text-white"
-      },
-      "progressCard": {
-        "backgroundColor": "from-green-100/80 to-emerald-100/80 dark:from-green-900/40 dark:to-emerald-900/40",
-        "borderColor": "border-green-300/60 dark:border-green-600/60",
-        "iconColor": "text-green-600 dark:text-green-400",
-        "textColor": "text-green-800 dark:text-green-200"
-      }
-    }
+  "achievements": [
+    "Strong password creation techniques",
+    "2FA setup and importance",
+    "Using a password manager",
+    "Recognizing phishing attacks"
+  ],
+  "icon": {
+    "name": "award",
+    "size": 48,
+    "color": "text-yellow-500 dark:text-yellow-400"
   },
+  "styling": {
+    "container": {
+      "backgroundColor": "bg-white/90 dark:bg-gray-800/80",
+      "borderColor": "border-gray-200/60 dark:border-gray-600/60"
+    },
+    "achievements": {
+      "iconColor": "from-green-500 to-emerald-600",
+      "textColor": "text-gray-800 dark:text-gray-200",
+      "hoverColor": "hover:text-gray-900 dark:hover:text-white"
+    },
+    "progressCard": {
+      "backgroundColor": "from-green-100/80 to-emerald-100/80 dark:from-green-900/40 dark:to-emerald-900/40",
+      "borderColor": "border-green-300/60 dark:border-green-600/60",
+      "iconColor": "text-green-600 dark:text-green-400",
+      "textColor": "text-green-800 dark:text-green-200"
+    }
+  }
+},
   "nudgeSceneConfig": {
     "texts": {
       "completionTitle": "🎉 Tebrikler! Eğitimi Tamamladınız",

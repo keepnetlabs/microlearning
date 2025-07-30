@@ -7,12 +7,7 @@ interface SummarySceneProps {
 }
 
 export function SummaryScene({ config }: SummarySceneProps) {
-  const achievements = config.achievements || [
-    "Güçlü parola oluşturma teknikleri",
-    "2FA kurulumu ve önemi",
-    "Parola yöneticisi kullanımı",
-    "Phishing saldırılarını tanıma"
-  ];
+  const achievements = config.achievements || [];
 
   // Dinamik icon mapping function (diğer componentlerle aynı)
   const getIconComponent = (iconName?: string): LucideIcon => {
@@ -58,7 +53,7 @@ export function SummaryScene({ config }: SummarySceneProps) {
         {config.texts?.subtitle || "Bu bilgileri ekibinizle paylaşma ve uygulamaya başlama zamanı"}
       </p>
 
-      <div className={`relative ${config.styling?.container?.padding || 'p-6'} ${config.styling?.container?.borderRadius || 'rounded-2xl'} ${config.styling?.container?.backgroundColor || 'bg-white/90 dark:bg-gray-800/80'} backdrop-blur-xl border ${config.styling?.container?.borderColor || 'border-gray-200/60 dark:border-gray-600/60'} ${config.styling?.container?.shadow || 'shadow-xl'} max-w-md w-full`}>
+      <div className={`relative p-6 rounded-2xl ${config.styling?.container?.backgroundColor || 'bg-white/90 dark:bg-gray-800/80'} backdrop-blur-xl border ${config.styling?.container?.borderColor || 'border-gray-200/60 dark:border-gray-600/60'} shadow-xl max-w-md w-full`}>
         <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent dark:from-gray-800/20 dark:to-transparent rounded-2xl"></div>
         <div className="relative z-10 space-y-4">
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">

@@ -7,7 +7,7 @@ import {
   Move,
   Zap,
   X,
-  Undo2,
+  Undo2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "../ui/button";
@@ -53,6 +53,18 @@ interface TrueFalseQuestion extends BaseQuestion {
   type: QuestionType.TRUE_FALSE;
   statement: string;
   correctAnswer: boolean;
+  options?: {
+    true: {
+      label: string;
+      icon: string; // Lucide icon name
+      color: string;
+    };
+    false: {
+      label: string;
+      icon: string; // Lucide icon name
+      color: string;
+    };
+  };
 }
 
 interface MultiSelectQuestion extends BaseQuestion {
@@ -696,10 +708,19 @@ export const QuizScene = React.memo(function QuizScene({
     const question = currentQuestion as TrueFalseQuestion;
     const userAnswer = currentAnswer;
 
-    const options = [
-      { value: true, label: "Doğru", icon: "✓" },
-      { value: false, label: "Yanlış", icon: "✗" },
+    // Default options if not provided in config
+    const defaultOptions = [
+      { value: true, label: "Doğru", icon: "check", color: "green" },
+      { value: false, label: "Yanlış", icon: "x", color: "red" },
     ];
+
+    // Use config options if available, otherwise use defaults
+    const options = question.options ? [
+      { value: true, label: question.options.true.label, icon: question.options.true.icon, color: question.options.true.color },
+      { value: false, label: question.options.false.label, icon: question.options.false.icon, color: question.options.false.color },
+    ] : defaultOptions;
+
+
 
     return (
       <div className="space-y-2.5">
@@ -794,9 +815,7 @@ export const QuizScene = React.memo(function QuizScene({
                       `
                     }}
                   >
-                    <span className={`text-2xl ${option.value ? 'text-green-600' : 'text-red-500'}`}>
-                      {option.icon}
-                    </span>
+                    {renderTrueFalseIcon(option.icon, option.value)}
                   </div>
 
                   <div
@@ -841,10 +860,6 @@ export const QuizScene = React.memo(function QuizScene({
 
     return (
       <div className="space-y-2.5">
-        <div className="text-center text-sm text-muted-foreground">
-          En az {question.minCorrect} seçenek seçiniz
-        </div>
-
         <div className="space-y-1.5">
           {question.options.map((option, index) => {
             const isSelected = multiSelectAnswers.includes(
@@ -1542,7 +1557,12 @@ export const QuizScene = React.memo(function QuizScene({
   }, [currentQuestion?.type, renderMultipleChoice, renderTrueFalse, renderMultiSelect, renderSliderScale, renderDragDrop]);
 
   const isAnswerCorrect = useMemo(() =>
-    currentAnswer ? validateAnswer(currentAnswer) : false,
+    {
+      if(currentQuestion?.type === QuestionType.TRUE_FALSE){
+        return currentAnswer === currentQuestion.correctAnswer;
+      }
+      return currentAnswer ? validateAnswer(currentAnswer) : false;
+    },
     [currentAnswer, validateAnswer]
   );
 
@@ -1674,6 +1694,18 @@ export const QuizScene = React.memo(function QuizScene({
     }
     return LucideIcons.HelpCircle;
   };
+
+  const renderTrueFalseIcon = (iconName: string, isTrue: boolean) => {
+    const IconComponent = getIconComponent(iconName);
+    return (
+      <IconComponent 
+        className={`w-6 h-6 ${isTrue ? 'text-green-600' : 'text-red-500'}`}
+        strokeWidth={2}
+      />
+    );
+  };
+
+
 
   const iconConfig = config.icon || {};
   let iconNode: React.ReactNode = null;

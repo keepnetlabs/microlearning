@@ -2,16 +2,16 @@ import { useState } from "react";
 import { Star, CheckCircle, Send, LucideIcon } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { motion } from "framer-motion";
-import { SurveySceneConfig, surveySceneConfig } from "../configs/educationConfigs";
+import { SurveySceneConfig } from "../configs/educationConfigs";
 
 interface SurveySceneProps {
-  config?: SurveySceneConfig;
+  config: SurveySceneConfig;
   onSurveySubmitted?: () => void;
   isSubmitted?: boolean;
 }
 
 export function SurveyScene({
-  config = surveySceneConfig,
+  config,
   onSurveySubmitted,
   isSubmitted: propIsSubmitted
 }: SurveySceneProps) {
@@ -21,12 +21,7 @@ export function SurveyScene({
   const [isSubmitted, setIsSubmitted] = useState(propIsSubmitted || false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const topics = config.topics || [
-    "Parola yöneticisi kullanımı",
-    "Çok faktörlü kimlik doğrulama",
-    "Phishing saldırılarından korunma",
-    "Kurumsal güvenlik politikaları"
-  ];
+  const topics = config.topics || [];
 
   // Dinamik icon mapping function (diğer componentlerle aynı)
   const getIconComponent = (iconName?: string): LucideIcon => {
@@ -134,7 +129,7 @@ export function SurveyScene({
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="mb-4 relative"
+        className="mb-1 sm:mb-2 relative"
       >
         <div className="relative p-3 rounded-2xl mx-auto w-fit">
           <div className="absolute inset-0 rounded-2xl"></div>
@@ -158,7 +153,7 @@ export function SurveyScene({
         initial={{ opacity: 0, y: 40, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.8, delay: 0.4 }}
-        className={`relative rounded-2xl backdrop-blur-xl border shadow-xl max-w-xs sm:max-w-md w-full space-y-2 ${config.styling?.container?.padding || 'p-4 sm:p-6'} ${config.styling?.container?.backgroundColor ? `bg-[${config.styling.container.backgroundColor}]` : 'bg-white/60 dark:bg-gray-800/80'} ${config.styling?.container?.borderColor ? `border-[${config.styling.container.borderColor}]` : 'border-white/30 dark:border-gray-600/60'}`}
+        className={`relative rounded-2xl backdrop-blur-xl border shadow-xl max-w-xs sm:max-w-md w-full space-y-2 p-4 sm:p-6 bg-white/60 dark:bg-gray-800/80 border-white/30 dark:border-gray-600/60`}
       >
         <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent dark:from-gray-800/20 dark:to-transparent rounded-2xl"></div>
         <div className="relative z-10 space-y-4 ">
@@ -174,13 +169,13 @@ export function SurveyScene({
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => setRating(star)}
-                  className={`p-2 rounded-xl transition-all backdrop-blur-sm ${config.styling?.rating?.hoverColor || 'hover:bg-white/40 dark:hover:bg-gray-700/50'}`}
+                  className={`p-2 rounded-xl transition-all backdrop-blur-sm hover:bg-white/40 dark:hover:bg-gray-700/50`}
                   style={{ touchAction: 'manipulation' }}
                 >
                   <Star
-                    size={parseInt(config.styling?.rating?.starSize || '20')}
+                    size={'20'}
                     className={`${star <= rating
-                      ? `${config.styling?.rating?.starColor || 'text-yellow-400'} fill-current drop-shadow-sm`
+                      ? `text-yellow-400 fill-current drop-shadow-sm`
                       : "text-gray-300 dark:text-gray-500"
                       } transition-all duration-200`}
                   />
@@ -202,13 +197,13 @@ export function SurveyScene({
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.6 + index * 0.1 }}
                   onClick={() => handleTopicToggle(index)}
-                  className={`w-full flex items-center text-sm group cursor-pointer p-1 rounded-lg transition-all ${config.styling?.topics?.hoverColor || 'hover:bg-white/30 dark:hover:bg-gray-700/40'}`}
+                  className={`w-full flex items-center text-sm group cursor-pointer p-1 rounded-lg transition-all hover:bg-white/30 dark:hover:bg-gray-700/40`}
                   style={{ touchAction: 'manipulation' }}
                 >
                   <div className="relative mr-3">
                     {/* Custom Checkbox */}
                     <div className={`w-4 h-4 rounded border-2 transition-all duration-200 flex items-center justify-center ${selectedTopics.includes(index)
-                      ? config.styling?.topics?.checkboxColor || 'bg-blue-500 border-blue-500'
+                      ? 'bg-blue-500 border-blue-500'
                       : 'bg-white/70 dark:bg-gray-600/70 border-gray-300 dark:border-gray-500 hover:border-blue-400 dark:hover:border-blue-400'
                       }`}>
                       {selectedTopics.includes(index) && (
@@ -222,7 +217,7 @@ export function SurveyScene({
                       )}
                     </div>
                   </div>
-                  <span className={`group-hover:text-gray-900 dark:group-hover:text-white transition-colors text-left flex-1 ${config.styling?.topics?.textColor || 'text-gray-700 dark:text-gray-200'}`}>
+                  <span className={`group-hover:text-gray-900 dark:group-hover:text-white transition-colors text-left flex-1 text-gray-700 dark:text-gray-200`}>
                     {topic}
                   </span>
                 </motion.button>
@@ -240,7 +235,7 @@ export function SurveyScene({
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
                 placeholder={config.texts?.feedbackPlaceholder || "İyileştirme önerilerinizi paylaşın..."}
-                className={`w-full h-20 p-3 sm:p-4 border rounded-xl text-sm resize-none backdrop-blur-sm focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 transition-all focus:outline-none ${config.styling?.feedback?.backgroundColor || 'bg-white/80 dark:bg-gray-700/60'} ${config.styling?.feedback?.borderColor || 'border-gray-200 dark:border-gray-600/50'} ${config.styling?.feedback?.textColor || 'text-gray-900 dark:text-white'} ${config.styling?.feedback?.placeholderColor || 'placeholder-gray-500 dark:placeholder-gray-400'} focus:bg-white/90 dark:focus:bg-gray-600/70 focus:border-blue-300/50 dark:focus:border-blue-400/50`}
+                className={`w-full h-20 p-3 sm:p-4 border rounded-xl text-sm resize-none backdrop-blur-sm focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 transition-all focus:outline-none bg-white/80 dark:bg-gray-700/60 border-gray-200 dark:border-gray-600/50 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:bg-white/90 dark:focus:bg-gray-600/70 focus:border-blue-300/50 dark:focus:border-blue-400/50`}
                 style={{ touchAction: 'manipulation' }}
               />
               <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-xl pointer-events-none"></div>
@@ -254,9 +249,9 @@ export function SurveyScene({
               whileTap={{ scale: rating > 0 ? 0.98 : 1 }}
               onClick={handleSubmit}
               disabled={rating === 0 || isSubmitting}
-              className={`w-full transition-all font-medium text-sm flex items-center justify-center space-x-2 ${config.styling?.submitButton?.padding || 'py-3'} ${config.styling?.submitButton?.borderRadius || 'rounded-xl'} ${rating > 0 && !isSubmitting
-                ? `${config.styling?.submitButton?.backgroundColor || 'bg-gradient-to-r from-blue-500 to-indigo-600'} ${config.styling?.submitButton?.textColor || 'text-white'} hover:from-blue-600 hover:to-indigo-700 shadow-lg hover:shadow-xl`
-                : `${config.styling?.submitButton?.disabledColor || 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'} cursor-not-allowed`
+              className={`w-full transition-all font-medium text-sm flex items-center justify-center space-x-2 py-3 rounded-xl ${rating > 0 && !isSubmitting
+                ? `bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-lg hover:shadow-xl`
+                : `bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed`
                 }`}
               style={{ touchAction: 'manipulation' }}
             >

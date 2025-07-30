@@ -1613,14 +1613,9 @@ export default function App() {
 
                       {/* Other scenes */}
                       {currentScene !== 4 && (
-                        currentScene === 5 ? (
-                          <SurveyScene
-                            onSurveySubmitted={handleSurveySubmitted}
-                            isSubmitted={isSurveySubmitted}
-                          />
-                        ) : (
-                          <CurrentSceneComponent config={currentSceneConfig} />
-                        )
+                        <CurrentSceneComponent config={currentSceneConfig}                             
+                        onSurveySubmitted={handleSurveySubmitted}
+                        isSubmitted={isSurveySubmitted} />
                       )}
                     </motion.div>
                   </div>
