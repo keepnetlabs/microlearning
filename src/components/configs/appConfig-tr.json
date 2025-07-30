@@ -175,7 +175,6 @@
         "sceneIconName": "play-circle",
         "className": "text-blue-500"
       },
-      "videoContainerClassName": "w-full max-w-sm sm:max-w-md lg:max-w-lg mb-6 sm:mb-8",
     "animations": {
       "headerIcon": {
         "initial": { "opacity": 0, "scale": 0.8, "y": -20 },
@@ -245,7 +244,6 @@
       "iconSize": 12,
       "bgColorType": "blue"
     },
-    "containerClassName": "flex flex-col items-center justify-center h-full px-6",
     "cardSpacing": "space-y-4",
     "maxWidth": "max-w-md w-full",
     "glassEffect": {

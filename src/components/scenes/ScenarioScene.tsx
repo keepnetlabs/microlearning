@@ -125,8 +125,9 @@ interface ScenarioSceneProps {
 export function ScenarioScene({
   config,
 }: ScenarioSceneProps) {
-  // Default values for removed config properties
-  const defaultContainerClassName = "flex flex-col items-center justify-start h-full px-4 py-4 sm:px-6 overflow-y-auto";
+  // Default values for container classes
+  const defaultContainerClassName = "flex flex-col items-center justify-start h-full px-4 sm:px-6 overflow-y-auto";
+  const defaultVideoContainerClassName = "w-full max-w-sm sm:max-w-md lg:max-w-lg mb-2 sm:mb-4";
 
   const [transcriptData, setTranscriptData] = useState<string>('');
   const [isLoadingTranscript, setIsLoadingTranscript] = useState(false);
@@ -266,7 +267,7 @@ export function ScenarioScene({
           initial={config.animations?.videoPlayer?.initial || { opacity: 0, y: 40, scale: 0.95 }}
           animate={config.animations?.videoPlayer?.animate || { opacity: 1, y: 0, scale: 1 }}
           transition={config.animations?.videoPlayer?.transition || { duration: 0.8, delay: 0.4 }}
-          className={config.videoContainerClassName || "w-full max-w-sm sm:max-w-md lg:max-w-lg mb-6 sm:mb-8"}
+          className={config.videoContainerClassName || defaultVideoContainerClassName}
         >
           <VideoPlayer
             src={config.video.src}

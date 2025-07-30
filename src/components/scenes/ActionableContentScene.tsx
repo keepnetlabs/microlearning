@@ -38,7 +38,6 @@ interface ActionableContentSceneConfig {
   tipConfig: TipConfig;
 
   // Layout configuration
-  containerClassName: string;
   cardSpacing: string;
   maxWidth: string;
 
@@ -212,13 +211,14 @@ const getTipIconColorClass = (bgColorType: ColorType): string => {
 export function ActionableContentScene({
   config = educationConfigs.smishing.actionableContentSceneConfig
 }: ActionableContentSceneProps) {
+  // Default values for container classes
+  const defaultContainerClassName = "flex flex-col items-center justify-center h-full px-6";
 
   const {
     title,
     actions,
     icon,
     tipConfig,
-    containerClassName,
     cardSpacing,
     maxWidth,
     glassEffect
@@ -243,11 +243,10 @@ export function ActionableContentScene({
   }, [tipConfig.iconName, tipConfig.iconSize]);
 
   return (
-    <div className={containerClassName}>
+    <div className={defaultContainerClassName}>
       <div className="mb-2 sm:mb-3">
         {sceneIconComponent}
       </div>
-
       <h1 className="text-xl mb-2 sm:mb-3 text-center text-gray-900 dark:text-white">
         {title}
       </h1>

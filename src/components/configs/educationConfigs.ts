@@ -145,7 +145,6 @@ const smishingGoalConfig = {
         sceneIconName: "target",
         className: "text-red-500"
     },
-    containerClassName: "flex flex-col items-center justify-center h-full text-center px-6",
     cardSpacing: "space-y-4",
     maxWidth: "max-w-md w-full",
     glassEffect: {
@@ -261,9 +260,6 @@ const passwordSecurityIntroConfig = {
         }
     },
 
-    // Layout
-    containerClassName: "flex flex-col items-center justify-center h-full text-center relative font-['Open_Sans'] overflow-hidden px-2 sm:px-4",
-
     // Animation delays
     animationDelays: {
         welcomeDelay: 1.5,
@@ -307,7 +303,6 @@ const passwordSecurityGoalConfig = {
         sceneIconName: "shield",
         className: "text-blue-500"
     },
-    containerClassName: "flex flex-col items-center justify-center h-full text-center px-6",
     cardSpacing: "space-y-4",
     maxWidth: "max-w-md w-full",
     glassEffect: {
@@ -423,9 +418,6 @@ const socialEngineeringIntroConfig = {
         }
     },
 
-    // Layout
-    containerClassName: "flex flex-col items-center justify-center h-full text-center relative font-['Open_Sans'] overflow-hidden px-2 sm:px-4",
-
     // Animation delays
     animationDelays: {
         welcomeDelay: 0.8,
@@ -469,7 +461,6 @@ const socialEngineeringGoalConfig = {
         sceneIconName: "users",
         className: "text-purple-500"
     },
-    containerClassName: "flex flex-col items-center justify-center h-full text-center px-6",
     cardSpacing: "space-y-4",
     maxWidth: "max-w-md w-full",
     glassEffect: {
@@ -555,10 +546,6 @@ const passwordSecurityScenarioConfig = {
         sceneIconName: "play-circle",
         className: "text-blue-500"
     },
-
-    // Layout Configuration
-    containerClassName: "flex flex-col items-center justify-start h-full px-4 py-4 sm:px-6 overflow-y-auto",
-    videoContainerClassName: "w-full max-w-sm sm:max-w-md lg:max-w-lg mb-6 sm:mb-8",
 
     // Animation Configuration
     animations: {
@@ -662,10 +649,6 @@ const socialEngineeringScenarioConfig = {
         className: "text-purple-500"
     },
 
-    // Layout Configuration
-    containerClassName: "flex flex-col items-center justify-start h-full px-4 py-4 sm:px-6 overflow-y-auto",
-    videoContainerClassName: "w-full max-w-sm sm:max-w-md lg:max-w-lg mb-6 sm:mb-8",
-
     // Animation Configuration
     animations: {
         headerIcon: {
@@ -741,7 +724,6 @@ const smishingActionableContentConfig = {
     },
 
     // Layout configuration
-    containerClassName: "flex flex-col items-center justify-center h-full px-6",
     cardSpacing: "space-y-4",
     maxWidth: "max-w-md w-full",
 
@@ -797,7 +779,6 @@ const passwordSecurityActionableContentConfig = {
     },
 
     // Layout configuration
-    containerClassName: "flex flex-col items-center justify-center h-full px-6",
     cardSpacing: "space-y-4",
     maxWidth: "max-w-md w-full",
 
@@ -853,7 +834,6 @@ const socialEngineeringActionableContentConfig = {
     },
 
     // Layout configuration
-    containerClassName: "flex flex-col items-center justify-center h-full px-6",
     cardSpacing: "space-y-4",
     maxWidth: "max-w-md w-full",
 

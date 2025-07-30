@@ -415,7 +415,24 @@ html {
     0 2px 8px rgba(59, 130, 246, 0.4),
     0 0 0 3px rgba(59, 130, 246, 0.5);
 }
+.plyr--video{
+  border-radius: 8px;
+}
 
+/* Plyr container border-radius override */
+.plyr {
+  border-radius: 8px !important;
+  overflow: hidden !important;
+}
+
+.plyr__video-wrapper {
+  border-radius: 8px !important;
+  overflow: hidden !important;
+}
+
+.plyr__video {
+  border-radius: 8px !important;
+}
 /* PLYR PROGRESS BAR DISABLE STYLES - For Educational Content */
 .plyr--video.plyr--disable-seek .plyr__progress {
   pointer-events: none !important;

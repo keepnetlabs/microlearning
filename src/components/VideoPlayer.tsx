@@ -443,6 +443,7 @@ export function VideoPlayer({
           "captions",
           "fullscreen",
         ],
+        settings: ["captions"],
         captions: {
           active: true,
           update: true,
@@ -656,10 +657,10 @@ export function VideoPlayer({
       style={containerStyle}
     >
       {/* Video Player */}
-      <div style={videoContainerStyle}>
+      <div style={videoContainerStyle} className="rounded-lg overflow-hidden">
         <video
           ref={videoRef}
-          className={`plyr-react plyr ${disableForwardSeek ? "plyr--disable-seek" : ""}`}
+          className={`plyr-react plyr rounded-lg ${disableForwardSeek ? "plyr--disable-seek" : ""}`}
           controls
           poster={poster}
           style={videoStyle}
@@ -713,7 +714,7 @@ export function VideoPlayer({
           }}
         >
           <div
-            className="relative overflow-hidden"
+            className="relative overflow-hidden dark:bg-gradient-to-br dark:from-slate-800/85 dark:via-slate-700/75 dark:to-slate-600/80 dark:border-slate-400/40 dark:shadow-[0_8px_32px_rgba(0,0,0,0.3),0_4px_16px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.05)]"
             style={transcriptPanelStyle}
           >
             {/* Noise texture */}
@@ -735,10 +736,10 @@ export function VideoPlayer({
             <div className="relative z-10 px-4 py-3 border-b border-slate-200/50 dark:border-slate-600/30">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <div className="p-1.5 rounded-lg bg-blue-50/80 dark:bg-blue-900/40 border border-blue-200/50 dark:border-blue-700/50">
-                    <FileText className="w-3.5 h-3.5 text-blue-600 dark:text-blue-300" />
+                  <div className="p-2 rounded-lg bg-blue-50/90 dark:bg-blue-900/60 border border-blue-200/60 dark:border-blue-600/60 shadow-sm">
+                    <FileText className="w-4 h-4 text-blue-600 dark:text-blue-200" />
                   </div>
-                  <h3 className="text-sm font-medium text-foreground">
+                  <h3 className="text-sm font-medium text-slate-900 dark:text-slate-100">
                     {transcriptTitle}
                   </h3>
                 </div>
@@ -781,16 +782,18 @@ export function VideoPlayer({
                         ? "rgba(226, 232, 240, 0.3)"
                         : "rgba(156, 163, 175, 0.08)",
                     }}
-                    className={`transition-all duration-200 mx-3 my-1 rounded-lg ${canAccess
-                      ? "cursor-pointer"
-                      : "cursor-not-allowed"
-                      }`}
+                    className={`transition-all duration-200 mx-3 my-1 rounded-lg ${
+                      canAccess
+                        ? "cursor-pointer"
+                        : "cursor-not-allowed"
+                    } ${
+                      isActive
+                        ? "border border-gray-300/50 dark:border-slate-500/50"
+                        : "border border-transparent"
+                    }`}
                     style={{
                       padding: "8px 12px",
                       backgroundColor: "transparent",
-                      border: isActive
-                        ? "1px solid rgba(156, 163, 175, 0.5)"
-                        : "1px solid transparent",
                       opacity: canAccess ? 1 : 0.5,
                     }}
                   >
@@ -798,13 +801,14 @@ export function VideoPlayer({
                       {/* Timestamp */}
                       <div className="flex-shrink-0">
                         <span
-                          className="font-medium transition-colors duration-200"
-                          style={{
-                            color: isActive
-                              ? "rgb(102, 102, 102)" // Orta gri - nötr
+                          className={`font-medium transition-colors duration-200 text-xs ${
+                            isActive
+                              ? "text-gray-600 dark:text-slate-300"
                               : canAccess
-                                ? "rgb(102, 102, 102)" // Orta gri - nötr
-                                : "rgb(156, 163, 175)", // Açık gri - disable durumu
+                                ? "text-gray-600 dark:text-slate-300"
+                                : "text-gray-400 dark:text-slate-500"
+                          }`}
+                          style={{
                             fontSize: "12px",
                             fontWeight: "500",
                           }}
@@ -832,14 +836,15 @@ export function VideoPlayer({
                           </div>
 
                           <p
-                            className="leading-relaxed transition-colors duration-200"
+                            className={`leading-relaxed transition-colors duration-200 ${
+                              isActive
+                                ? "text-black dark:text-slate-100"
+                                : canAccess
+                                  ? "text-gray-700 dark:text-slate-200"
+                                  : "text-gray-400 dark:text-slate-500"
+                            }`}
                             style={{
                               fontSize: "13px",
-                              color: isActive
-                                ? "rgb(0, 0, 0)" // Siyah - yüksek kontrast
-                                : canAccess
-                                  ? "rgb(51, 51, 51)" // Koyu gri - WCAG uyumlu
-                                  : "rgb(156, 163, 175)", // Açık gri - disable durumu
                               lineHeight: "1.4",
                               fontWeight: "400",
                             }}

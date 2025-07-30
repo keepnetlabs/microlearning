@@ -11,7 +11,7 @@ import { QuizScene } from "./components/scenes/QuizScene";
 import { SurveyScene } from "./components/scenes/SurveyScene";
 import { SummaryScene } from "./components/scenes/SummaryScene";
 import { NudgeScene } from "./components/scenes/NudgeScene";
-import { ChevronDown, Search, Loader2, ChevronDown as ChevronDownIcon, Star, X, Moon, Sun, Award } from "lucide-react";
+import { ChevronDown, Search, Loader2, ChevronDown as ChevronDownIcon, Star, X, Moon, Sun, Award, ChevronUp } from "lucide-react";
 import ReactCountryFlag from "react-country-flag";
 import { getCountryCode, getSearchPlaceholder, detectBrowserLanguage, useIsMobile, priorityLanguages, languages } from "./utils/languageUtils";
 import { loadAppConfig, createConfigChangeEvent } from "./components/configs/appConfigLoader";
@@ -335,6 +335,7 @@ export default function App() {
   const [pointsAwardedScenes, setPointsAwardedScenes] = useState(new Set<number>());
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
   const [scrollPosition, setScrollPosition] = useState({ top: true, bottom: false });
+  const [showScrollToTop, setShowScrollToTop] = useState(false);
   const [showAchievementNotification, setShowAchievementNotification] = useState(false);
   const [shownAchievements, setShownAchievements] = useState<string[]>([]);
   const [lastAchievementCount, setLastAchievementCount] = useState(0);
@@ -608,9 +609,22 @@ export default function App() {
 
     setScrollPosition({ top: isAtTop, bottom: isAtBottom });
     setShowScrollIndicator(scrollHeight > clientHeight + threshold);
+    
+    // Show scroll-to-top button when scrolled down (mobile only)
+    setShowScrollToTop(scrollTop > 200 && isMobile);
 
     // Update parallax scroll position for background movement
     setScrollY(scrollTop);
+  }, [isMobile]);
+
+  // Scroll to top function
+  const handleScrollToTop = useCallback(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
   }, []);
 
   // Enhanced filtered and sorted languages with priority
@@ -1614,18 +1628,18 @@ export default function App() {
 
                 {/* Enhanced Scroll Indicator */}
                 <AnimatePresence>
-                  {showScrollIndicator && !scrollPosition.bottom && (
+                  {showScrollIndicator && !scrollPosition.bottom && currentScene !== 2 && (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20 pointer-events-none"
+                      className="absolute bottom-4 left-0 right-0 mx-auto z-20 pointer-events-none flex justify-center"
                     >
-                      <div className={`flex items-center space-x-2 px-3 py-2 bg-white/90 dark:bg-gray-900/90 rounded-full border border-white/40 dark:border-gray-600/60 shadow-lg transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-xl'}`}>
-                        <span className="text-xs text-blue-800 dark:text-blue-200 font-medium transition-colors duration-300">
+                      <div className={`flex items-center space-x-2 px-4 py-2.5 bg-white/90 dark:bg-gray-900/90 rounded-full border border-white/40 dark:border-gray-600/60 shadow-lg transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-xl'} min-w-fit`}>
+                        <span className="text-xs text-blue-800 dark:text-blue-200 font-medium transition-colors duration-300 whitespace-nowrap">
                           {themeConfig.texts?.scrollHint}
                         </span>
-                        <ChevronDownIcon size={14} className="text-blue-700 dark:text-blue-300 animate-bounce" style={{ animationDuration: '2s' }} />
+                        <ChevronDownIcon size={14} className="text-blue-700 dark:text-blue-300 animate-bounce flex-shrink-0" style={{ animationDuration: '2s' }} />
                       </div>
                     </motion.div>
                   )}
@@ -1860,6 +1874,29 @@ export default function App() {
           </motion.div>
         </div>
       )}
+
+      {/* Mobile Floating Scroll-to-Top Button */}
+      <AnimatePresence>
+        {showScrollToTop && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="md:hidden fixed bottom-4 right-4 z-[9999]"
+          >
+            <motion.button
+              onClick={handleScrollToTop}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="flex items-center justify-center w-14 h-14 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border border-white/40 dark:border-gray-600/60 rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
+              title="Sayfanın Başına Dön"
+            >
+              <ChevronUp className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Toast Container */}
       <Toaster />
     </div>
