@@ -1748,7 +1748,11 @@ export const QuizScene = React.memo(function QuizScene({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setCurrentQuestionIndex(Math.max(0, currentQuestionIndex - 1))}
+              onClick={() => {
+                setCurrentQuestionIndex(Math.max(0, currentQuestionIndex - 1));
+                setShowResult(false); // Cevabı gizle
+                setIsAnswerLocked(false); // Answer lock'u sıfırla
+              }}
               disabled={currentQuestionIndex === 0}
               className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95"
               style={{
@@ -1777,7 +1781,11 @@ export const QuizScene = React.memo(function QuizScene({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setCurrentQuestionIndex(Math.min(questions.length - 1, currentQuestionIndex + 1))}
+              onClick={() => {
+                setCurrentQuestionIndex(Math.min(questions.length - 1, currentQuestionIndex + 1));
+                setShowResult(false); // Cevabı gizle
+                setIsAnswerLocked(false); // Answer lock'u sıfırla
+              }}
               disabled={currentQuestionIndex === questions.length - 1}
               className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95"
               style={{

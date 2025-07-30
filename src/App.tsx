@@ -610,8 +610,8 @@ export default function App() {
     setScrollPosition({ top: isAtTop, bottom: isAtBottom });
     setShowScrollIndicator(scrollHeight > clientHeight + threshold);
     
-    // Show scroll-to-top button when scrolled down (mobile only)
-    setShowScrollToTop(scrollTop > 200 && isMobile);
+    // Show scroll-to-top button when scrolled down (mobile only) and on video scene
+    setShowScrollToTop(scrollTop > 200 && isMobile && currentScene === 2);
 
     // Update parallax scroll position for background movement
     setScrollY(scrollTop);
