@@ -714,11 +714,8 @@
     },
     "styling": {
       "container": {
-        "padding": "px-4 py-2 sm:px-6",
-        "borderRadius": "rounded-xl",
         "backgroundColor": "bg-white/90 dark:bg-gray-800/80",
-        "borderColor": "border-gray-200/60 dark:border-gray-600/60",
-        "shadow": "shadow-xl"
+        "borderColor": "border-gray-200/60 dark:border-gray-600/60"
       },
       "stats": {
         "backgroundColor": "bg-gradient-to-r from-blue-100 to-indigo-100",

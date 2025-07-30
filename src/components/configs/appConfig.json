@@ -591,144 +591,140 @@
     }
   }
 },
-  "nudgeSceneConfig": {
-    "texts": {
-      "completionTitle": "🎉 Tebrikler! Eğitimi Tamamladınız",
-      "completionSubtitle": "Siber güvenlik bilgilerinizi başarıyla güncellediniz",
-      "achievementsTitle": "Kazandığınız Başarımlar",
-      "actionPlanTitle": "Şimdi Ne Yapmalısınız?",
-      "resourcesTitle": "Ek Kaynaklar",
-      "motivationalTitle": "Siber Güvenlik Yolculuğunuz Devam Ediyor",
-      "motivationalMessage": "Bu eğitimi tamamlayarak organizasyonunuzun güvenliğine önemli bir katkı sağladınız. Öğrendiklerinizi uygulamaya devam edin ve ekibinizi de bilinçlendirin.",
-      "downloadButton": "Sertifikayı İndir",
-      "downloadingText": "İndiriliyor...",
-      "urgentLabel": "Acil"
+"nudgeSceneConfig": {
+  "texts": {
+    "completionTitle": "🎉 Congratulations! You’ve Completed the Training",
+    "completionSubtitle": "You’ve successfully refreshed your cybersecurity knowledge",
+    "achievementsTitle": "Achievements Earned",
+    "actionPlanTitle": "What to Do Next?",
+    "resourcesTitle": "Additional Resources",
+    "motivationalTitle": "Your Cybersecurity Journey Continues",
+    "motivationalMessage": "By completing this training, you’ve made a significant contribution to your organization’s security. Keep applying what you’ve learned and encourage your team to do the same.",
+    "downloadButton": "Download Certificate",
+    "downloadingText": "Downloading...",
+    "urgentLabel": "Urgent"
+  },
+  "immediateActions": [
+    {
+      "iconName": "smartphone",
+      "title": "Do Now",
+      "description": "Download a password manager and add your primary accounts",
+      "priority": "critical",
+      "timeframe": "5 minutes",
+      "gradient": "from-red-500/20 to-pink-500/20",
+      "iconColor": "text-red-600",
+      "bgColor": "bg-red-50/80",
+      "borderColor": "border-red-200/60"
     },
-    "completionData": {
-      "totalPoints": 210,
-      "timeSpent": "8 dakika",
-      "completionDate": "2024-01-15",
-      "achievements": [
-        { "id": "quiz-master", "name": "Quiz Ustası", "iconName": "award", "color": "text-yellow-600" },
-        { "id": "fast-learner", "name": "Hızlı Öğrenen", "iconName": "trending-up", "color": "text-green-600" },
-        { "id": "security-champion", "name": "Güvenlik Şampiyonu", "iconName": "shield", "color": "text-blue-600" }
-      ]
+    {
+      "iconName": "users",
+      "title": "This Week",
+      "description": "Share security policies at your team meeting",
+      "priority": "high",
+      "timeframe": "This week",
+      "gradient": "from-amber-500/20 to-orange-500/20",
+      "iconColor": "text-amber-600",
+      "bgColor": "bg-amber-50/80",
+      "borderColor": "border-amber-200/60"
     },
-    "immediateActions": [
-      {
-        "iconName": "smartphone",
-        "title": "Hemen Yapın",
-        "description": "Parola yöneticisi indirin ve ana hesaplarınızı ekleyin",
-        "priority": "critical",
-        "timeframe": "5 dakika",
-        "gradient": "from-red-500/20 to-pink-500/20",
-        "iconColor": "text-red-600",
-        "bgColor": "bg-red-50/80",
-        "borderColor": "border-red-200/60"
-      },
-      {
-        "iconName": "users",
-        "title": "Bu Hafta",
-        "description": "Ekip toplantısında güvenlik politikalarını paylaşın",
-        "priority": "high",
-        "timeframe": "Bu hafta",
-        "gradient": "from-amber-500/20 to-orange-500/20",
-        "iconColor": "text-amber-600",
-        "bgColor": "bg-amber-50/80",
-        "borderColor": "border-amber-200/60"
-      },
-      {
-        "iconName": "calendar",
-        "title": "Bu Ay",
-        "description": "Ekip güvenlik eğitimlerini planlayın ve başlatın",
-        "priority": "medium",
-        "timeframe": "30 gün içinde",
-        "gradient": "from-blue-500/20 to-indigo-500/20",
-        "iconColor": "text-blue-600",
-        "bgColor": "bg-blue-50/80",
-        "borderColor": "border-blue-200/60"
-      }
-    ],
-    "resources": [
-      {
-        "title": "NIST Parola Rehberi",
-        "type": "PDF",
-        "url": "#",
-        "description": "Kapsamlı parola güvenliği kılavuzu"
-      },
-      {
-        "title": "2FA Kurulum Videoları",
-        "type": "Video",
-        "url": "#",
-        "description": "Adım adım iki faktörlü doğrulama"
-      },
-      {
-        "title": "Phishing Test Araçları",
-        "type": "Tool",
-        "url": "#",
-        "description": "Ekibinizi test etmek için araçlar"
-      }
-    ],
-    "icon": {
-      "name": "check-circle",
-      "size": 28,
-      "color": "text-white"
+    {
+      "iconName": "calendar",
+      "title": "This Month",
+      "description": "Plan and launch team security trainings",
+      "priority": "medium",
+      "timeframe": "Within 30 days",
+      "gradient": "from-blue-500/20 to-indigo-500/20",
+      "iconColor": "text-blue-600",
+      "bgColor": "bg-blue-50/80",
+      "borderColor": "border-blue-200/60"
+    }
+  ],
+  "resources": [
+    {
+      "title": "NIST Password Guide",
+      "type": "PDF",
+      "url": "#",
+      "description": "Comprehensive guide to password security"
     },
-    "styling": {
-      "container": {
-        "padding": "px-4 py-2 sm:px-6",
-        "borderRadius": "rounded-xl",
-        "backgroundColor": "bg-white/90 dark:bg-gray-800/80",
-        "borderColor": "border-gray-200/60 dark:border-gray-600/60",
-        "shadow": "shadow-xl"
-      },
-      "stats": {
-        "backgroundColor": "bg-gradient-to-r from-blue-100 to-indigo-100",
-        "borderColor": "border-blue-200/60",
-        "iconColor": "text-blue-600 dark:text-blue-400",
-        "textColor": "text-gray-800 dark:text-white"
-      },
-      "downloadButton": {
-        "backgroundColor": "from-blue-500 to-indigo-600",
-        "borderColor": "border-blue-500/30",
-        "textColor": "text-white",
-        "iconColor": "text-white",
-        "gradientFrom": "from-blue-500",
-        "gradientTo": "to-indigo-600",
-        "shadow": "shadow-lg hover:shadow-xl",
-        "borderRadius": "rounded-xl",
-        "padding": "px-4 py-2 sm:px-6 sm:py-3",
-        "fontSize": "text-sm sm:text-base",
-        "fontWeight": "font-medium"
-      },
-      "achievements": {
-        "backgroundColor": "bg-white/60 dark:bg-gray-800/80",
-        "borderColor": "border-white/40 dark:border-gray-600/60",
-        "iconColor": "text-yellow-600 dark:text-yellow-400",
-        "textColor": "text-gray-700 dark:text-gray-200",
-        "hoverColor": "hover:text-gray-900 dark:hover:text-white"
-      },
-      "actionCards": {
-        "backgroundColor": "bg-white/50 dark:bg-gray-800/60",
-        "borderColor": "border-white/30 dark:border-gray-600/50",
-        "iconColor": "text-gray-600 dark:text-gray-300",
-        "textColor": "text-gray-700 dark:text-gray-200",
-        "hoverColor": "hover:text-gray-900 dark:hover:text-white"
-      },
-      "resourceCards": {
-        "backgroundColor": "bg-white/50 dark:bg-gray-800/60",
-        "borderColor": "border-white/30 dark:border-gray-600/50",
-        "iconColor": "text-blue-600 dark:text-blue-400",
-        "textColor": "text-gray-800 dark:text-white",
-        "hoverColor": "hover:text-blue-700 dark:hover:text-blue-300"
-      },
-      "motivationalCard": {
-        "backgroundColor": "from-emerald-50/80 to-green-50/60 dark:from-emerald-900/40 dark:to-green-900/30",
-        "borderColor": "border-emerald-200/60 dark:border-emerald-600/50",
-        "iconColor": "text-emerald-600 dark:text-emerald-400",
-        "textColor": "text-emerald-700 dark:text-emerald-300",
-        "titleColor": "text-emerald-800 dark:text-emerald-200"
-      }
+    {
+      "title": "2FA Setup Videos",
+      "type": "Video",
+      "url": "#",
+      "description": "Step-by-step two-factor authentication"
+    },
+    {
+      "title": "Phishing Testing Tools",
+      "type": "Tool",
+      "url": "#",
+      "description": "Tools to test your team"
+    }
+  ],
+  "icon": {
+    "name": "check-circle",
+    "size": 28,
+    "color": "text-white"
+  },
+  "achievements": [
+    { "id": "quiz-master", "name": "Quiz Master", "iconName": "award", "color": "text-yellow-600" },
+    { "id": "fast-learner", "name": "Fast Learner", "iconName": "trending-up", "color": "text-green-600" },
+    { "id": "security-champion", "name": "Security Champion", "iconName": "shield", "color": "text-blue-600" }
+  ],
+  "styling": {
+    "container": {
+      "backgroundColor": "bg-white/90 dark:bg-gray-800/80",
+      "borderColor": "border-gray-200/60 dark:border-gray-600/60",
+      "padding": "px-4 py-2 sm:px-6",
+      "borderRadius": "rounded-xl",
+      "shadow": "shadow-xl"
+    },
+    "stats": {
+      "backgroundColor": "bg-gradient-to-r from-blue-100 to-indigo-100",
+      "borderColor": "border-blue-200/60",
+      "iconColor": "text-blue-600 dark:text-blue-400",
+      "textColor": "text-gray-800 dark:text-white"
+    },
+    "downloadButton": {
+      "backgroundColor": "from-blue-500 to-indigo-600",
+      "borderColor": "border-blue-500/30",
+      "textColor": "text-white",
+      "iconColor": "text-white",
+      "gradientFrom": "from-blue-500",
+      "gradientTo": "to-indigo-600",
+      "shadow": "shadow-lg hover:shadow-xl",
+      "borderRadius": "rounded-xl",
+      "padding": "px-4 py-2 sm:px-6 sm:py-3",
+      "fontSize": "text-sm sm:text-base",
+      "fontWeight": "font-medium"
+    },
+    "achievements": {
+      "backgroundColor": "bg-white/60 dark:bg-gray-800/80",
+      "borderColor": "border-white/40 dark:border-gray-600/60",
+      "iconColor": "text-yellow-600 dark:text-yellow-400",
+      "textColor": "text-gray-700 dark:text-gray-200",
+      "hoverColor": "hover:text-gray-900 dark:hover:text-white"
+    },
+    "actionCards": {
+      "backgroundColor": "bg-white/50 dark:bg-gray-800/60",
+      "borderColor": "border-white/30 dark:border-gray-600/50",
+      "iconColor": "text-gray-600 dark:text-gray-300",
+      "textColor": "text-gray-700 dark:text-gray-200",
+      "hoverColor": "hover:text-gray-900 dark:hover:text-white"
+    },
+    "resourceCards": {
+      "backgroundColor": "bg-white/50 dark:bg-gray-800/60",
+      "borderColor": "border-white/30 dark:border-gray-600/50",
+      "iconColor": "text-blue-600 dark:text-blue-400",
+      "textColor": "text-gray-800 dark:text-white",
+      "hoverColor": "hover:text-blue-700 dark:hover:text-blue-300"
+    },
+    "motivationalCard": {
+      "backgroundColor": "from-emerald-50/80 to-green-50/60 dark:from-emerald-900/40 dark:to-green-900/30",
+      "borderColor": "border-emerald-200/60 dark:border-emerald-600/50",
+      "iconColor": "text-emerald-600 dark:text-emerald-400",
+      "textColor": "text-emerald-700 dark:text-emerald-300",
+      "titleColor": "text-emerald-800 dark:text-emerald-200"
     }
   }
+}
+
 } 

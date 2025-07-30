@@ -19,9 +19,14 @@ import { NudgeSceneConfig, nudgeSceneConfig } from "../configs/educationConfigs"
 
 interface NudgeSceneProps {
   config: NudgeSceneConfig;
+  completionData?: {
+    totalPoints: number;
+    timeSpent: string;
+    completionDate: string;
+  };
 }
 
-export function NudgeScene({ config = nudgeSceneConfig }: NudgeSceneProps) {
+export function NudgeScene({ config = nudgeSceneConfig, completionData }: NudgeSceneProps) {
   const [showCertificate, setShowCertificate] = useState(false);
   const [showConfetti, setShowConfetti] = useState(true);
   const [celebrationPhase, setCelebrationPhase] = useState(0);
@@ -62,77 +67,15 @@ export function NudgeScene({ config = nudgeSceneConfig }: NudgeSceneProps) {
     return LucideIcons.CheckCircle;
   };
 
-  const completionData = config.completionData || {
+  const finalCompletionData = completionData || {
     totalPoints: 210,
     timeSpent: "8 dakika",
-    completionDate: new Date().toLocaleDateString('tr-TR', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    }),
-    achievements: [
-      { id: 'quiz-master', name: 'Quiz Ustası', iconName: 'award', color: 'text-yellow-600' },
-      { id: 'fast-learner', name: 'Hızlı Öğrenen', iconName: 'trending-up', color: 'text-green-600' },
-      { id: 'security-champion', name: 'Güvenlik Şampiyonu', iconName: 'shield', color: 'text-blue-600' }
-    ]
-  };
+    completionDate: "2024-01-15"
+  }
 
-  const immediateActions = config.immediateActions || [
-    {
-      iconName: "smartphone",
-      title: "Hemen Yapın",
-      description: "Parola yöneticisi indirin ve ana hesaplarınızı ekleyin",
-      priority: "critical" as const,
-      timeframe: "5 dakika",
-      gradient: "from-red-500/20 to-pink-500/20",
-      iconColor: "text-red-600",
-      bgColor: "bg-red-50/80",
-      borderColor: "border-red-200/60"
-    },
-    {
-      iconName: "users",
-      title: "Bu Hafta",
-      description: "Ekip toplantısında güvenlik politikalarını paylaşın",
-      priority: "high" as const,
-      timeframe: "Bu hafta",
-      gradient: "from-amber-500/20 to-orange-500/20",
-      iconColor: "text-amber-600",
-      bgColor: "bg-amber-50/80",
-      borderColor: "border-amber-200/60"
-    },
-    {
-      iconName: "calendar",
-      title: "Bu Ay",
-      description: "Ekip güvenlik eğitimlerini planlayın ve başlatın",
-      priority: "medium" as const,
-      timeframe: "30 gün içinde",
-      gradient: "from-blue-500/20 to-indigo-500/20",
-      iconColor: "text-blue-600",
-      bgColor: "bg-blue-50/80",
-      borderColor: "border-blue-200/60"
-    }
-  ];
+  const immediateActions = config.immediateActions || []
 
-  const resources = config.resources || [
-    {
-      title: "NIST Parola Rehberi",
-      type: "PDF",
-      url: "#",
-      description: "Kapsamlı parola güvenliği kılavuzu"
-    },
-    {
-      title: "2FA Kurulum Videoları",
-      type: "Video",
-      url: "#",
-      description: "Adım adım iki faktörlü doğrulama"
-    },
-    {
-      title: "Phishing Test Araçları",
-      type: "Tool",
-      url: "#",
-      description: "Ekibinizi test etmek için araçlar"
-    }
-  ];
+  const resources = config.resources || []
 
   const handleDownloadCertificate = () => {
     setShowCertificate(true);
@@ -178,7 +121,7 @@ export function NudgeScene({ config = nudgeSceneConfig }: NudgeSceneProps) {
   );
 
   return (
-    <div className={`flex flex-col items-center justify-start h-full ${config.styling?.container?.padding || 'px-4 py-2 sm:px-6'} overflow-y-auto relative`}>
+    <div className={`flex flex-col items-center justify-start h-full px-4 py-2 sm:px-6 overflow-y-auto relative`}>
       {/* Confetti Animation */}
       <AnimatePresence>
         {showConfetti && (
@@ -392,8 +335,8 @@ export function NudgeScene({ config = nudgeSceneConfig }: NudgeSceneProps) {
           className="flex items-center justify-center gap-4 sm:gap-6 mb-3"
         >
           {[
-            { icon: Award, value: completionData.totalPoints, label: "Puan", gradient: "from-blue-100 to-indigo-100", darkGradient: "from-blue-900/40 to-indigo-900/40", color: "text-blue-600 dark:text-blue-300", bgColor: "bg-white/80 dark:bg-gray-800/90", borderColor: "border-blue-200/60 dark:border-blue-600/40" },
-            { icon: Clock, value: completionData.timeSpent, label: "Süre", gradient: "from-green-100 to-emerald-100", darkGradient: "from-green-900/40 to-emerald-900/40", color: "text-green-600 dark:text-green-300", bgColor: "bg-white/80 dark:bg-gray-800/90", borderColor: "border-green-200/60 dark:border-green-600/40" },
+            { icon: Award, value: finalCompletionData.totalPoints, label: "Puan", gradient: "from-blue-100 to-indigo-100", darkGradient: "from-blue-900/40 to-indigo-900/40", color: "text-blue-600 dark:text-blue-300", bgColor: "bg-white/80 dark:bg-gray-800/90", borderColor: "border-blue-200/60 dark:border-blue-600/40" },
+            { icon: Clock, value: finalCompletionData.timeSpent, label: "Süre", gradient: "from-green-100 to-emerald-100", darkGradient: "from-green-900/40 to-emerald-900/40", color: "text-green-600 dark:text-green-300", bgColor: "bg-white/80 dark:bg-gray-800/90", borderColor: "border-green-200/60 dark:border-green-600/40" },
             { icon: Target, value: "100%", label: "Tamamlama", gradient: "from-purple-100 to-pink-100", darkGradient: "from-purple-900/40 to-pink-900/40", color: "text-purple-600 dark:text-purple-300", bgColor: "bg-white/80 dark:bg-gray-800/90", borderColor: "border-purple-200/60 dark:border-purple-600/40" }
           ].map((stat, index) => (
             <motion.div
@@ -453,7 +396,7 @@ export function NudgeScene({ config = nudgeSceneConfig }: NudgeSceneProps) {
             whileTap={{ scale: 0.95 }}
             onClick={handleDownloadCertificate}
             disabled={showCertificate}
-            className={`relative flex items-center space-x-2 ${config.styling?.downloadButton?.padding || 'px-4 py-2 sm:px-6 sm:py-3'} bg-gradient-to-r ${config.styling?.downloadButton?.gradientFrom || 'from-blue-500'} ${config.styling?.downloadButton?.gradientTo || 'to-indigo-600'} ${config.styling?.downloadButton?.textColor || 'text-white'} ${config.styling?.downloadButton?.borderRadius || 'rounded-xl'} hover:from-blue-600 hover:to-indigo-700 transition-all ${config.styling?.downloadButton?.shadow || 'shadow-lg hover:shadow-xl'} disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500/30 overflow-hidden`}
+            className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r ${config.styling?.downloadButton?.gradientFrom || 'from-blue-500'} ${config.styling?.downloadButton?.gradientTo || 'to-indigo-600'} ${config.styling?.downloadButton?.textColor || 'text-white'} rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500/30 overflow-hidden`}
           >
             {/* Button shimmer effect */}
             <motion.div
@@ -494,7 +437,7 @@ export function NudgeScene({ config = nudgeSceneConfig }: NudgeSceneProps) {
           {config.texts?.achievementsTitle || "Kazandığınız Başarımlar"}
         </h2>
         <div className="grid grid-cols-3 gap-2 sm:gap-3">
-          {(completionData.achievements || []).map((achievement, index) => {
+          {(config.achievements || []).map((achievement, index) => {
             const IconComponent = getIconComponent(achievement.iconName);
             return (
               <motion.div

@@ -383,6 +383,10 @@ export default function App() {
 
   // Survey feedback submission state
   const [isSurveySubmitted, setIsSurveySubmitted] = useState(false);
+  
+  // Scene timing tracking
+  const [sceneStartTimes, setSceneStartTimes] = useState<Map<number, number>>(new Map());
+  const [sceneTimeSpent, setSceneTimeSpent] = useState<Map<number, number>>(new Map());
 
   // Mobile detection
   const isMobile = useIsMobile();
@@ -671,6 +675,27 @@ export default function App() {
     return currentScene < scenes.length - 1;
   }, [currentScene, quizCompleted]);
 
+  // Track scene timing
+  const trackSceneTime = useCallback((sceneIndex: number) => {
+    const now = Date.now();
+    
+    // Record start time for current scene
+    setSceneStartTimes(prev => new Map(prev.set(sceneIndex, now)));
+    
+    // Calculate time spent on previous scene if exists
+    if (sceneIndex > 0) {
+      const previousScene = sceneIndex - 1;
+      setSceneStartTimes(prev => {
+        const previousStartTime = prev.get(previousScene);
+        if (previousStartTime) {
+          const timeSpent = now - previousStartTime;
+          setSceneTimeSpent(timeSpentPrev => new Map(timeSpentPrev.set(previousScene, timeSpent)));
+        }
+        return prev;
+      });
+    }
+  }, []);
+
   // Award points and achievements - only once per scene
   const awardPoints = useCallback((sceneIndex: number) => {
     // Check if points have already been awarded for this scene
@@ -696,6 +721,27 @@ export default function App() {
     setAchievements(prev => [...prev, ...newAchievements.filter(a => !prev.includes(a))]);
   }, [quizCompleted, visitedScenes.size, totalPoints, pointsAwardedScenes]);
 
+  // Calculate completion data for NudgeScene
+  const completionData = useMemo(() => {
+    const totalTimeSpent = Array.from(sceneTimeSpent.values()).reduce((total, time) => total + time, 0);
+    const minutes = Math.floor(totalTimeSpent / 60000);
+    const seconds = Math.floor((totalTimeSpent % 60000) / 1000);
+    const timeSpentString = minutes > 0 ? `${minutes} dakika ${seconds} saniye` : `${seconds} saniye`;
+    
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    
+    return {
+      totalPoints,
+      timeSpent: timeSpentString,
+      completionDate: today
+    };
+  }, [totalPoints, sceneTimeSpent]);
+
+  // Initialize first scene timing
+  useEffect(() => {
+    trackSceneTime(0);
+  }, []);
+
   // ULTRA FAST MOBILE TRANSITIONS - NO LOADING DELAY
   const nextScene = useCallback(() => {
     // Allow progression if quiz is completed or we're not on quiz scene
@@ -704,6 +750,9 @@ export default function App() {
     }
 
     if (currentScene < scenes.length - 1) {
+      // Track time spent on current scene
+      trackSceneTime(currentScene + 1);
+      
       // INSTANT transition on mobile - NO loading delay
       if (isMobile) {
         setDirection(1);
@@ -724,7 +773,7 @@ export default function App() {
         }, 100); // Reduced from 250ms to 100ms
       }
     }
-  }, [currentScene, quizCompleted, awardPoints, isMobile]);
+  }, [currentScene, quizCompleted, awardPoints, isMobile, trackSceneTime]);
 
   const prevScene = useCallback(() => {
     if (currentScene > 0) {
@@ -1615,7 +1664,9 @@ export default function App() {
                       {currentScene !== 4 && (
                         <CurrentSceneComponent config={currentSceneConfig}                             
                         onSurveySubmitted={handleSurveySubmitted}
-                        isSubmitted={isSurveySubmitted} />
+                        isSubmitted={isSurveySubmitted}
+                        completionData={currentScene === 7 ? completionData : undefined}
+                        />
                       )}
                     </motion.div>
                   </div>

@@ -888,6 +888,12 @@ export interface NudgeSceneConfig {
         downloadingText?: string;
         urgentLabel?: string;
     };
+    achievements?: Array<{
+        id: string;
+        name: string;
+        iconName: string;
+        color: string;
+    }>;
     completionData?: {
         totalPoints?: number;
         timeSpent?: string;
