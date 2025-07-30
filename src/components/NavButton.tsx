@@ -6,18 +6,18 @@ interface NavButtonProps {
   onClick: () => void;
   disabled?: boolean;
   label?: string;
+  isDarkMode?: boolean;
 }
 
-export function NavButton({ direction, onClick, disabled, label }: NavButtonProps) {
+export function NavButton({ direction, onClick, disabled, label, isDarkMode = false }: NavButtonProps) {
   const Icon = direction === "prev" ? ChevronLeft : ChevronRight;
   
   return (
     <motion.button
       whileHover={{ 
-        scale: disabled ? 1 : 1.05,
-        y: disabled ? 0 : -3,
+        scale: disabled ? 1 : 1.02,
       }}
-      whileTap={{ scale: disabled ? 1 : 0.95 }}
+      whileTap={{ scale: disabled ? 1 : 0.99 }}
       onClick={onClick}
       disabled={disabled}
       className={`
@@ -31,41 +31,23 @@ export function NavButton({ direction, onClick, disabled, label }: NavButtonProp
         }
       `}
       style={{
-        // LIQUID GLASS BACKGROUND - Adapted for light background contrast
+        // Clean neumorphic design
+        borderRadius: '16px',
         background: disabled 
-          ? `linear-gradient(135deg, 
-              rgba(71, 85, 105, 0.15) 0%, 
-              rgba(100, 116, 139, 0.10) 50%, 
-              rgba(148, 163, 184, 0.08) 100%
-            )`
-          : `linear-gradient(135deg, 
-              rgba(59, 130, 246, 0.20) 0%, 
-              rgba(99, 102, 241, 0.15) 30%,
-              rgba(139, 92, 246, 0.12) 70%,
-              rgba(168, 85, 247, 0.10) 100%
-            )`,
-        // Enhanced backdrop blur for stronger liquid glass effect
-        backdropFilter: 'blur(24px) saturate(200%)',
-        WebkitBackdropFilter: 'blur(24px) saturate(200%)',
-        // Enhanced border with colored gradient for better visibility
+          ? 'rgba(71, 85, 105, 0.10)'
+          : isDarkMode 
+            ? 'rgba(255, 255, 255, 0.10)' // White background for dark mode
+            : 'rgba(255, 255, 255, 0.10)',
         border: disabled 
-          ? '1px solid rgba(71, 85, 105, 0.25)'
-          : '1px solid rgba(59, 130, 246, 0.35)',
-        // Enhanced shadow system with colored shadows
+          ? '1px solid rgba(71, 85, 105, 0.50)'
+          : isDarkMode 
+            ? '1px solid rgba(255, 255, 255, 0.50)' // White border for dark mode
+            : '1px solid rgba(59, 130, 246, 0.50)',
         boxShadow: disabled 
-          ? `
-            0 4px 16px rgba(71, 85, 105, 0.08),
-            0 2px 8px rgba(71, 85, 105, 0.06),
-            inset 0 1px 0 rgba(255, 255, 255, 0.15),
-            inset 0 -1px 0 rgba(71, 85, 105, 0.08)
-          `
-          : `
-            0 8px 32px rgba(59, 130, 246, 0.20),
-            0 4px 16px rgba(99, 102, 241, 0.15),
-            0 2px 8px rgba(139, 92, 246, 0.10),
-            inset 0 1px 0 rgba(255, 255, 255, 0.25),
-            inset 0 -1px 0 rgba(59, 130, 246, 0.12)
-          `,
+          ? '-4px -4px 10px 0 rgba(71, 85, 105, 0.10), 4px 4px 10px 0 rgba(71, 85, 105, 0.10), 0 4px 4px 0 rgba(71, 85, 105, 0.10) inset'
+          : isDarkMode 
+            ? '-4px -4px 10px 0 rgba(255, 255, 255, 0.10), 4px 4px 10px 0 rgba(255, 255, 255, 0.10), 0 4px 4px 0 rgba(255, 255, 255, 0.10) inset'
+            : '-4px -4px 10px 0 rgba(59, 130, 246, 0.10), 4px 4px 10px 0 rgba(59, 130, 246, 0.10), 0 4px 4px 0 rgba(59, 130, 246, 0.10) inset',
         // Hardware acceleration
         transform: 'translateZ(0)',
         willChange: 'transform'
@@ -82,10 +64,6 @@ export function NavButton({ direction, onClick, disabled, label }: NavButtonProp
         }}
       />
 
-      {/* ENHANCED Multi-layer liquid glass gradients with color adaptation */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-indigo-50/15 to-purple-50/10 dark:from-blue-900/20 dark:via-indigo-900/10 dark:to-purple-900/8 rounded-2xl transition-colors duration-500"></div>
-      <div className="absolute inset-0 bg-gradient-to-tl from-cyan-50/20 via-transparent to-violet-50/15 dark:from-cyan-900/12 dark:via-transparent dark:to-violet-900/8 rounded-2xl transition-colors duration-500"></div>
-      <div className="absolute inset-0 bg-gradient-to-t from-slate-100/15 via-transparent to-transparent dark:from-slate-800/10 rounded-2xl transition-colors duration-500"></div>
       
       {/* Enhanced Apple-style inner highlight with color tinting */}
       <div 
@@ -108,21 +86,15 @@ export function NavButton({ direction, onClick, disabled, label }: NavButtonProp
         }}
       />
       
-      {/* Icon container with enhanced animations */}
+      {/* Icon container - Fixed position, no animation */}
       <div className="relative z-20 flex items-center justify-center">
-        <motion.div
-          animate={!disabled ? {
-            x: direction === "next" ? [0, 3, 0] : [0, -3, 0],
-          } : {}}
-          transition={{
-            duration: 2.5,
-            repeat: Infinity,
-            ease: [0.4, 0, 0.6, 1] // Custom easing for smooth motion
-          }}
+        <div
           className={`transition-colors duration-300 ${
             disabled 
               ? "text-slate-500/70 dark:text-slate-400/70" 
-              : "text-blue-700 dark:text-blue-300 group-hover:text-blue-900 dark:group-hover:text-white"
+              : isDarkMode 
+                ? "text-white group-hover:text-gray-200" // White icon for dark mode
+                : "text-blue-600 dark:text-blue-400 group-hover:text-blue-700 dark:group-hover:text-blue-300"
           }`}
         >
           <Icon 
@@ -130,120 +102,94 @@ export function NavButton({ direction, onClick, disabled, label }: NavButtonProp
             strokeWidth={2.5} 
             className="drop-shadow-sm sm:w-5 sm:h-5 md:w-6 md:h-6 transition-all duration-300" 
           />
-        </motion.div>
+        </div>
       </div>
       
       {/* Enhanced hover effects with color adaptation */}
       {!disabled && (
         <>
-          {/* Hover glow overlay with enhanced colors */}
-          <motion.div 
+          {/* Subtle hover overlay */}
+          <div 
             className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 pointer-events-none"
             style={{
-              background: `linear-gradient(135deg, 
-                rgba(59, 130, 246, 0.15) 0%, 
-                rgba(99, 102, 241, 0.12) 30%,
-                rgba(139, 92, 246, 0.10) 70%,
-                rgba(168, 85, 247, 0.08) 100%
-              )`
+              background: isDarkMode 
+                ? 'rgba(255, 255, 255, 0.08)' // White overlay for dark mode
+                : 'rgba(59, 130, 246, 0.02)', // Much lighter blue for light mode
+              transition: 'opacity 0.3s ease'
             }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
           />
           
-          {/* Enhanced hover border with colored glow */}
-          <motion.div 
+          {/* Enhanced hover border - No shadow */}
+          <div 
             className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 pointer-events-none"
             style={{
-              border: '1px solid rgba(59, 130, 246, 0.5)',
-              boxShadow: `
-                0 0 20px rgba(59, 130, 246, 0.25),
-                0 0 40px rgba(99, 102, 241, 0.15),
-                inset 0 0 20px rgba(59, 130, 246, 0.08)
-              `
+              border: isDarkMode 
+                ? '1px solid rgba(255, 255, 255, 0.6)' // White border for dark mode
+                : '1px solid rgba(59, 130, 246, 0.3)', // Lighter blue border for light mode
+              transition: 'opacity 0.3s ease'
             }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
           />
           
-          {/* Enhanced shimmer effect with color tinting */}
-          <motion.div
+          {/* Static hover effect - No animation */}
+          <div
             className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 pointer-events-none"
             style={{
-              background: `linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(59, 130, 246, 0.15) 25%,
-                rgba(255, 255, 255, 0.25) 50%,
-                rgba(99, 102, 241, 0.15) 75%,
-                transparent 100%
-              )`
-            }}
-            animate={{
-              x: ['-120%', '220%'],
-            }}
-            transition={{
-              duration: 1.8,
-              repeat: Infinity,
-              ease: "easeInOut",
-              repeatDelay: 2.5
+              background: isDarkMode 
+                ? `linear-gradient(90deg, 
+                  transparent 0%, 
+                  rgba(255, 255, 255, 0.12) 25%,
+                  rgba(255, 255, 255, 0.20) 50%,
+                  rgba(255, 255, 255, 0.12) 75%,
+                  transparent 100%
+                )`
+                : `linear-gradient(90deg, 
+                  transparent 0%, 
+                  rgba(59, 130, 246, 0.08) 25%,
+                  rgba(255, 255, 255, 0.15) 50%,
+                  rgba(99, 102, 241, 0.08) 75%,
+                  transparent 100%
+                )`
             }}
           />
         </>
       )}
       
-      {/* Enhanced active press state with color feedback */}
+      {/* Enhanced active press state - Subtle feedback */}
       <motion.div 
         className="absolute inset-0 rounded-2xl opacity-0 group-active:opacity-100 pointer-events-none"
         style={{
           background: disabled 
-            ? 'rgba(71, 85, 105, 0.15)'
-            : 'rgba(59, 130, 246, 0.20)'
+            ? 'rgba(71, 85, 105, 0.05)'
+            : isDarkMode 
+              ? 'rgba(255, 255, 255, 0.05)' // White active state for dark mode
+              : 'rgba(59, 130, 246, 0.02)' // Much lighter blue for light mode
         }}
         transition={{ duration: 0.1 }}
       />
       
-      {/* Enhanced focus ring with color adaptation */}
+      {/* Enhanced focus ring with color adaptation - No shadow */}
       <motion.div 
         className="absolute inset-0 rounded-2xl border-2 opacity-0 group-focus-visible:opacity-100 pointer-events-none"
         style={{
-          borderColor: 'rgba(59, 130, 246, 0.6)',
-          boxShadow: '0 0 0 2px rgba(59, 130, 246, 0.25)'
+          borderColor: isDarkMode 
+            ? 'rgba(255, 255, 255, 0.6)' // White focus ring for dark mode
+            : 'rgba(59, 130, 246, 0.4)'
         }}
         transition={{ duration: 0.2 }}
       />
       
-      {/* Enhanced mobile pulse indicator with color */}
+      {/* Static mobile indicator - No animation */}
       {!disabled && (
-        <motion.div 
+        <div 
           className="absolute inset-0 rounded-2xl border opacity-0 pointer-events-none lg:hidden"
           style={{
             borderColor: 'rgba(59, 130, 246, 0.4)',
             boxShadow: '0 0 20px rgba(59, 130, 246, 0.15)'
           }}
-          animate={{
-            scale: [1, 1.15, 1],
-            opacity: [0, 0.5, 0]
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut",
-            repeatDelay: 1
-          }}
         />
       )}
       
-      {/* Enhanced outer glow for improved depth with color adaptation */}
-      {!disabled && (
-        <div 
-          className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-          style={{
-            boxShadow: `
-              0 0 40px rgba(59, 130, 246, 0.15),
-              0 0 80px rgba(99, 102, 241, 0.10),
-              0 0 120px rgba(139, 92, 246, 0.08)
-            `
-          }}
-        />
-      )}
+      {/* Removed outer glow for cleaner neumorphic design */}
     </motion.button>
   );
 }

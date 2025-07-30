@@ -781,7 +781,7 @@ export const IntroScene = React.memo(({
             type: "spring",
             stiffness: 200
           }}
-          className="flex justify-center mb-2 sm:mb-3 relative"
+          className="flex justify-center mb-1 sm:mb-3 relative"
         >
           {/* Icon glow effect */}
           <div className="absolute inset-0 from-blue-400/30 to-transparent rounded-full animate-pulse scale-150"></div>

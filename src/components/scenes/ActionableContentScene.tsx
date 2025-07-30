@@ -244,11 +244,11 @@ export function ActionableContentScene({
 
   return (
     <div className={containerClassName}>
-      <div className="mb-3">
+      <div className="mb-2 sm:mb-3">
         {sceneIconComponent}
       </div>
 
-      <h1 className="text-xl mb-5 text-center text-gray-900 dark:text-white">
+      <h1 className="text-xl mb-2 sm:mb-3 text-center text-gray-900 dark:text-white">
         {title}
       </h1>
 

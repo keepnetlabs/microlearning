@@ -16,6 +16,85 @@ import ReactCountryFlag from "react-country-flag";
 import { getCountryCode, getSearchPlaceholder, detectBrowserLanguage, useIsMobile, priorityLanguages, languages } from "./utils/languageUtils";
 import { loadAppConfig, createConfigChangeEvent } from "./components/configs/appConfigLoader";
 
+// Static CSS classes - Component dışında tanımlandı çünkü hiç değişmiyor
+const STATIC_CSS_CLASSES = {
+  // Loading overlay
+  loadingOverlay: "fixed inset-0 bg-white/50 dark:bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center transition-colors duration-300",
+  loadingText: "text-sm font-medium text-gray-900 dark:text-white",
+
+  // Theme hint notification
+  themeHintContainer: "fixed top-20 left-1/2 transform -translate-x-1/2 z-40",
+
+  // Background
+  backgroundContainer: "fixed inset-0 pointer-events-none overflow-hidden",
+  backgroundGradient3: "absolute top-1/3 right-1/5 w-40 h-40 bg-gradient-radial from-cyan-100/25 to-transparent dark:from-cyan-900/15 dark:to-transparent rounded-full blur-2xl",
+  backgroundGradient4: "absolute bottom-1/4 left-1/4 w-32 h-32 bg-gradient-radial from-emerald-100/30 to-transparent dark:from-emerald-900/18 dark:to-transparent rounded-full blur-xl",
+
+  // Header
+  headerContainer: "relative shrink-0",
+  headerBackground: "absolute inset-0 bg-gradient-to-b from-white/95 via-white/90 to-white/85 dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-900/85 transition-colors duration-300",
+  headerBorder: "absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gray-200/60 dark:via-gray-600/60 to-transparent transition-colors duration-300",
+  headerContent: "relative z-10 px-4 py-4 bg-white dark:bg-gray-900 lg:px-16 xl:px-20 2xl:px-24",
+
+  // Logo
+  logoContainer: "flex-shrink-0 z-20",
+  logoGlass: "relative p-1 sm:p-1.5 md:p-2 rounded-lg sm:rounded-xl md:rounded-2xl overflow-hidden transition-all duration-500 ease-out group",
+  logoNoise: "absolute inset-0 opacity-[0.015] dark:opacity-[0.008] rounded-lg sm:rounded-xl md:rounded-2xl mix-blend-overlay pointer-events-none",
+  logoGradient: "absolute inset-0 bg-gradient-to-br from-slate-50/20 via-slate-100/10 to-slate-200/5 dark:from-slate-800/15 dark:via-slate-700/8 dark:to-slate-600/4 rounded-lg sm:rounded-xl md:rounded-2xl transition-colors duration-500",
+  logoHighlight: "absolute inset-0 rounded-lg sm:rounded-xl md:rounded-2xl pointer-events-none",
+  logoImage: "h-3.5 w-auto sm:h-4 md:h-6 lg:h-7 transition-opacity duration-300",
+
+  // Title
+  titleContainer: "absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 max-w-[120px] sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg px-1 sm:px-2",
+  titleText: "text-[10px] sm:text-xs md:text-base lg:text-lg font-semibold text-gray-900 dark:text-white tracking-tight transition-colors duration-300 text-center truncate",
+
+  // Controls
+  controlsContainer: "flex items-center space-x-1.5 md:space-x-3 flex-shrink-0 z-20",
+
+  // Points badge
+  pointsBadge: "relative flex items-center justify-center min-w-[54px] sm:min-w-[60px] space-x-1 sm:space-x-1.5 md:space-x-1.5 px-1.5 sm:px-2 md:px-3 h-8 sm:h-10 rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 dark:bg-black dark:border-white border-[#F59E0B] border-[1px] ease-out group",
+  pointsBadgeNoise: "absolute inset-0 opacity-[0.020] dark:opacity-[0.012] rounded-lg sm:rounded-xl mix-blend-overlay pointer-events-none",
+  pointsText: "text-xs md:text-sm font-semibold text-[#D97706] dark:text-[#D97706] transition-colors duration-300",
+
+  // Theme button
+  themeButton: "relative dark:bg-black dark:border-white border-[#C7C7CC] border-[1px] flex items-center justify-center p-1 sm:p-1.5 md:p-2 h-[32px] sm:h-[40px] sm:max-h-[40px] rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group ",
+  themeButtonIcon: "w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 text-[#8E8E93] dark:text-gray-300 transition-colors duration-300",
+
+  // Language button
+  languageButton: "relative flex items-center justify-center space-x-0.5 bg-[white] border-[#C7C7CC] dark:bg-black dark:border-white border-[#C7C7CC] border-[1px] sm:space-x-1 md:space-x-2 px-1 sm:px-1.5 md:px-3 h-8 sm:h-10 sm:w-[100px] rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group",
+  languageFlag: "w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 rounded-sm transition-opacity duration-300",
+  languageChevron: "w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4 text-gray-500 dark:text-white transition-colors duration-300",
+
+  // Language dropdown
+  languageSearch: "w-full px-3 py-2 text-sm bg-transparent border-0 focus:outline-none focus:ring-0 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400",
+  languageList: "max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent",
+  languageItem: "flex items-center space-x-2 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 cursor-pointer",
+  languageItemText: "text-sm text-gray-900 dark:text-white",
+  languageItemFlag: "w-4 h-4 rounded-sm",
+
+  // Content area
+  contentContainer: "flex-1 relative z-10 overflow-hidden",
+
+  // Achievement notification
+  achievementContainer: "fixed top-24 right-4 z-40",
+  achievementContent: "relative px-4 py-3 bg-gradient-to-r from-yellow-50/98 to-orange-50/95 dark:from-gray-900/98 dark:to-gray-800/95 border border-yellow-200/70 dark:border-yellow-400/80 rounded-2xl shadow-xl shadow-yellow-500/10 dark:shadow-black/40 transition-colors duration-300",
+  achievementClose: "ml-2 p-1 rounded-full hover:bg-yellow-200/50 dark:hover:bg-yellow-900/40 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-400/30 dark:focus:ring-yellow-600/30",
+
+  // Navigation
+  navContainer: "fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30",
+  navButtonIcon: "w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-gray-600 dark:text-gray-300 transition-colors duration-300",
+
+  // Quiz timer
+  timerContainer: "fixed top-4 right-4 z-30",
+
+  // Quiz completion notification
+  quizNotificationContainer: "fixed z-30 bottom-4 right-4 sm:bottom-6 sm:right-6",
+  quizNotificationClose: "ml-1 p-1 rounded-full hover:bg-amber-200/50 dark:hover:bg-amber-900/40 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400/30 dark:focus:ring-amber-600/30 opacity-60",
+
+  // Mobile navigation hint
+  mobileNavHintContainer: "md:hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 z-30"
+} as const;
+
 export default function App() {
   // Dinamik appConfig state'i - ileride API'den gelecek
   const [appConfig, setAppConfig] = useState(() => {
@@ -88,199 +167,147 @@ export default function App() {
 
 
 
-  // Mevcut CSS'leri değişkenlere çekme - Tema parametrelerine göre dinamik (PERFORMANS OPTİMİZE)
-  const cssClasses = useMemo(() => ({
+  // Dynamic CSS classes - Sadece themeConfig değiştiğinde yeniden hesaplanır
+  const dynamicCssClasses = useMemo(() => ({
     // Ana container
     mainContainer: `min-h-screen bg-gradient-to-br from-${themeConfig.colors?.background || 'slate'}-100/90 via-${themeConfig.colors?.primary || 'blue'}-50/60 to-${themeConfig.colors?.secondary || 'indigo'}-100/75 dark:from-gray-800 dark:via-gray-850 dark:to-gray-900 flex flex-col relative overflow-hidden font-['Open_Sans'] transition-colors duration-300`,
 
-    // Loading overlay
-    loadingOverlay: "fixed inset-0 bg-white/50 dark:bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center transition-colors duration-300",
+    // Loading container
     loadingContainer: `flex items-center space-x-3 px-6 py-4 bg-${themeConfig.colors?.surface || 'white'}/90 dark:bg-gray-900/90 ${themeConfig.effects?.backdropBlur || 'backdrop-blur-xl'} ${themeConfig.effects?.borderRadius || 'rounded-2xl'} border border-${themeConfig.colors?.surface || 'white'}/${themeConfig.effects?.borderOpacity || '60'} dark:border-gray-600/60 ${themeConfig.effects?.shadow || 'shadow-xl'} transition-colors duration-300`,
     loadingSpinner: `animate-spin text-${themeConfig.colors?.primary || 'blue'}-600 dark:text-${themeConfig.colors?.primary || 'blue'}-400`,
-    loadingText: "text-sm font-medium text-gray-900 dark:text-white",
 
     // Theme hint notification
-    themeHintContainer: "fixed top-20 left-1/2 transform -translate-x-1/2 z-40",
     themeHintContent: `relative px-5 py-4 bg-${themeConfig.colors?.primary || 'blue'}-50/98 dark:bg-gray-900/98 ${themeConfig.effects?.backdropBlur || 'backdrop-blur-2xl'} border-2 border-${themeConfig.colors?.primary || 'blue'}-200/80 dark:border-gray-600/80 ${themeConfig.effects?.borderRadius || 'rounded-2xl'} ${themeConfig.effects?.shadow || 'shadow-xl'} shadow-${themeConfig.colors?.primary || 'blue'}-500/20 dark:shadow-black/40 transition-colors duration-300 max-w-sm`,
     themeHintIcon: `flex-shrink-0 p-1.5 bg-${themeConfig.colors?.primary || 'blue'}-100/80 dark:bg-${themeConfig.colors?.primary || 'blue'}-900/60 ${themeConfig.effects?.borderRadius || 'rounded-lg'}`,
     themeHintTitle: `text-sm text-${themeConfig.colors?.primary || 'blue'}-900 dark:text-white font-medium mb-2`,
     themeHintDescription: `text-xs text-${themeConfig.colors?.primary || 'blue'}-800 dark:text-gray-200 leading-relaxed`,
     themeHintClose: `ml-2 p-1 rounded-full hover:bg-${themeConfig.colors?.primary || 'blue'}-200/50 dark:hover:bg-gray-700/50 transition-colors focus:outline-none focus:ring-2 focus:ring-${themeConfig.colors?.primary || 'blue'}-400/30 dark:focus:ring-${themeConfig.colors?.primary || 'blue'}-600/30`,
 
-    // Background
-    backgroundContainer: "fixed inset-0 pointer-events-none overflow-hidden",
+    // Background gradients
     backgroundGradient1: `absolute -top-60 -left-60 w-96 h-96 bg-gradient-to-br from-${themeConfig.colors?.primary || 'blue'}-200/40 via-${themeConfig.colors?.secondary || 'indigo'}-100/30 to-transparent dark:from-${themeConfig.colors?.primary || 'blue'}-900/25 dark:via-${themeConfig.colors?.secondary || 'indigo'}-800/18 dark:to-transparent ${themeConfig.effects?.borderRadius || 'rounded-full'} blur-3xl animate-pulse transition-colors duration-500`,
     backgroundGradient2: `absolute -bottom-60 -right-60 w-[500px] h-[500px] bg-gradient-to-tl from-${themeConfig.colors?.accent || 'purple'}-100/35 via-pink-100/25 to-transparent dark:from-${themeConfig.colors?.accent || 'purple'}-900/20 dark:via-pink-900/15 dark:to-transparent ${themeConfig.effects?.borderRadius || 'rounded-full'} blur-3xl animate-pulse transition-colors duration-500`,
-    backgroundGradient3: "absolute top-1/3 right-1/5 w-40 h-40 bg-gradient-radial from-cyan-100/25 to-transparent dark:from-cyan-900/15 dark:to-transparent rounded-full blur-2xl",
-    backgroundGradient4: "absolute bottom-1/4 left-1/4 w-32 h-32 bg-gradient-radial from-emerald-100/30 to-transparent dark:from-emerald-900/18 dark:to-transparent rounded-full blur-xl",
 
-    // Header
-    headerContainer: "relative shrink-0",
-    headerBackground: "absolute inset-0 bg-gradient-to-b from-white/95 via-white/90 to-white/85 dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-900/85 transition-colors duration-300",
-    headerBorder: "absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gray-200/60 dark:via-gray-600/60 to-transparent transition-colors duration-300",
-    headerContent: "relative z-10 px-4 py-4 bg-white dark:bg-gray-900 lg:px-16 xl:px-20 2xl:px-24",
+    // Content card
+    contentCard: `absolute inset-0 w-full h-full ${themeConfig.effects?.borderRadius || 'rounded-2xl'} sm:rounded-3xl overflow-hidden transition-colors duration-300`,
 
-    // Logo
-    logoContainer: "flex-shrink-0 z-20",
-    logoGlass: `relative p-1 sm:p-1.5 md:p-2 rounded-lg sm:rounded-xl md:rounded-2xl overflow-hidden transition-all duration-500 ease-out group`,
-    logoNoise: "absolute inset-0 opacity-[0.015] dark:opacity-[0.008] rounded-lg sm:rounded-xl md:rounded-2xl mix-blend-overlay pointer-events-none",
-    logoGradient: "absolute inset-0 bg-gradient-to-br from-slate-50/20 via-slate-100/10 to-slate-200/5 dark:from-slate-800/15 dark:via-slate-700/8 dark:to-slate-600/4 rounded-lg sm:rounded-xl md:rounded-2xl transition-colors duration-500",
-    logoHighlight: "absolute inset-0 rounded-lg sm:rounded-xl md:rounded-2xl pointer-events-none",
-    logoImage: "h-3.5 w-auto sm:h-4 md:h-6 lg:h-7 transition-opacity duration-300",
-
-    // Title
-    titleContainer: "absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 max-w-[120px] sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg px-1 sm:px-2",
-    titleText: "text-[10px] sm:text-xs md:text-base lg:text-lg font-semibold text-gray-900 dark:text-white tracking-tight transition-colors duration-300 text-center truncate",
-
-    // Controls
-    controlsContainer: "flex items-center space-x-1 sm:space-x-1.5 md:space-x-3 flex-shrink-0 z-20",
-
-    // Points badge
-    pointsBadge: `relative flex items-center space-x-1 sm:space-x-1.5 md:space-x-1.5 px-1.5 sm:px-2 md:px-3 h-8 sm:h-10 rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 dark:bg-black dark:border-white border-[#F59E0B] border-[1px] ease-out group`,
-    pointsBadgeNoise: "absolute inset-0 opacity-[0.020] dark:opacity-[0.012] rounded-lg sm:rounded-xl mix-blend-overlay pointer-events-none",
-    pointsText: `text-[8px] sm:text-xs md:text-sm font-semibold text-[#D97706] dark:text-[#D97706] transition-colors duration-300`,
-
-    // Theme button
-    themeButton: `relative dark:bg-black dark:border-white border-[#C7C7CC] border-[1px] flex items-center justify-center p-1 sm:p-1.5 md:p-2 max-h-[32px] sm:max-h-[40px] rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group `,
-    themeButtonIcon: `w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 text-[#8E8E93] dark:text-gray-300 transition-colors duration-300`,
-
-    // Language button
-    languageButton: `relative flex items-center justify-center space-x-0.5 bg-[white] border-[#C7C7CC] dark:bg-black dark:border-white border-[#C7C7CC] border-[1px] sm:space-x-1 md:space-x-2 px-1 sm:px-1.5 md:px-3 h-8 sm:h-10 sm:w-[100px] rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group`,
-    languageFlag: "w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 rounded-sm transition-opacity duration-300",
-    languageChevron: "w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4 text-gray-500 dark:text-white transition-colors duration-300",
+    // Navigation button
+    navButton: `relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full backdrop-blur-xl border border-${themeConfig.colors?.surface || 'white'}/60 dark:border-gray-600/60 shadow-lg transition-all duration-300 focus:outline-none`,
 
     // Language dropdown
     languageDropdown: `absolute top-full right-0 mt-1 w-64 bg-${themeConfig.colors?.surface || 'white'}/95 dark:bg-gray-900/95 backdrop-blur-xl border border-${themeConfig.colors?.surface || 'white'}/60 dark:border-gray-600/60 rounded-xl shadow-xl shadow-black/10 dark:shadow-black/30 transition-all duration-300 z-50`,
-    languageSearch: "w-full px-3 py-2 text-sm bg-transparent border-0 focus:outline-none focus:ring-0 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400",
-    languageList: "max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent",
-    languageItem: "flex items-center space-x-2 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 cursor-pointer",
-    languageItemText: "text-sm text-gray-900 dark:text-white",
-    languageItemFlag: "w-4 h-4 rounded-sm",
 
-    // Content area
-    contentContainer: "flex-1 relative z-10 overflow-hidden",
-    contentCard: `absolute inset-0 w-full h-full ${themeConfig.effects?.borderRadius || 'rounded-2xl'} sm:rounded-3xl overflow-hidden transition-colors duration-300`,
-
-    // Achievement notification
-    achievementContainer: "fixed top-24 right-4 z-40",
-    achievementContent: `relative px-4 py-3 bg-gradient-to-r from-yellow-50/98 to-orange-50/95 dark:from-gray-900/98 dark:to-gray-800/95 border border-yellow-200/70 dark:border-yellow-400/80 rounded-2xl shadow-xl shadow-yellow-500/10 dark:shadow-black/40 transition-colors duration-300`,
-    achievementClose: `ml-2 p-1 rounded-full hover:bg-yellow-200/50 dark:hover:bg-yellow-900/40 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-400/30 dark:focus:ring-yellow-600/30`,
-
-    // Navigation
-    navContainer: "fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30",
-    navButton: `relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full backdrop-blur-xl border border-${themeConfig.colors?.surface || 'white'}/60 dark:border-gray-600/60 shadow-lg transition-all duration-300 focus:outline-none`,
-    navButtonIcon: "w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-gray-600 dark:text-gray-300 transition-colors duration-300",
-
-    // ProgressBar Config
-    progressBarConfig: {
-      // Container colors
-      containerBackground: `white`,
-      containerBorder: '1px solid #C7C7CC',
-      containerBoxShadow: `
-        0 2px 8px rgba(148, 163, 184, 0.12),
-        0 1px 4px rgba(148, 163, 184, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.20)
-      `,
-
-      // Background gradients
-      backgroundGradient: 'bg-gradient-to-br from-slate-100/20 via-slate-200/12 to-slate-300/8',
-      backgroundGradientDark: 'dark:from-slate-700/18 dark:via-slate-600/12 dark:to-slate-500/8',
-
-      // Progress fill colors
-      progressFillBackground: `linear-gradient(135deg, 
-        #3B82F6 0%, 
-        #3B82F6 50%,
-        #3B82F6 100%
-      )`,
-      progressFillBorder: '0.5px solid rgba(59, 130, 246, 0.40)',
-      progressFillBoxShadow: `
-        0 2px 8px rgba(59, 130, 246, 0.30),
-        0 1px 4px rgba(59, 130, 246, 0.20),
-        inset 0 1px 0 rgba(255, 255, 255, 0.30)
-      `,
-
-      // Dot colors
-      dotCompletedBackground: `linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.95) 0%, 
-        rgba(255, 255, 255, 0.90) 50%, 
-        rgba(255, 255, 255, 0.85) 100%
-      )`,
-      dotActiveBackground: `linear-gradient(135deg, 
-        rgba(59, 130, 246, 0.90) 0%, 
-        rgba(59, 130, 246, 0.85) 50%, 
-        rgba(59, 130, 246, 0.80) 100%
-      )`,
-      dotInactiveBackground: `linear-gradient(135deg, 
-        rgba(148, 163, 184, 0.50) 0%, 
-        rgba(148, 163, 184, 0.40) 50%, 
-        rgba(148, 163, 184, 0.30) 100%
-      )`,
-      dotCompletedBorder: '0.5px solid rgba(255, 255, 255, 0.70)',
-      dotActiveBorder: '0.5px solid rgba(59, 130, 246, 0.60)',
-      dotInactiveBorder: '0.5px solid rgba(148, 163, 184, 0.40)',
-      dotCompletedBoxShadow: `
-        0 2px 6px rgba(255, 255, 255, 0.25),
-        0 1px 3px rgba(255, 255, 255, 0.20),
-        inset 0 1px 0 rgba(255, 255, 255, 0.35)
-      `,
-      dotActiveBoxShadow: `
-        0 2px 6px rgba(59, 130, 246, 0.30),
-        0 1px 3px rgba(59, 130, 246, 0.20),
-        inset 0 1px 0 rgba(255, 255, 255, 0.30)
-      `,
-      dotInactiveBoxShadow: `
-        0 1px 3px rgba(148, 163, 184, 0.20),
-        inset 0 1px 0 rgba(255, 255, 255, 0.20)
-      `,
-
-      // Text colors
-      textBackground: `linear-gradient(135deg, 
-        rgba(71, 85, 105, 0.08) 0%, 
-        rgba(100, 116, 139, 0.06) 50%, 
-        rgba(148, 163, 184, 0.04) 100%
-      )`,
-      textBorder: '0.5px solid rgba(71, 85, 105, 0.15)',
-      textBoxShadow: `
-        0 1px 3px rgba(71, 85, 105, 0.05),
-        inset 0 1px 0 rgba(255, 255, 255, 0.10)
-      `,
-      textColor: 'rgb(71, 85, 105)',
-
-      // Percentage colors
-      percentageBackground: `linear-gradient(135deg, 
-        rgba(59, 130, 246, 0.15) 0%, 
-        rgba(59, 130, 246, 0.12) 50%, 
-        rgba(59, 130, 246, 0.10) 100%
-      )`,
-      percentageBorder: '0.5px solid rgba(59, 130, 246, 0.20)',
-      percentageBoxShadow: `
-        0 1px 3px rgba(59, 130, 246, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.15)
-      `,
-      percentageColor: 'rgb(59, 130, 246)',
-
-      // Text labels
-      startLabel: themeConfig.texts?.startLabel,
-      completedLabel: themeConfig.texts?.completedLabel,
-      progressLabel: themeConfig.texts?.progressLabel,
-      ariaLabel: 'Training progress'
-    },
-
-    // Quiz timer
-    timerContainer: "fixed top-4 right-4 z-30",
+    // Timer badge
     timerBadge: `flex items-center space-x-1.5 px-2.5 py-1.5 bg-${themeConfig.colors?.badge?.timer?.background || 'red'}-50/90 dark:bg-${themeConfig.colors?.badge?.timer?.background || 'red'}-900/90 ${themeConfig.effects?.backdropBlur || 'backdrop-blur-xl'} border border-${themeConfig.colors?.badge?.timer?.background || 'red'}-200/60 dark:border-${themeConfig.colors?.badge?.timer?.background || 'red'}-600/60 ${themeConfig.effects?.borderRadius || 'rounded-lg'} ${themeConfig.effects?.shadow || 'shadow-lg'} transition-colors duration-300`,
     timerIcon: `w-4 h-4 text-${themeConfig.colors?.badge?.timer?.icon || 'red-600'} dark:text-${themeConfig.colors?.badge?.timer?.iconDark || 'red-400'}`,
     timerText: `text-sm font-semibold text-${themeConfig.colors?.badge?.timer?.text || 'red-700'} dark:text-${themeConfig.colors?.badge?.timer?.textDark || 'red-300'}`,
 
-    // Quiz completion notification
-    quizNotificationContainer: "fixed z-30 bottom-4 right-4 sm:bottom-6 sm:right-6",
+    // Quiz notification
     quizNotificationContent: `relative px-4 py-3 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-gray-800 dark:to-gray-900 border border-amber-200/60 dark:border-amber-600/60 ${themeConfig.effects?.borderRadius || 'rounded-xl'} ${themeConfig.effects?.shadow || 'shadow-lg'} shadow-amber-500/20 dark:shadow-black/40 transition-all duration-300 backdrop-blur-xl hover:shadow-xl hover:shadow-amber-500/30 dark:hover:shadow-black/50 group`,
-    quizNotificationClose: `ml-1 p-1 ${themeConfig.effects?.borderRadius || 'rounded-full'} hover:bg-amber-200/50 dark:hover:bg-amber-900/40 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400/30 dark:focus:ring-amber-600/30 opacity-60`,
 
-    // Mobile navigation hint
-    mobileNavHintContainer: "md:hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 z-30",
+    // Mobile nav hint
     mobileNavHintContent: `flex items-center px-3 py-2 bg-white/85 dark:bg-gray-900/85 ${themeConfig.effects?.borderRadius || 'rounded-full'} border border-white/40 dark:border-gray-600/40 ${themeConfig.effects?.shadow || 'shadow-lg'} transition-colors duration-300 backdrop-blur-xl`
   }), [themeConfig]);
+
+  // Combined CSS classes - Static ve dynamic sınıfları birleştir
+  const cssClasses = useMemo(() => ({
+    ...STATIC_CSS_CLASSES,
+    ...dynamicCssClasses
+  }), [dynamicCssClasses]);
+
+  // ProgressBar Config - Ayrı memoize edildi çünkü sadece texts değiştiğinde güncellenmesi gerekiyor
+  const progressBarConfig = useMemo(() => ({
+    // Container colors
+    containerBackground: `white`,
+    containerBorder: '1px solid #C7C7CC',
+    containerBoxShadow: `
+      0 2px 8px rgba(148, 163, 184, 0.12),
+      0 1px 4px rgba(148, 163, 184, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.20)
+    `,
+
+    // Background gradients
+    backgroundGradient: 'bg-gradient-to-br from-slate-100/20 via-slate-200/12 to-slate-300/8',
+    backgroundGradientDark: 'dark:from-slate-700/18 dark:via-slate-600/12 dark:to-slate-500/8',
+
+    // Progress fill colors
+    progressFillBackground: `linear-gradient(135deg, 
+      #3B82F6 0%, 
+      #3B82F6 50%,
+      #3B82F6 100%
+    )`,
+    progressFillBorder: '1px solid #3B82F6',
+    progressFillBoxShadow: `
+      0 2px 8px rgba(59, 130, 246, 0.30),
+      0 1px 4px rgba(59, 130, 246, 0.20),
+      inset 0 1px 0 rgba(255, 255, 255, 0.30)
+    `,
+
+    // Dot colors
+    dotCompletedBackground: `linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.95) 0%, 
+      rgba(255, 255, 255, 0.90) 50%, 
+      rgba(255, 255, 255, 0.85) 100%
+    )`,
+    dotActiveBackground: `linear-gradient(135deg, 
+      rgba(59, 130, 246, 0.90) 0%, 
+      rgba(59, 130, 246, 0.85) 50%, 
+      rgba(59, 130, 246, 0.80) 100%
+    )`,
+    dotInactiveBackground: `linear-gradient(135deg, 
+      rgba(148, 163, 184, 0.50) 0%, 
+      rgba(148, 163, 184, 0.40) 50%, 
+      rgba(148, 163, 184, 0.30) 100%
+    )`,
+    dotCompletedBorder: '0.5px solid rgba(255, 255, 255, 0.70)',
+    dotActiveBorder: '0.5px solid rgba(59, 130, 246, 0.60)',
+    dotInactiveBorder: '0.5px solid rgba(148, 163, 184, 0.40)',
+    dotCompletedBoxShadow: `
+      0 2px 6px rgba(255, 255, 255, 0.25),
+      0 1px 3px rgba(255, 255, 255, 0.20),
+      inset 0 1px 0 rgba(255, 255, 255, 0.35)
+    `,
+    dotActiveBoxShadow: `
+      0 2px 6px rgba(59, 130, 246, 0.30),
+      0 1px 3px rgba(59, 130, 246, 0.20),
+      inset 0 1px 0 rgba(255, 255, 255, 0.30)
+    `,
+    dotInactiveBoxShadow: `
+      0 1px 3px rgba(148, 163, 184, 0.20),
+      inset 0 1px 0 rgba(255, 255, 255, 0.20)
+    `,
+
+    // Text colors
+    textBackground: `linear-gradient(135deg, 
+      rgba(71, 85, 105, 0.08) 0%, 
+      rgba(100, 116, 139, 0.06) 50%, 
+      rgba(148, 163, 184, 0.04) 100%
+    )`,
+    textBorder: '0.5px solid rgba(71, 85, 105, 0.15)',
+    textBoxShadow: `
+      0 1px 3px rgba(71, 85, 105, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.10)
+    `,
+    textColor: 'rgb(71, 85, 105)',
+
+    // Percentage colors
+    percentageBackground: `linear-gradient(135deg, 
+      rgba(59, 130, 246, 0.15) 0%, 
+      rgba(59, 130, 246, 0.12) 50%, 
+      rgba(59, 130, 246, 0.10) 100%
+    )`,
+    percentageBorder: '0.5px solid rgba(59, 130, 246, 0.20)',
+    percentageBoxShadow: `
+      0 1px 3px rgba(59, 130, 246, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15)
+    `,
+    percentageColor: 'rgb(59, 130, 246)',
+
+    // Text labels
+    startLabel: themeConfig.texts?.startLabel,
+    completedLabel: themeConfig.texts?.completedLabel,
+    progressLabel: themeConfig.texts?.progressLabel,
+    ariaLabel: 'Training progress'
+  }), [themeConfig.texts]);
   const [currentScene, setCurrentScene] = useState(0);
   const [direction, setDirection] = useState(0);
   const [selectedLanguage, setSelectedLanguage] = useState(() => detectBrowserLanguage());
@@ -914,9 +941,9 @@ export default function App() {
               <div className="flex items-start space-x-3 relative z-10">
                 <div className={cssClasses.themeHintIcon}>
                   {isDarkMode ? (
-                    <Moon size={16} />
+                    <Moon size={isMobile ? 12 : 16 }/>
                   ) : (
-                    <Sun size={16} />
+                    <Sun size={isMobile ? 12 : 16 } />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -1057,7 +1084,7 @@ export default function App() {
                 <ProgressBar
                   currentScene={currentScene + 1}
                   totalScenes={scenes.length}
-                  config={cssClasses.progressBarConfig}
+                  config={progressBarConfig}
                 />
               </div>
             </div>
@@ -1121,7 +1148,7 @@ export default function App() {
                       >
                         <Sun
                           size={40}
-                          className="text-yellow-600 group-hover:text-yellow-700 dark:text-white dark:group-hover:text-white transition-colors duration-300 w-6 h-6 sm:w-6 sm:h-6"
+                          className="text-yellow-600 group-hover:text-yellow-700 dark:text-white dark:group-hover:text-white transition-colors duration-300 w-5 h-5 sm:w-6 sm:h-6"
                         />
                       </motion.div>
                     ) : (
@@ -1134,7 +1161,7 @@ export default function App() {
                       >
                         <Moon
                           size={40}
-                          className="text-[#8E8E93] dark:text-[#8E8E93] transition-colors duration-300 w-6 h-6 sm:w-6 sm:h-6"
+                          className="text-[#8E8E93] dark:text-[#8E8E93] transition-colors duration-300 w-5 h-5 sm:w-6 sm:h-6"
                         />
                       </motion.div>
                     )}
@@ -1166,9 +1193,9 @@ export default function App() {
                     <ReactCountryFlag
                       countryCode={getCountryCode(currentLanguage?.code || 'tr')}
                       svg
-                      style={{ fontSize: '1rem' }}
+                      style={{ fontSize: isMobile ? '1rem' : '1.2rem' }}
                     />
-                    <span className="text-[8px] sm:text-xs text-gray-800 dark:text-gray-200 font-medium transition-colors duration-300">
+                    <span className="text-xs text-gray-800 dark:text-gray-200 font-medium transition-colors duration-300">
                       {getCountryCode(currentLanguage?.code || 'tr')}
                     </span>
                     <ChevronDown
@@ -1355,7 +1382,7 @@ export default function App() {
               <ProgressBar
                 currentScene={currentScene + 1}
                 totalScenes={scenes.length}
-                config={cssClasses.progressBarConfig}
+                config={progressBarConfig}
               />
             </div>
           )}
@@ -1374,13 +1401,14 @@ export default function App() {
               onClick={prevScene}
               disabled={false}
               label="Önceki bölüm"
+              isDarkMode={isDarkMode}
             />
           </div>
         )}
 
         {/* APPLE VISIONOS FLOATING GLASS CARD - Enhanced prominence with darker background */}
         <div className="flex-1 mx-2 sm:mx-4 md:mx-16 lg:mx-20 xl:mx-24 sm:my-3 md:my-6 flex items-center justify-center">
-          <div className="w-full h-[calc(100vh-160px)] relative">
+          <div className="w-full h-[calc(100vh-140px)] relative">
             <AnimatePresence initial={false} custom={direction} mode="wait">
               <motion.div
                 key={currentScene}
@@ -1420,20 +1448,30 @@ export default function App() {
                   willChange: 'transform',
                   transformStyle: "preserve-3d",
                   transformOrigin: "center center",
-                  // Enhanced card background with better contrast against darker background
-                  background: isMobile
-                    ? 'rgba(255, 255, 255, 0.90)'
-                    : 'rgba(255, 255, 255, 0.75)',
-                  backdropFilter: isMobile ? 'blur(12px)' : 'blur(24px)',
-                  WebkitBackdropFilter: isMobile ? 'blur(12px)' : 'blur(24px)'
+                  // Dark mode specific styling
+                  ...(isDarkMode && {
+                    borderRadius: '24px',
+                    border: '1px solid rgba(255, 255, 255, 0.50)',
+                    background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.06) 100%)',
+                    backdropFilter: 'blur(24px)',
+                    WebkitBackdropFilter: 'blur(24px)'
+                  }),
+                  // Light mode styling
+                  ...(!isDarkMode && {
+                    background: isMobile
+                      ? 'rgba(255, 255, 255, 0.90)'
+                      : 'rgba(255, 255, 255, 0.75)',
+                    backdropFilter: isMobile ? 'blur(12px)' : 'blur(24px)',
+                    WebkitBackdropFilter: isMobile ? 'blur(12px)' : 'blur(24px)'
+                  })
                 }}
               >
-                {/* ENHANCED APPLE VISIONOS GLASS EFFECTS - Better contrast with darker background */}
-                {!isMobile && (
+                {/* ENHANCED APPLE VISIONOS GLASS EFFECTS - Light mode only */}
+                {!isMobile && !isDarkMode && (
                   <>
                     {/* 1. VERY SUBTLE NOISE TEXTURE - Simulates glass imperfections */}
                     <div
-                      className="absolute inset-0 opacity-[0.018] dark:opacity-[0.010] rounded-2xl sm:rounded-3xl mix-blend-overlay pointer-events-none"
+                      className="absolute inset-0 opacity-[0.018] rounded-2xl sm:rounded-3xl mix-blend-overlay pointer-events-none"
                       style={{
                         backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 800 800' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='glassNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='8' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23glassNoise)'/%3E%3C/svg%3E")`,
                         backgroundSize: '300px 300px',
@@ -1442,9 +1480,9 @@ export default function App() {
                     />
 
                     {/* 2. ENHANCED GRADIENT BLUR - Better depth with darker background */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-white/15 to-white/8 dark:from-gray-700/25 dark:via-gray-800/12 dark:to-gray-900/6 rounded-2xl sm:rounded-3xl transition-colors duration-500" />
-                    <div className="absolute inset-0 bg-gradient-to-tl from-blue-50/20 via-transparent to-purple-50/15 dark:from-blue-900/8 dark:via-transparent dark:to-purple-900/5 rounded-2xl sm:rounded-3xl transition-colors duration-500" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-gray-100/12 via-transparent to-transparent dark:from-gray-800/8 rounded-2xl sm:rounded-3xl transition-colors duration-500" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-white/15 to-white/8 rounded-2xl sm:rounded-3xl transition-colors duration-500" />
+                    <div className="absolute inset-0 bg-gradient-to-tl from-blue-50/20 via-transparent to-purple-50/15 rounded-2xl sm:rounded-3xl transition-colors duration-500" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-gray-100/12 via-transparent to-transparent rounded-2xl sm:rounded-3xl transition-colors duration-500" />
 
                     {/* 3. ENHANCED APPLE-STYLE INNER GLOSS - More prominent with darker background */}
                     <div
@@ -1479,19 +1517,19 @@ export default function App() {
                     />
 
                     {/* Enhanced inner depth effect - More pronounced */}
-                    <div className="absolute inset-1 bg-gradient-to-br from-white/20 via-transparent to-transparent dark:from-white/8 rounded-xl sm:rounded-2xl pointer-events-none" />
+                    <div className="absolute inset-1 bg-gradient-to-br from-white/20 via-transparent to-transparent rounded-xl sm:rounded-2xl pointer-events-none" />
                   </>
                 )}
 
-                {/* ENHANCED MOBILE GLASS EFFECTS - Better contrast */}
-                {isMobile && (
+                {/* ENHANCED MOBILE GLASS EFFECTS - Light mode only */}
+                {isMobile && !isDarkMode && (
                   <>
                     {/* Enhanced glass background for mobile with better contrast */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-white/40 to-white/35 dark:from-gray-700/45 dark:via-gray-800/35 dark:to-gray-900/30 rounded-2xl transition-colors duration-300" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-white/40 to-white/35 rounded-2xl transition-colors duration-300" />
 
                     {/* Enhanced border for mobile with better visibility */}
                     <div
-                      className="absolute inset-0 rounded-2xl border border-white/40 dark:border-gray-600/40"
+                      className="absolute inset-0 rounded-2xl border border-white/40"
                       style={{
                         boxShadow: '0 6px 20px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.20)'
                       }}
@@ -1605,6 +1643,7 @@ export default function App() {
               onClick={nextScene}
               disabled={!canProceedNext()}
               label={themeConfig.texts?.nextSection}
+              isDarkMode={isDarkMode}
             />
           </div>
         )}

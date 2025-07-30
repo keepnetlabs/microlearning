@@ -216,7 +216,7 @@ export function ScenarioScene({
         initial={config.animations?.headerIcon?.initial || { opacity: 0, scale: 0.8, y: -20 }}
         animate={config.animations?.headerIcon?.animate || { opacity: 1, scale: 1, y: 0 }}
         transition={config.animations?.headerIcon?.transition || { duration: 0.8, ease: "easeOut" }}
-        className="mb-4"
+        className="mb-2 sm:mb-3"
       >
         {iconComponent}
       </motion.div>

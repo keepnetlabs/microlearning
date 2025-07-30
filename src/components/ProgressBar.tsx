@@ -312,20 +312,12 @@ export function ProgressBar({ currentScene, totalScenes, config = {} }: Progress
                             : "w-1 h-1 sm:w-1.5 sm:h-1.5"
                           }`}
                         style={{
-                          // All dots now have white background with #C7C7CC color
+                          // All dots have the same #C7C7CC color
                           background: '#C7C7CC',
-                          backdropFilter: isCompleted || isActive ? 'blur(8px)' : 'blur(4px)',
-                          WebkitBackdropFilter: isCompleted || isActive ? 'blur(8px)' : 'blur(4px)',
-                          border: isCompleted
-                            ? finalConfig.dotCompletedBorder
-                            : isActive
-                              ? finalConfig.dotActiveBorder
-                              : finalConfig.dotInactiveBorder,
-                          boxShadow: isCompleted
-                            ? finalConfig.dotCompletedBoxShadow
-                            : isActive
-                              ? finalConfig.dotActiveBoxShadow
-                              : finalConfig.dotInactiveBoxShadow,
+                          backdropFilter: 'blur(4px)',
+                          WebkitBackdropFilter: 'blur(4px)',
+                          border: '0.5px solid rgba(199, 199, 204, 0.40)',
+                          boxShadow: '0 1px 3px rgba(148, 163, 184, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.20)',
                           transform: 'translateZ(0)',
                           willChange: 'transform'
                         }}
@@ -542,20 +534,12 @@ export function ProgressBar({ currentScene, totalScenes, config = {} }: Progress
                           : "w-1 h-1 sm:w-1.5 sm:h-1.5"
                         }`}
                       style={{
-                        // All dots now have white background with #C7C7CC color
+                        // All dots have the same #C7C7CC color
                         background: '#C7C7CC',
-                        backdropFilter: isCompleted || isActive ? 'blur(8px)' : 'blur(4px)',
-                        WebkitBackdropFilter: isCompleted || isActive ? 'blur(8px)' : 'blur(4px)',
-                        border: isCompleted
-                          ? finalConfig.dotCompletedBorder
-                          : isActive
-                            ? finalConfig.dotActiveBorder
-                            : finalConfig.dotInactiveBorder,
-                        boxShadow: isCompleted
-                          ? finalConfig.dotCompletedBoxShadow
-                          : isActive
-                            ? finalConfig.dotActiveBoxShadow
-                            : finalConfig.dotInactiveBoxShadow,
+                        backdropFilter: 'blur(4px)',
+                        WebkitBackdropFilter: 'blur(4px)',
+                        border: '0.5px solid rgba(199, 199, 204, 0.40)',
+                        boxShadow: '0 1px 3px rgba(148, 163, 184, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.20)',
                         transform: 'translateZ(0)',
                         willChange: 'transform'
                       }}

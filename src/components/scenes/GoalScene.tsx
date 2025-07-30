@@ -272,21 +272,21 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
 
   const cardStyle = useMemo(() => ({
     background: `linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.95) 0%, 
-      rgba(255, 255, 255, 0.85) 25%,
-      rgba(255, 255, 255, 0.75) 50%,
-      rgba(255, 255, 255, 0.65) 75%,
-      rgba(255, 255, 255, 0.55) 100%
+      rgba(255, 255, 255, 0.92) 0%, 
+      rgba(255, 255, 255, 0.82) 25%,
+      rgba(255, 255, 255, 0.72) 50%,
+      rgba(255, 255, 255, 0.62) 75%,
+      rgba(255, 255, 255, 0.52) 100%
     )`,
-    backdropFilter: glassEffect?.blur || 'blur(36px) saturate(240%)',
-    WebkitBackdropFilter: glassEffect?.blur || 'blur(36px) saturate(240%)',
-    border: glassEffect?.border || '0.5px solid rgba(255, 255, 255, 0.4)',
+    backdropFilter: glassEffect?.blur || 'blur(32px) saturate(200%)',
+    WebkitBackdropFilter: glassEffect?.blur || 'blur(32px) saturate(200%)',
+    border: glassEffect?.border || '0.5px solid rgba(255, 255, 255, 0.35)',
     boxShadow: glassEffect?.shadow || `
-      0 12px 40px rgba(0, 0, 0, 0.08),
-      0 6px 20px rgba(0, 0, 0, 0.06),
-      0 2px 8px rgba(0, 0, 0, 0.03),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.06)
+      0 8px 32px rgba(0, 0, 0, 0.06),
+      0 4px 16px rgba(0, 0, 0, 0.04),
+      0 2px 8px rgba(0, 0, 0, 0.02),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.04)
     `,
     transform: 'translateZ(0)',
     willChange: 'transform'
@@ -294,7 +294,7 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
 
   return (
     <div
-      className="relative p-4 sm:p-5 rounded-2xl overflow-hidden transition-all duration-700 ease-out group hover:scale-[1.015] hover:shadow-2xl cursor-pointer"
+      className="relative p-4 sm:p-5 rounded-2xl overflow-hidden transition-all duration-500 ease-out group hover:scale-[1.02] hover:shadow-xl cursor-pointer"
       style={cardStyle}
     >
       {/* APPLE-STYLE ULTRA-FINE NOISE TEXTURE - VisionOS Quality */}
@@ -351,7 +351,7 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
         <div className="flex items-center mb-3">
           {/* APPLE ICON CONTAINER - Ultra-refined liquid glass */}
           <div
-            className="p-2 sm:p-2.5 rounded-xl mr-3 overflow-hidden transition-all duration-500 ease-out group-hover:scale-105"
+            className="p-2 sm:p-2.5 rounded-xl mr-3 overflow-hidden transition-all duration-300 ease-out group-hover:scale-102"
             style={{
               ...staticStyles.iconContainer,
               backdropFilter: 'blur(28px) saturate(220%)',
@@ -379,17 +379,17 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
 
             <Icon
               size={16}
-              className={`${iconColor} dark:opacity-90 relative z-10 transition-all duration-500 ease-out group-hover:scale-110`}
+              className={`${iconColor} dark:opacity-90 relative z-10 transition-all duration-300 ease-out group-hover:scale-105`}
             />
           </div>
 
           {/* APPLE TITLE & SUBTITLE TEXT - Ultra-crisp typography */}
           <div className="flex flex-col items-start">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white transition-colors duration-500 ease-out group-hover:text-gray-800 dark:group-hover:text-gray-100">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white transition-colors duration-300 ease-out group-hover:text-gray-800 dark:group-hover:text-gray-100">
               {goal.title}
             </h3>
             {goal.subtitle && (
-              <p className="text-xs font-medium text-gray-600 dark:text-gray-300 transition-colors duration-500 ease-out group-hover:text-gray-500 dark:group-hover:text-gray-200 mt-0.5">
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-300 transition-colors duration-300 ease-out group-hover:text-gray-500 dark:group-hover:text-gray-200 mt-0.5">
                 {goal.subtitle}
               </p>
             )}
@@ -397,7 +397,7 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
         </div>
 
         {/* APPLE DESCRIPTION TEXT - Perfect readability */}
-        <p className="text-xs text-left text-gray-700 dark:text-gray-200 leading-relaxed transition-colors duration-500 ease-out group-hover:text-gray-600 dark:group-hover:text-gray-100">
+        <p className="text-xs text-left text-gray-700 dark:text-gray-200 leading-relaxed transition-colors duration-300 ease-out group-hover:text-gray-600 dark:group-hover:text-gray-100">
           {goal.description}
         </p>
       </div>
@@ -461,11 +461,11 @@ export const GoalScene = memo(({
 
   return (
     <div className={containerClassName}>
-      <div className="mb-4 relative">
+      <div className="mb-2 sm:mb-3 relative">
         {iconComponent}
       </div>
 
-      <h1 className="text-2xl mb-5 text-gray-900 dark:text-white">
+      <h1 className="text-2xl mb-3 sm:mb-5 text-gray-900 dark:text-white">
         {title}
       </h1>
 
