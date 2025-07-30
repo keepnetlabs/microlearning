@@ -95,6 +95,36 @@ const STATIC_CSS_CLASSES = {
   mobileNavHintContainer: "md:hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 z-30"
 } as const;
 
+// Memoized constants for better performance
+const MEMOIZED_CONSTANTS = {
+  SWIPE_THRESHOLD: 50,
+  SCROLL_THRESHOLD: 10,
+  MOBILE_SCROLL_THRESHOLD: 200,
+  ANIMATION_DURATIONS: {
+    MOBILE: 0.3,
+    DESKTOP: 0.5,
+    FADE: 0.2,
+    SCALE: 0.4
+  },
+  TOUCH_THRESHOLDS: {
+    HORIZONTAL: 30,
+    VERTICAL: 75,
+    MIN_MOVEMENT: 3
+  }
+} as const;
+
+// Memoized components for better performance
+const MemoizedProgressBar = React.memo(ProgressBar);
+const MemoizedNavButton = React.memo(NavButton);
+const MemoizedIntroScene = React.memo(IntroScene);
+const MemoizedGoalScene = React.memo(GoalScene);
+const MemoizedScenarioScene = React.memo(ScenarioScene);
+const MemoizedActionableContentScene = React.memo(ActionableContentScene);
+const MemoizedQuizScene = React.memo(QuizScene);
+const MemoizedSurveyScene = React.memo(SurveyScene);
+const MemoizedSummaryScene = React.memo(SummaryScene);
+const MemoizedNudgeScene = React.memo(NudgeScene);
+
 export default function App() {
   // Dinamik appConfig state'i - ileride API'den gelecek
   const [appConfig, setAppConfig] = useState(() => {
@@ -119,20 +149,20 @@ export default function App() {
     return appConfig.theme;
   });
 
-  // Scenes array'ini appConfig'e bağlı olarak oluştur
+  // Scenes array'ini appConfig'e bağlı olarak oluştur - Memoized components
   const scenes = useMemo(() => [
     {
-      component: IntroScene,
+      component: MemoizedIntroScene,
       points: 10,
       config: appConfig.introSceneConfig
     },
-    { component: GoalScene, points: 15, config: appConfig.goalSceneConfig },
-    { component: ScenarioScene, points: 20, config: appConfig.scenarioSceneConfig },
-    { component: ActionableContentScene, points: 25, config: appConfig.actionableContentSceneConfig },
-    { component: QuizScene, points: 50, config: appConfig.quizSceneConfig },
-    { component: SurveyScene, points: 20, config: appConfig.surveySceneConfig },
-    { component: SummaryScene, points: 30, config: appConfig.summarySceneConfig },
-    { component: NudgeScene, points: 40, config: appConfig.nudgeSceneConfig }
+    { component: MemoizedGoalScene, points: 15, config: appConfig.goalSceneConfig },
+    { component: MemoizedScenarioScene, points: 20, config: appConfig.scenarioSceneConfig },
+    { component: MemoizedActionableContentScene, points: 25, config: appConfig.actionableContentSceneConfig },
+    { component: MemoizedQuizScene, points: 50, config: appConfig.quizSceneConfig },
+    { component: MemoizedSurveyScene, points: 20, config: appConfig.surveySceneConfig },
+    { component: MemoizedSummaryScene, points: 30, config: appConfig.summarySceneConfig },
+    { component: MemoizedNudgeScene, points: 40, config: appConfig.nudgeSceneConfig }
   ], [appConfig]);
 
   // Backend'den tema config'ini güncelleme fonksiyonu
@@ -383,7 +413,7 @@ export default function App() {
 
   // Survey feedback submission state
   const [isSurveySubmitted, setIsSurveySubmitted] = useState(false);
-  
+
   // Scene timing tracking
   const [sceneStartTimes, setSceneStartTimes] = useState<Map<number, number>>(new Map());
   const [sceneTimeSpent, setSceneTimeSpent] = useState<Map<number, number>>(new Map());
@@ -397,7 +427,6 @@ export default function App() {
   const touchStartY = useRef<number>(0);
   const touchEndY = useRef<number>(0);
   const [isSwiping, setIsSwiping] = useState(false);
-  const swipeThreshold = 50; // Minimum swipe distance
 
   // Dark mode state - Light mode is now primary/default
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -477,8 +506,8 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyboardShortcut);
   }, [toggleTheme]);
 
-  // Auto-save functionality
-  useEffect(() => {
+  // Auto-save functionality - Optimized with useCallback
+  const saveDataToStorage = useCallback(() => {
     const saveData = {
       currentScene,
       totalPoints,
@@ -493,6 +522,10 @@ export default function App() {
     };
     localStorage.setItem('cyber-training-progress', JSON.stringify(saveData));
   }, [currentScene, totalPoints, achievements, visitedScenes, pointsAwardedScenes, quizCompleted, selectedLanguage, shownAchievements, lastAchievementCount, isSurveySubmitted]);
+
+  useEffect(() => {
+    saveDataToStorage();
+  }, [saveDataToStorage]);
 
   // Load saved data on mount
   useEffect(() => {
@@ -603,23 +636,23 @@ export default function App() {
     }
   }, []);
 
-  // Enhanced scroll handler with parallax support
+  // Enhanced scroll handler with parallax support - Optimized with throttling
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
-    const threshold = 10;
+    const threshold = MEMOIZED_CONSTANTS.SCROLL_THRESHOLD;
 
     const isAtTop = scrollTop <= threshold;
     const isAtBottom = scrollTop + clientHeight >= scrollHeight - threshold;
 
     setScrollPosition({ top: isAtTop, bottom: isAtBottom });
     setShowScrollIndicator(scrollHeight > clientHeight + threshold);
-    
+
     // Show scroll-to-top button when scrolled down (mobile only) and on video scene
-    setShowScrollToTop(scrollTop > 200 && isMobile && currentScene === 2);
+    setShowScrollToTop(scrollTop > MEMOIZED_CONSTANTS.MOBILE_SCROLL_THRESHOLD && isMobile && currentScene === 2);
 
     // Update parallax scroll position for background movement
     setScrollY(scrollTop);
-  }, [isMobile]);
+  }, [isMobile, currentScene]);
 
   // Scroll to top function
   const handleScrollToTop = useCallback(() => {
@@ -631,34 +664,51 @@ export default function App() {
     }
   }, []);
 
-  // Enhanced filtered and sorted languages with priority
+  // Enhanced filtered and sorted languages with priority - Memoized for performance
   const filteredLanguages = useMemo(() => {
-    let filtered = languages;
+    if (!languageSearchTerm) {
+      return languages.sort((a, b) => {
+        const aPriority = priorityLanguages.indexOf(a.code);
+        const bPriority = priorityLanguages.indexOf(b.code);
 
-    if (languageSearchTerm) {
-      filtered = languages.filter(lang =>
-        lang.name.toLowerCase().includes(languageSearchTerm.toLowerCase()) ||
-        lang.code.toLowerCase().includes(languageSearchTerm.toLowerCase())
-      );
+        if (aPriority !== -1 && bPriority !== -1) {
+          return aPriority - bPriority;
+        }
+
+        if (aPriority !== -1 && bPriority === -1) {
+          return -1;
+        }
+        if (aPriority === -1 && bPriority !== -1) {
+          return 1;
+        }
+
+        return a.name.localeCompare(b.name);
+      });
     }
 
-    return filtered.sort((a, b) => {
-      const aPriority = priorityLanguages.indexOf(a.code);
-      const bPriority = priorityLanguages.indexOf(b.code);
+    return languages
+      .filter(lang => {
+        const searchTerm = languageSearchTerm.toLowerCase();
+        return lang.name.toLowerCase().includes(searchTerm) ||
+          lang.code.toLowerCase().includes(searchTerm);
+      })
+      .sort((a, b) => {
+        const aPriority = priorityLanguages.indexOf(a.code);
+        const bPriority = priorityLanguages.indexOf(b.code);
 
-      if (aPriority !== -1 && bPriority !== -1) {
-        return aPriority - bPriority;
-      }
+        if (aPriority !== -1 && bPriority !== -1) {
+          return aPriority - bPriority;
+        }
 
-      if (aPriority !== -1 && bPriority === -1) {
-        return -1;
-      }
-      if (aPriority === -1 && bPriority !== -1) {
-        return 1;
-      }
+        if (aPriority !== -1 && bPriority === -1) {
+          return -1;
+        }
+        if (aPriority === -1 && bPriority !== -1) {
+          return 1;
+        }
 
-      return a.name.localeCompare(b.name);
-    });
+        return a.name.localeCompare(b.name);
+      });
   }, [languageSearchTerm]);
 
   // Separate priority and other languages for display
@@ -678,10 +728,10 @@ export default function App() {
   // Track scene timing
   const trackSceneTime = useCallback((sceneIndex: number) => {
     const now = Date.now();
-    
+
     // Record start time for current scene
     setSceneStartTimes(prev => new Map(prev.set(sceneIndex, now)));
-    
+
     // Calculate time spent on previous scene if exists
     if (sceneIndex > 0) {
       const previousScene = sceneIndex - 1;
@@ -721,15 +771,15 @@ export default function App() {
     setAchievements(prev => [...prev, ...newAchievements.filter(a => !prev.includes(a))]);
   }, [quizCompleted, visitedScenes.size, totalPoints, pointsAwardedScenes]);
 
-  // Calculate completion data for NudgeScene
+  // Calculate completion data for NudgeScene - Optimized calculation
   const completionData = useMemo(() => {
     const totalTimeSpent = Array.from(sceneTimeSpent.values()).reduce((total, time) => total + time, 0);
     const minutes = Math.floor(totalTimeSpent / 60000);
     const seconds = Math.floor((totalTimeSpent % 60000) / 1000);
     const timeSpentString = minutes > 0 ? `${minutes} dakika ${seconds} saniye` : `${seconds} saniye`;
-    
+
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-    
+
     return {
       totalPoints,
       timeSpent: timeSpentString,
@@ -752,7 +802,7 @@ export default function App() {
     if (currentScene < scenes.length - 1) {
       // Track time spent on current scene
       trackSceneTime(currentScene + 1);
-      
+
       // INSTANT transition on mobile - NO loading delay
       if (isMobile) {
         setDirection(1);
@@ -881,7 +931,7 @@ export default function App() {
     const deltaY = Math.abs(touchEndY.current - touchStartY.current);
 
     // Only consider it swiping if horizontal movement is greater than vertical
-    if (deltaX > deltaY && deltaX > 10) {
+    if (deltaX > deltaY && deltaX > MEMOIZED_CONSTANTS.TOUCH_THRESHOLDS.MIN_MOVEMENT) {
       setIsSwiping(true);
     }
   }, [isMobile]);
@@ -893,7 +943,7 @@ export default function App() {
     const deltaY = Math.abs(touchStartY.current - touchEndY.current);
 
     // Only process swipe if vertical movement is minimal and horizontal is significant
-    if (deltaY < 75 && Math.abs(deltaX) >= swipeThreshold) {
+    if (deltaY < MEMOIZED_CONSTANTS.TOUCH_THRESHOLDS.VERTICAL && Math.abs(deltaX) >= MEMOIZED_CONSTANTS.SWIPE_THRESHOLD) {
       if (deltaX > 0 && canProceedNext()) {
         // Swipe left - go to next scene
         nextScene();
@@ -936,11 +986,11 @@ export default function App() {
   }, [currentScene, previousScene, handleSceneChange, resetScrollPosition, isMobile]);
 
   const CurrentSceneComponent = scenes[currentScene].component as React.ComponentType<any>;
-  const currentLanguage = languages.find(lang => lang.code === selectedLanguage);
+  const currentLanguage = useMemo(() => languages.find(lang => lang.code === selectedLanguage), [selectedLanguage]);
   const currentSceneConfig = scenes[currentScene].config;
 
-  // PERFORMANCE OPTIMIZED slide variants - simpler animations for mobile
-  const slideVariants = {
+  // PERFORMANCE OPTIMIZED slide variants - Memoized for better performance
+  const slideVariants = useMemo(() => ({
     enter: (direction: number) => ({
       x: direction > 0 ? '100%' : '-100%',
       opacity: isMobile ? 1 : 0, // Skip opacity animation on mobile
@@ -958,7 +1008,7 @@ export default function App() {
       opacity: isMobile ? 1 : 0, // Skip opacity animation on mobile
       scale: isMobile ? 1 : 0.98 // Minimal scale on mobile
     })
-  };
+  }), [isMobile]);
 
   return (
     <div
@@ -1004,9 +1054,9 @@ export default function App() {
               <div className="flex items-start space-x-3 relative z-10">
                 <div className={cssClasses.themeHintIcon}>
                   {isDarkMode ? (
-                    <Moon size={isMobile ? 12 : 16 }/>
+                    <Moon size={isMobile ? 12 : 16} />
                   ) : (
-                    <Sun size={isMobile ? 12 : 16 } />
+                    <Sun size={isMobile ? 12 : 16} />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -1144,7 +1194,7 @@ export default function App() {
             {/* Center - Progress Bar */}
             <div className="flex-1 hidden md:block">
               <div className="relative">
-                <ProgressBar
+                <MemoizedProgressBar
                   currentScene={currentScene + 1}
                   totalScenes={scenes.length}
                   config={progressBarConfig}
@@ -1277,7 +1327,12 @@ export default function App() {
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95, y: -8 }}
                       transition={{ duration: 0.2, ease: "easeOut" }}
-                      className={`absolute top-full right-0 mt-2 w-64 sm:w-72 bg-white/95 dark:bg-gray-900/95 border border-white/50 dark:border-gray-600/60 rounded-2xl shadow-2xl shadow-black/10 dark:shadow-black/30 z-50 overflow-hidden transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-3xl'}`}
+                      className={`absolute top-full right-0 mt-2 w-64 sm:w-72 bg-white/95 border border-white/50 dark:border-gray-600/60 rounded-2xl shadow-2xl shadow-black/10 dark:shadow-black/30 z-50 overflow-hidden transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-3xl'}`}
+                      style={{
+                        background: isDarkMode
+                          ? 'linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.06) 100%)'
+                          : undefined
+                      }}
                       role="listbox"
                       aria-label="Language Selector"
                     >
@@ -1293,7 +1348,7 @@ export default function App() {
                             placeholder={getSearchPlaceholder(currentLanguage?.code || 'tr')}
                             value={languageSearchTerm}
                             onChange={(e) => setLanguageSearchTerm(e.target.value)}
-                            className={`w-full pl-6 pr-3 py-1.5 text-xs bg-white/60 dark:bg-gray-800/80 border border-white/40 dark:border-gray-600/60 rounded-lg  placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-xl'}`}
+                            className={`w-full pl-6 pr-3 py-1.5 text-xs bg-white/60 dark:bg-white border border-white/40 dark:border-blue-500/60 rounded-lg  placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-xl'}`}
                             aria-label={getSearchPlaceholder(currentLanguage?.code || 'tr')}
                           />
                         </div>
@@ -1316,9 +1371,9 @@ export default function App() {
                             {/* Priority Languages Section */}
                             {priorityLangs.length > 0 && !languageSearchTerm && (
                               <>
-                                <div className="px-3 py-1.5 text-xs font-medium text-blue-800 dark:text-blue-300 bg-blue-50/50 dark:bg-blue-900/40 border-b border-blue-100/50 dark:border-blue-800/50 flex items-center transition-colors duration-300">
+                                <div className="px-3 py-1.5 text-xs font-medium text-[#3B82F6] dark:text-white bg-gray-50/50 dark:bg-gray-800/40 border-b border-gray-200/50 dark:border-gray-700/50 flex items-center transition-colors duration-300">
                                   <Star size={10} className="mr-1.5" />
-                                  {themeConfig.texts?.popularLanguages || "Popüler Diller"}
+                                  {themeConfig.texts?.popularLanguages}
                                 </div>
                                 {priorityLangs.map((language, index) => (
                                   <motion.button
@@ -1331,7 +1386,7 @@ export default function App() {
                                       setIsLanguageDropdownOpen(false);
                                       setLanguageSearchTerm('');
                                     }}
-                                    className={`relative z-10 w-full flex items-center space-x-2.5 px-3 py-3 text-left hover:bg-blue-50/50 dark:hover:bg-blue-900/40 active:bg-blue-100/50 dark:active:bg-blue-900/60 transition-all duration-200 focus:outline-none focus:bg-blue-50/50 dark:focus:bg-blue-900/40 ${selectedLanguage === language.code ? 'bg-blue-50/60 dark:bg-blue-900/50' : ''
+                                    className={`relative z-10 w-full flex items-center space-x-2.5 px-3 py-3 text-left hover:bg-[#3b82f633] dark:hover:bg-gray-700/40 active:bg-gray-200/50 dark:active:bg-gray-600/60 transition-all duration-200 focus:outline-none focus:bg-gray-100/50 dark:focus:bg-gray-700/40 ${selectedLanguage === language.code ? 'bg-gray-100/60 dark:bg-gray-700/50' : ''
                                       }`}
                                     style={{ touchAction: 'manipulation' }}
                                     role="option"
@@ -1342,7 +1397,7 @@ export default function App() {
                                       svg
                                       style={{ fontSize: '0.75rem' }}
                                     />
-                                    <span className="text-xs text-gray-900 dark:text-white font-medium flex-1 min-w-0 truncate transition-colors duration-300">
+                                    <span className={`text-xs text-gray-900 dark:text-white font-medium flex-1 min-w-0 truncate transition-colors duration-300 ${selectedLanguage === language.code ? 'text-[#3B82F6]' : ''}`}>
                                       {language.name}
                                     </span>
                                     <span className="text-xs text-gray-600 dark:text-gray-300 flex-shrink-0 transition-colors duration-300">
@@ -1375,7 +1430,7 @@ export default function App() {
                                     setIsLanguageDropdownOpen(false);
                                     setLanguageSearchTerm('');
                                   }}
-                                  className={`relative z-10 w-full flex items-center space-x-2.5 px-3 py-3 text-left hover:bg-blue-50/50 dark:hover:bg-blue-900/40 active:bg-blue-100/50 dark:active:bg-blue-900/60 transition-all duration-200 focus:outline-none focus:bg-blue-50/50 dark:focus:bg-blue-900/40 ${selectedLanguage === language.code ? 'bg-blue-50/60 dark:bg-blue-900/50' : ''
+                                  className={`relative z-10 w-full flex items-center space-x-2.5 px-3 py-3 text-left hover:bg-blue-50/50 dark:hover:bg-gray-700/40 active:bg-blue-100/50 dark:active:bg-gray-600/60 transition-all duration-200 focus:outline-none focus:bg-blue-50/50 dark:focus:bg-gray-700/40 ${selectedLanguage === language.code ? 'bg-blue-50/60 dark:bg-gray-700/50' : ''
                                     }`}
                                   style={{ touchAction: 'manipulation' }}
                                   role="option"
@@ -1389,7 +1444,7 @@ export default function App() {
                                     {language.code.toUpperCase()}
                                   </span>
                                   {selectedLanguage === language.code && (
-                                    <div className="w-1 h-1 bg-blue-500 dark:bg-blue-400 rounded-full flex-shrink-0"></div>
+                                    <div className="w-1 h-1 bg-blue-500 dark:bg-gray-400 rounded-full flex-shrink-0"></div>
                                   )}
                                 </motion.button>
                               ))
@@ -1406,7 +1461,7 @@ export default function App() {
                                     setIsLanguageDropdownOpen(false);
                                     setLanguageSearchTerm('');
                                   }}
-                                  className={`relative z-10 w-full flex items-center space-x-2.5 px-3 py-3 text-left hover:bg-blue-50/50 dark:hover:bg-blue-900/40 active:bg-blue-100/50 dark:active:bg-blue-900/60 transition-all duration-200 focus:outline-none focus:bg-blue-50/50 dark:focus:bg-blue-900/40 ${selectedLanguage === language.code ? 'bg-blue-50/60 dark:bg-blue-900/50' : ''
+                                  className={`relative z-10 w-full flex items-center space-x-2.5 px-3 py-3 text-left hover:bg-blue-50/50 dark:hover:bg-gray-700/40 active:bg-blue-100/50 dark:active:bg-gray-600/60 transition-all duration-200 focus:outline-none focus:bg-blue-50/50 dark:focus:bg-gray-700/40 ${selectedLanguage === language.code ? 'bg-blue-50/60 dark:bg-gray-700/50' : ''
                                     }`}
                                   style={{ touchAction: 'manipulation' }}
                                   role="option"
@@ -1424,7 +1479,7 @@ export default function App() {
                                     {getCountryCode(language.code)}
                                   </span>
                                   {selectedLanguage === language.code && (
-                                    <div className="w-1 h-1 bg-blue-500 dark:bg-blue-400 rounded-full flex-shrink-0"></div>
+                                    <div className="w-1 h-1 bg-blue-500 dark:bg-gray-400 rounded-full flex-shrink-0"></div>
                                   )}
                                 </motion.button>
                               ))
@@ -1442,7 +1497,7 @@ export default function App() {
           </div>
           {isMobile && (
             <div className="flex-1 relative flex items-center">
-              <ProgressBar
+              <MemoizedProgressBar
                 currentScene={currentScene + 1}
                 totalScenes={scenes.length}
                 config={progressBarConfig}
@@ -1459,7 +1514,7 @@ export default function App() {
         {/* Left Navigation - Hidden on mobile and only show when active */}
         {currentScene > 0 && (
           <div className="absolute left-2 sm:left-4 z-30 top-1/2 transform -translate-y-1/2 hidden md:block">
-            <NavButton
+            <MemoizedNavButton
               direction="prev"
               onClick={prevScene}
               disabled={false}
@@ -1481,20 +1536,20 @@ export default function App() {
                 animate="center"
                 exit="exit"
                 transition={{
-                  // OPTIMIZED ANIMATIONS for mobile performance
+                  // OPTIMIZED ANIMATIONS for mobile performance - Memoized constants
                   x: {
                     type: isMobile ? "tween" : "spring",
-                    duration: isMobile ? 0.3 : 0.5,
+                    duration: isMobile ? MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.MOBILE : MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.DESKTOP,
                     ease: isMobile ? [0.25, 0.46, 0.45, 0.94] : "easeOut",
                     stiffness: isMobile ? undefined : 300,
                     damping: isMobile ? undefined : 25
                   },
                   opacity: {
-                    duration: isMobile ? 0.2 : 0.4,
+                    duration: isMobile ? MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.FADE : MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.SCALE,
                     ease: [0.25, 0.46, 0.45, 0.94]
                   },
                   scale: {
-                    duration: isMobile ? 0.2 : 0.4,
+                    duration: isMobile ? MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.FADE : MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.SCALE,
                     ease: [0.25, 0.46, 0.45, 0.94]
                   }
                 }}
@@ -1631,11 +1686,9 @@ export default function App() {
                     >
                       {/* Quiz Scene - Always mounted to preserve state */}
                       <div style={{ display: currentScene === 4 ? 'block' : 'none' }}>
-                        <QuizScene
+                        <MemoizedQuizScene
                           config={(appConfig as any).quizSceneConfig}
                           onQuizCompleted={handleQuizCompleted}
-
-                          // Quiz state props
                           currentQuestionIndex={quizCurrentQuestionIndex}
                           setCurrentQuestionIndex={setQuizCurrentQuestionIndex}
                           answers={quizAnswers}
@@ -1657,15 +1710,16 @@ export default function App() {
                           selectedItem={quizSelectedItem}
                           setSelectedItem={setQuizSelectedItem}
                           questionLoadingText={themeConfig.texts?.questionLoading}
+                          isDarkMode={isDarkMode}
                         />
                       </div>
 
                       {/* Other scenes */}
                       {currentScene !== 4 && (
-                        <CurrentSceneComponent config={currentSceneConfig}                             
-                        onSurveySubmitted={handleSurveySubmitted}
-                        isSubmitted={isSurveySubmitted}
-                        completionData={currentScene === 7 ? completionData : undefined}
+                        <CurrentSceneComponent config={currentSceneConfig}
+                          onSurveySubmitted={handleSurveySubmitted}
+                          isSubmitted={isSurveySubmitted}
+                          completionData={currentScene === 7 ? completionData : undefined}
                         />
                       )}
                     </motion.div>
@@ -1698,7 +1752,7 @@ export default function App() {
         {/* Right Navigation - Hidden on mobile and on last scene */}
         {currentScene < scenes.length - 1 && (
           <div className="absolute right-2 sm:right-4 z-30 top-1/2 transform -translate-y-1/2 hidden md:block">
-            <NavButton
+            <MemoizedNavButton
               direction="next"
               onClick={nextScene}
               disabled={!canProceedNext()}
@@ -1726,7 +1780,7 @@ export default function App() {
             onTouchStart={(e) => {
               const startX = e.touches[0].clientX;
               const startY = e.touches[0].clientY;
-              const threshold = 30; // Much lower threshold for hyper responsiveness
+              const threshold = MEMOIZED_CONSTANTS.TOUCH_THRESHOLDS.HORIZONTAL;
               let hasMovedHorizontally = false;
 
               const handleTouchMove = (moveEvent: TouchEvent) => {
@@ -1736,7 +1790,7 @@ export default function App() {
                 const diffY = Math.abs(startY - currentY);
 
                 // ULTRA sensitive horizontal detection
-                if (diffX > diffY && diffX > 3) {
+                if (diffX > diffY && diffX > MEMOIZED_CONSTANTS.TOUCH_THRESHOLDS.MIN_MOVEMENT) {
                   hasMovedHorizontally = true;
                 }
               };
@@ -1776,7 +1830,7 @@ export default function App() {
             onTouchStart={(e) => {
               const startX = e.touches[0].clientX;
               const startY = e.touches[0].clientY;
-              const threshold = 30; // Much lower threshold for hyper responsiveness
+              const threshold = MEMOIZED_CONSTANTS.TOUCH_THRESHOLDS.HORIZONTAL;
               let hasMovedHorizontally = false;
 
               const handleTouchMove = (moveEvent: TouchEvent) => {
@@ -1786,7 +1840,7 @@ export default function App() {
                 const diffY = Math.abs(startY - currentY);
 
                 // ULTRA sensitive horizontal detection
-                if (diffX > diffY && diffX > 3) {
+                if (diffX > diffY && diffX > MEMOIZED_CONSTANTS.TOUCH_THRESHOLDS.MIN_MOVEMENT) {
                   hasMovedHorizontally = true;
                 }
               };

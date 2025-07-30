@@ -102,18 +102,18 @@ export function SurveyScene({
             <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent dark:from-gray-800/20 dark:to-transparent rounded-2xl"></div>
             <div className="relative z-10">
               <p className={`text-sm leading-relaxed mb-3 ${config.styling?.successCard?.textColor || 'text-emerald-800 dark:text-emerald-100'}`}>
-                {config.texts?.successMessage1 || "✅ Değerlendirmeniz başarıyla kaydedildi"}
+                {config.texts?.successMessage1}
               </p>
               <p className={`text-sm leading-relaxed mb-3 ${config.styling?.successCard?.textColor || 'text-emerald-800 dark:text-emerald-100'}`}>
-                {config.texts?.successMessage2 || "📧 Ekibimiz geri bildirimlerinizi inceleyecek"}
+                {config.texts?.successMessage2}
               </p>
               <p className={`text-xs leading-relaxed ${config.styling?.successCard?.textColor || 'text-emerald-800 dark:text-emerald-100'}`}>
-                {config.texts?.successMessage3 || "🔒 Tüm verileriniz güvenli bir şekilde saklanmaktadır"}
+                {config.texts?.successMessage3}
               </p>
 
               <div className="mt-4 pt-3 border-t border-emerald-200/40 dark:border-emerald-600/40">
                 <p className={`text-xs font-medium ${config.styling?.successCard?.textColor || 'text-emerald-800 dark:text-emerald-100'}`}>
-                  {config.texts?.thankYouMessage || "Teşekkürler! Görüşleriniz bizim için çok değerli."}
+                  {config.texts?.thankYouMessage}
                 </p>
               </div>
             </div>
@@ -144,9 +144,9 @@ export function SurveyScene({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.2 }}
-        className="text-lg sm:text-xl mb-4 text-center text-gray-900 dark:text-white"
+        className="text-lg sm:text-2xl mb-3 text-center text-gray-900 dark:text-white"
       >
-        {config.texts?.title || "Geri Bildiriminiz"}
+        {config.texts?.title}
       </motion.h1>
 
       <motion.div
@@ -203,7 +203,7 @@ export function SurveyScene({
                   <div className="relative mr-3">
                     {/* Custom Checkbox */}
                     <div className={`w-4 h-4 rounded border-2 transition-all duration-200 flex items-center justify-center ${selectedTopics.includes(index)
-                      ? 'bg-blue-500 border-blue-500'
+                      ? 'w-3 h-3 text-blue-600 dark:text-white dark:bg-black dark:border-0'
                       : 'bg-white/70 dark:bg-gray-600/70 border-gray-300 dark:border-gray-500 hover:border-blue-400 dark:hover:border-blue-400'
                       }`}>
                       {selectedTopics.includes(index) && (
@@ -212,7 +212,7 @@ export function SurveyScene({
                           animate={{ scale: 1 }}
                           transition={{ duration: 0.2 }}
                         >
-                          <CheckCircle size={10} className="text-white" />
+                          <CheckCircle size={10} className="w-3 h-3 text-blue-600 dark:text-white" />
                         </motion.div>
                       )}
                     </div>

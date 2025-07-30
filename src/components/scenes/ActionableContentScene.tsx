@@ -212,7 +212,7 @@ export function ActionableContentScene({
   config = educationConfigs.smishing.actionableContentSceneConfig
 }: ActionableContentSceneProps) {
   // Default values for container classes
-  const defaultContainerClassName = "flex flex-col items-center justify-center h-full px-6";
+  const defaultContainerClassName = "flex flex-col items-center justify-center h-full px-2 sm:px-6";
 
   const {
     title,
@@ -247,7 +247,7 @@ export function ActionableContentScene({
       <div className="mb-2 sm:mb-3">
         {sceneIconComponent}
       </div>
-      <h1 className="text-xl mb-2 sm:mb-3 text-center text-gray-900 dark:text-white">
+      <h1 className="text-2xl mb-2 sm:mb-3 text-center text-gray-900 dark:text-white">
         {title}
       </h1>
 

@@ -227,7 +227,7 @@ export function ScenarioScene({
         initial={config.animations?.title?.initial || { opacity: 0, y: 20 }}
         animate={config.animations?.title?.animate || { opacity: 1, y: 0 }}
         transition={config.animations?.title?.transition || { duration: 0.8, delay: 0.2 }}
-        className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white text-center mb-2"
+        className="text-2xl mb-1 sm:mb-3 text-gray-900 dark:text-white text-center"
       >
         {config.title}
       </motion.h1>
