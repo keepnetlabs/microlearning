@@ -564,7 +564,9 @@ export function VideoPlayer({
         playerRef.current.destroy();
       }
 
-      const plyrConfig: Plyr.Options = {
+      const plyrConfig: Plyr.Options & {
+        playsinline?: boolean;
+      } = {
         controls: [
           "play",
           "progress",
