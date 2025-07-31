@@ -131,10 +131,8 @@ interface QuizSceneConfig {
     list?: Question[];
   };
   ui?: {
-    showProgressBar?: boolean;
     showTimer?: boolean;
     showDifficulty?: boolean;
-    showCategory?: boolean;
   };
   icon?: {
     component?: React.ReactNode;
@@ -348,8 +346,6 @@ export const QuizScene = React.memo(function QuizScene({
   const maxAttempts = useMemo(() => config?.questions?.maxAttempts || 2, [config?.questions?.maxAttempts]);
   const currentQuestion = useMemo(() => questions[currentQuestionIndex], [questions, currentQuestionIndex]);
   const currentAnswer = useMemo(() => answers.get(currentQuestion?.id), [answers, currentQuestion?.id]);
-  const progress = useMemo(() => ((currentQuestionIndex + 1) / questions.length) * 100, [currentQuestionIndex, questions.length]);
-
   // Answer options style helper - Mobile-first with proper dark mode support
   const getAnswerOptionStyle = useCallback((isSelected: boolean, isCorrect?: boolean, showResult?: boolean) => {
     // Mobile-first color palette with proper dark mode support
@@ -852,10 +848,8 @@ export const QuizScene = React.memo(function QuizScene({
                   <div
                     className="px-4 py-1.5 rounded-lg text-center transition-all duration-300"
                     style={{
-                      background: "linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%)",
-                      border: "1px solid rgba(255, 255, 255, 0.12)",
-                      backdropFilter: "blur(12px) saturate(180%)",
-                      boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.05)"
+                      background: "transparent",
+                      border: "none"
                     }}
                   >
                     <span className="text-foreground font-medium text-sm">

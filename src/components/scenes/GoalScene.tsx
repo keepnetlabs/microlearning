@@ -61,59 +61,6 @@ interface GoalSceneConfig {
   glassEffect?: GlassEffectConfig;
 }
 
-// Memoized default config
-const defaultConfig: GoalSceneConfig = {
-  // Content defaults
-  title: "Eğitim Hedefleri",
-  goals: [
-    {
-      iconName: "briefcase",
-      title: "Profesyonel Güvenlik",
-      subtitle: "Kurumsal Standartlar",
-      description: "Kurumsal verileri korumak için güvenli parola politikaları oluşturmak",
-      colorType: ColorType.BLUE,
-    },
-    {
-      iconName: "users",
-      title: "Ekip Liderliği",
-      subtitle: "Örnek Olma",
-      description: "Takım üyelerinize güvenlik bilinciyle örnek olmak",
-      colorType: ColorType.GREEN,
-    },
-    {
-      iconName: "shield",
-      title: "Risk Yönetimi",
-      subtitle: "Proaktif Yaklaşım",
-      description: "Güvenlik açıklarını önceden tespit etmek ve önlemek",
-      colorType: ColorType.RED,
-    }
-  ],
-
-  // Visual configuration defaults
-  icon: {
-    component: null,
-    size: 48,
-    sceneIconName: "target",
-    className: "text-blue-500"
-  },
-
-  // Layout defaults
-  containerClassName: "flex flex-col items-center justify-center h-full text-center px-6",
-  cardSpacing: "space-y-4",
-  maxWidth: "max-w-md w-full",
-
-  // Glass effect defaults - Enhanced Apple liquid glass
-  glassEffect: {
-    blur: "blur(28px) saturate(220%)",
-    saturation: "saturate(220%)",
-    border: "0.5px solid rgba(255, 255, 255, 0.35)",
-    shadow: `0 12px 40px rgba(0, 0, 0, 0.12),
-             0 6px 20px rgba(0, 0, 0, 0.08),
-             0 2px 8px rgba(0, 0, 0, 0.04),
-             inset 0 1px 0 rgba(255, 255, 255, 0.25),
-             inset 0 -1px 0 rgba(0, 0, 0, 0.08)`
-  }
-};
 
 // Memoized static styles
 const staticStyles = {
@@ -212,27 +159,27 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
   const getStrongBgGradient = useCallback((bgColorType: ColorType): string => {
     switch (bgColorType) {
       case ColorType.BLUE:
-        return 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.10) 50%, rgba(29, 78, 216, 0.08) 100%)';
+        return 'linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(37, 99, 235, 0.18) 50%, rgba(29, 78, 216, 0.12) 100%)';
       case ColorType.GREEN:
-        return 'linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(22, 163, 74, 0.10) 50%, rgba(21, 128, 61, 0.08) 100%)';
+        return 'linear-gradient(135deg, rgba(34, 197, 94, 0.25) 0%, rgba(22, 163, 74, 0.18) 50%, rgba(21, 128, 61, 0.12) 100%)';
       case ColorType.EMERALD:
-        return 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.10) 50%, rgba(4, 120, 87, 0.08) 100%)';
+        return 'linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(5, 150, 105, 0.18) 50%, rgba(4, 120, 87, 0.12) 100%)';
       case ColorType.PURPLE:
-        return 'linear-gradient(135deg, rgba(147, 51, 234, 0.15) 0%, rgba(126, 34, 206, 0.10) 50%, rgba(107, 33, 168, 0.08) 100%)';
+        return 'linear-gradient(135deg, rgba(147, 51, 234, 0.25) 0%, rgba(126, 34, 206, 0.18) 50%, rgba(107, 33, 168, 0.12) 100%)';
       case ColorType.RED:
-        return 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.10) 50%, rgba(185, 28, 28, 0.08) 100%)';
+        return 'linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(220, 38, 38, 0.18) 50%, rgba(185, 28, 28, 0.12) 100%)';
       case ColorType.ORANGE:
-        return 'linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(234, 88, 12, 0.10) 50%, rgba(194, 65, 12, 0.08) 100%)';
+        return 'linear-gradient(135deg, rgba(249, 115, 22, 0.25) 0%, rgba(234, 88, 12, 0.18) 50%, rgba(194, 65, 12, 0.12) 100%)';
       case ColorType.YELLOW:
-        return 'linear-gradient(135deg, rgba(250, 204, 21, 0.15) 0%, rgba(234, 179, 8, 0.10) 50%, rgba(202, 138, 4, 0.08) 100%)';
+        return 'linear-gradient(135deg, rgba(250, 204, 21, 0.25) 0%, rgba(234, 179, 8, 0.18) 50%, rgba(202, 138, 4, 0.12) 100%)';
       case ColorType.INDIGO:
-        return 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(79, 70, 229, 0.10) 50%, rgba(67, 56, 202, 0.08) 100%)';
+        return 'linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(79, 70, 229, 0.18) 50%, rgba(67, 56, 202, 0.12) 100%)';
       case ColorType.PINK:
-        return 'linear-gradient(135deg, rgba(236, 72, 153, 0.15) 0%, rgba(219, 39, 119, 0.10) 50%, rgba(190, 24, 93, 0.08) 100%)';
+        return 'linear-gradient(135deg, rgba(236, 72, 153, 0.25) 0%, rgba(219, 39, 119, 0.18) 50%, rgba(190, 24, 93, 0.12) 100%)';
       case ColorType.GRAY:
-        return 'linear-gradient(135deg, rgba(107, 114, 128, 0.15) 0%, rgba(75, 85, 99, 0.10) 50%, rgba(55, 65, 81, 0.08) 100%)';
+        return 'linear-gradient(135deg, rgba(107, 114, 128, 0.25) 0%, rgba(75, 85, 99, 0.18) 50%, rgba(55, 65, 81, 0.12) 100%)';
       default:
-        return 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.10) 50%, rgba(29, 78, 216, 0.08) 100%)';
+        return 'linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(37, 99, 235, 0.18) 50%, rgba(29, 78, 216, 0.12) 100%)';
     }
   }, []);
 
@@ -272,21 +219,21 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
 
   const cardStyle = useMemo(() => ({
     background: `linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.92) 0%, 
-      rgba(255, 255, 255, 0.82) 25%,
-      rgba(255, 255, 255, 0.72) 50%,
-      rgba(255, 255, 255, 0.62) 75%,
-      rgba(255, 255, 255, 0.52) 100%
+      rgba(255, 255, 255, 0.95) 0%, 
+      rgba(255, 255, 255, 0.88) 25%,
+      rgba(255, 255, 255, 0.80) 50%,
+      rgba(255, 255, 255, 0.72) 75%,
+      rgba(255, 255, 255, 0.65) 100%
     )`,
     backdropFilter: glassEffect?.blur || 'blur(32px) saturate(200%)',
     WebkitBackdropFilter: glassEffect?.blur || 'blur(32px) saturate(200%)',
-    border: glassEffect?.border || '0.5px solid rgba(255, 255, 255, 0.35)',
+    border: glassEffect?.border || '1px solid rgba(255, 255, 255, 0.45)',
     boxShadow: glassEffect?.shadow || `
-      0 8px 32px rgba(0, 0, 0, 0.06),
-      0 4px 16px rgba(0, 0, 0, 0.04),
-      0 2px 8px rgba(0, 0, 0, 0.02),
-      inset 0 1px 0 rgba(255, 255, 255, 0.8),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.04)
+      0 12px 40px rgba(0, 0, 0, 0.12),
+      0 6px 20px rgba(0, 0, 0, 0.08),
+      0 3px 10px rgba(0, 0, 0, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.06)
     `,
     transform: 'translateZ(0)',
     willChange: 'transform'
@@ -294,7 +241,7 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
 
   return (
     <div
-      className="relative p-4 sm:p-5 rounded-2xl overflow-hidden transition-all duration-500 ease-out group hover:scale-[1.02] hover:shadow-xl cursor-pointer"
+      className="relative p-4 sm:p-5 rounded-2xl overflow-hidden transition-all duration-500 ease-out group hover:scale-[1.03] hover:shadow-2xl cursor-pointer"
       style={cardStyle}
     >
       {/* APPLE-STYLE ULTRA-FINE NOISE TEXTURE - VisionOS Quality */}
@@ -351,17 +298,17 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
         <div className="flex items-center mb-3">
           {/* APPLE ICON CONTAINER - Ultra-refined liquid glass */}
           <div
-            className="p-2 sm:p-2.5 rounded-xl mr-3 overflow-hidden transition-all duration-300 ease-out group-hover:scale-102"
+            className="p-2 sm:p-2.5 rounded-xl mr-3 overflow-hidden transition-all duration-300 ease-out group-hover:scale-105"
             style={{
               ...staticStyles.iconContainer,
               backdropFilter: 'blur(28px) saturate(220%)',
               WebkitBackdropFilter: 'blur(28px) saturate(220%)',
-              border: '0.5px solid rgba(255, 255, 255, 0.7)',
+              border: '1px solid rgba(255, 255, 255, 0.8)',
               boxShadow: `
-                0 6px 20px rgba(0, 0, 0, 0.06),
-                0 3px 10px rgba(0, 0, 0, 0.04),
-                inset 0 1px 0 rgba(255, 255, 255, 0.6),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.04)
+                0 8px 25px rgba(0, 0, 0, 0.10),
+                0 4px 12px rgba(0, 0, 0, 0.06),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.06)
               `
             }}
           >
@@ -385,11 +332,11 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
 
           {/* APPLE TITLE & SUBTITLE TEXT - Ultra-crisp typography */}
           <div className="flex flex-col items-start">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white transition-colors duration-300 ease-out group-hover:text-gray-800 dark:group-hover:text-gray-100">
+            <h3 className="text-sm font-medium text-gray-900 dark:text-white transition-colors duration-300 ease-out group-hover:text-gray-800 dark:group-hover:text-gray-100">
               {goal.title}
             </h3>
             {goal.subtitle && (
-              <p className="text-xs font-medium text-gray-600 dark:text-gray-300 transition-colors duration-300 ease-out group-hover:text-gray-500 dark:group-hover:text-gray-200 mt-0.5">
+              <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-300 ease-out group-hover:text-gray-600 dark:group-hover:text-gray-200 mt-0.5">
                 {goal.subtitle}
               </p>
             )}
@@ -397,7 +344,7 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
         </div>
 
         {/* APPLE DESCRIPTION TEXT - Perfect readability */}
-        <p className="text-xs text-left text-gray-700 dark:text-gray-200 leading-relaxed transition-colors duration-300 ease-out group-hover:text-gray-600 dark:group-hover:text-gray-100">
+        <p className="text-xs text-left text-gray-800 dark:text-gray-200 leading-relaxed transition-colors duration-300 ease-out group-hover:text-gray-700 dark:group-hover:text-gray-100 font-medium">
           {goal.description}
         </p>
       </div>
@@ -411,12 +358,12 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
 GoalCard.displayName = 'GoalCard';
 
 export const GoalScene = memo(({
-  config = defaultConfig
-}: { config?: GoalSceneConfig }) => {
+  config
+}: { config: GoalSceneConfig }) => {
 
   // Default values for removed config properties
   const defaultContainerClassName = "flex flex-col items-center justify-center h-full text-center px-6";
-  const defaultCardSpacing = "space-y-4";
+  const defaultCardSpacing = "space-y-6";
   const defaultMaxWidth = "max-w-md w-full";
   const defaultGlassEffect = {
     blur: "blur(24px)",

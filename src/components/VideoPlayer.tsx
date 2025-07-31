@@ -252,12 +252,22 @@ export function VideoPlayer({
 
   // Handle replay button click
   const handleReplay = useCallback(() => {
-    const video = videoRef.current;
-    if (video) {
-      video.currentTime = 0;
-      video.play();
-      setIsVideoEnded(false);
+    if (hlsRef.current) {
+      hlsRef.current.startLoad(0);
     }
+
+    if (playerRef.current) {
+      // seek and play via Plyr
+      playerRef.current.currentTime = 0;
+      playerRef.current.play();
+    } else if (videoRef.current) {
+      // fallback: raw video element
+      videoRef.current.currentTime = 0;
+      videoRef.current.play();
+    }
+
+    // hide the replay button again
+    setIsVideoEnded(false);
   }, []);
 
   // Keyboard event handler to prevent forward seeking
@@ -790,7 +800,6 @@ export function VideoPlayer({
           poster={poster}
           style={videoStyle}
           playsInline={orientation === 'portrait' || !isIOSDevice}
-          webkit-playsinline={orientation === 'portrait' || !isIOSDevice}
           onContextMenu={
             disableForwardSeek
               ? (e) => e.preventDefault()

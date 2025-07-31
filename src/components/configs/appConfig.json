@@ -102,10 +102,10 @@
     "level": "All Levels",
     "callToActionText": "Swipe to learn SMS security",
     "card": {
-      "backgroundColor": "bg-blue-50/10 dark:bg-slate-900/50",
-      "borderColor": "border-blue-100/10 dark:border-slate-700/40",
-      "gradientFrom": "from-blue-50/10 dark:from-slate-900/40",
-      "gradientTo": "to-blue-50/3 dark:to-slate-800/20"
+      "backgroundColor": "bg-blue-50/10 dark:bg-slate-900/70",
+      "borderColor": "border-blue-100/10 dark:border-slate-700/50",
+      "gradientFrom": "from-blue-50/10 dark:from-slate-900/60",
+      "gradientTo": "to-blue-50/3 dark:to-slate-800/40"
     },
     "texts": {
       "sceneLabel": "Introduction Scene",
@@ -162,7 +162,7 @@
     "video": {
       "src": "https://customer-0lll6yc8omc23rbm.cloudflarestream.com/5fdb12ff1436c991f50b698a02e2faa1/manifest/video.m3u8",
       "poster": null,
-      "disableForwardSeek": true,
+      "disableForwardSeek": false,
       "showTranscript": true,
       "transcriptTitle": "Scenario Transcript",
       "transcriptLanguage": "English",
