@@ -804,6 +804,7 @@ export function VideoPlayer({
           controls
           poster={poster}
           style={videoStyle}
+          playsInline={orientation === 'portrait' || !isIOSDevice}
           onContextMenu={
             disableForwardSeek
               ? (e) => e.preventDefault()
