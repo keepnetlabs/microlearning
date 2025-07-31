@@ -112,7 +112,7 @@ export function VideoPlayer({
   const [isTranscriptOpen, setIsTranscriptOpen] =
     useState(showTranscript);
   const [orientation, setOrientation] = useState<'portrait' | 'landscape'>(getOrientation());
-  const [isIOSDevice] = useState(isIOS());
+  const [isIOSDevice] = useState(true);
   const [isVideoEnded, setIsVideoEnded] = useState(false);
 
   // Parse transcript if it's a string - useMemo ile optimize edildi
@@ -598,7 +598,9 @@ export function VideoPlayer({
       };
 
       playerRef.current = new Plyr(video, plyrConfig);
-
+      playerRef.current.on('enterfullscreen', () => {
+        playerRef?.current?.toggleCaptions(true);
+      });
       if (disableForwardSeek && playerRef.current) {
         const plyrInstance = playerRef.current;
 
