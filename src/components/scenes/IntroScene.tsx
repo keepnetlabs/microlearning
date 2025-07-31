@@ -140,7 +140,7 @@ interface IntroSceneConfig {
 const getTextColorClass = (colorType: ColorType): string => {
   switch (colorType) {
     case ColorType.BLUE:
-      return 'text-blue-500';
+      return 'text-blue-500 dark:text-blue-900';
     case ColorType.GREEN:
       return 'text-emerald-500';
     case ColorType.PURPLE:
@@ -848,7 +848,7 @@ export const IntroScene = React.memo(({
           </motion.h1>
 
           <motion.p
-            className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-200 max-w-sm sm:max-w-md mt-2 sm:mt-3 font-medium leading-relaxed px-2"
+            className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-white max-w-sm sm:max-w-md mt-2 sm:mt-3 font-medium leading-relaxed px-2"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: delays.subtitle }}

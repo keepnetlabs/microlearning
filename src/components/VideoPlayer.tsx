@@ -83,6 +83,16 @@ function formatTime(seconds: number): string {
   return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
 }
 
+// iOS detection utility
+function isIOS(): boolean {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent);
+}
+
+// Orientation detection utility
+function getOrientation(): 'portrait' | 'landscape' {
+  return window.innerHeight > window.innerWidth ? 'portrait' : 'landscape';
+}
+
 export function VideoPlayer({
   src = "https://customer-0lll6yc8omc23rbm.cloudflarestream.com/5fdb12ff1436c991f50b698a02e2faa1/manifest/video.m3u8",
   poster,
@@ -101,6 +111,8 @@ export function VideoPlayer({
   const [currentTime, setCurrentTime] = useState(0);
   const [isTranscriptOpen, setIsTranscriptOpen] =
     useState(showTranscript);
+  const [orientation, setOrientation] = useState<'portrait' | 'landscape'>(getOrientation());
+  const [isIOSDevice] = useState(isIOS());
 
   // Parse transcript if it's a string - useMemo ile optimize edildi
   const parsedTranscript = useMemo(() =>
@@ -123,6 +135,43 @@ export function VideoPlayer({
     ),
     [parsedTranscript, currentTime]
   );
+
+  // Handle orientation change for iOS
+  useEffect(() => {
+    if (!isIOSDevice) return;
+
+    const handleOrientationChange = () => {
+      const newOrientation = getOrientation();
+      setOrientation(newOrientation);
+
+      const video = videoRef.current;
+      if (video) {
+        if (newOrientation === 'landscape') {
+          // Landscape: Enable fullscreen attributes
+          video.setAttribute('webkit-playsinline', 'false');
+          video.setAttribute('playsinline', 'false');
+          video.setAttribute('webkit-presentation-mode', 'fullscreen');
+        } else {
+          // Portrait: Enable inline playback
+          video.setAttribute('webkit-playsinline', 'true');
+          video.setAttribute('playsinline', 'true');
+          video.removeAttribute('webkit-presentation-mode');
+        }
+      }
+    };
+
+    // Set initial orientation
+    handleOrientationChange();
+
+    // Listen for orientation changes
+    window.addEventListener('orientationchange', handleOrientationChange);
+    window.addEventListener('resize', handleOrientationChange);
+
+    return () => {
+      window.removeEventListener('orientationchange', handleOrientationChange);
+      window.removeEventListener('resize', handleOrientationChange);
+    };
+  }, [isIOSDevice]);
 
   // Auto-scroll to current transcript row
   useEffect(() => {
@@ -319,6 +368,19 @@ export function VideoPlayer({
     }
 
     video._lastTime = 0;
+
+    // Set iOS-specific video attributes based on orientation
+    if (isIOSDevice) {
+      if (orientation === 'landscape') {
+        video.setAttribute('webkit-playsinline', 'false');
+        video.setAttribute('playsinline', 'false');
+        video.setAttribute('webkit-presentation-mode', 'fullscreen');
+      } else {
+        video.setAttribute('webkit-playsinline', 'true');
+        video.setAttribute('playsinline', 'true');
+        video.removeAttribute('webkit-presentation-mode');
+      }
+    }
 
     // Forward seek prevention
     const handleSeeking = (e: Event) => {
@@ -650,6 +712,8 @@ export function VideoPlayer({
     disableForwardSeek,
     handleTimeUpdate,
     handleKeyDown,
+    isIOSDevice,
+    orientation,
   ]);
 
   return (
@@ -665,8 +729,8 @@ export function VideoPlayer({
           controls
           poster={poster}
           style={videoStyle}
-          playsInline
-          webkit-playsinline
+          playsInline={orientation === 'portrait' || !isIOSDevice}
+          webkit-playsinline={orientation === 'portrait' || !isIOSDevice}
           onContextMenu={
             disableForwardSeek
               ? (e) => e.preventDefault()
