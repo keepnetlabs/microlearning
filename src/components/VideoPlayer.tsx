@@ -433,7 +433,7 @@ export function VideoPlayer({
         playerRef.current.destroy();
       }
 
-      const plyrConfig: Plyr.Options = {
+      const plyrConfig: Plyr.Options & { playsinline: boolean } = {
         controls: [
           "play",
           "progress",
@@ -784,8 +784,8 @@ export function VideoPlayer({
                         : "rgba(156, 163, 175, 0.08)",
                     }}
                     className={`transition-all duration-200 mx-3 my-1 rounded-lg ${canAccess
-                        ? "cursor-pointer"
-                        : "cursor-not-allowed"
+                      ? "cursor-pointer"
+                      : "cursor-not-allowed"
                       } ${isActive
                         ? "border border-gray-300/50 dark:border-slate-500/50"
                         : "border border-transparent"
@@ -801,10 +801,10 @@ export function VideoPlayer({
                       <div className="flex-shrink-0">
                         <span
                           className={`font-medium transition-colors duration-200 text-xs ${isActive
+                            ? "text-gray-600 dark:text-slate-300"
+                            : canAccess
                               ? "text-gray-600 dark:text-slate-300"
-                              : canAccess
-                                ? "text-gray-600 dark:text-slate-300"
-                                : "text-gray-400 dark:text-slate-500"
+                              : "text-gray-400 dark:text-slate-500"
                             }`}
                           style={{
                             fontSize: "12px",
@@ -835,10 +835,10 @@ export function VideoPlayer({
 
                           <p
                             className={`leading-relaxed transition-colors duration-200 ${isActive
-                                ? "text-black dark:text-slate-100"
-                                : canAccess
-                                  ? "text-gray-700 dark:text-slate-200"
-                                  : "text-gray-400 dark:text-slate-500"
+                              ? "text-black dark:text-slate-100"
+                              : canAccess
+                                ? "text-gray-700 dark:text-slate-200"
+                                : "text-gray-400 dark:text-slate-500"
                               }`}
                             style={{
                               fontSize: "13px",
