@@ -88,28 +88,6 @@ interface ScenarioSceneConfig {
   };
   containerClassName?: string;
   videoContainerClassName?: string;
-  animations?: {
-    headerIcon?: {
-      initial: any;
-      animate: any;
-      transition: any;
-    };
-    title?: {
-      initial: any;
-      animate: any;
-      transition: any;
-    };
-    videoPlayer?: {
-      initial: any;
-      animate: any;
-      transition: any;
-    };
-    mobileHint?: {
-      initial: any;
-      animate: any;
-      transition: any;
-    };
-  };
   mobileHint?: {
     text: string;
     className: string;
@@ -214,9 +192,9 @@ export function ScenarioScene({
     <div className={config.containerClassName || defaultContainerClassName}>
       {/* Header Icon */}
       <motion.div
-        initial={config.animations?.headerIcon?.initial || { opacity: 0, scale: 0.8, y: -20 }}
-        animate={config.animations?.headerIcon?.animate || { opacity: 1, scale: 1, y: 0 }}
-        transition={config.animations?.headerIcon?.transition || { duration: 0.8, ease: "easeOut" }}
+        initial={{ opacity: 0, scale: 0.8, y: -20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
         className="mb-2 sm:mb-3"
       >
         {iconComponent}
@@ -224,9 +202,9 @@ export function ScenarioScene({
 
       {/* Title */}
       <motion.h1
-        initial={config.animations?.title?.initial || { opacity: 0, y: 20 }}
-        animate={config.animations?.title?.animate || { opacity: 1, y: 0 }}
-        transition={config.animations?.title?.transition || { duration: 0.8, delay: 0.2 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
         className="text-2xl mb-1 sm:mb-3 text-gray-900 dark:text-white text-center"
       >
         {config.title}
@@ -264,9 +242,9 @@ export function ScenarioScene({
       {/* Video Player */}
       {!isLoadingTranscript && !transcriptError && (
         <motion.div
-          initial={config.animations?.videoPlayer?.initial || { opacity: 0, y: 40, scale: 0.95 }}
-          animate={config.animations?.videoPlayer?.animate || { opacity: 1, y: 0, scale: 1 }}
-          transition={config.animations?.videoPlayer?.transition || { duration: 0.8, delay: 0.4 }}
+          initial={{ opacity: 0, y: 40, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
           className={config.videoContainerClassName || defaultVideoContainerClassName}
         >
           <VideoPlayer
@@ -283,9 +261,9 @@ export function ScenarioScene({
 
       {/* Mobile Hint */}
       <motion.div
-        initial={config.animations?.mobileHint?.initial || { opacity: 0 }}
-        animate={config.animations?.mobileHint?.animate || { opacity: 1 }}
-        transition={config.animations?.mobileHint?.transition || { delay: 1.2 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.2 }}
         className={config.mobileHint?.className || "sm:hidden mt-2"}
       >
         <p className="text-xs text-gray-500 dark:text-gray-400 text-center">

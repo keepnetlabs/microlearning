@@ -27,12 +27,6 @@ export interface TranscriptRow {
 interface VideoPlayerProps {
   src?: string;
   poster?: string;
-  captions?: {
-    language: string;
-    label: string;
-    src: string;
-    default?: boolean;
-  }[];
   disableForwardSeek?: boolean;
   className?: string;
   style?: React.CSSProperties;
@@ -96,7 +90,6 @@ function getOrientation(): 'portrait' | 'landscape' {
 export function VideoPlayer({
   src = "https://customer-0lll6yc8omc23rbm.cloudflarestream.com/5fdb12ff1436c991f50b698a02e2faa1/manifest/video.m3u8",
   poster,
-  captions = [],
   disableForwardSeek = true,
   className,
   style,
@@ -122,7 +115,6 @@ export function VideoPlayer({
       : transcript || [],
     [transcript]
   );
-  console.log("captions", captions)
   // Find current transcript row - useMemo ile optimize edildi
   const currentRowIndex = useMemo(() =>
     parsedTranscript.findIndex(
@@ -806,7 +798,6 @@ export function VideoPlayer({
         <video
           ref={videoRef}
           className={`plyr-react plyr rounded-lg ${disableForwardSeek ? "plyr--disable-seek" : ""}`}
-          controls
           poster={poster}
           style={videoStyle}
           onContextMenu={

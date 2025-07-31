@@ -204,28 +204,6 @@
       "sceneIconName": "play-circle",
       "className": "text-blue-500"
     },
-    "animations": {
-      "headerIcon": {
-        "initial": { "opacity": 0, "scale": 0.8, "y": -20 },
-        "animate": { "opacity": 1, "scale": 1, "y": 0 },
-        "transition": { "duration": 0.8, "ease": "easeOut" }
-      },
-      "title": {
-        "initial": { "opacity": 0, "y": 20 },
-        "animate": { "opacity": 1, "y": 0 },
-        "transition": { "duration": 0.8, "delay": 0.2 }
-      },
-      "videoPlayer": {
-        "initial": { "opacity": 0, "y": 40, "scale": 0.95 },
-        "animate": { "opacity": 1, "y": 0, "scale": 1 },
-        "transition": { "duration": 0.8, "delay": 0.4 }
-      },
-      "mobileHint": {
-        "initial": { "opacity": 0 },
-        "animate": { "opacity": 1 },
-        "transition": { "delay": 1.2 }
-      }
-    },
     "mobileHint": {
       "text": "💡 Watch the video and review the transcript",
       "className": "sm:hidden mt-2"
