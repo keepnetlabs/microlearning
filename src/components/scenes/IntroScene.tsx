@@ -134,23 +134,6 @@ interface IntroSceneConfig {
 
   // Animation delays
   animationDelays?: AnimationDelays;
-
-  // Accessibility texts
-  texts?: {
-    sceneLabel?: string;
-    sceneDescription?: string;
-    iconLabel?: string;
-    titleLabel?: string;
-    subtitleLabel?: string;
-    cardLabel?: string;
-    cardDescription?: string;
-    highlightItemLabel?: string;
-    statsLabel?: string;
-    durationLabel?: string;
-    levelLabel?: string;
-    ctaLabel?: string;
-    sparkleLabel?: string;
-  };
 }
 
 // Color mapping functions
@@ -447,8 +430,7 @@ export const IntroScene = React.memo(({
     level,
     callToActionText,
     icon,
-    card,
-    texts
+    card
   } = config;
 
   // Use default values for removed properties
@@ -606,29 +588,15 @@ export const IntroScene = React.memo(({
   }), []);
 
   return (
-    <div
-      className={containerClassName}
-      role="main"
-      aria-label={texts?.sceneLabel || "Introduction Scene"}
-      aria-describedby="intro-scene-description"
-    >
-      <div id="intro-scene-description" className="sr-only">
-        {texts?.sceneDescription || "Welcome to the training module"}
-      </div>
+    <div className={containerClassName}>
       {/* Apple-style Background Sparkles - Balanced */}
       {sparkles?.enabled && (
-        <div
-          className="absolute inset-0 pointer-events-none overflow-hidden z-10"
-          aria-hidden="true"
-          role="presentation"
-        >
+        <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
           {/* Subtle ambient sparkles */}
           {ambientSparkles.map((_, i) => (
             <motion.div
               key={`ambient-${i}`}
               className={`absolute w-${sparkles.ambient?.size || 0.5} h-${sparkles.ambient?.size || 0.5} bg-white/${sparkles.ambient?.opacity || 25} rounded-full`}
-              aria-hidden="true"
-              role="presentation"
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
@@ -652,8 +620,6 @@ export const IntroScene = React.memo(({
             <motion.div
               key={`floating-${i}`}
               className={`absolute w-${sparkles.floating?.size || 0.5} h-${sparkles.floating?.size || 0.5} bg-white/${sparkles.floating?.opacity || 20} rounded-full`}
-              aria-hidden="true"
-              role="presentation"
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
@@ -678,8 +644,6 @@ export const IntroScene = React.memo(({
             <motion.div
               key={`twinkle-${i}`}
               className={`absolute w-${sparkles.twinkling?.size || 0.5} h-${sparkles.twinkling?.size || 0.5} bg-white/${sparkles.twinkling?.opacity || 18} rounded-full`}
-              aria-hidden="true"
-              role="presentation"
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
@@ -703,8 +667,6 @@ export const IntroScene = React.memo(({
             <motion.div
               key={`gradient-${i}`}
               className={`absolute w-${sparkles.gradient?.size || 1} h-${sparkles.gradient?.size || 1} rounded-full`}
-              aria-hidden="true"
-              role="presentation"
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
@@ -729,8 +691,6 @@ export const IntroScene = React.memo(({
             <motion.div
               key={`drift-${i}`}
               className={`absolute w-${sparkles.drifting?.size || 0.5} h-${sparkles.drifting?.size || 0.5} bg-white/${sparkles.drifting?.opacity || 15} rounded-full`}
-              aria-hidden="true"
-              role="presentation"
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
@@ -756,8 +716,6 @@ export const IntroScene = React.memo(({
             <motion.div
               key={`breathing-${i}`}
               className={`absolute w-${sparkles.breathing?.size || 0.5} h-${sparkles.breathing?.size || 0.5} bg-white/${sparkles.breathing?.opacity || 12} rounded-full`}
-              aria-hidden="true"
-              role="presentation"
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
@@ -780,17 +738,11 @@ export const IntroScene = React.memo(({
 
       {/* Floating Light Particles */}
       {particles?.enabled && (
-        <div
-          className="absolute inset-0 pointer-events-none overflow-hidden"
-          aria-hidden="true"
-          role="presentation"
-        >
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
           {particlesArray.map((_, i) => (
             <motion.div
               key={i}
               className={`absolute w-1 h-1 ${particles.color || "bg-blue-400/60"} rounded-full`}
-              aria-hidden="true"
-              role="presentation"
               initial={{
                 x: Math.random() * window.innerWidth,
                 y: window.innerHeight + 20,
@@ -818,8 +770,6 @@ export const IntroScene = React.memo(({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut", delay: delays.welcome }}
         className="mb-3 sm:mb-5 relative"
-        role="banner"
-        aria-label={texts?.titleLabel || "Training title"}
       >
         {/* Scene Icon with Enhanced Effects */}
         <motion.div
@@ -832,8 +782,6 @@ export const IntroScene = React.memo(({
             stiffness: 200
           }}
           className="flex justify-center mb-1 sm:mb-3 relative"
-          role="img"
-          aria-label={texts?.iconLabel || "Training icon"}
         >
           {/* Icon glow effect */}
           <div className="absolute inset-0 from-blue-400/30 to-transparent rounded-full animate-pulse scale-150"></div>
@@ -852,8 +800,6 @@ export const IntroScene = React.memo(({
                 left: '50%',
                 transformOrigin: 'center'
               }}
-              aria-hidden="true"
-              role="presentation"
               initial={{ opacity: 0, scale: 0 }}
               animate={{
                 opacity: [0, 1, 0],
@@ -879,8 +825,6 @@ export const IntroScene = React.memo(({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: delays.title }}
-          role="heading"
-          aria-level={1}
         >
           <motion.h1
             className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-900 dark:text-white"
@@ -908,7 +852,6 @@ export const IntroScene = React.memo(({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: delays.subtitle }}
-            aria-label={texts?.subtitleLabel || "Training description"}
           >
             {subtitle}
           </motion.p>
@@ -933,13 +876,7 @@ export const IntroScene = React.memo(({
         className={`relative p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl backdrop-blur-3xl border shadow-2xl shadow-black/5 dark:shadow-black/30 max-w-xs sm:max-w-md w-full mx-2 ${card?.backgroundColor || 'bg-white/60 dark:bg-gray-800/80'
           } ${card?.borderColor || 'border-white/60 dark:border-gray-600/60'
           }`}
-        role="region"
-        aria-label={texts?.cardLabel || "Learning objectives"}
-        aria-describedby="card-description"
       >
-        <div id="card-description" className="sr-only">
-          {texts?.cardDescription || "List of skills you will learn in this training"}
-        </div>
         {/* Enhanced Card Background Effects with Noise */}
         <div className={`absolute inset-0 bg-gradient-to-br ${card?.gradientFrom || 'from-white/50'
           } via-white/30 ${card?.gradientTo || 'to-white/20'
@@ -959,7 +896,7 @@ export const IntroScene = React.memo(({
 
         {/* ENHANCED LIQUID GLASS BORDER EFFECTS */}
         <div
-          className="absolute inset-0.5 rounded-2xl sm:rounded-3xl overflow-hidden"
+          className="absolute inset-0 rounded-2xl sm:rounded-3xl overflow-hidden"
           style={cardStyles}
         >
           {/* Ultra-fine noise texture for authentic glass feel */}
@@ -1002,13 +939,11 @@ export const IntroScene = React.memo(({
             animate={{ opacity: 1 }}
             transition={{ delay: delays.cardTitle }}
             className="mb-3 sm:mb-4 text-gray-800 dark:text-gray-100 font-semibold text-center text-sm sm:text-base"
-            role="heading"
-            aria-level={2}
           >
             {sectionTitle}
           </motion.h3>
 
-          <div className="space-y-3 sm:space-y-4" role="list" aria-label="Learning objectives list">
+          <div className="space-y-3 sm:space-y-4">
             {memoizedHighlights.map((item, index) => (
               <motion.div
                 key={index}
@@ -1025,8 +960,6 @@ export const IntroScene = React.memo(({
                   transition: { type: "spring", stiffness: 400 }
                 }}
                 className="flex items-center group hover:transform hover:scale-102 transition-all duration-300"
-                role="listitem"
-                aria-label={`${texts?.highlightItemLabel || "Learning objective"} ${index + 1}: ${item.text}`}
               >
                 <div className="flex-shrink-0 mr-3 sm:mr-4">
                   <motion.div
@@ -1083,18 +1016,10 @@ export const IntroScene = React.memo(({
                     {/* Traditional background gradients maintained for compatibility */}
                     <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent rounded-xl sm:rounded-2xl"></div>
 
-                    <item.Icon
-                      size={14}
-                      className={`${item.textColor} relative z-10 sm:w-4 sm:h-4`}
-                      strokeWidth={2}
-                      aria-hidden="true"
-                    />
+                    <item.Icon size={14} className={`${item.textColor} relative z-10 sm:w-4 sm:h-4`} strokeWidth={2} />
                   </motion.div>
                 </div>
-                <span
-                  className="text-xs sm:text-sm text-gray-700 dark:text-gray-200 font-medium leading-relaxed group-hover:text-gray-900 dark:group-hover:text-white transition-colors"
-                  aria-label={`${texts?.highlightItemLabel || "Learning objective"}: ${item.text}`}
-                >
+                <span className="text-xs sm:text-sm text-gray-700 dark:text-gray-200 font-medium leading-relaxed group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
                   {item.text}
                 </span>
               </motion.div>
@@ -1107,16 +1032,12 @@ export const IntroScene = React.memo(({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: delays.stats }}
             className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200/50 dark:border-gray-600/50"
-            role="region"
-            aria-label={texts?.statsLabel || "Training statistics"}
           >
             <div className="flex justify-between items-center">
               <motion.div
                 className="relative flex items-center space-x-2 px-2 py-1 rounded-lg overflow-hidden transition-all duration-500 ease-out group"
                 whileHover={{ scale: 1.05 }}
                 style={statsStyles}
-                role="group"
-                aria-label={texts?.durationLabel || "Training duration"}
               >
                 {/* Ultra-fine noise texture */}
                 <div
@@ -1143,8 +1064,6 @@ export const IntroScene = React.memo(({
                 className="relative flex items-center space-x-2 px-2 py-1 rounded-lg overflow-hidden transition-all duration-500 ease-out group"
                 whileHover={{ scale: 1.05 }}
                 style={statsStyles}
-                role="group"
-                aria-label={texts?.levelLabel || "Training difficulty level"}
               >
                 {/* Ultra-fine noise texture */}
                 <div
@@ -1184,8 +1103,6 @@ export const IntroScene = React.memo(({
           stiffness: 200
         }}
         className="mt-4 sm:mt-6 relative"
-        role="region"
-        aria-label={texts?.ctaLabel || "Call to action"}
       >
         <motion.div
           className="relative flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-full overflow-hidden transition-all duration-500 ease-out group"
@@ -1233,12 +1150,7 @@ export const IntroScene = React.memo(({
             }}
           />
 
-          <span
-            className="relative z-10 text-xs text-gray-600 dark:text-gray-300 font-medium"
-            aria-label={`${texts?.ctaLabel || "Call to action"}: ${callToActionText}`}
-          >
-            {callToActionText}
-          </span>
+          <span className="relative z-10 text-xs text-gray-600 dark:text-gray-300 font-medium">{callToActionText}</span>
         </motion.div>
       </motion.div>
     </div>

@@ -22,8 +22,6 @@ const STATIC_CSS_CLASSES = {
   loadingOverlay: "fixed inset-0 bg-white/50 dark:bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center transition-colors duration-300",
   loadingText: "text-sm font-medium text-gray-900 dark:text-white",
 
-  // Theme hint notification
-  themeHintContainer: "fixed top-20 left-1/2 transform -translate-x-1/2 z-40",
 
   // Background
   backgroundContainer: "fixed inset-0 pointer-events-none overflow-hidden",
@@ -34,7 +32,7 @@ const STATIC_CSS_CLASSES = {
   headerContainer: "relative shrink-0",
   headerBackground: "absolute inset-0 bg-gradient-to-b from-white/95 via-white/90 to-white/85 dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-900/85 transition-colors duration-300",
   headerBorder: "absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gray-200/60 dark:via-gray-600/60 to-transparent transition-colors duration-300",
-  headerContent: "relative z-10 px-4 py-4 bg-white dark:bg-gray-900 lg:px-16 xl:px-20 2xl:px-24",
+  headerContent: "relative z-10 px-4 py-4 pt-safe bg-white dark:bg-gray-900 lg:px-16 xl:px-20 2xl:px-24",
 
   // Logo
   logoContainer: "flex-shrink-0 z-20",
@@ -202,13 +200,6 @@ export default function App() {
     // Loading container
     loadingContainer: `flex items-center space-x-3 px-6 py-4 bg-${themeConfig.colors?.surface || 'white'}/90 dark:bg-gray-900/90 ${themeConfig.effects?.backdropBlur || 'backdrop-blur-xl'} ${themeConfig.effects?.borderRadius || 'rounded-2xl'} border border-${themeConfig.colors?.surface || 'white'}/${themeConfig.effects?.borderOpacity || '60'} dark:border-gray-600/60 ${themeConfig.effects?.shadow || 'shadow-xl'} transition-colors duration-300`,
     loadingSpinner: `animate-spin text-${themeConfig.colors?.primary || 'blue'}-600 dark:text-${themeConfig.colors?.primary || 'blue'}-400`,
-
-    // Theme hint notification
-    themeHintContent: `relative px-5 py-4 bg-${themeConfig.colors?.primary || 'blue'}-50/98 dark:bg-gray-900/98 ${themeConfig.effects?.backdropBlur || 'backdrop-blur-2xl'} border-2 border-${themeConfig.colors?.primary || 'blue'}-200/80 dark:border-gray-600/80 ${themeConfig.effects?.borderRadius || 'rounded-2xl'} ${themeConfig.effects?.shadow || 'shadow-xl'} shadow-${themeConfig.colors?.primary || 'blue'}-500/20 dark:shadow-black/40 transition-colors duration-300 max-w-sm`,
-    themeHintIcon: `flex-shrink-0 p-1.5 bg-${themeConfig.colors?.primary || 'blue'}-100/80 dark:bg-${themeConfig.colors?.primary || 'blue'}-900/60 ${themeConfig.effects?.borderRadius || 'rounded-lg'}`,
-    themeHintTitle: `text-sm text-${themeConfig.colors?.primary || 'blue'}-900 dark:text-white font-medium mb-2`,
-    themeHintDescription: `text-xs text-${themeConfig.colors?.primary || 'blue'}-800 dark:text-gray-200 leading-relaxed`,
-    themeHintClose: `ml-2 p-1 rounded-full hover:bg-${themeConfig.colors?.primary || 'blue'}-200/50 dark:hover:bg-gray-700/50 transition-colors focus:outline-none focus:ring-2 focus:ring-${themeConfig.colors?.primary || 'blue'}-400/30 dark:focus:ring-${themeConfig.colors?.primary || 'blue'}-600/30`,
 
     // Background gradients
     backgroundGradient1: `absolute -top-60 -left-60 w-96 h-96 bg-gradient-to-br from-${themeConfig.colors?.primary || 'blue'}-200/40 via-${themeConfig.colors?.secondary || 'indigo'}-100/30 to-transparent dark:from-${themeConfig.colors?.primary || 'blue'}-900/25 dark:via-${themeConfig.colors?.secondary || 'indigo'}-800/18 dark:to-transparent ${themeConfig.effects?.borderRadius || 'rounded-full'} blur-3xl animate-pulse transition-colors duration-500`,
@@ -438,14 +429,6 @@ export default function App() {
     return false;
   });
 
-  // Simplified theme hint - more prominent and informative
-  const [showThemeHint, setShowThemeHint] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return !localStorage.getItem('theme-hint-dismissed');
-    }
-    return false;
-  });
-
   // Refs for scroll container and parallax background
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -486,8 +469,6 @@ export default function App() {
   // Simplified toggle theme function
   const toggleTheme = useCallback(() => {
     setIsDarkMode(prev => !prev);
-    setShowThemeHint(false);
-    localStorage.setItem('theme-hint-dismissed', 'true');
   }, []);
 
   // Desktop keyboard shortcut: Ctrl + Shift + D (keep for power users)
@@ -595,16 +576,7 @@ export default function App() {
     }
   }, [currentScene]);
 
-  // Simplified theme hint - shorter duration, more prominent
-  useEffect(() => {
-    if (showThemeHint) {
-      const timer = setTimeout(() => {
-        setShowThemeHint(false);
-        localStorage.setItem('theme-hint-dismissed', 'true');
-      }, 5000); // Reduced from 8 seconds
-      return () => clearTimeout(timer);
-    }
-  }, [showThemeHint]);
+
 
   // Show quiz completion hint only once at first quiz start
   useEffect(() => {
@@ -1043,50 +1015,6 @@ export default function App() {
               <span className={cssClasses.loadingText}>
                 {themeConfig.texts?.loading}
               </span>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Simplified Theme Discovery Hint - More prominent */}
-      <AnimatePresence>
-        {showThemeHint && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className={cssClasses.themeHintContainer}
-            role="alert"
-            aria-live="polite"
-            aria-label={appConfig.theme?.ariaTexts?.themeHintLabel || "Theme hint notification"}
-          >
-            <div className={cssClasses.themeHintContent}>
-              <div className="flex items-start space-x-3 relative z-10">
-                <div className={cssClasses.themeHintIcon} aria-hidden="true">
-                  {isDarkMode ? (
-                    <Moon size={isMobile ? 12 : 16} />
-                  ) : (
-                    <Sun size={isMobile ? 12 : 16} />
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className={cssClasses.themeHintTitle} id="theme-hint-title">{themeConfig.texts?.hintTitle}</p>
-                  <p className={cssClasses.themeHintDescription} id="theme-hint-description">
-                    {themeConfig.texts?.hintDescription}
-                  </p>
-                </div>
-                <button
-                  onClick={() => {
-                    setShowThemeHint(false);
-                    localStorage.setItem('theme-hint-dismissed', 'true');
-                  }}
-                  className={cssClasses.themeHintClose}
-                  aria-label="İpucunu kapat"
-                  aria-describedby="theme-hint-title theme-hint-description"
-                >
-                  <X size={12} className="text-blue-600 dark:text-gray-300" aria-hidden="true" />
-                </button>
-              </div>
             </div>
           </motion.div>
         )}

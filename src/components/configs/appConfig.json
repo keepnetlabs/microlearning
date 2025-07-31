@@ -41,8 +41,6 @@
       "appLabel": "Cyber Security Training Application",
       "appDescription": "Interactive cyber security training application with multiple learning modules and progress tracking",
       "loadingLabel": "Loading content",
-      "themeHintLabel": "Theme hint notification",
-      "themeHintDescription": "Toggle between light and dark theme",
       "headerLabel": "Application header",
       "logoLabel": "Application logo",
       "progressLabel": "Training progress",
@@ -104,10 +102,10 @@
       "className": "text-red-500"
     },
     "card": {
-      "backgroundColor": "bg-red-50/60 dark:bg-red-900/80",
-      "borderColor": "border-red-200/60 dark:border-red-600/60",
-      "gradientFrom": "from-red-50/50",
-      "gradientTo": "to-red-100/20"
+      "backgroundColor": "bg-blue-50/10 dark:bg-slate-800/30",
+      "borderColor": "border-blue-100/10 dark:border-slate-600/20",
+      "gradientFrom": "from-blue-50/10 dark:from-slate-800/30",
+      "gradientTo": "to-blue-50/3 dark:to-slate-700/10"
     },
     "texts": {
       "sceneLabel": "Introduction Scene",

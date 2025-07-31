@@ -433,7 +433,7 @@ export function VideoPlayer({
         playerRef.current.destroy();
       }
 
-      const plyrConfig: Plyr.Options & { playsinline: boolean } = {
+      const plyrConfig: Plyr.Options = {
         controls: [
           "play",
           "progress",
@@ -454,7 +454,6 @@ export function VideoPlayer({
           global: !disableForwardSeek,
         },
         seekTime: disableForwardSeek ? 0 : 10,
-        playsinline: true,
         clickToPlay: !disableForwardSeek,
         listeners: disableForwardSeek
           ? {
@@ -665,6 +664,8 @@ export function VideoPlayer({
           controls
           poster={poster}
           style={videoStyle}
+          playsInline
+          webkit-playsinline
           onContextMenu={
             disableForwardSeek
               ? (e) => e.preventDefault()
