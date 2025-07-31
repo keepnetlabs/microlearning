@@ -258,19 +258,19 @@ export function SurveyScene({
               {isSubmitting ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  <span>{config.texts?.submittingText || "Gönderiliyor..."}</span>
+                  <span>{config.texts?.submittingText}</span>
                 </>
               ) : (
                 <>
                   <Send size={16} />
-                  <span>{config.texts?.submitButton || "Geri Bildirimi Gönder"}</span>
+                  <span>{config.texts?.submitButton}</span>
                 </>
               )}
             </motion.button>
 
             {rating === 0 && (
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
-                {config.texts?.ratingRequiredText || "Göndermek için lütfen bir puan verin"}
+                {config.texts?.ratingRequiredText}
               </p>
             )}
           </div>
@@ -278,7 +278,7 @@ export function SurveyScene({
           {/* Data Security Notice */}
           <div className="pt-3 border-t border-gray-200/30 dark:border-gray-600/30">
             <p className="text-xs text-gray-500 dark:text-gray-400 text-center leading-relaxed">
-              {config.texts?.dataSecurityNotice || "🔒 Geri bildirimleriniz güvenli bir şekilde saklanır ve sadece eğitim kalitesini artırmak için kullanılır."}
+              {config.texts?.dataSecurityNotice}
             </p>
           </div>
         </div>

@@ -5,6 +5,7 @@
       "mobile": "Security Training"
     }
   },
+
   "theme": {
     "colors": {
       "primary": "blue",
@@ -12,47 +13,12 @@
       "accent": "purple",
       "background": "slate",
       "surface": "white",
-      "border": "gray",
-      "badge": {
-        "points": {
-          "background": "amber",
-          "text": "amber-900",
-          "textDark": "amber-100",
-          "gradient": {
-            "from": "rgba(245, 158, 11, 0.15)",
-            "via1": "rgba(251, 146, 60, 0.12)",
-            "via2": "rgba(249, 115, 22, 0.10)",
-            "to": "rgba(234, 88, 12, 0.08)"
-          },
-          "border": "rgba(245, 158, 11, 0.25)",
-          "shadow": {
-            "primary": "rgba(245, 158, 11, 0.12)",
-            "secondary": "rgba(251, 146, 60, 0.08)"
-          }
-        }
-      }
+      "border": "gray"
     },
     "logo": {
       "src": "https://keepnetlabs.com/keepnet-logo.svg",
       "darkSrc": "https://imagedelivery.net/KxWh-mxPGDbsqJB3c5_fmA/74b2b289-fe69-4e14-ef7d-f15e2ad3bb00/public",
       "alt": "Keepnet Labs"
-    },
-    "effects": {
-      "borderRadius": "rounded-xl",
-      "shadow": "shadow-lg",
-      "backdropBlur": "backdrop-blur-xl",
-      "glassOpacity": "60",
-      "borderOpacity": "25"
-    },
-    "toggleButton": {
-      "title": {
-        "lightMode": "Switch to light theme",
-        "darkMode": "Switch to dark theme"
-      }
-    },
-    "hint": {
-      "title": "Dark/Light Theme",
-      "description": "Click the moon/sun icon in the top right to change your theme"
     },
     "texts": {
       "loading": "Loading...",
@@ -65,7 +31,34 @@
       "completedLabel": "Completed",
       "progressLabel": "completed",
       "points": "points",
-      "popularLanguages": "Popular Languages"
+      "popularLanguages": "Popular Languages",
+      "toggleButtonLightMode": "Switch to light theme",
+      "toggleButtonDarkMode": "Switch to dark theme",
+      "hintTitle": "Dark/Light Theme",
+      "hintDescription": "Click the moon/sun icon in the top right to change your theme"
+    },
+    "ariaTexts": {
+      "appLabel": "Cyber Security Training Application",
+      "appDescription": "Interactive cyber security training application with multiple learning modules and progress tracking",
+      "loadingLabel": "Loading content",
+      "themeHintLabel": "Theme hint notification",
+      "themeHintDescription": "Toggle between light and dark theme",
+      "headerLabel": "Application header",
+      "logoLabel": "Application logo",
+      "progressLabel": "Training progress",
+      "pointsLabel": "Total points earned",
+      "pointsDescription": "points earned",
+      "themeToggleDescription": "Toggle between light and dark theme",
+      "languageSelectorLabel": "Language selector",
+      "languageSelectorDescription": "Select your preferred language for the application",
+      "languageListLabel": "Available languages",
+      "languageListDescription": "List of available languages for the application",
+      "languageSearchDescription": "Search for languages by name or country code",
+      "contentLabel": "Training content",
+      "contentDescription": "Scrollable training content area with interactive learning modules",
+      "achievementLabel": "Achievement notification",
+      "quizCompletionLabel": "Quiz completion hint",
+      "scrollToTopLabel": "Scroll to top of page"
     }
   },
   "introSceneConfig": {
@@ -91,34 +84,34 @@
   "goalSceneConfig": {
   "title": "SMS Security Goals",
     "goals": [
-  {
-  "iconName": "smartphone",
-  "title": "Recognize SMS Threats",
-  "subtitle": "Awareness",
-  "description": "Quickly recognize and identify SMS-based phishing attacks",
-  "colorType": "red"
-  },
-  {
-  "iconName": "shield",
-  "title": "Protection Strategies",
-  "subtitle": "Defense",
-  "description": "Develop effective methods to protect against SMS attacks",
-  "colorType": "green"
-  },
-  {
-  "iconName": "alert-triangle",
-  "title": "Detect Suspicious Messages",
-  "subtitle": "Vigilance",
-  "description": "Analyze and verify suspicious SMS messages",
-  "colorType": "orange"
-  }
-  ],
-  "icon": {
-  "component": null,
-  "size": 48,
-  "sceneIconName": "target",
-  "className": "text-red-500"
-  }
+          {
+          "iconName": "smartphone",
+          "title": "Recognize SMS Threats",
+          "subtitle": "Awareness",
+          "description": "Quickly recognize and identify SMS-based phishing attacks",
+          "colorType": "red"
+          },
+          {
+          "iconName": "shield",
+          "title": "Protection Strategies",
+          "subtitle": "Defense",
+          "description": "Develop effective methods to protect against SMS attacks",
+          "colorType": "green"
+          },
+          {
+          "iconName": "alert-triangle",
+          "title": "Detect Suspicious Messages",
+          "subtitle": "Vigilance",
+          "description": "Analyze and verify suspicious SMS messages",
+          "colorType": "orange"
+          }
+          ],
+          "icon": {
+          "component": null,
+          "size": 48,
+          "sceneIconName": "target",
+          "className": "text-red-500"
+          }
     },
  "scenarioSceneConfig": {
   "title": "Real‑Life Scenario",
@@ -601,7 +594,10 @@
     "motivationalMessage": "By completing this training, you’ve made a significant contribution to your organization’s security. Keep applying what you’ve learned and encourage your team to do the same.",
     "downloadButton": "Download Certificate",
     "downloadingText": "Downloading...",
-    "urgentLabel": "Urgent"
+    "urgentLabel": "Urgent",
+    "pointsLabel": "Points",
+    "timeLabel": "Time",
+    "completionLabel": "Completion"
   },
   "immediateActions": [
     {

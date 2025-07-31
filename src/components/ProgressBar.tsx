@@ -368,7 +368,7 @@ export function ProgressBar({ currentScene, totalScenes, config = {} }: Progress
               transition={{ duration: 0.3, ease: "easeOut" }}
               className="absolute -top-8 left-0 transform transition-all duration-300 -translate-x-1/2 z-20"
               style={{
-                left: `${progress - 1.5}%`,
+                left: `${progress === 100 ? progress - 2 : progress - 1.5}%`,
                 top: '-24px'
               }}
             >

@@ -179,9 +179,6 @@ export default function App() {
         // const response = await fetch('/api/theme-config');
         // const backendConfig = await response.json();
         // updateThemeConfig(backendConfig);
-
-        // Şimdilik varsayılan config kullanılıyor
-        console.log('Theme config loaded:', themeConfig);
       } catch (error) {
         console.error('Error loading theme from backend:', error);
       }
@@ -1021,7 +1018,14 @@ export default function App() {
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
+      role="application"
+      aria-label={appConfig.theme?.ariaTexts?.appLabel || "Cyber Security Training Application"}
+      aria-describedby="app-description"
     >
+      {/* Hidden description for screen readers */}
+      <div id="app-description" className="sr-only">
+        {appConfig.theme?.ariaTexts?.appDescription || "Interactive cyber security training application with multiple learning modules and progress tracking"}
+      </div>
       {/* Loading Overlay - Only show on desktop */}
       <AnimatePresence>
         {isLoading && !isMobile && (
@@ -1030,9 +1034,12 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className={cssClasses.loadingOverlay}
+            role="status"
+            aria-live="polite"
+            aria-label={appConfig.theme?.ariaTexts?.loadingLabel || "Loading content"}
           >
             <div className={cssClasses.loadingContainer}>
-              <Loader2 size={20} className={cssClasses.loadingSpinner} />
+              <Loader2 size={20} className={cssClasses.loadingSpinner} aria-hidden="true" />
               <span className={cssClasses.loadingText}>
                 {themeConfig.texts?.loading}
               </span>
@@ -1049,10 +1056,13 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             className={cssClasses.themeHintContainer}
+            role="alert"
+            aria-live="polite"
+            aria-label={appConfig.theme?.ariaTexts?.themeHintLabel || "Theme hint notification"}
           >
             <div className={cssClasses.themeHintContent}>
               <div className="flex items-start space-x-3 relative z-10">
-                <div className={cssClasses.themeHintIcon}>
+                <div className={cssClasses.themeHintIcon} aria-hidden="true">
                   {isDarkMode ? (
                     <Moon size={isMobile ? 12 : 16} />
                   ) : (
@@ -1060,9 +1070,9 @@ export default function App() {
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className={cssClasses.themeHintTitle}>{themeConfig.hint?.title}</p>
-                  <p className={cssClasses.themeHintDescription}>
-                    {themeConfig.hint?.description}
+                  <p className={cssClasses.themeHintTitle} id="theme-hint-title">{themeConfig.texts?.hintTitle}</p>
+                  <p className={cssClasses.themeHintDescription} id="theme-hint-description">
+                    {themeConfig.texts?.hintDescription}
                   </p>
                 </div>
                 <button
@@ -1072,8 +1082,9 @@ export default function App() {
                   }}
                   className={cssClasses.themeHintClose}
                   aria-label="İpucunu kapat"
+                  aria-describedby="theme-hint-title theme-hint-description"
                 >
-                  <X size={12} className="text-blue-600 dark:text-gray-300" />
+                  <X size={12} className="text-blue-600 dark:text-gray-300" aria-hidden="true" />
                 </button>
               </div>
             </div>
@@ -1089,6 +1100,7 @@ export default function App() {
           transform: `translateY(${scrollY * 0.3}px)`,
           transition: 'transform 0.1s ease-out'
         }}
+        aria-hidden="true"
       >
         {!isMobile && (
           <>
@@ -1099,6 +1111,7 @@ export default function App() {
                 animationDuration: '12s',
                 transform: `translateY(${scrollY * 0.4}px) translateX(${scrollY * 0.1}px)` // Different parallax speed
               }}
+              aria-hidden="true"
             />
 
             <motion.div
@@ -1108,6 +1121,7 @@ export default function App() {
                 animationDelay: '3s',
                 transform: `translateY(${scrollY * -0.2}px) translateX(${scrollY * -0.05}px)` // Opposite direction
               }}
+              aria-hidden="true"
             />
 
             {/* Additional depth layers - Enhanced contrast */}
@@ -1116,6 +1130,7 @@ export default function App() {
               style={{
                 transform: `translateY(${scrollY * 0.5}px) translateX(${scrollY * 0.08}px) scale(${1 + scrollY * 0.0002})`
               }}
+              aria-hidden="true"
             />
 
             <motion.div
@@ -1123,6 +1138,7 @@ export default function App() {
               style={{
                 transform: `translateY(${scrollY * -0.25}px) translateX(${scrollY * -0.04}px) scale(${1 + scrollY * 0.0001})`
               }}
+              aria-hidden="true"
             />
 
             {/* Enhanced floating ambient particles */}
@@ -1131,6 +1147,7 @@ export default function App() {
               style={{
                 transform: `translateY(${scrollY * 0.6}px) translateX(${Math.sin(scrollY * 0.01) * 20}px)`
               }}
+              aria-hidden="true"
             />
 
             <motion.div
@@ -1138,6 +1155,7 @@ export default function App() {
               style={{
                 transform: `translateY(${scrollY * -0.35}px) translateX(${Math.cos(scrollY * 0.008) * 15}px)`
               }}
+              aria-hidden="true"
             />
 
             {/* Additional background texture layers for more depth */}
@@ -1146,6 +1164,7 @@ export default function App() {
               style={{
                 transform: `translateY(${scrollY * 0.35}px) translateX(${scrollY * 0.06}px) rotate(${scrollY * 0.05}deg)`
               }}
+              aria-hidden="true"
             />
 
             <motion.div
@@ -1153,22 +1172,23 @@ export default function App() {
               style={{
                 transform: `translateY(${scrollY * -0.4}px) translateX(${scrollY * -0.07}px) rotate(${scrollY * -0.03}deg)`
               }}
+              aria-hidden="true"
             />
           </>
         )}
       </motion.div>
 
       {/* Optimized Mobile Header - Enhanced dark mode contrast */}
-      <div className={cssClasses.headerContainer}>
-        <div className={cssClasses.headerBackground}></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-50/30 via-transparent to-purple-50/20 dark:from-blue-900/10 dark:via-transparent dark:to-purple-900/8 transition-colors duration-300"></div>
-        <div className={cssClasses.headerBorder}></div>
+      <header className={cssClasses.headerContainer} role="banner" aria-label={appConfig.theme?.ariaTexts?.headerLabel || "Application header"}>
+        <div className={cssClasses.headerBackground} aria-hidden="true"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-50/30 via-transparent to-purple-50/20 dark:from-blue-900/10 dark:via-transparent dark:to-purple-900/8 transition-colors duration-300" aria-hidden="true"></div>
+        <div className={cssClasses.headerBorder} aria-hidden="true"></div>
 
         <div className={cssClasses.headerContent}>
           {/* Header Layout - Logo Left, Progress Center, Controls Right */}
           <div className="flex items-center justify-between">
             {/* Left - Logo */}
-            <div className="flex items-center">
+            <div className="flex items-center" role="banner">
               <motion.div
                 className="flex items-center"
                 whileHover={{
@@ -1180,19 +1200,20 @@ export default function App() {
                 {/* Logo Image - Industry Standard */}
                 <img
                   src={isDarkMode ? themeConfig.logo?.darkSrc : themeConfig.logo?.src}
-                  alt={themeConfig.logo?.alt || "Logo"}
+                  alt={themeConfig.logo?.alt || "Application Logo"}
                   className="h-8 sm:h-10 md:h-12 w-auto max-h-12 object-contain"
                   style={{
                     display: 'block',
                     maxWidth: '120px',
                     height: 'auto'
                   }}
+                  aria-label={appConfig.theme?.ariaTexts?.logoLabel || "Application logo"}
                 />
               </motion.div>
             </div>
 
             {/* Center - Progress Bar */}
-            <div className="flex-1 hidden md:block">
+            <div className="flex-1 hidden md:block" role="progressbar" aria-label={appConfig.theme?.ariaTexts?.progressLabel || "Training progress"}>
               <div className="relative">
                 <MemoizedProgressBar
                   currentScene={currentScene + 1}
@@ -1211,11 +1232,14 @@ export default function App() {
                   scale: 1.02,
                   y: -1
                 }}
+                role="status"
+                aria-label={appConfig.theme?.ariaTexts?.pointsLabel || "Total points earned"}
+                aria-live="polite"
               >
                 {/* Badge Content */}
                 <div className="relative z-10 flex items-center space-x-1 sm:space-x-1.5 md:space-x-1.5">
-                  <Award size={isMobile ? 16 : 20} className="text-[#F59E0B] dark:text-[#F59E0B] sm:w-4 sm:h-4 md:w-5 md:h-5 transition-colors duration-300" />
-                  <span className={cssClasses.pointsText}>
+                  <Award size={isMobile ? 16 : 20} className="text-[#F59E0B] dark:text-[#F59E0B] sm:w-4 sm:h-4 md:w-5 md:h-5 transition-colors duration-300" aria-hidden="true" />
+                  <span className={cssClasses.pointsText} aria-label={`${totalPoints} ${appConfig.theme?.ariaTexts?.pointsDescription || "points earned"}`}>
                     {totalPoints}
                   </span>
                 </div>
@@ -1230,8 +1254,11 @@ export default function App() {
                   y: -2
                 }}
                 whileTap={{ scale: 0.95 }}
-                aria-label={isDarkMode ? themeConfig.toggleButton?.title?.lightMode : themeConfig.toggleButton?.title?.darkMode}
-                title={isDarkMode ? themeConfig.toggleButton?.title?.lightMode : themeConfig.toggleButton?.title?.darkMode}
+                aria-label={isDarkMode ? themeConfig.texts?.toggleButtonLightMode : themeConfig.texts?.toggleButtonDarkMode}
+                title={isDarkMode ? themeConfig.texts?.toggleButtonLightMode : themeConfig.texts?.toggleButtonDarkMode}
+                aria-checked={isDarkMode}
+                role="switch"
+                aria-describedby="theme-toggle-description"
               >
 
 
@@ -1262,6 +1289,7 @@ export default function App() {
                         <Sun
                           size={40}
                           className="text-yellow-600 group-hover:text-yellow-700 dark:text-white dark:group-hover:text-white transition-colors duration-300 w-5 h-5 sm:w-6 sm:h-6"
+                          aria-hidden="true"
                         />
                       </motion.div>
                     ) : (
@@ -1275,15 +1303,20 @@ export default function App() {
                         <Moon
                           size={40}
                           className="text-[#8E8E93] dark:text-[#8E8E93] transition-colors duration-300 w-5 h-5 sm:w-6 sm:h-6"
+                          aria-hidden="true"
                         />
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </div>
+                {/* Hidden description for screen readers */}
+                <div id="theme-toggle-description" className="sr-only">
+                  {appConfig.theme?.ariaTexts?.themeToggleDescription || "Toggle between light and dark theme"}
+                </div>
               </motion.button>
 
               {/* ENHANCED LIQUID GLASS LANGUAGE SELECTOR - Mobile Optimized */}
-              <div className="relative" ref={dropdownRef}>
+              <div className="relative" ref={dropdownRef} role="combobox" aria-haspopup="listbox" aria-expanded={isLanguageDropdownOpen} aria-controls="language-dropdown-list">
                 <motion.button
                   onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
                   className={cssClasses.languageButton}
@@ -1292,8 +1325,9 @@ export default function App() {
                     y: -1
                   }}
                   whileTap={{ scale: 0.98 }}
-                  aria-label="Dil seçici"
+                  aria-label={appConfig.theme?.ariaTexts?.languageSelectorLabel || "Language selector"}
                   aria-expanded={isLanguageDropdownOpen}
+                  aria-describedby="language-selector-description"
                   style={{
                     transform: 'translateZ(0)',
                     willChange: 'transform',
@@ -1307,6 +1341,7 @@ export default function App() {
                       countryCode={getCountryCode(currentLanguage?.code || 'tr')}
                       svg
                       style={{ fontSize: isMobile ? '1rem' : '1.2rem' }}
+                      aria-hidden="true"
                     />
                     <span className="text-xs text-gray-800 dark:text-gray-200 font-medium transition-colors duration-300">
                       {getCountryCode(currentLanguage?.code || 'tr')}
@@ -1315,7 +1350,12 @@ export default function App() {
                       size={8}
                       className={`${cssClasses.languageChevron} hidden sm:block`}
                       style={{ transform: isLanguageDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                      aria-hidden="true"
                     />
+                  </div>
+                  {/* Hidden description for screen readers */}
+                  <div id="language-selector-description" className="sr-only">
+                    {appConfig.theme?.ariaTexts?.languageSelectorDescription || "Select your preferred language for the application"}
                   </div>
                 </motion.button>
 
@@ -1334,7 +1374,9 @@ export default function App() {
                           : undefined
                       }}
                       role="listbox"
-                      aria-label="Language Selector"
+                      id="language-dropdown-list"
+                      aria-label={appConfig.theme?.ariaTexts?.languageListLabel || "Language Selector"}
+                      aria-describedby="language-list-description"
                     >
                       {/* Enhanced Search Input */}
                       <div className="relative p-2.5 border-b border-gray-200/50 dark:border-gray-600/50 transition-colors duration-300">
@@ -1350,7 +1392,13 @@ export default function App() {
                             onChange={(e) => setLanguageSearchTerm(e.target.value)}
                             className={`w-full pl-6 pr-3 py-1.5 text-xs bg-white/60 dark:bg-white border border-white/40 dark:border-blue-500/60 rounded-lg  placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-xl'}`}
                             aria-label={getSearchPlaceholder(currentLanguage?.code || 'tr')}
+                            aria-describedby="language-search-description"
+                            role="searchbox"
                           />
+                          {/* Hidden description for search input */}
+                          <div id="language-search-description" className="sr-only">
+                            {appConfig.theme?.ariaTexts?.languageSearchDescription || "Search for languages by name or country code"}
+                          </div>
                         </div>
                       </div>
 
@@ -1361,7 +1409,13 @@ export default function App() {
                           WebkitOverflowScrolling: 'touch',
                           touchAction: 'pan-y'
                         }}
+                        role="listbox"
+                        aria-label="Available languages"
                       >
+                        {/* Hidden description for screen readers */}
+                        <div id="language-list-description" className="sr-only">
+                          {appConfig.theme?.ariaTexts?.languageListDescription || "List of available languages for the application"}
+                        </div>
                         {filteredLanguages.length === 0 ? (
                           <div className="px-3 py-2 text-xs text-gray-600 dark:text-gray-300 text-center transition-colors duration-300">
                             {themeConfig.texts?.languageNotFound}
@@ -1372,7 +1426,7 @@ export default function App() {
                             {priorityLangs.length > 0 && !languageSearchTerm && (
                               <>
                                 <div className="px-3 py-1.5 text-xs font-medium text-[#3B82F6] dark:text-white bg-gray-50/50 dark:bg-gray-800/40 border-b border-gray-200/50 dark:border-gray-700/50 flex items-center transition-colors duration-300">
-                                  <Star size={10} className="mr-1.5" />
+                                  <Star size={10} className="mr-1.5" aria-hidden="true" />
                                   {themeConfig.texts?.popularLanguages}
                                 </div>
                                 {priorityLangs.map((language, index) => (
@@ -1396,6 +1450,7 @@ export default function App() {
                                       countryCode={getCountryCode(language.code)}
                                       svg
                                       style={{ fontSize: '0.75rem' }}
+                                      aria-hidden="true"
                                     />
                                     <span className={`text-xs text-gray-900 dark:text-white font-medium flex-1 min-w-0 truncate transition-colors duration-300 ${selectedLanguage === language.code ? 'text-[#3B82F6]' : ''}`}>
                                       {language.name}
@@ -1507,10 +1562,10 @@ export default function App() {
 
 
         </div>
-      </div>
+      </header>
 
       {/* Navigation Area - Optimized spacing */}
-      <div className="flex-1 relative flex items-center">
+      <main className="flex-1 relative flex items-center" role="main" aria-label={appConfig.theme?.ariaTexts?.contentLabel || "Training content area"}>
         {/* Left Navigation - Hidden on mobile and only show when active */}
         {currentScene > 0 && (
           <div className="absolute left-2 sm:left-4 z-30 top-1/2 transform -translate-y-1/2 hidden md:block">
@@ -1661,6 +1716,8 @@ export default function App() {
                   className="relative z-10 h-full overflow-y-auto overflow-x-hidden scroll-smooth custom-scrollbar"
                   onScroll={handleScroll}
                   role="main"
+                  aria-label={appConfig.theme?.ariaTexts?.contentLabel || "Training content"}
+                  aria-describedby="content-description"
                   style={{
                     scrollbarWidth: 'thin',
                     scrollbarColor: isDarkMode ? 'rgba(59, 130, 246, 0.4) transparent' : 'rgba(59, 130, 246, 0.3) transparent',
@@ -1672,6 +1729,10 @@ export default function App() {
                     willChange: 'scroll-position'
                   }}
                 >
+                  {/* Hidden description for screen readers */}
+                  <div id="content-description" className="sr-only">
+                    {appConfig.theme?.ariaTexts?.contentDescription || "Scrollable training content area with interactive learning modules"}
+                  </div>
                   {/* Optimized Content Padding - Industry Standards */}
                   <div className="p-2 sm:p-3 md:p-4 lg:p-5">
                     <motion.div
@@ -1869,7 +1930,7 @@ export default function App() {
             }}
           />
         </div>
-      </div>
+      </main>
 
       {/* Enhanced Achievement Notifications */}
       <AnimatePresence>
@@ -1879,10 +1940,13 @@ export default function App() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 300 }}
             className={cssClasses.achievementContainer}
+            role="alert"
+            aria-live="polite"
+            aria-label={appConfig.theme?.ariaTexts?.achievementLabel || "Achievement notification"}
           >
             <div className={cssClasses.achievementContent}>
               <div className="flex items-center space-x-3 relative z-10">
-                <Award size={16} className="text-yellow-600 dark:text-yellow-300 flex-shrink-0" />
+                <Award size={16} className="text-yellow-600 dark:text-yellow-300 flex-shrink-0" aria-hidden="true" />
                 <span className="text-sm text-yellow-900 dark:text-yellow-100 font-medium transition-colors duration-300">
                   {themeConfig.texts?.achievementNotification}
                 </span>
@@ -1892,7 +1956,7 @@ export default function App() {
                   aria-label={themeConfig.texts?.closeNotification}
                   style={{ touchAction: 'manipulation' }}
                 >
-                  <X size={14} className="text-yellow-800 dark:text-yellow-200" />
+                  <X size={14} className="text-yellow-800 dark:text-yellow-200" aria-hidden="true" />
                 </button>
               </div>
             </div>
@@ -1908,10 +1972,13 @@ export default function App() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             className={cssClasses.quizNotificationContainer}
+            role="alert"
+            aria-live="polite"
+            aria-label={appConfig.theme?.ariaTexts?.quizCompletionLabel || "Quiz completion hint"}
           >
             <div className={cssClasses.quizNotificationContent}>
               <div className="flex items-center space-x-2.5 relative z-10">
-                <div className="w-2 h-2 bg-amber-500 dark:bg-amber-400 rounded-full animate-pulse"></div>
+                <div className="w-2 h-2 bg-amber-500 dark:bg-amber-400 rounded-full animate-pulse" aria-hidden="true"></div>
                 <p className="text-sm text-[#D97706] dark:text-[#D97706] font-medium transition-colors duration-300">
                   {(appConfig as any).quizSceneConfig?.texts?.quizCompletionHint}
                 </p>
@@ -1922,11 +1989,11 @@ export default function App() {
                   aria-label={themeConfig.texts?.closeNotification}
                   style={{ touchAction: 'manipulation' }}
                 >
-                  <X size={12} className="text-amber-700 dark:text-amber-300" />
+                  <X size={12} className="text-amber-700 dark:text-amber-300" aria-hidden="true" />
                 </button>
               </div>
               {/* Industry Standard: Subtle Glow Effect */}
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-400/5 to-orange-400/5 dark:from-amber-400/10 dark:to-orange-400/10 pointer-events-none"></div>
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-400/5 to-orange-400/5 dark:from-amber-400/10 dark:to-orange-400/10 pointer-events-none" aria-hidden="true"></div>
             </div>
           </motion.div>
         )}
@@ -1934,7 +2001,7 @@ export default function App() {
 
       {/* Industry Standard Mobile Navigation Hint - Visual Only */}
       {currentScene === 0 && (
-        <div className={cssClasses.mobileNavHintContainer}>
+        <div className={cssClasses.mobileNavHintContainer} aria-hidden="true">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -1989,15 +2056,14 @@ export default function App() {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               className="flex items-center justify-center w-14 h-14 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border border-white/40 dark:border-gray-600/60 rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
-              title="Sayfanın Başına Dön"
+              title={appConfig.theme?.ariaTexts?.scrollToTopLabel || "Sayfanın Başına Dön"}
+              aria-label={appConfig.theme?.ariaTexts?.scrollToTopLabel || "Scroll to top of page"}
             >
-              <ChevronUp className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              <ChevronUp className="w-6 h-6 text-blue-600 dark:text-blue-400" aria-hidden="true" />
             </motion.button>
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Toast Container */}
       <Toaster />
     </div>
   );

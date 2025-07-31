@@ -79,11 +79,142 @@ export function NudgeScene({ config = nudgeSceneConfig, completionData }: NudgeS
 
   const handleDownloadCertificate = () => {
     setShowCertificate(true);
-    // Simulate certificate download
-    setTimeout(() => {
-      setShowCertificate(false);
-      // In real app, this would trigger actual download
-    }, 2000);
+
+    // Generate certificate HTML
+    const certificateHTML = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Certificate of Completion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: 'Montserrat', sans-serif;
+      background: #f5f5f5;
+    }
+    .certificate-container {
+      width: 800px;
+      height: 525px;
+      border: 2px solid #8898AA;
+      margin: 0 auto;
+      background: white;
+      position: relative;
+    }
+    .header {
+      height: 70px;
+    }
+    .logo-section {
+      text-align: center;
+      padding: 20px 0;
+    }
+    .logo {
+      max-height: 160px;
+      min-height: 32px;
+      max-width: 240px;
+      object-fit: contain;
+    }
+    .title {
+      text-align: center;
+      font-weight: 700;
+      font-size: 30px;
+      line-height: 37px;
+      letter-spacing: 0.03em;
+      color: #383B41;
+      padding-top: 24px;
+    }
+    .subtitle {
+      text-align: center;
+      font-weight: 600;
+      font-size: 20px;
+      line-height: 24px;
+      color: #383B41;
+    }
+    .name {
+      text-align: center;
+      font-weight: 600;
+      font-size: 36px;
+      line-height: 44px;
+      letter-spacing: 0.04em;
+      color: #2196F3;
+      padding-top: 20px;
+    }
+    .divider {
+      background: #8898AA;
+      height: 2px;
+      max-width: 435px;
+      margin: 20px auto;
+    }
+    .training-info {
+      text-align: center;
+      font-weight: 500;
+      font-size: 20px;
+      line-height: 24px;
+      color: #383B41;
+    }
+    .training-name {
+      text-align: center;
+      font-weight: 600;
+      font-size: 20px;
+      line-height: 24px;
+      color: #383B41;
+    }
+    .completion-date {
+      text-align: center;
+      font-weight: 500;
+      font-size: 16px;
+      line-height: 20px;
+      color: #383B41;
+    }
+    .footer {
+      padding-top: 24px;
+      padding-bottom: 70px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 17px;
+      letter-spacing: 0.06em;
+      color: #383B41;
+    }
+  </style>
+</head>
+<body>
+  <div class="certificate-container">
+    <div class="header"></div>
+    <div class="logo-section">
+      <img src="https://keepnetlabs.com/keepnet-logo.svg" alt="Keepnet Labs" class="logo">
+    </div>
+    <div class="title">Certificate Of Completion</div>
+    <div class="subtitle">This certificate is awarded to</div>
+    <div class="name">John Doe</div>
+    <div class="divider"></div>
+    <div class="training-info">for successful completion of</div>
+    <div class="training-name">SMS Phishing Protection Training</div>
+    <div class="completion-date">on ${new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })}</div>
+    <div class="footer"></div>
+  </div>
+</body>
+</html>`;
+
+    // Create blob and download
+    const blob = new Blob([certificateHTML], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'certificate-of-completion.html';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    setShowCertificate(false);
   };
 
   // Confetti component
@@ -312,9 +443,9 @@ export function NudgeScene({ config = nudgeSceneConfig, completionData }: NudgeS
             initial={{ width: 0 }}
             animate={{ width: "auto" }}
             transition={{ duration: 1, delay: 0.5 }}
-            className="inline-block overflow-hidden whitespace-nowrap bg-gradient-to-r from-emerald-600 via-green-500 to-emerald-500 dark:from-emerald-300 dark:via-green-300 dark:to-emerald-200 bg-clip-text text-transparent drop-shadow-sm dark:drop-shadow-lg"
+            className="inline-block overflow-hidden whitespace-normal lg:whitespace-nowrap bg-gradient-to-r from-emerald-600 via-green-500 to-emerald-500 dark:from-emerald-300 dark:via-green-300 dark:to-emerald-200 bg-clip-text text-transparent drop-shadow-sm dark:drop-shadow-lg break-words"
           >
-            {config.texts?.completionTitle || "🎉 Tebrikler! Eğitimi Tamamladınız"}
+            {config.texts?.completionTitle}
           </motion.span>
         </motion.h1>
 
@@ -324,7 +455,7 @@ export function NudgeScene({ config = nudgeSceneConfig, completionData }: NudgeS
           transition={{ duration: 0.8, delay: 0.4 }}
           className="text-base sm:text-lg text-gray-700 dark:text-gray-100 mb-6 font-medium leading-relaxed dark:font-semibold"
         >
-          {config.texts?.completionSubtitle || "Siber güvenlik bilgilerinizi başarıyla güncellediniz"}
+          {config.texts?.completionSubtitle}
         </motion.p>
 
         {/* FIXED: Completion Stats with Perfect Center Alignment */}
@@ -335,9 +466,9 @@ export function NudgeScene({ config = nudgeSceneConfig, completionData }: NudgeS
           className="flex items-center justify-center gap-4 sm:gap-6 mb-3"
         >
           {[
-            { icon: Award, value: finalCompletionData.totalPoints, label: "Puan", gradient: "from-blue-100 to-indigo-100", darkGradient: "from-blue-900/40 to-indigo-900/40", color: "text-blue-600 dark:text-blue-300", bgColor: "bg-white/80 dark:bg-gray-800/90", borderColor: "border-blue-200/60 dark:border-blue-600/40" },
-            { icon: Clock, value: finalCompletionData.timeSpent, label: "Süre", gradient: "from-green-100 to-emerald-100", darkGradient: "from-green-900/40 to-emerald-900/40", color: "text-green-600 dark:text-green-300", bgColor: "bg-white/80 dark:bg-gray-800/90", borderColor: "border-green-200/60 dark:border-green-600/40" },
-            { icon: Target, value: "100%", label: "Tamamlama", gradient: "from-purple-100 to-pink-100", darkGradient: "from-purple-900/40 to-pink-900/40", color: "text-purple-600 dark:text-purple-300", bgColor: "bg-white/80 dark:bg-gray-800/90", borderColor: "border-purple-200/60 dark:border-purple-600/40" }
+            { icon: Award, value: finalCompletionData.totalPoints, label: config.texts?.pointsLabel, gradient: "from-blue-100 to-indigo-100", darkGradient: "from-blue-900/40 to-indigo-900/40", color: "text-blue-600 dark:text-blue-300", bgColor: "bg-white/80 dark:bg-gray-800/90", borderColor: "border-blue-200/60 dark:border-blue-600/40" },
+            { icon: Clock, value: finalCompletionData.timeSpent, label: config.texts?.timeLabel, gradient: "from-green-100 to-emerald-100", darkGradient: "from-green-900/40 to-emerald-900/40", color: "text-green-600 dark:text-green-300", bgColor: "bg-white/80 dark:bg-gray-800/90", borderColor: "border-green-200/60 dark:border-green-600/40" },
+            { icon: Target, value: "100%", label: config.texts?.completionLabel, gradient: "from-purple-100 to-pink-100", darkGradient: "from-purple-900/40 to-pink-900/40", color: "text-purple-600 dark:text-purple-300", bgColor: "bg-white/80 dark:bg-gray-800/90", borderColor: "border-purple-200/60 dark:border-purple-600/40" }
           ].map((stat, index) => (
             <motion.div
               key={index}

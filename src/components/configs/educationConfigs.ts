@@ -887,6 +887,9 @@ export interface NudgeSceneConfig {
         downloadButton?: string;
         downloadingText?: string;
         urgentLabel?: string;
+        pointsLabel?: string;
+        timeLabel?: string;
+        completionLabel?: string;
     };
     achievements?: Array<{
         id: string;
@@ -996,7 +999,10 @@ export const nudgeSceneConfig: NudgeSceneConfig = {
         motivationalMessage: "Bu eğitimi tamamlayarak organizasyonunuzun güvenliğine önemli bir katkı sağladınız. Öğrendiklerinizi uygulamaya devam edin ve ekibinizi de bilinçlendirin.",
         downloadButton: "Sertifikayı İndir",
         downloadingText: "İndiriliyor...",
-        urgentLabel: "Acil"
+        urgentLabel: "Acil",
+        pointsLabel: "Puan",
+        timeLabel: "Süre",
+        completionLabel: "Tamamlama"
     },
     completionData: {
         totalPoints: 210,

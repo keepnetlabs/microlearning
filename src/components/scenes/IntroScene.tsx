@@ -1129,14 +1129,23 @@ export const IntroScene = React.memo(({
             }}
           />
 
-          {/* Multi-layer gradients */}
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-50/20 via-slate-100/10 to-slate-200/5 dark:from-slate-800/15 dark:via-slate-700/8 dark:to-slate-600/4 rounded-full transition-colors duration-500"></div>
+          {/* Multi-layer gradients - Light & Dark Mode */}
+          <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-gray-50/20 to-gray-100/10 dark:from-gray-800/25 dark:via-gray-700/15 dark:to-gray-600/8 rounded-full transition-colors duration-500"></div>
 
-          {/* Apple-style highlight */}
+          {/* Apple-style highlight - Light Mode */}
           <div
             className="absolute inset-0 rounded-full pointer-events-none"
             style={{
-              background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.08) 40%, transparent 70%)`,
+              background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.12) 40%, transparent 70%)`,
+              mixBlendMode: 'overlay'
+            }}
+          />
+
+          {/* Apple-style highlight - Dark Mode */}
+          <div
+            className="absolute inset-0 rounded-full pointer-events-none hidden dark:block"
+            style={{
+              background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.06) 40%, transparent 70%)`,
               mixBlendMode: 'overlay'
             }}
           />
