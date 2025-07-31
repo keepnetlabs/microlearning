@@ -105,9 +105,9 @@ export function VideoPlayer({
   const [isTranscriptOpen, setIsTranscriptOpen] =
     useState(showTranscript);
   const [orientation, setOrientation] = useState<'portrait' | 'landscape'>(getOrientation());
-  const [isIOSDevice] = useState(true);
+  const [isIOSDevice] = useState(isIOS());
   const [isVideoEnded, setIsVideoEnded] = useState(false);
-
+  const [tracks, setTracks] = useState<any[]>([]);
   // Parse transcript if it's a string - useMemo ile optimize edildi
   const parsedTranscript = useMemo(() =>
     typeof transcript === "string"
@@ -130,7 +130,7 @@ export function VideoPlayer({
   );
 
   // Handle orientation change for iOS
-  /*
+
   useEffect(() => {
     if (!isIOSDevice) return;
 
@@ -165,7 +165,7 @@ export function VideoPlayer({
       window.removeEventListener('orientationchange', handleOrientationChange);
       window.removeEventListener('resize', handleOrientationChange);
     };
-  }, [isIOSDevice]);*/
+  }, [isIOSDevice]);
 
   // Auto-scroll to current transcript row
   useEffect(() => {
@@ -431,7 +431,7 @@ export function VideoPlayer({
     video._lastTime = 0;
 
     // Set iOS-specific video attributes based on orientation
-    /*
+
     if (isIOSDevice) {
       if (orientation === 'landscape') {
         video.setAttribute('webkit-playsinline', 'false');
@@ -443,7 +443,7 @@ export function VideoPlayer({
         video.removeAttribute('webkit-presentation-mode');
       }
     }
-    */
+
 
     // Forward seek prevention
     const handleSeeking = (e: Event) => {
@@ -576,6 +576,7 @@ export function VideoPlayer({
           update: true,
           language: 'en'
         },
+        fullscreen: { fallback: true, iosNative: false },
         hideControls: false,
         keyboard: {
           focused: !disableForwardSeek,
@@ -722,6 +723,10 @@ export function VideoPlayer({
       hlsRef.current = hls;
       hls.loadSource(src);
       hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_LOADED, (_event, data) => {
+        console.log('Mevcut altyazı track’leri:', data);
+        setTracks(data?.subtitles || []);
+      });
       hls.on(Hls.Events.MANIFEST_PARSED, initializePlayer);
     } else {
       video.src = src;
@@ -798,8 +803,12 @@ export function VideoPlayer({
         <video
           ref={videoRef}
           className={`plyr-react plyr rounded-lg ${disableForwardSeek ? "plyr--disable-seek" : ""}`}
+          controls
           poster={poster}
           style={videoStyle}
+          playsInline
+          webkit-playsinline
+          crossOrigin="anonymous"
           onContextMenu={
             disableForwardSeek
               ? (e) => e.preventDefault()
@@ -811,6 +820,15 @@ export function VideoPlayer({
               : undefined
           }
         >
+          {tracks.map((track) => (
+            <track
+              key={track.id}
+              src={track.url}
+              kind="subtitles"
+              label={track.name}
+              default={track.default}
+            />
+          ))}
         </video>
 
         {/* Replay Button */}

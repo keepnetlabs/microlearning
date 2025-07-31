@@ -334,14 +334,11 @@ export default function App() {
   const handleLanguageChange = useCallback((newLanguage: string) => {
     setSelectedLanguage(newLanguage);
     const newConfig = loadAppConfig(newLanguage);
-    console.log(newConfig)
     setAppConfig(newConfig);
     createConfigChangeEvent(newLanguage);
 
     // LocalStorage'a kaydet
     localStorage.setItem('selected-language', newLanguage);
-
-    console.log(`Language changed to: ${newLanguage}, config updated`);
   }, []);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [languageSearchTerm, setLanguageSearchTerm] = useState('');

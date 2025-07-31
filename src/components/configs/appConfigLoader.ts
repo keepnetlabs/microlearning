@@ -13,12 +13,9 @@ const configMap: Record<string, any> = {
 export const loadAppConfig = (language: string): any => {
   // Dil kodunu normalize et (tr-TR -> tr)
   const normalizedLang = language.toLowerCase().split('-')[0];
-  console.log(normalizedLang)
   // Config'i yükle
   const config = configMap[normalizedLang] || configMap['default'];
-  
-  console.log(`Loading config for language: ${language} (normalized: ${normalizedLang})`);
-  
+
   return config;
 };
 
