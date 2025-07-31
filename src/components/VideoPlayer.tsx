@@ -564,9 +564,7 @@ export function VideoPlayer({
         playerRef.current.destroy();
       }
 
-      const plyrConfig: Plyr.Options & {
-        playsinline?: boolean;
-      } = {
+      const plyrConfig: Plyr.Options = {
         controls: [
           "play",
           "progress",
@@ -587,7 +585,6 @@ export function VideoPlayer({
           focused: !disableForwardSeek,
           global: !disableForwardSeek,
         },
-        playsinline: true,
         seekTime: disableForwardSeek ? 0 : 10,
         clickToPlay: !disableForwardSeek,
         listeners: disableForwardSeek
@@ -805,7 +802,6 @@ export function VideoPlayer({
           controls
           poster={poster}
           style={videoStyle}
-          playsInline={orientation === 'portrait' || !isIOSDevice}
           onContextMenu={
             disableForwardSeek
               ? (e) => e.preventDefault()
@@ -826,6 +822,12 @@ export function VideoPlayer({
             style={replayButtonStyle}
             title="Videoyu Tekrar Oynat"
             className="replay-button"
+            onTouchStart={(e) => e.preventDefault()}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleReplay();
+            }}
           >
             <RotateCcw className="w-8 h-8 text-white flex-shrink-0" style={{ display: 'block' }} />
           </button>
