@@ -252,23 +252,26 @@ export function VideoPlayer({
 
   // Handle replay button click
   const handleReplay = useCallback(() => {
-    if (hlsRef.current) {
-      hlsRef.current.startLoad(0);
-    }
+    const video = videoRef.current;
+    if (video) {
+      // iOS için özel handling
+      if (isIOSDevice) {
+        // Önce pause et, sonra reset et
+        video.pause();
+        video.currentTime = 0;
 
-    if (playerRef.current) {
-      // seek and play via Plyr
-      playerRef.current.currentTime = 0;
-      playerRef.current.play();
-    } else if (videoRef.current) {
-      // fallback: raw video element
-      videoRef.current.currentTime = 0;
-      videoRef.current.play();
+        // iOS'ta bazen bir tick beklemek gerekir
+        setTimeout(() => {
+          video.play().catch(console.error);
+          setIsVideoEnded(false);
+        }, 100);
+      } else {
+        video.currentTime = 0;
+        video.play();
+        setIsVideoEnded(false);
+      }
     }
-
-    // hide the replay button again
-    setIsVideoEnded(false);
-  }, []);
+  }, [isIOSDevice]);
 
   // Keyboard event handler to prevent forward seeking
   const handleKeyDown = useCallback(
@@ -571,7 +574,7 @@ export function VideoPlayer({
           "captions",
           "fullscreen",
         ],
-        settings: ["captions"],
+        settings: ["settings", "captions"],
         captions: {
           active: true,
           update: true,
@@ -582,6 +585,7 @@ export function VideoPlayer({
           focused: !disableForwardSeek,
           global: !disableForwardSeek,
         },
+        playsinline: true,
         seekTime: disableForwardSeek ? 0 : 10,
         clickToPlay: !disableForwardSeek,
         listeners: disableForwardSeek

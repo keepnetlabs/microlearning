@@ -1697,13 +1697,6 @@ export const QuizScene = React.memo(function QuizScene({
   const mainRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Focus the main container when component mounts
-    if (mainRef.current) {
-      mainRef.current.focus();
-    }
-  }, []);
-
-  useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
@@ -2284,8 +2277,6 @@ export const QuizScene = React.memo(function QuizScene({
           <span aria-hidden="true">💡</span> {config.texts?.mobileHint || "En iyi deneyim için soruları dikkatle okuyun"}
         </p>
       </motion.div>
-
-
     </div>
   );
 });
