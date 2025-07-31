@@ -212,7 +212,7 @@ export function ActionableContentScene({
   config = educationConfigs.smishing.actionableContentSceneConfig
 }: ActionableContentSceneProps) {
   // Default values for container classes
-  const defaultContainerClassName = "flex flex-col items-center justify-start min-h-full px-2 sm:px-6 py-2 sm:py-6 overflow-y-auto";
+  const defaultContainerClassName = "flex flex-col items-center justify-start min-h-full px-2 sm:px-6 overflow-y-auto";
 
   const {
     title,

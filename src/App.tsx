@@ -32,7 +32,7 @@ const STATIC_CSS_CLASSES = {
   headerContainer: "relative shrink-0",
   headerBackground: "absolute inset-0 bg-gradient-to-b from-white/95 via-white/90 to-white/85 dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-900/85 transition-colors duration-300",
   headerBorder: "absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gray-200/60 dark:via-gray-600/60 to-transparent transition-colors duration-300",
-  headerContent: "relative z-10 px-4 py-4 pt-safe bg-white dark:bg-gray-900 lg:px-16 xl:px-20 2xl:px-24 min-h-[106px] md:min-h-auto",
+  headerContent: "relative z-10 px-4 py-4 pt-safe bg-white dark:bg-gray-900 lg:px-16 xl:px-20 2xl:px-24 min-h-[106px] md:min-h-[72px]",
 
   // Logo
   logoContainer: "flex-shrink-0 z-20",

@@ -1839,19 +1839,6 @@ export const QuizScene = React.memo(function QuizScene({
       aria-label={`Quiz: ${config.title}`}
       tabIndex={-1}
     >
-      {/* Progress Bar */}
-      {config.ui?.showProgressBar && (
-        <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: `${progress}%` }}
-          className="fixed top-0 left-0 h-1 bg-gradient-to-r from-primary to-primary/60 z-50"
-          role="progressbar"
-          aria-valuenow={progress}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-label={`Quiz progress: ${progress}%`}
-        />
-      )}
 
       {/* Header */}
       <motion.div
