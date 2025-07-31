@@ -151,16 +151,44 @@ export default function App() {
   const scenes = useMemo(() => [
     {
       component: MemoizedIntroScene,
-      points: 10,
+      points: appConfig.introSceneConfig.points || 10,
       config: appConfig.introSceneConfig
     },
-    { component: MemoizedGoalScene, points: 15, config: appConfig.goalSceneConfig },
-    { component: MemoizedScenarioScene, points: 20, config: appConfig.scenarioSceneConfig },
-    { component: MemoizedActionableContentScene, points: 25, config: appConfig.actionableContentSceneConfig },
-    { component: MemoizedQuizScene, points: 50, config: appConfig.quizSceneConfig },
-    { component: MemoizedSurveyScene, points: 20, config: appConfig.surveySceneConfig },
-    { component: MemoizedSummaryScene, points: 30, config: appConfig.summarySceneConfig },
-    { component: MemoizedNudgeScene, points: 40, config: appConfig.nudgeSceneConfig }
+    {
+      component: MemoizedGoalScene,
+      points: appConfig.goalSceneConfig.points || 15,
+      config: appConfig.goalSceneConfig
+    },
+    {
+      component: MemoizedScenarioScene,
+      points: appConfig.scenarioSceneConfig.points || 20,
+      config: appConfig.scenarioSceneConfig
+    },
+    {
+      component: MemoizedActionableContentScene,
+      points: appConfig.actionableContentSceneConfig.points || 25,
+      config: appConfig.actionableContentSceneConfig
+    },
+    {
+      component: MemoizedQuizScene,
+      points: appConfig.quizSceneConfig.points || 50,
+      config: appConfig.quizSceneConfig
+    },
+    {
+      component: MemoizedSurveyScene,
+      points: appConfig.surveySceneConfig.points || 20,
+      config: appConfig.surveySceneConfig
+    },
+    {
+      component: MemoizedSummaryScene,
+      points: appConfig.summarySceneConfig.points || 30,
+      config: appConfig.summarySceneConfig
+    },
+    {
+      component: MemoizedNudgeScene,
+      points: appConfig.nudgeSceneConfig.points || 40,
+      config: appConfig.nudgeSceneConfig
+    }
   ], [appConfig]);
 
   // Backend'den tema config'ini güncelleme fonksiyonu
@@ -742,7 +770,7 @@ export default function App() {
     const totalTimeSpent = Array.from(sceneTimeSpent.values()).reduce((total, time) => total + time, 0);
     const minutes = Math.floor(totalTimeSpent / 60000);
     const seconds = Math.floor((totalTimeSpent % 60000) / 1000);
-    const timeSpentString = minutes > 0 ? `${minutes} dakika ${seconds} saniye` : `${seconds} saniye`;
+    const timeSpentString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
 
@@ -1143,6 +1171,7 @@ export default function App() {
                 <MemoizedProgressBar
                   currentScene={currentScene + 1}
                   totalScenes={scenes.length}
+                  language={selectedLanguage}
                   config={progressBarConfig}
                 />
               </div>
@@ -1480,6 +1509,7 @@ export default function App() {
               <MemoizedProgressBar
                 currentScene={currentScene + 1}
                 totalScenes={scenes.length}
+                language={selectedLanguage}
                 config={progressBarConfig}
               />
             </div>

@@ -154,18 +154,27 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
   }), [glassEffect]);
 
   return (
-    <div
+    <article
       className="relative p-4 sm:p-5 rounded-2xl overflow-hidden transition-all duration-500 ease-out group hover:scale-[1.03] hover:shadow-2xl cursor-pointer"
       style={cardStyle}
+      aria-labelledby={`goal-title-${index}`}
+      aria-describedby={`goal-description-${index}`}
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+        }
+      }}
     >
       {/* APPLE-STYLE ULTRA-FINE NOISE TEXTURE - VisionOS Quality */}
       <div
         className="absolute inset-0 opacity-[0.008] dark:opacity-[0.004] rounded-2xl mix-blend-overlay pointer-events-none"
         style={staticStyles.noiseTexture}
+        aria-hidden="true"
       />
 
       {/* APPLE MULTI-LAYERED DEPTH SYSTEM */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-white/30 to-white/20 dark:from-gray-800/40 dark:via-gray-700/25 dark:to-gray-600/20 rounded-2xl transition-colors duration-500" />
+      <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-white/30 to-white/20 dark:from-gray-800/40 dark:via-gray-700/25 dark:to-gray-600/20 rounded-2xl transition-colors duration-500" aria-hidden="true" />
 
       {/* APPLE COLORED BACKGROUND - Subtle but visible */}
       <div
@@ -173,6 +182,7 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
         style={{
           background: goal.strongBgGradient
         }}
+        aria-hidden="true"
       />
 
       {/* APPLE DARK MODE COLORED BACKGROUND */}
@@ -181,35 +191,39 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
         style={{
           background: goal.darkBgGradient
         }}
+        aria-hidden="true"
       />
 
       {/* APPLE TOP HIGHLIGHT LAYER */}
-      <div className="absolute inset-0 bg-gradient-to-t from-gray-100/25 via-transparent to-transparent dark:from-gray-800/20 rounded-2xl transition-colors duration-500" />
+      <div className="absolute inset-0 bg-gradient-to-t from-gray-100/25 via-transparent to-transparent dark:from-gray-800/20 rounded-2xl transition-colors duration-500" aria-hidden="true" />
 
       {/* APPLE RADIAL HIGHLIGHT - Ultra-subtle inner glow */}
       <div
         className="absolute inset-0 rounded-2xl pointer-events-none"
         style={staticStyles.radialHighlight}
+        aria-hidden="true"
       />
 
       {/* APPLE ULTRA-THIN BORDER SYSTEM - 0.5px precision */}
       <div
         className="absolute inset-0 rounded-2xl pointer-events-none"
         style={staticStyles.ultraThinBorder}
+        aria-hidden="true"
       />
 
       {/* APPLE HOVER GLOW EFFECT - Subtle interaction */}
       <div
         className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-700"
         style={staticStyles.hoverGlow}
+        aria-hidden="true"
       />
 
       {/* APPLE DARK MODE ADAPTATION - Subtle depth */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-800/20 via-gray-900/12 to-gray-900/8 dark:from-gray-700/30 dark:via-gray-800/20 dark:to-gray-900/15 rounded-2xl opacity-0 dark:opacity-100 transition-opacity duration-500" />
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-800/20 via-gray-900/12 to-gray-900/8 dark:from-gray-700/30 dark:via-gray-800/20 dark:to-gray-900/15 rounded-2xl opacity-0 dark:opacity-100 transition-opacity duration-500" aria-hidden="true" />
 
       {/* APPLE CONTENT LAYER */}
       <div className="relative z-10">
-        <div className="flex items-center mb-3">
+        <header className="flex items-center mb-3">
           {/* APPLE ICON CONTAINER - Ultra-refined liquid glass */}
           <div
             className="p-2 sm:p-2.5 rounded-xl mr-3 overflow-hidden transition-all duration-300 ease-out group-hover:scale-105"
@@ -225,28 +239,35 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
                 inset 0 -1px 0 rgba(0, 0, 0, 0.06)
               `
             }}
+            aria-hidden="true"
           >
             {/* Apple-style icon noise texture */}
             <div
               className="absolute inset-0 opacity-[0.006] dark:opacity-[0.003] rounded-xl mix-blend-overlay pointer-events-none"
               style={staticStyles.iconNoiseTexture}
+              aria-hidden="true"
             />
 
             {/* Apple-style icon highlight */}
             <div
               className="absolute inset-0 rounded-xl pointer-events-none"
               style={staticStyles.iconHighlight}
+              aria-hidden="true"
             />
 
             <Icon
               size={16}
               className={`${goal.iconColor} dark:opacity-90 relative z-10 transition-all duration-300 ease-out group-hover:scale-105`}
+              aria-hidden="true"
             />
           </div>
 
           {/* APPLE TITLE & SUBTITLE TEXT - Ultra-crisp typography */}
           <div className="flex flex-col items-start">
-            <h3 className="text-sm font-medium text-gray-900 dark:text-white transition-colors duration-300 ease-out group-hover:text-gray-800 dark:group-hover:text-gray-100">
+            <h3
+              id={`goal-title-${index}`}
+              className="text-sm font-medium text-gray-900 dark:text-white transition-colors duration-300 ease-out group-hover:text-gray-800 dark:group-hover:text-gray-100"
+            >
               {goal.title}
             </h3>
             {goal.subtitle && (
@@ -255,17 +276,20 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
               </p>
             )}
           </div>
-        </div>
+        </header>
 
         {/* APPLE DESCRIPTION TEXT - Perfect readability */}
-        <p className="text-xs text-left text-gray-800 dark:text-gray-200 leading-relaxed transition-colors duration-300 ease-out group-hover:text-gray-700 dark:group-hover:text-gray-100 font-medium">
+        <p
+          id={`goal-description-${index}`}
+          className="text-xs text-left text-gray-800 dark:text-gray-200 leading-relaxed transition-colors duration-300 ease-out group-hover:text-gray-700 dark:group-hover:text-gray-100 font-medium"
+        >
           {goal.description}
         </p>
       </div>
 
       {/* APPLE INNER DEPTH EFFECT - Ultra-subtle */}
-      <div className="absolute inset-1 bg-gradient-to-br from-white/15 via-transparent to-transparent dark:from-white/8 rounded-xl pointer-events-none" />
-    </div>
+      <div className="absolute inset-1 bg-gradient-to-br from-white/15 via-transparent to-transparent dark:from-white/8 rounded-xl pointer-events-none" aria-hidden="true" />
+    </article>
   );
 });
 
@@ -307,6 +331,7 @@ export const GoalScene = memo(({
       <SceneIcon
         size={icon?.size || 48}
         className={icon?.className || "text-blue-500"}
+        aria-hidden="true"
       />
     );
   }, [icon?.component, icon?.sceneIconName, icon?.size, icon?.className]);
@@ -321,16 +346,27 @@ export const GoalScene = memo(({
   );
 
   return (
-    <div className={containerClassName}>
+    <main
+      className={containerClassName}
+      role="main"
+      aria-labelledby="goal-scene-title"
+    >
       <div className="mb-2 sm:mb-3 relative">
         {iconComponent}
       </div>
 
-      <h1 className="text-2xl mb-3 sm:mb-5 text-gray-900 dark:text-white">
+      <h1
+        id="goal-scene-title"
+        className="text-2xl mb-3 sm:mb-5 text-gray-900 dark:text-white"
+      >
         {title}
       </h1>
 
-      <div className={containerClass}>
+      <section
+        className={containerClass}
+        role="region"
+        aria-label="Training Goals"
+      >
         {memoizedGoals.map((goal, index) => (
           <GoalCard
             key={`${goal.title}-${index}`}
@@ -339,8 +375,8 @@ export const GoalScene = memo(({
             glassEffect={glassEffect}
           />
         ))}
-      </div>
-    </div>
+      </section>
+    </main>
   );
 });
 

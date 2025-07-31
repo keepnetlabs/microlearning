@@ -33,6 +33,25 @@ interface VideoPlayerProps {
   transcript?: TranscriptRow[] | string;
   showTranscript?: boolean;
   transcriptTitle?: string;
+  ariaTexts?: {
+    mainLabel?: string;
+    mainDescription?: string;
+    videoLabel?: string;
+    videoDescription?: string;
+    videoEndedDescription?: string;
+    videoPlayingDescription?: string;
+    transcriptPanelLabel?: string;
+    transcriptHeaderLabel?: string;
+    transcriptEntriesLabel?: string;
+    transcriptProgressLabel?: string;
+    showTranscriptLabel?: string;
+    hideTranscriptLabel?: string;
+    replayLabel?: string;
+    transcriptEntryLabel?: string;
+    timestampLabel?: string;
+    transcriptTextLabel?: string;
+    lockedLabel?: string;
+  };
 }
 function parseTactiqTranscript(raw: string): TranscriptRow[] {
   if (!raw || typeof raw !== "string") {
@@ -84,6 +103,7 @@ export function VideoPlayer({
   transcript,
   showTranscript = true,
   transcriptTitle = "Video Transkripti",
+  ariaTexts,
 }: VideoPlayerProps) {
   const videoRef = useRef<VideoWithLastTime>(null);
   const playerRef = useRef<Plyr | null>(null);
@@ -416,11 +436,49 @@ export function VideoPlayer({
     maxWidth: "100%",
   }), []);
   return (
-    <div style={containerStyle}>
-      <div style={videoContainerStyle} className="rounded-lg overflow-hidden relative">
+    <div
+      style={containerStyle}
+      role="main"
+      aria-label={ariaTexts?.mainLabel || "Video Player"}
+      aria-describedby="video-player-description"
+    >
+      <div
+        id="video-player-description"
+        className="sr-only"
+        aria-live="polite"
+      >
+        {ariaTexts?.mainDescription || "Video player with transcript functionality. Use the transcript panel to navigate through video content."}
+      </div>
 
-        <video ref={videoRef} id="player" controls playsInline crossOrigin="anonymous" style={videoStyle}>
+      <div
+        style={videoContainerStyle}
+        className="rounded-lg overflow-hidden relative"
+        role="region"
+        aria-label={ariaTexts?.videoLabel || "Video Container"}
+      >
+        <video
+          ref={videoRef}
+          id="player"
+          controls
+          playsInline
+          crossOrigin="anonymous"
+          style={videoStyle}
+          aria-label={ariaTexts?.videoDescription || "Video content"}
+          aria-describedby="video-description"
+        >
         </video>
+
+        <div
+          id="video-description"
+          className="sr-only"
+          aria-live="polite"
+        >
+          {isVideoEnded
+            ? (ariaTexts?.videoEndedDescription || "Video has ended. Use replay button to restart.")
+            : (ariaTexts?.videoPlayingDescription || "Video is playing.")
+          }
+        </div>
+
         {parsedTranscript && parsedTranscript.length > 0 && (
           <motion.button
             onClick={() =>
@@ -435,8 +493,22 @@ export function VideoPlayer({
                 ? "Transkripti Gizle"
                 : "Transkripti Göster"
             }
+            aria-label={
+              isTranscriptOpen
+                ? (ariaTexts?.hideTranscriptLabel || "Hide transcript panel")
+                : (ariaTexts?.showTranscriptLabel || "Show transcript panel")
+            }
+            aria-expanded={isTranscriptOpen}
+            aria-controls="transcript-panel"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setIsTranscriptOpen(!isTranscriptOpen);
+              }
+            }}
           >
-            <Lock className="w-5 h-5" />
+            <Lock className="w-5 h-5" aria-hidden="true" />
           </motion.button>
         )}
 
@@ -449,12 +521,23 @@ export function VideoPlayer({
             className="absolute top-4 left-4 z-20 overflow-hidden transition-all duration-300"
             style={toggleButtonStyle}
             title="Videoyu Baştan Oynat"
+            aria-label={ariaTexts?.replayLabel || "Replay video from beginning"}
             disabled={isReplaying}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if ((e.key === 'Enter' || e.key === ' ') && !isReplaying) {
+                e.preventDefault();
+                handleReplay();
+              }
+            }}
           >
-            <RotateCw className={`w-5 h-5 ${isReplaying ? 'animate-spin' : ''}`} />
+            <RotateCw
+              className={`w-5 h-5 ${isReplaying ? 'animate-spin' : ''}`}
+              aria-hidden="true"
+            />
           </motion.button>
         )}
       </div>
@@ -473,6 +556,10 @@ export function VideoPlayer({
           style={{
             display: isTranscriptOpen ? "block" : "none",
           }}
+          role="region"
+          aria-label={ariaTexts?.transcriptPanelLabel || "Transcript Panel"}
+          id="transcript-panel"
+          aria-hidden={!isTranscriptOpen}
         >
           <div
             className="relative overflow-hidden"
@@ -480,19 +567,41 @@ export function VideoPlayer({
           >
 
             {/* Header */}
-            <div className="relative z-10 px-4 py-3 border-b border-slate-200/50 dark:border-slate-500/40">
+            <header
+              className="relative z-10 px-4 py-3 border-b border-slate-200/50 dark:border-slate-500/40"
+              role="banner"
+              aria-label={ariaTexts?.transcriptHeaderLabel || "Transcript header"}
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <div className="p-2 rounded-lg bg-blue-50/90 dark:bg-blue-900/60 border border-blue-200/60 dark:border-blue-600/60 shadow-sm">
+                  <div
+                    className="p-2 rounded-lg bg-blue-50/90 dark:bg-blue-900/60 border border-blue-200/60 dark:border-blue-600/60 shadow-sm"
+                    aria-hidden="true"
+                  >
                     <Lock className="w-4 h-4 text-blue-600 dark:text-blue-200" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                    <h3
+                      className="text-sm font-medium text-slate-900 dark:text-slate-100"
+                      id="transcript-title"
+                    >
                       {transcriptTitle}
                     </h3>
                     {parsedTranscript.length > 0 && (
-                      <div className="flex items-center space-x-2 mt-1">
-                        <div className="w-16 h-1 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
+                      <div
+                        className="flex items-center space-x-2 mt-1"
+                        role="status"
+                        aria-live="polite"
+                        aria-label={`${ariaTexts?.transcriptProgressLabel || "Progress"}: ${currentRowIndex + 1} of ${parsedTranscript.length} transcript entries`}
+                      >
+                        <div
+                          className="w-16 h-1 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden"
+                          role="progressbar"
+                          aria-valuenow={currentRowIndex + 1}
+                          aria-valuemin={1}
+                          aria-valuemax={parsedTranscript.length}
+                          aria-label={ariaTexts?.transcriptProgressLabel || "Transcript progress"}
+                        >
                           <div
                             className="h-full bg-blue-500 dark:bg-blue-400 transition-all duration-300 ease-out"
                             style={{
@@ -508,7 +617,7 @@ export function VideoPlayer({
                   </div>
                 </div>
               </div>
-            </div>
+            </header>
 
             {/* Content */}
             <div
@@ -518,6 +627,9 @@ export function VideoPlayer({
               onWheel={(e) => e.stopPropagation()}
               onTouchStart={(e) => e.stopPropagation()}
               onTouchMove={(e) => e.stopPropagation()}
+              role="list"
+              aria-label={ariaTexts?.transcriptEntriesLabel || "Transcript entries"}
+              aria-describedby="transcript-title"
             >
               {parsedTranscript.map((row, index) => {
                 const isActive = index === currentRowIndex;
@@ -561,6 +673,17 @@ export function VideoPlayer({
                         ? "0 2px 8px rgba(59, 130, 246, 0.15)"
                         : "none",
                     }}
+                    role="listitem"
+                    aria-label={`${ariaTexts?.transcriptEntryLabel || "Transcript entry"} ${index + 1} at ${formatTime(row.start)}`}
+                    aria-current={isActive ? "true" : "false"}
+                    aria-disabled={!canAccess}
+                    tabIndex={canAccess ? 0 : -1}
+                    onKeyDown={(e) => {
+                      if (canAccess && (e.key === 'Enter' || e.key === ' ')) {
+                        e.preventDefault();
+                        handleTranscriptRowClick(row.start);
+                      }
+                    }}
                   >
                     <div className="flex space-x-3">
                       {/* Timestamp */}
@@ -576,6 +699,7 @@ export function VideoPlayer({
                             fontSize: "12px",
                             fontWeight: isActive ? "600" : "500",
                           }}
+                          aria-label={`${ariaTexts?.timestampLabel || "Timestamp"}: ${formatTime(row.start)}${!canAccess ? ` - ${ariaTexts?.lockedLabel || "Locked"}` : ''}`}
                         >
                           {formatTime(row.start)}
                           {!canAccess && " 🔒"}
@@ -611,6 +735,7 @@ export function VideoPlayer({
                               lineHeight: "1.5",
                               fontWeight: isActive ? "500" : "400",
                             }}
+                            aria-label={`${ariaTexts?.transcriptTextLabel || "Transcript text"}: ${row.text}`}
                           >
                             {row.text}
                           </p>

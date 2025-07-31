@@ -1,6 +1,13 @@
 import React from "react";
 import { motion } from "framer-motion";
 
+// Yüzde formatı için localization fonksiyonu
+export const formatPercent = (value: number, locale = navigator.language) =>
+  new Intl.NumberFormat(locale, {
+    style: 'percent',
+    minimumFractionDigits: 0
+  }).format(value / 100);
+
 interface ProgressBarConfig {
   // Container colors
   containerBackground: string;
@@ -51,6 +58,7 @@ interface ProgressBarConfig {
 interface ProgressBarProps {
   currentScene: number;
   totalScenes: number;
+  language?: string;
   config?: Partial<ProgressBarConfig>;
 }
 
@@ -150,7 +158,7 @@ const defaultConfig: ProgressBarConfig = {
   ariaLabel: 'Eğitim ilerlemesi'
 };
 
-export function ProgressBar({ currentScene, totalScenes, config = {} }: ProgressBarProps) {
+export function ProgressBar({ currentScene, totalScenes, language = 'en', config = {} }: ProgressBarProps) {
   const progress = (currentScene / totalScenes) * 100;
   const finalConfig = { ...defaultConfig, ...config };
 
@@ -168,7 +176,7 @@ export function ProgressBar({ currentScene, totalScenes, config = {} }: Progress
               className="bg-white dark:bg-blue-900/20 max-w-[40px] h-[27px] rounded-lg flex justify-center items-center p-1 border border-blue-200 dark:border-blue-700/50 rounded-lg px-3 py-1.5 shadow-sm"
             >
               <span className="text-sm font-medium text-blue-600 dark:text-blue-300">
-                %{Math.round(progress)}
+                {formatPercent(progress, language)}
               </span>
             </motion.div>
           </div>
@@ -377,7 +385,7 @@ export function ProgressBar({ currentScene, totalScenes, config = {} }: Progress
                 {/* Tooltip Background */}
                 <div className="h-5 w-8 sm:h-5 sm:w-8 md:h-5 md:w-8 flex items-center justify-center bg-[#3B82F6] dark:bg-[#3B82F6] rounded-[2px] shadow-lg">
                   <div className="text-[10px] sm:text-xs font-semibold text-white">
-                    %{Math.round(progress)}
+                    {formatPercent(progress, language)}
                   </div>
                 </div>
 

@@ -60,6 +60,7 @@
     }
   },
   "introSceneConfig": {
+    "points": 10,
     "title": {
       "words": ["SMS", "Phishing", "Protection"],
       "highlightLastWord": true,
@@ -148,6 +149,7 @@
     }
   },
   "goalSceneConfig": {
+    "points": 15,
     "title": "SMS Security Goals",
     "goals": [
       {
@@ -186,6 +188,7 @@
     }
   },
   "scenarioSceneConfig": {
+    "points": 20,
     "title": "Real‑Life Scenario",
     "subtitle": "DevOps Manager's Phishing Experience",
     "description": "Review and learn from a real phishing attack scenario",
@@ -210,9 +213,18 @@
     },
     "texts": {
       "transcriptLoading": "Loading transcript..."
+    },
+    "ariaTexts": {
+      "mainLabel": "Scenario Scene",
+      "mainDescription": "Real-life scenario video with transcript",
+      "loadingLabel": "Loading transcript",
+      "errorLabel": "Transcript loading error",
+      "videoPlayerLabel": "Video Player",
+      "mobileHintLabel": "Mobile user hint"
     }
   },
   "actionableContentSceneConfig": {
+    "points": 25,
     "title": "Actionable Steps",
     "actions": [
       {
@@ -220,24 +232,33 @@
         "title": "Create Strong Password",
         "description": "At least 12 characters, uppercase and lowercase letters, numbers, and symbols",
         "tip": "Example: 'Coffee!very7Good#2024'",
-        "colorType": "blue",
-        "bgColorType": "blue"
+        "iconColorClass": "text-blue-500 dark:text-blue-300",
+        "bgGradientClass": "from-blue-500/20 to-indigo-500/20",
+        "tipColorClass": "from-blue-50/50 to-indigo-50/50 dark:from-blue-900/40 dark:to-indigo-900/40 border-blue-200/30 dark:border-blue-600/60",
+        "tipTextColorClass": "text-blue-800 dark:text-blue-100",
+        "tipIconColorClass": "text-blue-600 dark:text-blue-200"
       },
       {
         "iconName": "smartphone",
         "title": "Enable 2FA",
         "description": "Enable multi-factor authentication on all critical accounts",
         "tip": "Use Google Authenticator or Authy",
-        "colorType": "green",
-        "bgColorType": "green"
+        "iconColorClass": "text-green-500 dark:text-green-300",
+        "bgGradientClass": "from-green-500/20 to-emerald-500/20",
+        "tipColorClass": "from-green-50/50 to-emerald-50/50 dark:from-green-900/40 dark:to-emerald-900/40 border-green-200/30 dark:border-green-600/60",
+        "tipTextColorClass": "text-green-800 dark:text-green-100",
+        "tipIconColorClass": "text-green-600 dark:text-green-200"
       },
       {
         "iconName": "database",
         "title": "Password Manager",
         "description": "Use unique and complex passwords for each account",
         "tip": "1Password, Bitwarden, or LastPass",
-        "colorType": "purple",
-        "bgColorType": "purple"
+        "iconColorClass": "text-purple-500 dark:text-purple-300",
+        "bgGradientClass": "from-purple-500/20 to-violet-500/20",
+        "tipColorClass": "from-purple-50/50 to-violet-50/50 dark:from-purple-900/40 dark:to-violet-900/40 border-purple-200/30 dark:border-purple-600/60",
+        "tipTextColorClass": "text-purple-800 dark:text-purple-100",
+        "tipIconColorClass": "text-purple-600 dark:text-purple-200"
       }
     ],
     "icon": {
@@ -249,18 +270,22 @@
     "tipConfig": {
       "iconName": "check-circle",
       "iconSize": 12,
-      "bgColorType": "blue"
+      "tipColorClass": "from-blue-50/50 to-indigo-50/50 dark:from-blue-900/40 dark:to-indigo-900/40 border-blue-200/30 dark:border-blue-600/60",
+      "tipTextColorClass": "text-blue-800 dark:text-blue-100",
+      "tipIconColorClass": "text-blue-600 dark:text-blue-200"
     },
-    "cardSpacing": "space-y-4",
-    "maxWidth": "max-w-md w-full",
-    "glassEffect": {
-      "cardBackground": "bg-white/60 dark:bg-gray-800/80",
-      "cardBorder": "border-white/30 dark:border-gray-600/60",
-      "shadow": "shadow-lg hover:shadow-xl",
-      "backdropBlur": "backdrop-blur-xl"
+    "ariaTexts": {
+      "mainLabel": "Actionable Content",
+      "mainDescription": "Actionable content section with interactive cards containing tips and guidance",
+      "headerLabel": "Scene header",
+      "actionCardsLabel": "Action cards",
+      "actionCardsDescription": "Actionable content cards",
+      "actionCardLabel": "Action card",
+      "tipLabel": "Tip"
     }
   },
   "quizSceneConfig": {
+    "points": 50,
     "title": "Cyber Security Quiz",
     "subtitle": "Test your knowledge",
     "difficulty": {
@@ -268,17 +293,10 @@
       "medium": "Medium",
       "hard": "Hard"
     },
-    "timer": {
-      "enabled": true,
-      "duration": 30,
-      "warningThreshold": 10
-    },
     "icon": {
       "sceneIconName": "brain-circuit",
       "size": 48,
-      "className": "text-blue-500",
-      "strokeWidth": 2,
-      "color": "#3b82f6"
+      "className": "text-blue-500"
     },
     "questions": {
       "totalCount": 5,
@@ -437,29 +455,18 @@
         }
       ]
     },
-    "ui": {
-      "showProgressBar": true,
-      "showTimer": true,
-      "showDifficulty": true,
-      "showCategory": true
-    },
     "styling": {
-      "primaryColor": "blue",
       "card": {
         "backgroundColor": "bg-white/60 dark:bg-gray-800/80",
         "borderColor": "border-white/60 dark:border-gray-600/60",
         "gradientFrom": "from-white/50",
-        "gradientTo": "to-white/20",
-        "shadow": "shadow-xl",
-        "borderRadius": "rounded-2xl"
+        "gradientTo": "to-white/20"
       },
       "resultPanel": {
         "backgroundColor": "bg-green-50/90 dark:bg-green-900/20",
         "borderColor": "border-green-200 dark:border-green-700",
         "gradientFrom": "from-green-50",
-        "gradientTo": "to-green-100",
-        "shadow": "shadow-lg",
-        "borderRadius": "rounded-xl"
+        "gradientTo": "to-green-100"
       },
       "answerOptions": {
         "backgroundColor": "bg-white/80 dark:bg-gray-700/80",
@@ -471,8 +478,7 @@
       },
       "cardStyle": {
         "background": "linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card) / 0.95) 25%, hsl(var(--card) / 0.85) 50%, hsl(var(--card) / 0.75) 75%, hsl(var(--card) / 0.65) 100%)",
-        "border": "0.5px solid rgba(255, 255, 255, 0.4)",
-        "shadow": "0 12px 40px rgba(0, 0, 0, 0.08), 0 6px 20px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 rgba(0, 0, 0, 0.06)"
+        "border": "0.5px solid rgba(255, 255, 255, 0.4)"
       },
       "resultPanelStyle": {
         "background": "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 25%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.65) 75%, rgba(255, 255, 255, 0.55) 100%)",
@@ -485,12 +491,7 @@
           "textColor": "text-blue-800 dark:text-white",
           "iconColor": "text-blue-600 dark:text-blue-200",
           "gradientFrom": "rgba(59, 130, 246, 0.15)",
-          "gradientTo": "rgba(59, 130, 246, 0.08)",
-          "shadow": "0 4px 16px rgba(59, 130, 246, 0.2), 0 2px 8px rgba(59, 130, 246, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 -1px 0 rgba(0, 0, 0, 0.05)",
-          "borderRadius": "rounded-lg",
-          "padding": "px-4 py-2.5",
-          "fontSize": "text-sm",
-          "fontWeight": "font-medium"
+          "gradientTo": "rgba(59, 130, 246, 0.08)"
         },
         "retryQuestion": {
           "backgroundColor": "rgba(255, 255, 255, 0.8)",
@@ -498,12 +499,7 @@
           "textColor": "text-gray-800 dark:text-gray-200",
           "iconColor": "text-gray-600 dark:text-gray-300",
           "gradientFrom": "rgba(255, 255, 255, 0.8)",
-          "gradientTo": "rgba(255, 255, 255, 0.6)",
-          "shadow": "0 4px 16px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 0 rgba(0, 0, 0, 0.02)",
-          "borderRadius": "rounded-lg",
-          "padding": "px-4 py-2.5",
-          "fontSize": "text-sm",
-          "fontWeight": "font-medium"
+          "gradientTo": "rgba(255, 255, 255, 0.6)"
         },
         "checkAnswer": {
           "backgroundColor": "rgba(59, 130, 246, 0.15)",
@@ -511,12 +507,7 @@
           "textColor": "text-blue-800 dark:text-white",
           "iconColor": "text-blue-600 dark:text-blue-200",
           "gradientFrom": "rgba(59, 130, 246, 0.15)",
-          "gradientTo": "rgba(59, 130, 246, 0.08)",
-          "shadow": "0 4px 16px rgba(59, 130, 246, 0.2), 0 2px 8px rgba(59, 130, 246, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 -1px 0 rgba(0, 0, 0, 0.05)",
-          "borderRadius": "rounded-lg",
-          "padding": "px-4 py-2.5",
-          "fontSize": "text-sm",
-          "fontWeight": "font-medium"
+          "gradientTo": "rgba(59, 130, 246, 0.08)"
         }
       }
     },
@@ -554,6 +545,7 @@
     }
   },
   "surveySceneConfig": {
+    "points": 20,
     "texts": {
       "title": "Training Evaluation",
       "ratingQuestion": "How would you rate this training?",
@@ -583,9 +575,7 @@
     "icon": {
       "name": "clipboard-list",
       "size": 48,
-      "color": "text-blue-500 dark:text-blue-400",
-      "isActive": true,
-      "isCompleted": false
+      "color": "text-blue-500 dark:text-blue-400"
     },
     "styling": {
       "successCard": {
@@ -597,6 +587,7 @@
     }
   },
   "summarySceneConfig": {
+    "points": 30,
     "texts": {
       "title": "You’re More Secure Now!",
       "subtitle": "Time to share this knowledge with your team and start applying it",
@@ -633,6 +624,7 @@
     }
   },
   "nudgeSceneConfig": {
+    "points": 40,
     "texts": {
       "completionTitle": "🎉 Congratulations! You’ve Completed the Training",
       "completionSubtitle": "You’ve successfully refreshed your cybersecurity knowledge",
@@ -729,10 +721,6 @@
       }
     ],
     "styling": {
-      "container": {
-        "borderColor": "border-gray-200/60 dark:border-gray-600/60",
-        "padding": "px-4 py-2 sm:px-6"
-      },
       "stats": {
         "backgroundColor": "bg-gradient-to-r from-blue-100 to-indigo-100",
         "borderColor": "border-blue-200/60",

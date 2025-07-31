@@ -15,7 +15,7 @@ import {
 import * as LucideIcons from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
-import { NudgeSceneConfig, nudgeSceneConfig } from "../configs/educationConfigs";
+import { NudgeSceneConfig } from "../configs/educationConfigs";
 
 interface NudgeSceneProps {
   config: NudgeSceneConfig;
@@ -26,7 +26,7 @@ interface NudgeSceneProps {
   };
 }
 
-export function NudgeScene({ config = nudgeSceneConfig, completionData }: NudgeSceneProps) {
+export function NudgeScene({ config, completionData }: NudgeSceneProps) {
   const [showCertificate, setShowCertificate] = useState(false);
   const [showConfetti, setShowConfetti] = useState(true);
   const [celebrationPhase, setCelebrationPhase] = useState(0);

@@ -130,10 +130,6 @@ interface QuizSceneConfig {
     maxAttempts?: number;
     list?: Question[];
   };
-  ui?: {
-    showTimer?: boolean;
-    showDifficulty?: boolean;
-  };
   icon?: {
     component?: React.ReactNode;
     sceneIconName?: string;
@@ -143,7 +139,6 @@ interface QuizSceneConfig {
     color?: string;
   };
   styling?: {
-    primaryColor?: string;
     card?: {
       backgroundColor?: string;
       borderColor?: string;
@@ -946,7 +941,7 @@ export const QuizScene = React.memo(function QuizScene({
               isLoading ||
               multiSelectAnswers.length < question.minCorrect
             }
-            className={`transition-all duration-300 ${config.styling?.buttons?.checkAnswer?.padding || 'px-4 py-2.5'} ${config.styling?.buttons?.checkAnswer?.fontSize || 'text-sm'} ${config.styling?.buttons?.checkAnswer?.fontWeight || 'font-medium'} ${config.styling?.buttons?.checkAnswer?.borderRadius || 'rounded-lg'}`}
+            className={`transition-all duration-300 ${'px-4 py-2.5'} ${'text-sm'} ${'font-medium'} ${'rounded-lg'}`}
             style={{
               background: config.styling?.buttons?.checkAnswer?.gradientFrom && config.styling?.buttons?.checkAnswer?.gradientTo
                 ? `linear-gradient(135deg, ${config.styling?.buttons?.checkAnswer?.gradientFrom} 0%, ${config.styling?.buttons?.checkAnswer?.gradientTo} 100%)`
@@ -954,7 +949,7 @@ export const QuizScene = React.memo(function QuizScene({
               border: config.styling?.buttons?.checkAnswer?.borderColor || "1px solid rgba(59, 130, 246, 0.3)",
               backdropFilter: "blur(16px) saturate(160%)",
               WebkitBackdropFilter: "blur(16px) saturate(160%)",
-              boxShadow: config.styling?.buttons?.checkAnswer?.shadow || `
+              boxShadow: `
                 0 4px 16px rgba(59, 130, 246, 0.2),
                 0 2px 8px rgba(59, 130, 246, 0.1),
                 inset 0 1px 0 rgba(255, 255, 255, 0.3),
@@ -1721,13 +1716,12 @@ export const QuizScene = React.memo(function QuizScene({
         inset 0 1px 0 rgba(255, 255, 255, 0.85),
         inset 0 -1px 0 rgba(0, 0, 0, 0.08)
       `,
-      borderRadius: card?.borderRadius || "rounded-2xl",
+      borderRadius: "rounded-2xl",
       gradientFrom: card?.gradientFrom,
       gradientTo: card?.gradientTo,
-      // Yeni lightweight props'ları ayrı tut
       backgroundColor: card?.backgroundColor,
       borderColor: card?.borderColor,
-      shadow: card?.shadow,
+      shadow: 'shadow-xl',
     };
   }, [config.styling?.card, config.styling?.cardStyle]);
 
@@ -1747,13 +1741,13 @@ export const QuizScene = React.memo(function QuizScene({
         inset 0 1px 0 rgba(255, 255, 255, 0.8),
         inset 0 -1px 0 rgba(0, 0, 0, 0.05)
       `,
-      borderRadius: resultPanel?.borderRadius || "rounded-2xl",
+      borderRadius: "rounded-2xl",
       gradientFrom: resultPanel?.gradientFrom,
       gradientTo: resultPanel?.gradientTo,
       // Yeni lightweight props'ları ayrı tut
       backgroundColor: resultPanel?.backgroundColor,
       borderColor: resultPanel?.borderColor,
-      shadow: resultPanel?.shadow,
+      shadow: 'shadow-lg',
     };
   }, [config.styling?.resultPanel, config.styling?.resultPanelStyle]);
 
@@ -1792,8 +1786,7 @@ export const QuizScene = React.memo(function QuizScene({
       <LucideIconComponent
         size={iconConfig.size ?? 48}
         className={iconConfig.className}
-        color={iconConfig.color}
-        strokeWidth={iconConfig.strokeWidth ?? 2}
+        strokeWidth={2}
       />
     );
   } else {
@@ -1876,22 +1869,36 @@ export const QuizScene = React.memo(function QuizScene({
                 }
               }}
               disabled={currentQuestionIndex === 0}
-              className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95"
+              className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}
               aria-label={currentQuestionIndex === 0 ? "Previous question (disabled)" : `Go to previous question ${currentQuestionIndex}`}
               style={{
                 background: currentQuestionIndex === 0
-                  ? "linear-gradient(135deg, rgba(156, 163, 175, 0.1) 0%, rgba(156, 163, 175, 0.05) 100%)"
-                  : "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 25%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.65) 75%, rgba(255, 255, 255, 0.55) 100%)",
+                  ? isDarkMode
+                    ? "linear-gradient(135deg, rgba(75, 85, 99, 0.1) 0%, rgba(75, 85, 99, 0.05) 100%)"
+                    : "linear-gradient(135deg, rgba(156, 163, 175, 0.1) 0%, rgba(156, 163, 175, 0.05) 100%)"
+                  : isDarkMode
+                    ? "linear-gradient(135deg, rgba(31, 41, 55, 0.95) 0%, rgba(31, 41, 55, 0.85) 25%, rgba(31, 41, 55, 0.75) 50%, rgba(31, 41, 55, 0.65) 75%, rgba(31, 41, 55, 0.55) 100%)"
+                    : "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 25%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.65) 75%, rgba(255, 255, 255, 0.55) 100%)",
                 backdropFilter: "blur(20px) saturate(200%)",
                 WebkitBackdropFilter: "blur(20px) saturate(200%)",
                 border: currentQuestionIndex === 0
-                  ? "1px solid rgba(156, 163, 175, 0.3)"
-                  : "1px solid rgba(255, 255, 255, 0.6)",
-                boxShadow: `
-                  0 4px 12px rgba(0, 0, 0, 0.08),
-                  0 2px 6px rgba(0, 0, 0, 0.04),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.8)
-                `,
+                  ? isDarkMode
+                    ? "1px solid rgba(75, 85, 99, 0.3)"
+                    : "1px solid rgba(156, 163, 175, 0.3)"
+                  : isDarkMode
+                    ? "1px solid rgba(75, 85, 99, 0.6)"
+                    : "1px solid rgba(255, 255, 255, 0.6)",
+                boxShadow: isDarkMode
+                  ? `
+                    0 4px 12px rgba(0, 0, 0, 0.3),
+                    0 2px 6px rgba(0, 0, 0, 0.2),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1)
+                  `
+                  : `
+                    0 4px 12px rgba(0, 0, 0, 0.08),
+                    0 2px 6px rgba(0, 0, 0, 0.04),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.8)
+                  `,
               }}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -1921,22 +1928,36 @@ export const QuizScene = React.memo(function QuizScene({
                 }
               }}
               disabled={currentQuestionIndex === questions.length - 1}
-              className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95"
+              className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}
               aria-label={currentQuestionIndex === questions.length - 1 ? "Next question (disabled)" : `Go to next question ${currentQuestionIndex + 2}`}
               style={{
                 background: currentQuestionIndex === questions.length - 1
-                  ? "linear-gradient(135deg, rgba(156, 163, 175, 0.1) 0%, rgba(156, 163, 175, 0.05) 100%)"
-                  : "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 25%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.65) 75%, rgba(255, 255, 255, 0.55) 100%)",
+                  ? isDarkMode
+                    ? "linear-gradient(135deg, rgba(75, 85, 99, 0.1) 0%, rgba(75, 85, 99, 0.05) 100%)"
+                    : "linear-gradient(135deg, rgba(156, 163, 175, 0.1) 0%, rgba(156, 163, 175, 0.05) 100%)"
+                  : isDarkMode
+                    ? "linear-gradient(135deg, rgba(31, 41, 55, 0.95) 0%, rgba(31, 41, 55, 0.85) 25%, rgba(31, 41, 55, 0.75) 50%, rgba(31, 41, 55, 0.65) 75%, rgba(31, 41, 55, 0.55) 100%)"
+                    : "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 25%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.65) 75%, rgba(255, 255, 255, 0.55) 100%)",
                 backdropFilter: "blur(20px) saturate(200%)",
                 WebkitBackdropFilter: "blur(20px) saturate(200%)",
                 border: currentQuestionIndex === questions.length - 1
-                  ? "1px solid rgba(156, 163, 175, 0.3)"
-                  : "1px solid rgba(255, 255, 255, 0.6)",
-                boxShadow: `
-                  0 4px 12px rgba(0, 0, 0, 0.08),
-                  0 2px 6px rgba(0, 0, 0, 0.04),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.8)
-                `,
+                  ? isDarkMode
+                    ? "1px solid rgba(75, 85, 99, 0.3)"
+                    : "1px solid rgba(156, 163, 175, 0.3)"
+                  : isDarkMode
+                    ? "1px solid rgba(75, 85, 99, 0.6)"
+                    : "1px solid rgba(255, 255, 255, 0.6)",
+                boxShadow: isDarkMode
+                  ? `
+                    0 4px 12px rgba(0, 0, 0, 0.3),
+                    0 2px 6px rgba(0, 0, 0, 0.2),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1)
+                  `
+                  : `
+                    0 4px 12px rgba(0, 0, 0, 0.08),
+                    0 2px 6px rgba(0, 0, 0, 0.04),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.8)
+                  `,
               }}
             >
               <span className="hidden sm:inline">{config.texts?.nextQuestion}</span>
@@ -1959,7 +1980,7 @@ export const QuizScene = React.memo(function QuizScene({
         id="question-content"
       >
         <div
-          className={`p-5 md:p-6 ${cardStyle.borderRadius} ${cardStyle.shadow || ''} ${cardStyle.borderColor || ''}`}
+          className={`p-5 md:p-6 ${cardStyle.borderRadius} 0 12px 40px rgba(0, 0, 0, 0.08), 0 6px 20px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 rgba(0, 0, 0, 0.06) ${cardStyle.borderColor || ''}`}
           style={{
             background: cardStyle.gradientFrom && cardStyle.gradientTo
               ? `linear-gradient(135deg, ${cardStyle.gradientFrom} 0%, ${cardStyle.gradientTo} 100%)`
@@ -2178,7 +2199,7 @@ export const QuizScene = React.memo(function QuizScene({
                           <Button
                             variant="outline"
                             onClick={retryQuestion}
-                            className={`flex items-center space-x-2 transition-all duration-300 ${config.styling?.buttons?.retryQuestion?.padding || 'px-4 py-2.5'} ${config.styling?.buttons?.retryQuestion?.borderRadius || 'rounded-lg'} ${config.styling?.buttons?.retryQuestion?.fontSize || 'text-sm'} ${config.styling?.buttons?.retryQuestion?.fontWeight || 'font-medium'}`}
+                            className={`flex items-center space-x-2 transition-all duration-300 ${'px-4 py-2.5'} ${'rounded-lg'} ${'text-sm'} ${'font-medium'}`}
                             aria-label="Try this question again"
                             style={{
                               background: config.styling?.buttons?.retryQuestion?.gradientFrom && config.styling?.buttons?.retryQuestion?.gradientTo
@@ -2187,7 +2208,7 @@ export const QuizScene = React.memo(function QuizScene({
                               border: config.styling?.buttons?.retryQuestion?.borderColor || "1px solid rgba(0, 0, 0, 0.1)",
                               backdropFilter: "blur(16px) saturate(160%)",
                               WebkitBackdropFilter: "blur(16px) saturate(160%)",
-                              boxShadow: config.styling?.buttons?.retryQuestion?.shadow || `
+                              boxShadow: `
                                 0 4px 16px rgba(0, 0, 0, 0.1),
                                 0 2px 8px rgba(0, 0, 0, 0.05),
                                 inset 0 1px 0 rgba(255, 255, 255, 0.8),
@@ -2219,7 +2240,7 @@ export const QuizScene = React.memo(function QuizScene({
                         currentQuestionIndex < questions.length - 1 && (
                           <Button
                             onClick={handleNextQuestion}
-                            className={`flex items-center space-x-2 transition-all duration-300 ${config.styling?.buttons?.nextQuestion?.padding || 'px-4 py-2.5'} ${config.styling?.buttons?.nextQuestion?.borderRadius || 'rounded-lg'} ${config.styling?.buttons?.nextQuestion?.fontSize || 'text-sm'} ${config.styling?.buttons?.nextQuestion?.fontWeight || 'font-medium'}`}
+                            className={`flex items-center space-x-2 transition-all duration-300 ${'px-4 py-2.5'} ${'rounded-lg'} ${'text-sm'} ${'font-medium'}`}
                             aria-label="Go to next question"
                             style={{
                               background: config.styling?.buttons?.nextQuestion?.gradientFrom && config.styling?.buttons?.nextQuestion?.gradientTo
@@ -2228,7 +2249,7 @@ export const QuizScene = React.memo(function QuizScene({
                               border: config.styling?.buttons?.nextQuestion?.borderColor || "1px solid rgba(59, 130, 246, 0.3)",
                               backdropFilter: "blur(16px) saturate(160%)",
                               WebkitBackdropFilter: "blur(16px) saturate(160%)",
-                              boxShadow: config.styling?.buttons?.nextQuestion?.shadow || `
+                              boxShadow: `
                                 0 4px 16px rgba(59, 130, 246, 0.2),
                                 0 2px 8px rgba(59, 130, 246, 0.1),
                                 inset 0 1px 0 rgba(255, 255, 255, 0.3),

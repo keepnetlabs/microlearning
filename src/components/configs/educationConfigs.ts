@@ -1,4 +1,4 @@
-// Standart renk tipi enum'u - Tüm scene'ler için ortak
+
 export enum ColorType {
     BLUE = 'blue',
     GREEN = 'green',
@@ -11,6 +11,80 @@ export enum ColorType {
     GRAY = 'gray',
     EMERALD = 'emerald'
 }
+
+// Direct CSS class mappings for colors
+export const ColorClasses = {
+    BLUE: {
+        icon: 'text-blue-500 dark:text-blue-300',
+        bgGradient: 'from-blue-500/20 to-indigo-500/20',
+        tip: 'from-blue-50/50 to-indigo-50/50 dark:from-blue-900/40 dark:to-indigo-900/40 border-blue-200/30 dark:border-blue-600/60',
+        tipText: 'text-blue-800 dark:text-blue-100',
+        tipIcon: 'text-blue-600 dark:text-blue-200'
+    },
+    GREEN: {
+        icon: 'text-green-500 dark:text-green-300',
+        bgGradient: 'from-green-500/20 to-emerald-500/20',
+        tip: 'from-green-50/50 to-emerald-50/50 dark:from-green-900/40 dark:to-emerald-900/40 border-green-200/30 dark:border-green-600/60',
+        tipText: 'text-green-800 dark:text-green-100',
+        tipIcon: 'text-green-600 dark:text-green-200'
+    },
+    EMERALD: {
+        icon: 'text-emerald-500 dark:text-emerald-300',
+        bgGradient: 'from-emerald-500/20 to-emerald-600/20',
+        tip: 'from-emerald-50/50 to-emerald-100/50 dark:from-emerald-900/40 dark:to-emerald-800/40 border-emerald-200/30 dark:border-emerald-600/60',
+        tipText: 'text-emerald-800 dark:text-emerald-100',
+        tipIcon: 'text-emerald-600 dark:text-emerald-200'
+    },
+    PURPLE: {
+        icon: 'text-purple-500 dark:text-purple-300',
+        bgGradient: 'from-purple-500/20 to-pink-500/20',
+        tip: 'from-purple-50/50 to-pink-50/50 dark:from-purple-900/40 dark:to-pink-900/40 border-purple-200/30 dark:border-purple-600/60',
+        tipText: 'text-purple-800 dark:text-purple-100',
+        tipIcon: 'text-purple-600 dark:text-purple-200'
+    },
+    RED: {
+        icon: 'text-red-500 dark:text-red-300',
+        bgGradient: 'from-red-500/20 to-red-600/20',
+        tip: 'from-red-50/50 to-red-100/50 dark:from-red-900/40 dark:to-red-800/40 border-red-200/30 dark:border-red-600/60',
+        tipText: 'text-red-800 dark:text-red-100',
+        tipIcon: 'text-red-600 dark:text-red-200'
+    },
+    ORANGE: {
+        icon: 'text-orange-500 dark:text-orange-300',
+        bgGradient: 'from-orange-500/20 to-orange-600/20',
+        tip: 'from-orange-50/50 to-orange-100/50 dark:from-orange-900/40 dark:to-orange-800/40 border-orange-200/30 dark:border-orange-600/60',
+        tipText: 'text-orange-800 dark:text-orange-100',
+        tipIcon: 'text-orange-600 dark:text-orange-200'
+    },
+    YELLOW: {
+        icon: 'text-yellow-500 dark:text-yellow-300',
+        bgGradient: 'from-yellow-500/20 to-yellow-600/20',
+        tip: 'from-yellow-50/50 to-yellow-100/50 dark:from-yellow-900/40 dark:to-yellow-800/40 border-yellow-200/30 dark:border-yellow-600/60',
+        tipText: 'text-yellow-800 dark:text-yellow-100',
+        tipIcon: 'text-yellow-600 dark:text-yellow-200'
+    },
+    INDIGO: {
+        icon: 'text-indigo-500 dark:text-indigo-300',
+        bgGradient: 'from-indigo-500/20 to-indigo-600/20',
+        tip: 'from-indigo-50/50 to-indigo-100/50 dark:from-indigo-900/40 dark:to-indigo-800/40 border-indigo-200/30 dark:border-indigo-600/60',
+        tipText: 'text-indigo-800 dark:text-indigo-100',
+        tipIcon: 'text-indigo-600 dark:text-indigo-200'
+    },
+    PINK: {
+        icon: 'text-pink-500 dark:text-pink-300',
+        bgGradient: 'from-pink-500/20 to-pink-600/20',
+        tip: 'from-pink-50/50 to-pink-100/50 dark:from-pink-900/40 dark:to-pink-800/40 border-pink-200/30 dark:border-pink-600/60',
+        tipText: 'text-pink-800 dark:text-pink-100',
+        tipIcon: 'text-pink-600 dark:text-pink-200'
+    },
+    GRAY: {
+        icon: 'text-gray-500 dark:text-gray-300',
+        bgGradient: 'from-gray-500/20 to-gray-600/20',
+        tip: 'from-gray-50/50 to-gray-100/50 dark:from-gray-900/40 dark:to-gray-800/40 border-gray-200/30 dark:border-gray-600/60',
+        tipText: 'text-gray-800 dark:text-gray-100',
+        tipIcon: 'text-gray-600 dark:text-gray-200'
+    }
+};
 
 
 export interface SurveySceneConfig {
@@ -145,8 +219,7 @@ const smishingGoalConfig = {
         sceneIconName: "target",
         className: "text-red-500"
     },
-    cardSpacing: "space-y-4",
-    maxWidth: "max-w-md w-full",
+
     glassEffect: {
         blur: "blur(24px)",
         saturation: "saturate(180%)",
@@ -303,8 +376,6 @@ const passwordSecurityGoalConfig = {
         sceneIconName: "shield",
         className: "text-blue-500"
     },
-    cardSpacing: "space-y-4",
-    maxWidth: "max-w-md w-full",
     glassEffect: {
         blur: "blur(24px)",
         saturation: "saturate(180%)",
@@ -461,8 +532,6 @@ const socialEngineeringGoalConfig = {
         sceneIconName: "users",
         className: "text-purple-500"
     },
-    cardSpacing: "space-y-4",
-    maxWidth: "max-w-md w-full",
     glassEffect: {
         blur: "blur(24px)",
         saturation: "saturate(180%)",
@@ -689,24 +758,33 @@ const smishingActionableContentConfig = {
             title: "Güçlü Parola Oluşturun",
             description: "En az 12 karakter, büyük-küçük harf, sayı ve sembol",
             tip: "Örnek: 'Kahve!çok7Güzel#2024'",
-            colorType: ColorType.BLUE,
-            bgColorType: ColorType.BLUE
+            iconColorClass: ColorClasses.BLUE.icon,
+            bgGradientClass: ColorClasses.BLUE.bgGradient,
+            tipColorClass: ColorClasses.BLUE.tip,
+            tipTextColorClass: ColorClasses.BLUE.tipText,
+            tipIconColorClass: ColorClasses.BLUE.tipIcon
         },
         {
             iconName: "smartphone",
             title: "2FA Aktifleştirin",
             description: "Tüm kritik hesaplarınızda çok faktörlü kimlik doğrulama",
             tip: "Google Authenticator veya Authy kullanın",
-            colorType: ColorType.GREEN,
-            bgColorType: ColorType.GREEN
+            iconColorClass: ColorClasses.GREEN.icon,
+            bgGradientClass: ColorClasses.GREEN.bgGradient,
+            tipColorClass: ColorClasses.GREEN.tip,
+            tipTextColorClass: ColorClasses.GREEN.tipText,
+            tipIconColorClass: ColorClasses.GREEN.tipIcon
         },
         {
             iconName: "database",
             title: "Parola Yöneticisi",
             description: "Her hesap için farklı ve karmaşık parolalar",
             tip: "1Password, Bitwarden veya LastPass",
-            colorType: ColorType.PURPLE,
-            bgColorType: ColorType.PURPLE
+            iconColorClass: ColorClasses.PURPLE.icon,
+            bgGradientClass: ColorClasses.PURPLE.bgGradient,
+            tipColorClass: ColorClasses.PURPLE.tip,
+            tipTextColorClass: ColorClasses.PURPLE.tipText,
+            tipIconColorClass: ColorClasses.PURPLE.tipIcon
         }
     ],
 
@@ -720,12 +798,10 @@ const smishingActionableContentConfig = {
     tipConfig: {
         iconName: "check-circle",
         iconSize: 12,
-        bgColorType: ColorType.BLUE
+        tipColorClass: ColorClasses.BLUE.tip,
+        tipTextColorClass: ColorClasses.BLUE.tipText,
+        tipIconColorClass: ColorClasses.BLUE.tipIcon
     },
-
-    // Layout configuration
-    cardSpacing: "space-y-4",
-    maxWidth: "max-w-md w-full",
 
     // Glass effect configuration
     glassEffect: {
@@ -744,24 +820,33 @@ const passwordSecurityActionableContentConfig = {
             title: "Güçlü Parola Oluşturun",
             description: "En az 12 karakter, büyük-küçük harf, sayı ve sembol",
             tip: "Örnek: 'Kahve!çok7Güzel#2024'",
-            colorType: ColorType.BLUE,
-            bgColorType: ColorType.BLUE
+            iconColorClass: ColorClasses.BLUE.icon,
+            bgGradientClass: ColorClasses.BLUE.bgGradient,
+            tipColorClass: ColorClasses.BLUE.tip,
+            tipTextColorClass: ColorClasses.BLUE.tipText,
+            tipIconColorClass: ColorClasses.BLUE.tipIcon
         },
         {
             iconName: "smartphone",
             title: "2FA Aktifleştirin",
             description: "Tüm kritik hesaplarınızda çok faktörlü kimlik doğrulama",
             tip: "Google Authenticator veya Authy kullanın",
-            colorType: ColorType.GREEN,
-            bgColorType: ColorType.GREEN
+            iconColorClass: ColorClasses.GREEN.icon,
+            bgGradientClass: ColorClasses.GREEN.bgGradient,
+            tipColorClass: ColorClasses.GREEN.tip,
+            tipTextColorClass: ColorClasses.GREEN.tipText,
+            tipIconColorClass: ColorClasses.GREEN.tipIcon
         },
         {
             iconName: "database",
             title: "Parola Yöneticisi",
             description: "Her hesap için farklı ve karmaşık parolalar",
             tip: "1Password, Bitwarden veya LastPass",
-            colorType: ColorType.PURPLE,
-            bgColorType: ColorType.PURPLE
+            iconColorClass: ColorClasses.PURPLE.icon,
+            bgGradientClass: ColorClasses.PURPLE.bgGradient,
+            tipColorClass: ColorClasses.PURPLE.tip,
+            tipTextColorClass: ColorClasses.PURPLE.tipText,
+            tipIconColorClass: ColorClasses.PURPLE.tipIcon
         }
     ],
 
@@ -775,12 +860,10 @@ const passwordSecurityActionableContentConfig = {
     tipConfig: {
         iconName: "check-circle",
         iconSize: 12,
-        bgColorType: ColorType.GREEN
+        tipColorClass: ColorClasses.GREEN.tip,
+        tipTextColorClass: ColorClasses.GREEN.tipText,
+        tipIconColorClass: ColorClasses.GREEN.tipIcon
     },
-
-    // Layout configuration
-    cardSpacing: "space-y-4",
-    maxWidth: "max-w-md w-full",
 
     // Glass effect configuration
     glassEffect: {
@@ -799,24 +882,33 @@ const socialEngineeringActionableContentConfig = {
             title: "Şüpheli Mesajları Tanıyın",
             description: "Acil durum, korku veya acele hissi veren mesajlara dikkat",
             tip: "Resmi kurumlar asla SMS ile şifre istemez",
-            colorType: ColorType.RED,
-            bgColorType: ColorType.RED
+            iconColorClass: ColorClasses.RED.icon,
+            bgGradientClass: ColorClasses.RED.bgGradient,
+            tipColorClass: ColorClasses.RED.tip,
+            tipTextColorClass: ColorClasses.RED.tipText,
+            tipIconColorClass: ColorClasses.RED.tipIcon
         },
         {
             iconName: "phone",
             title: "Doğrulama Yapın",
             description: "Gönderen numarasını ve mesaj içeriğini kontrol edin",
             tip: "Resmi web sitelerinden doğrulayın",
-            colorType: ColorType.ORANGE,
-            bgColorType: ColorType.ORANGE
+            iconColorClass: ColorClasses.ORANGE.icon,
+            bgGradientClass: ColorClasses.ORANGE.bgGradient,
+            tipColorClass: ColorClasses.ORANGE.tip,
+            tipTextColorClass: ColorClasses.ORANGE.tipText,
+            tipIconColorClass: ColorClasses.ORANGE.tipIcon
         },
         {
             iconName: "shield",
             title: "Güvenlik Yazılımı",
             description: "Güncel antivirüs ve güvenlik yazılımları kullanın",
             tip: "Otomatik güncellemeleri aktif tutun",
-            colorType: ColorType.BLUE,
-            bgColorType: ColorType.BLUE
+            iconColorClass: ColorClasses.BLUE.icon,
+            bgGradientClass: ColorClasses.BLUE.bgGradient,
+            tipColorClass: ColorClasses.BLUE.tip,
+            tipTextColorClass: ColorClasses.BLUE.tipText,
+            tipIconColorClass: ColorClasses.BLUE.tipIcon
         }
     ],
 
@@ -830,12 +922,10 @@ const socialEngineeringActionableContentConfig = {
     tipConfig: {
         iconName: "check-circle",
         iconSize: 12,
-        bgColorType: ColorType.RED
+        tipColorClass: ColorClasses.RED.tip,
+        tipTextColorClass: ColorClasses.RED.tipText,
+        tipIconColorClass: ColorClasses.RED.tipIcon
     },
-
-    // Layout configuration
-    cardSpacing: "space-y-4",
-    maxWidth: "max-w-md w-full",
 
     // Glass effect configuration
     glassEffect: {
@@ -987,151 +1077,3 @@ export interface NudgeSceneConfig {
         };
     };
 }
-
-export const nudgeSceneConfig: NudgeSceneConfig = {
-    texts: {
-        completionTitle: "🎉 Tebrikler! Eğitimi Tamamladınız",
-        completionSubtitle: "Siber güvenlik bilgilerinizi başarıyla güncellediniz",
-        achievementsTitle: "Kazandığınız Başarımlar",
-        actionPlanTitle: "Şimdi Ne Yapmalısınız?",
-        resourcesTitle: "Ek Kaynaklar",
-        motivationalTitle: "Siber Güvenlik Yolculuğunuz Devam Ediyor",
-        motivationalMessage: "Bu eğitimi tamamlayarak organizasyonunuzun güvenliğine önemli bir katkı sağladınız. Öğrendiklerinizi uygulamaya devam edin ve ekibinizi de bilinçlendirin.",
-        downloadButton: "Sertifikayı İndir",
-        downloadingText: "İndiriliyor...",
-        urgentLabel: "Acil",
-        pointsLabel: "Puan",
-        timeLabel: "Süre",
-        completionLabel: "Tamamlama"
-    },
-    completionData: {
-        totalPoints: 210,
-        timeSpent: "8 dakika",
-        completionDate: new Date().toLocaleDateString('tr-TR', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric'
-        }),
-        achievements: [
-            { id: 'quiz-master', name: 'Quiz Ustası', iconName: 'award', color: 'text-yellow-600' },
-            { id: 'fast-learner', name: 'Hızlı Öğrenen', iconName: 'trending-up', color: 'text-green-600' },
-            { id: 'security-champion', name: 'Güvenlik Şampiyonu', iconName: 'shield', color: 'text-blue-600' }
-        ]
-    },
-    immediateActions: [
-        {
-            iconName: "smartphone",
-            title: "Hemen Yapın",
-            description: "Parola yöneticisi indirin ve ana hesaplarınızı ekleyin",
-            priority: "critical",
-            timeframe: "5 dakika",
-            gradient: "from-red-500/20 to-pink-500/20",
-            iconColor: "text-red-600",
-            bgColor: "bg-red-50/80",
-            borderColor: "border-red-200/60"
-        },
-        {
-            iconName: "users",
-            title: "Bu Hafta",
-            description: "Ekip toplantısında güvenlik politikalarını paylaşın",
-            priority: "high",
-            timeframe: "Bu hafta",
-            gradient: "from-amber-500/20 to-orange-500/20",
-            iconColor: "text-amber-600",
-            bgColor: "bg-amber-50/80",
-            borderColor: "border-amber-200/60"
-        },
-        {
-            iconName: "calendar",
-            title: "Bu Ay",
-            description: "Ekip güvenlik eğitimlerini planlayın ve başlatın",
-            priority: "medium",
-            timeframe: "30 gün içinde",
-            gradient: "from-blue-500/20 to-indigo-500/20",
-            iconColor: "text-blue-600",
-            bgColor: "bg-blue-50/80",
-            borderColor: "border-blue-200/60"
-        }
-    ],
-    resources: [
-        {
-            title: "NIST Parola Rehberi",
-            type: "PDF",
-            url: "#",
-            description: "Kapsamlı parola güvenliği kılavuzu"
-        },
-        {
-            title: "2FA Kurulum Videoları",
-            type: "Video",
-            url: "#",
-            description: "Adım adım iki faktörlü doğrulama"
-        },
-        {
-            title: "Phishing Test Araçları",
-            type: "Tool",
-            url: "#",
-            description: "Ekibinizi test etmek için araçlar"
-        }
-    ],
-    icon: {
-        name: "check-circle",
-        size: 28,
-        color: "text-white"
-    },
-    styling: {
-        container: {
-            padding: "px-4 py-2 sm:px-6",
-            borderRadius: "rounded-xl",
-            backgroundColor: "bg-white/90 dark:bg-gray-800/80",
-            borderColor: "border-gray-200/60 dark:border-gray-600/60",
-            shadow: "shadow-xl"
-        },
-        stats: {
-            backgroundColor: "bg-gradient-to-r from-blue-100 to-indigo-100",
-            borderColor: "border-blue-200/60",
-            iconColor: "text-blue-600 dark:text-blue-400",
-            textColor: "text-gray-800 dark:text-white"
-        },
-        downloadButton: {
-            backgroundColor: "from-blue-500 to-indigo-600",
-            borderColor: "border-blue-500/30",
-            textColor: "text-white",
-            iconColor: "text-white",
-            gradientFrom: "from-blue-500",
-            gradientTo: "to-indigo-600",
-            shadow: "shadow-lg hover:shadow-xl",
-            borderRadius: "rounded-xl",
-            padding: "px-4 py-2 sm:px-6 sm:py-3",
-            fontSize: "text-sm sm:text-base",
-            fontWeight: "font-medium"
-        },
-        achievements: {
-            backgroundColor: "bg-white/60 dark:bg-gray-800/80",
-            borderColor: "border-white/40 dark:border-gray-600/60",
-            iconColor: "text-yellow-600 dark:text-yellow-400",
-            textColor: "text-gray-700 dark:text-gray-200",
-            hoverColor: "hover:text-gray-900 dark:hover:text-white"
-        },
-        actionCards: {
-            backgroundColor: "bg-white/50 dark:bg-gray-800/60",
-            borderColor: "border-white/30 dark:border-gray-600/50",
-            iconColor: "text-gray-600 dark:text-gray-300",
-            textColor: "text-gray-700 dark:text-gray-200",
-            hoverColor: "hover:text-gray-900 dark:hover:text-white"
-        },
-        resourceCards: {
-            backgroundColor: "bg-white/50 dark:bg-gray-800/60",
-            borderColor: "border-white/30 dark:border-gray-600/50",
-            iconColor: "text-blue-600 dark:text-blue-400",
-            textColor: "text-gray-800 dark:text-white",
-            hoverColor: "hover:text-blue-700 dark:hover:text-blue-300"
-        },
-        motivationalCard: {
-            backgroundColor: "from-emerald-50/80 to-green-50/60 dark:from-emerald-900/40 dark:to-green-900/30",
-            borderColor: "border-emerald-200/60 dark:border-emerald-600/50",
-            iconColor: "text-emerald-600 dark:text-emerald-400",
-            textColor: "text-emerald-700 dark:text-emerald-300",
-            titleColor: "text-emerald-800 dark:text-emerald-200"
-        }
-    }
-};

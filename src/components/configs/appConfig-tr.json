@@ -94,6 +94,7 @@
     }
   },
   "introSceneConfig": {
+    "points": 10,
     "title": {
       "words": ["SMS", "Phishing", "Korunma"],
       "highlightLastWord": true,
@@ -182,6 +183,7 @@
     }
   },
   "goalSceneConfig": {
+    "points": 15,
     "title": "SMS Güvenlik Hedefleri",
     "goals": [
       {
@@ -223,6 +225,7 @@
     }
   },
   "scenarioSceneConfig": {
+    "points": 20,
     "title": "Gerçek Hayat Senaryosu",
     "subtitle": "DevOps Manager'ın Phishing Deneyimi",
     "description": "Gerçek bir phishing saldırısı senaryosunu inceleyin ve öğrenin",
@@ -269,9 +272,33 @@
     },
     "texts": {
       "transcriptLoading": "Transcript yükleniyor..."
+    },
+    "ariaTexts": {
+      "mainLabel": "Senaryo Sahnesi",
+      "mainDescription": "Gerçek hayat senaryosu videosu ve transkripti",
+      "loadingLabel": "Transkript yükleniyor",
+      "errorLabel": "Transkript yükleme hatası",
+      "videoPlayerLabel": "Video Oynatıcı",
+      "mobileHintLabel": "Mobil kullanıcı ipucu",
+      "videoLabel": "Video Konteyneri",
+      "videoDescription": "Video içeriği",
+      "videoEndedDescription": "Video bitti. Yeniden başlatmak için replay butonunu kullanın.",
+      "videoPlayingDescription": "Video oynatılıyor.",
+      "transcriptPanelLabel": "Transkript Paneli",
+      "transcriptHeaderLabel": "Transkript başlığı",
+      "transcriptEntriesLabel": "Transkript girişleri",
+      "transcriptProgressLabel": "Transkript ilerlemesi",
+      "showTranscriptLabel": "Transkript panelini göster",
+      "hideTranscriptLabel": "Transkript panelini gizle",
+      "replayLabel": "Videoyu baştan oynat",
+      "transcriptEntryLabel": "Transkript girişi",
+      "timestampLabel": "Zaman damgası",
+      "transcriptTextLabel": "Transkript metni",
+      "lockedLabel": "Kilitli"
     }
   },
   "actionableContentSceneConfig": {
+    "points": 25,
     "title": "Hemen Uygulanabilir Adımlar",
     "actions": [
       {
@@ -310,16 +337,24 @@
       "iconSize": 12,
       "bgColorType": "blue"
     },
-    "cardSpacing": "space-y-4",
-    "maxWidth": "max-w-md w-full",
     "glassEffect": {
       "cardBackground": "bg-white/60 dark:bg-gray-800/80",
       "cardBorder": "border-white/30 dark:border-gray-600/60",
       "shadow": "shadow-lg hover:shadow-xl",
       "backdropBlur": "backdrop-blur-xl"
+    },
+    "ariaTexts": {
+      "mainLabel": "Uygulanabilir İçerik",
+      "mainDescription": "İpuçları ve rehberlik içeren etkileşimli kartlarla uygulanabilir içerik bölümü",
+      "headerLabel": "Sahne başlığı",
+      "actionCardsLabel": "Aksiyon kartları",
+      "actionCardsDescription": "Uygulanabilir içerik kartları",
+      "actionCardLabel": "Aksiyon kartı",
+      "tipLabel": "İpucu"
     }
   },
   "quizSceneConfig": {
+    "points": 50,
     "title": "Siber Güvenlik Quiz",
     "subtitle": "Bilgilerinizi test edin",
     "difficulty": {
@@ -614,6 +649,7 @@
     }
   },
   "surveySceneConfig": {
+    "points": 20,
     "texts": {
       "title": "Eğitim Değerlendirmesi",
       "ratingQuestion": "Bu eğitimi nasıl değerlendirirsiniz?",
@@ -657,6 +693,7 @@
     }
   },
   "summarySceneConfig": {
+    "points": 30,
     "texts": {
       "title": "Artık Daha Güvenlisiniz!",
       "subtitle": "Bu bilgileri ekibinizle paylaşma ve uygulamaya başlama zamanı",
@@ -696,6 +733,7 @@
     }
   },
   "nudgeSceneConfig": {
+    "points": 40,
     "texts": {
       "completionTitle": "🎉 Tebrikler! Eğitimi Tamamladınız",
       "completionSubtitle": "Siber güvenlik bilgilerinizi başarıyla güncellediniz",
