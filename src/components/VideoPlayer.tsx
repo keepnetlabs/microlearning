@@ -9,7 +9,7 @@ import Plyr from "plyr";
 import "plyr/dist/plyr.css";
 import Hls from "hls.js";
 import { motion } from "framer-motion";
-import { FileText, RotateCcw } from "lucide-react";
+import { Lock, RotateCcw } from "lucide-react";
 
 // HTMLVideoElement'e _lastTime özelliği ekle
 interface VideoWithLastTime extends HTMLVideoElement {
@@ -847,7 +847,7 @@ export function VideoPlayer({
                 : "Transkripti Göster"
             }
           >
-            <FileText className="w-5 h-5" />
+            <Lock className="w-5 h-5" />
           </motion.button>
         )}
       </div>
@@ -891,7 +891,7 @@ export function VideoPlayer({
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <div className="p-2 rounded-lg bg-blue-50/90 dark:bg-blue-900/60 border border-blue-200/60 dark:border-blue-600/60 shadow-sm">
-                    <FileText className="w-4 h-4 text-blue-600 dark:text-blue-200" />
+                    <Lock className="w-4 h-4 text-blue-600 dark:text-blue-200" />
                   </div>
                   <h3 className="text-sm font-medium text-slate-900 dark:text-slate-100">
                     {transcriptTitle}
