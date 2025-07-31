@@ -155,21 +155,27 @@
         "title": "Recognize SMS Threats",
         "subtitle": "Awareness",
         "description": "Quickly recognize and identify SMS-based phishing attacks",
-        "colorType": "red"
+        "iconColor": "text-red-500",
+        "strongBgGradient": "linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(220, 38, 38, 0.18) 50%, rgba(185, 28, 28, 0.12) 100%)",
+        "darkBgGradient": "linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(220, 38, 38, 0.18) 50%, rgba(185, 28, 28, 0.12) 100%)"
       },
       {
         "iconName": "shield",
         "title": "Protection Strategies",
         "subtitle": "Defense",
         "description": "Develop effective methods to protect against SMS attacks",
-        "colorType": "green"
+        "iconColor": "text-green-500",
+        "strongBgGradient": "linear-gradient(135deg, rgba(34, 197, 94, 0.25) 0%, rgba(22, 163, 74, 0.18) 50%, rgba(21, 128, 61, 0.12) 100%)",
+        "darkBgGradient": "linear-gradient(135deg, rgba(34, 197, 94, 0.25) 0%, rgba(22, 163, 74, 0.18) 50%, rgba(21, 128, 61, 0.12) 100%)"
       },
       {
         "iconName": "alert-triangle",
         "title": "Detect Suspicious Messages",
         "subtitle": "Vigilance",
         "description": "Analyze and verify suspicious SMS messages",
-        "colorType": "orange"
+        "iconColor": "text-orange-500",
+        "strongBgGradient": "linear-gradient(135deg, rgba(249, 115, 22, 0.25) 0%, rgba(234, 88, 12, 0.18) 50%, rgba(194, 65, 12, 0.12) 100%)",
+        "darkBgGradient": "linear-gradient(135deg, rgba(249, 115, 22, 0.25) 0%, rgba(234, 88, 12, 0.18) 50%, rgba(194, 65, 12, 0.12) 100%)"
       }
     ],
     "icon": {

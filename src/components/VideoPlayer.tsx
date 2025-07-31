@@ -138,6 +138,7 @@ export function VideoPlayer({
   );
 
   // Handle orientation change for iOS
+  /*
   useEffect(() => {
     if (!isIOSDevice) return;
 
@@ -172,7 +173,7 @@ export function VideoPlayer({
       window.removeEventListener('orientationchange', handleOrientationChange);
       window.removeEventListener('resize', handleOrientationChange);
     };
-  }, [isIOSDevice]);
+  }, [isIOSDevice]);*/
 
   // Auto-scroll to current transcript row
   useEffect(() => {
@@ -266,8 +267,9 @@ export function VideoPlayer({
           setIsVideoEnded(false);
         }, 100);
       } else {
+        video.pause();
         video.currentTime = 0;
-        video.play();
+        playerRef?.current?.restart();
         setIsVideoEnded(false);
       }
     }
@@ -437,6 +439,7 @@ export function VideoPlayer({
     video._lastTime = 0;
 
     // Set iOS-specific video attributes based on orientation
+    /*
     if (isIOSDevice) {
       if (orientation === 'landscape') {
         video.setAttribute('webkit-playsinline', 'false');
@@ -448,6 +451,7 @@ export function VideoPlayer({
         video.removeAttribute('webkit-presentation-mode');
       }
     }
+    */
 
     // Forward seek prevention
     const handleSeeking = (e: Event) => {

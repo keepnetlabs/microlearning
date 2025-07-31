@@ -1,7 +1,6 @@
 import * as LucideIcons from "lucide-react";
-import { ReactNode, useMemo, useCallback, memo } from "react";
+import { ReactNode, useMemo, memo } from "react";
 import { LucideIcon } from "lucide-react";
-import { ColorType } from "../configs/educationConfigs";
 
 // İkon mapping fonksiyonu
 const getIconComponent = (iconName: string): LucideIcon => {
@@ -27,7 +26,9 @@ interface GoalItem {
   title: string;
   subtitle?: string; // Optional subtitle
   description: string;
-  colorType: ColorType;
+  iconColor: string;
+  strongBgGradient: string;
+  darkBgGradient: string;
 }
 
 interface IconConfig {
@@ -127,95 +128,8 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
   index: number;
   glassEffect?: GlassEffectConfig;
 }) => {
-  // Memoized color mapping functions
-  const getIconColorClass = useCallback((colorType: ColorType): string => {
-    switch (colorType) {
-      case ColorType.BLUE:
-        return 'text-blue-500';
-      case ColorType.GREEN:
-        return 'text-green-500';
-      case ColorType.EMERALD:
-        return 'text-emerald-500';
-      case ColorType.PURPLE:
-        return 'text-purple-500';
-      case ColorType.RED:
-        return 'text-red-500';
-      case ColorType.ORANGE:
-        return 'text-orange-500';
-      case ColorType.YELLOW:
-        return 'text-yellow-500';
-      case ColorType.INDIGO:
-        return 'text-indigo-500';
-      case ColorType.PINK:
-        return 'text-pink-500';
-      case ColorType.GRAY:
-        return 'text-gray-500';
-      default:
-        return 'text-blue-500';
-    }
-  }, []);
-
-  // Memoized gradient functions
-  const getStrongBgGradient = useCallback((bgColorType: ColorType): string => {
-    switch (bgColorType) {
-      case ColorType.BLUE:
-        return 'linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(37, 99, 235, 0.18) 50%, rgba(29, 78, 216, 0.12) 100%)';
-      case ColorType.GREEN:
-        return 'linear-gradient(135deg, rgba(34, 197, 94, 0.25) 0%, rgba(22, 163, 74, 0.18) 50%, rgba(21, 128, 61, 0.12) 100%)';
-      case ColorType.EMERALD:
-        return 'linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(5, 150, 105, 0.18) 50%, rgba(4, 120, 87, 0.12) 100%)';
-      case ColorType.PURPLE:
-        return 'linear-gradient(135deg, rgba(147, 51, 234, 0.25) 0%, rgba(126, 34, 206, 0.18) 50%, rgba(107, 33, 168, 0.12) 100%)';
-      case ColorType.RED:
-        return 'linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(220, 38, 38, 0.18) 50%, rgba(185, 28, 28, 0.12) 100%)';
-      case ColorType.ORANGE:
-        return 'linear-gradient(135deg, rgba(249, 115, 22, 0.25) 0%, rgba(234, 88, 12, 0.18) 50%, rgba(194, 65, 12, 0.12) 100%)';
-      case ColorType.YELLOW:
-        return 'linear-gradient(135deg, rgba(250, 204, 21, 0.25) 0%, rgba(234, 179, 8, 0.18) 50%, rgba(202, 138, 4, 0.12) 100%)';
-      case ColorType.INDIGO:
-        return 'linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(79, 70, 229, 0.18) 50%, rgba(67, 56, 202, 0.12) 100%)';
-      case ColorType.PINK:
-        return 'linear-gradient(135deg, rgba(236, 72, 153, 0.25) 0%, rgba(219, 39, 119, 0.18) 50%, rgba(190, 24, 93, 0.12) 100%)';
-      case ColorType.GRAY:
-        return 'linear-gradient(135deg, rgba(107, 114, 128, 0.25) 0%, rgba(75, 85, 99, 0.18) 50%, rgba(55, 65, 81, 0.12) 100%)';
-      default:
-        return 'linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(37, 99, 235, 0.18) 50%, rgba(29, 78, 216, 0.12) 100%)';
-    }
-  }, []);
-
-  const getDarkBgGradient = useCallback((bgColorType: ColorType): string => {
-    switch (bgColorType) {
-      case ColorType.BLUE:
-        return 'linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(37, 99, 235, 0.18) 50%, rgba(29, 78, 216, 0.12) 100%)';
-      case ColorType.GREEN:
-        return 'linear-gradient(135deg, rgba(34, 197, 94, 0.25) 0%, rgba(22, 163, 74, 0.18) 50%, rgba(21, 128, 61, 0.12) 100%)';
-      case ColorType.EMERALD:
-        return 'linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(5, 150, 105, 0.18) 50%, rgba(4, 120, 87, 0.12) 100%)';
-      case ColorType.PURPLE:
-        return 'linear-gradient(135deg, rgba(147, 51, 234, 0.25) 0%, rgba(126, 34, 206, 0.18) 50%, rgba(107, 33, 168, 0.12) 100%)';
-      case ColorType.RED:
-        return 'linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(220, 38, 38, 0.18) 50%, rgba(185, 28, 28, 0.12) 100%)';
-      case ColorType.ORANGE:
-        return 'linear-gradient(135deg, rgba(249, 115, 22, 0.25) 0%, rgba(234, 88, 12, 0.18) 50%, rgba(194, 65, 12, 0.12) 100%)';
-      case ColorType.YELLOW:
-        return 'linear-gradient(135deg, rgba(250, 204, 21, 0.25) 0%, rgba(234, 179, 8, 0.18) 50%, rgba(202, 138, 4, 0.12) 100%)';
-      case ColorType.INDIGO:
-        return 'linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(79, 70, 229, 0.18) 50%, rgba(67, 56, 202, 0.12) 100%)';
-      case ColorType.PINK:
-        return 'linear-gradient(135deg, rgba(236, 72, 153, 0.25) 0%, rgba(219, 39, 119, 0.18) 50%, rgba(190, 24, 93, 0.12) 100%)';
-      case ColorType.GRAY:
-        return 'linear-gradient(135deg, rgba(107, 114, 128, 0.25) 0%, rgba(75, 85, 99, 0.18) 50%, rgba(55, 65, 81, 0.12) 100%)';
-      default:
-        return 'linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(37, 99, 235, 0.18) 50%, rgba(29, 78, 216, 0.12) 100%)';
-    }
-  }, []);
-
   // Memoize icon component
   const Icon = useMemo(() => getIconComponent(goal.iconName), [goal.iconName]);
-
-  const iconColor = useMemo(() => getIconColorClass(goal.colorType), [goal.colorType, getIconColorClass]);
-  const strongBgGradient = useMemo(() => getStrongBgGradient(goal.colorType), [goal.colorType, getStrongBgGradient]);
-  const darkBgGradient = useMemo(() => getDarkBgGradient(goal.colorType), [goal.colorType, getDarkBgGradient]);
 
   const cardStyle = useMemo(() => ({
     background: `linear-gradient(135deg, 
@@ -257,7 +171,7 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
       <div
         className="absolute inset-0 rounded-2xl transition-opacity duration-500"
         style={{
-          background: strongBgGradient
+          background: goal.strongBgGradient
         }}
       />
 
@@ -265,7 +179,7 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
       <div
         className="absolute inset-0 rounded-2xl opacity-0 dark:opacity-100 transition-opacity duration-500"
         style={{
-          background: darkBgGradient
+          background: goal.darkBgGradient
         }}
       />
 
@@ -326,7 +240,7 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
 
             <Icon
               size={16}
-              className={`${iconColor} dark:opacity-90 relative z-10 transition-all duration-300 ease-out group-hover:scale-105`}
+              className={`${goal.iconColor} dark:opacity-90 relative z-10 transition-all duration-300 ease-out group-hover:scale-105`}
             />
           </div>
 
