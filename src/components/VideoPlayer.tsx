@@ -599,7 +599,8 @@ export function VideoPlayer({
 
       playerRef.current = new Plyr(video, plyrConfig);
       playerRef.current.on('enterfullscreen', () => {
-        playerRef?.current?.toggleCaptions(true);
+        playerRef.current?.toggleCaptions(true);
+        playerRef.current?.toggleControls(true);
       });
       if (disableForwardSeek && playerRef.current) {
         const plyrInstance = playerRef.current;
