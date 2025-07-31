@@ -393,7 +393,7 @@ export function VideoPlayer({
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    zIndex: 30,
+    zIndex: 9999,
     background: `linear-gradient(135deg, 
       rgba(0, 0, 0, 0.85) 0%, 
       rgba(0, 0, 0, 0.75) 50%, 
@@ -574,7 +574,7 @@ export function VideoPlayer({
           "captions",
           "fullscreen",
         ],
-        settings: ["settings", "captions"],
+        settings: ["captions"],
         captions: {
           active: true,
           update: true,
@@ -586,7 +586,7 @@ export function VideoPlayer({
           global: !disableForwardSeek,
         },
         seekTime: disableForwardSeek ? 0 : 10,
-        clickToPlay: false,
+        clickToPlay: !disableForwardSeek,
         listeners: disableForwardSeek
           ? {
             seek: (e: Event) => {
@@ -599,7 +599,7 @@ export function VideoPlayer({
 
       playerRef.current = new Plyr(video, plyrConfig);
       playerRef.current.on('enterfullscreen', () => {
-        playerRef.current?.toggleCaptions(true);
+        playerRef?.current?.toggleCaptions(true);
         playerRef.current?.toggleControls(true);
       });
       if (disableForwardSeek && playerRef.current) {
@@ -805,7 +805,6 @@ export function VideoPlayer({
           controls
           poster={poster}
           style={videoStyle}
-          playsInline={orientation === 'portrait' || !isIOSDevice}
           onContextMenu={
             disableForwardSeek
               ? (e) => e.preventDefault()

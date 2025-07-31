@@ -1,8 +1,7 @@
 import * as LucideIcons from "lucide-react";
 import { motion } from "framer-motion";
 import React, { ReactNode, useMemo, useCallback } from "react";
-import { LucideIcon } from "lucide-react";
-import { ColorType } from "../configs/educationConfigs";
+import { LucideIcon } from "lucide-react"
 
 // İkon mapping fonksiyonu
 const getIconComponent = (iconName: string): LucideIcon => {
@@ -26,7 +25,13 @@ const getIconComponent = (iconName: string): LucideIcon => {
 interface HighlightItem {
   iconName: string;
   text: string;
-  colorType: ColorType;
+  textColor: string;
+  liquidGlassBackground?: string;
+  liquidGlassBorder?: string;
+  liquidGlassBoxShadow?: string;
+  multiLayerGradient?: string;
+  radialHighlight?: string;
+  innerDepthGradient?: string;
 }
 
 interface ParticlesConfig {
@@ -136,272 +141,6 @@ interface IntroSceneConfig {
   animationDelays?: AnimationDelays;
 }
 
-// Color mapping functions
-const getTextColorClass = (colorType: ColorType): string => {
-  switch (colorType) {
-    case ColorType.BLUE:
-      return 'text-blue-500 dark:text-blue-900';
-    case ColorType.GREEN:
-      return 'text-emerald-500';
-    case ColorType.PURPLE:
-      return 'text-purple-500';
-    case ColorType.RED:
-      return 'text-red-500';
-    case ColorType.ORANGE:
-      return 'text-orange-500';
-    case ColorType.YELLOW:
-      return 'text-yellow-500';
-    case ColorType.INDIGO:
-      return 'text-indigo-500';
-    case ColorType.PINK:
-      return 'text-pink-500';
-    case ColorType.GRAY:
-      return 'text-gray-500';
-    default:
-      return 'text-blue-500';
-  }
-};
-
-
-const getLiquidGlassBackground = (colorType: ColorType): string => {
-  switch (colorType) {
-    case ColorType.BLUE:
-      return `linear-gradient(135deg, 
-        rgba(59, 130, 246, 0.15) 0%, 
-        rgba(37, 99, 235, 0.12) 30%,
-        rgba(29, 78, 216, 0.10) 70%,
-        rgba(30, 64, 175, 0.08) 100%
-      )`;
-    case ColorType.GREEN:
-      return `linear-gradient(135deg, 
-        rgba(34, 197, 94, 0.15) 0%, 
-        rgba(22, 163, 74, 0.12) 30%,
-        rgba(21, 128, 61, 0.10) 70%,
-        rgba(22, 101, 52, 0.08) 100%
-      )`;
-    case ColorType.PURPLE:
-      return `linear-gradient(135deg, 
-        rgba(147, 51, 234, 0.15) 0%, 
-        rgba(126, 34, 206, 0.12) 30%,
-        rgba(107, 33, 168, 0.10) 70%,
-        rgba(88, 28, 135, 0.08) 100%
-      )`;
-    case ColorType.RED:
-      return `linear-gradient(135deg, 
-        rgba(239, 68, 68, 0.15) 0%, 
-        rgba(220, 38, 38, 0.12) 30%,
-        rgba(185, 28, 28, 0.10) 70%,
-        rgba(153, 27, 27, 0.08) 100%
-      )`;
-    case ColorType.ORANGE:
-      return `linear-gradient(135deg, 
-        rgba(249, 115, 22, 0.15) 0%, 
-        rgba(234, 88, 12, 0.12) 30%,
-        rgba(194, 65, 12, 0.10) 70%,
-        rgba(154, 52, 18, 0.08) 100%
-      )`;
-    case ColorType.YELLOW:
-      return `linear-gradient(135deg, 
-        rgba(250, 204, 21, 0.15) 0%, 
-        rgba(234, 179, 8, 0.12) 30%,
-        rgba(202, 138, 4, 0.10) 70%,
-        rgba(161, 98, 7, 0.08) 100%
-      )`;
-    case ColorType.INDIGO:
-      return `linear-gradient(135deg, 
-        rgba(99, 102, 241, 0.15) 0%, 
-        rgba(79, 70, 229, 0.12) 30%,
-        rgba(67, 56, 202, 0.10) 70%,
-        rgba(55, 48, 163, 0.08) 100%
-      )`;
-    case ColorType.PINK:
-      return `linear-gradient(135deg, 
-        rgba(236, 72, 153, 0.15) 0%, 
-        rgba(219, 39, 119, 0.12) 30%,
-        rgba(190, 24, 93, 0.10) 70%,
-        rgba(157, 23, 77, 0.08) 100%
-      )`;
-    case ColorType.GRAY:
-      return `linear-gradient(135deg, 
-        rgba(107, 114, 128, 0.15) 0%, 
-        rgba(75, 85, 99, 0.12) 30%,
-        rgba(55, 65, 81, 0.10) 70%,
-        rgba(31, 41, 55, 0.08) 100%
-      )`;
-    default:
-      return `linear-gradient(135deg, 
-        rgba(59, 130, 246, 0.15) 0%, 
-        rgba(37, 99, 235, 0.12) 30%,
-        rgba(29, 78, 216, 0.10) 70%,
-        rgba(30, 64, 175, 0.08) 100%
-      )`;
-  }
-};
-
-const getLiquidGlassBorder = (colorType: ColorType): string => {
-  switch (colorType) {
-    case ColorType.BLUE:
-      return '1px solid rgba(59, 130, 246, 0.25)';
-    case ColorType.GREEN:
-      return '1px solid rgba(34, 197, 94, 0.25)';
-    case ColorType.PURPLE:
-      return '1px solid rgba(147, 51, 234, 0.25)';
-    case ColorType.RED:
-      return '1px solid rgba(239, 68, 68, 0.25)';
-    case ColorType.ORANGE:
-      return '1px solid rgba(249, 115, 22, 0.25)';
-    case ColorType.YELLOW:
-      return '1px solid rgba(250, 204, 21, 0.25)';
-    case ColorType.INDIGO:
-      return '1px solid rgba(99, 102, 241, 0.25)';
-    case ColorType.PINK:
-      return '1px solid rgba(236, 72, 153, 0.25)';
-    case ColorType.GRAY:
-      return '1px solid rgba(107, 114, 128, 0.25)';
-    default:
-      return '1px solid rgba(59, 130, 246, 0.25)';
-  }
-};
-
-const getLiquidGlassBoxShadow = (colorType: ColorType): string => {
-  switch (colorType) {
-    case ColorType.BLUE:
-      return `
-        0 4px 16px rgba(59, 130, 246, 0.12),
-        0 2px 8px rgba(37, 99, 235, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.20)
-      `;
-    case ColorType.GREEN:
-      return `
-        0 4px 16px rgba(34, 197, 94, 0.12),
-        0 2px 8px rgba(22, 163, 74, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.20)
-      `;
-    case ColorType.PURPLE:
-      return `
-        0 4px 16px rgba(147, 51, 234, 0.12),
-        0 2px 8px rgba(126, 34, 206, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.20)
-      `;
-    case ColorType.RED:
-      return `
-        0 4px 16px rgba(239, 68, 68, 0.12),
-        0 2px 8px rgba(220, 38, 38, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.20)
-      `;
-    case ColorType.ORANGE:
-      return `
-        0 4px 16px rgba(249, 115, 22, 0.12),
-        0 2px 8px rgba(234, 88, 12, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.20)
-      `;
-    case ColorType.YELLOW:
-      return `
-        0 4px 16px rgba(250, 204, 21, 0.12),
-        0 2px 8px rgba(234, 179, 8, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.20)
-      `;
-    case ColorType.INDIGO:
-      return `
-        0 4px 16px rgba(99, 102, 241, 0.12),
-        0 2px 8px rgba(79, 70, 229, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.20)
-      `;
-    case ColorType.PINK:
-      return `
-        0 4px 16px rgba(236, 72, 153, 0.12),
-        0 2px 8px rgba(219, 39, 119, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.20)
-      `;
-    case ColorType.GRAY:
-      return `
-        0 4px 16px rgba(107, 114, 128, 0.12),
-        0 2px 8px rgba(75, 85, 99, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.20)
-      `;
-    default:
-      return `
-        0 4px 16px rgba(59, 130, 246, 0.12),
-        0 2px 8px rgba(37, 99, 235, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.20)
-      `;
-  }
-};
-
-const getMultiLayerGradient = (colorType: ColorType): string => {
-  switch (colorType) {
-    case ColorType.BLUE:
-      return 'linear-gradient(135deg, rgba(59, 130, 246, 0.10) 0%, rgba(37, 99, 235, 0.06) 50%, rgba(29, 78, 216, 0.04) 100%)';
-    case ColorType.GREEN:
-      return 'linear-gradient(135deg, rgba(34, 197, 94, 0.10) 0%, rgba(22, 163, 74, 0.06) 50%, rgba(21, 128, 61, 0.04) 100%)';
-    case ColorType.PURPLE:
-      return 'linear-gradient(135deg, rgba(147, 51, 234, 0.10) 0%, rgba(126, 34, 206, 0.06) 50%, rgba(107, 33, 168, 0.04) 100%)';
-    case ColorType.RED:
-      return 'linear-gradient(135deg, rgba(239, 68, 68, 0.10) 0%, rgba(220, 38, 38, 0.06) 50%, rgba(185, 28, 28, 0.04) 100%)';
-    case ColorType.ORANGE:
-      return 'linear-gradient(135deg, rgba(249, 115, 22, 0.10) 0%, rgba(234, 88, 12, 0.06) 50%, rgba(194, 65, 12, 0.04) 100%)';
-    case ColorType.YELLOW:
-      return 'linear-gradient(135deg, rgba(250, 204, 21, 0.10) 0%, rgba(234, 179, 8, 0.06) 50%, rgba(202, 138, 4, 0.04) 100%)';
-    case ColorType.INDIGO:
-      return 'linear-gradient(135deg, rgba(99, 102, 241, 0.10) 0%, rgba(79, 70, 229, 0.06) 50%, rgba(67, 56, 202, 0.04) 100%)';
-    case ColorType.PINK:
-      return 'linear-gradient(135deg, rgba(236, 72, 153, 0.10) 0%, rgba(219, 39, 119, 0.06) 50%, rgba(190, 24, 93, 0.04) 100%)';
-    case ColorType.GRAY:
-      return 'linear-gradient(135deg, rgba(107, 114, 128, 0.10) 0%, rgba(75, 85, 99, 0.06) 50%, rgba(55, 65, 81, 0.04) 100%)';
-    default:
-      return 'linear-gradient(135deg, rgba(59, 130, 246, 0.10) 0%, rgba(37, 99, 235, 0.06) 50%, rgba(29, 78, 216, 0.04) 100%)';
-  }
-};
-
-const getRadialHighlight = (colorType: ColorType): string => {
-  switch (colorType) {
-    case ColorType.BLUE:
-      return `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(59, 130, 246, 0.25) 0%, rgba(37, 99, 235, 0.15) 30%, rgba(255, 255, 255, 0.10) 60%, transparent 80%)`;
-    case ColorType.GREEN:
-      return `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(34, 197, 94, 0.25) 0%, rgba(22, 163, 74, 0.15) 30%, rgba(255, 255, 255, 0.10) 60%, transparent 80%)`;
-    case ColorType.PURPLE:
-      return `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(147, 51, 234, 0.25) 0%, rgba(126, 34, 206, 0.15) 30%, rgba(255, 255, 255, 0.10) 60%, transparent 80%)`;
-    case ColorType.RED:
-      return `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(239, 68, 68, 0.25) 0%, rgba(220, 38, 38, 0.15) 30%, rgba(255, 255, 255, 0.10) 60%, transparent 80%)`;
-    case ColorType.ORANGE:
-      return `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(249, 115, 22, 0.25) 0%, rgba(234, 88, 12, 0.15) 30%, rgba(255, 255, 255, 0.10) 60%, transparent 80%)`;
-    case ColorType.YELLOW:
-      return `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(250, 204, 21, 0.25) 0%, rgba(234, 179, 8, 0.15) 30%, rgba(255, 255, 255, 0.10) 60%, transparent 80%)`;
-    case ColorType.INDIGO:
-      return `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(99, 102, 241, 0.25) 0%, rgba(79, 70, 229, 0.15) 30%, rgba(255, 255, 255, 0.10) 60%, transparent 80%)`;
-    case ColorType.PINK:
-      return `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(236, 72, 153, 0.25) 0%, rgba(219, 39, 119, 0.15) 30%, rgba(255, 255, 255, 0.10) 60%, transparent 80%)`;
-    case ColorType.GRAY:
-      return `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(107, 114, 128, 0.25) 0%, rgba(75, 85, 99, 0.15) 30%, rgba(255, 255, 255, 0.10) 60%, transparent 80%)`;
-    default:
-      return `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(59, 130, 246, 0.25) 0%, rgba(37, 99, 235, 0.15) 30%, rgba(255, 255, 255, 0.10) 60%, transparent 80%)`;
-  }
-};
-
-const getInnerDepthGradient = (colorType: ColorType): string => {
-  switch (colorType) {
-    case ColorType.BLUE:
-      return `linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(255, 255, 255, 0.15) 30%, transparent 70%)`;
-    case ColorType.GREEN:
-      return `linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(255, 255, 255, 0.15) 30%, transparent 70%)`;
-    case ColorType.PURPLE:
-      return `linear-gradient(135deg, rgba(147, 51, 234, 0.08) 0%, rgba(255, 255, 255, 0.15) 30%, transparent 70%)`;
-    case ColorType.RED:
-      return `linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(255, 255, 255, 0.15) 30%, transparent 70%)`;
-    case ColorType.ORANGE:
-      return `linear-gradient(135deg, rgba(249, 115, 22, 0.08) 0%, rgba(255, 255, 255, 0.15) 30%, transparent 70%)`;
-    case ColorType.YELLOW:
-      return `linear-gradient(135deg, rgba(250, 204, 21, 0.08) 0%, rgba(255, 255, 255, 0.15) 30%, transparent 70%)`;
-    case ColorType.INDIGO:
-      return `linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(255, 255, 255, 0.15) 30%, transparent 70%)`;
-    case ColorType.PINK:
-      return `linear-gradient(135deg, rgba(236, 72, 153, 0.08) 0%, rgba(255, 255, 255, 0.15) 30%, transparent 70%)`;
-    case ColorType.GRAY:
-      return `linear-gradient(135deg, rgba(107, 114, 128, 0.08) 0%, rgba(255, 255, 255, 0.15) 30%, transparent 70%)`;
-    default:
-      return `linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(255, 255, 255, 0.15) 30%, transparent 70%)`;
-  }
-};
 
 export const IntroScene = React.memo(({
   config
@@ -463,13 +202,15 @@ export const IntroScene = React.memo(({
   const memoizedHighlights = useMemo(() => {
     return highlights?.map((item, index) => {
       const Icon = memoizedGetIconComponent(item.iconName);
-      const textColor = getTextColorClass(item.colorType);
-      const liquidGlassBackground = getLiquidGlassBackground(item.colorType);
-      const liquidGlassBorder = getLiquidGlassBorder(item.colorType);
-      const liquidGlassBoxShadow = getLiquidGlassBoxShadow(item.colorType);
-      const multiLayerGradient = getMultiLayerGradient(item.colorType);
-      const radialHighlight = getRadialHighlight(item.colorType);
-      const innerDepthGradient = getInnerDepthGradient(item.colorType);
+      const textColor = item.textColor
+
+      // Use config values if available, otherwise fall back to function-generated values
+      const liquidGlassBackground = item.liquidGlassBackground
+      const liquidGlassBorder = item.liquidGlassBorder
+      const liquidGlassBoxShadow = item.liquidGlassBoxShadow
+      const multiLayerGradient = item.multiLayerGradient
+      const radialHighlight = item.radialHighlight
+      const innerDepthGradient = item.innerDepthGradient
 
       return {
         ...item,
