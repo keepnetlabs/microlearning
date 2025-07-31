@@ -63,10 +63,19 @@
     "title": {
       "words": ["SMS", "Phishing", "Protection"],
       "highlightLastWord": true,
-      "gradientClasses": "bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent"
+      "gradientClasses": "bg-gradient-to-r from-blue-500 to-blue-500 dark:from-blue-500 dark:to-blue-300 bg-clip-text text-transparent"
     },
     "subtitle": "Recognize SMS-based phishing attacks and protection methods",
     "sectionTitle": "What You'll Learn in This Training:",
+    "icon": {
+      "component": null,
+      "size": 48,
+      "sparkleCount": 8,
+      "sparkleEnabled": true,
+      "sparkleIconName": "alert-triangle",
+      "sceneIconName": "smartphone",
+      "className": "text-blue-500 dark:text-blue-500"
+    },
     "highlights": [
       {
         "iconName": "smartphone",
@@ -92,20 +101,11 @@
     "duration": "~10 minutes",
     "level": "All Levels",
     "callToActionText": "Swipe to learn SMS security",
-    "icon": {
-      "component": null,
-      "size": 48,
-      "sparkleCount": 8,
-      "sparkleEnabled": true,
-      "sparkleIconName": "alert-triangle",
-      "sceneIconName": "smartphone",
-      "className": "text-red-500"
-    },
     "card": {
-      "backgroundColor": "bg-blue-50/10 dark:bg-slate-800/30",
-      "borderColor": "border-blue-100/10 dark:border-slate-600/20",
-      "gradientFrom": "from-blue-50/10 dark:from-slate-800/30",
-      "gradientTo": "to-blue-50/3 dark:to-slate-700/10"
+      "backgroundColor": "bg-blue-50/10 dark:bg-slate-900/50",
+      "borderColor": "border-blue-100/10 dark:border-slate-700/40",
+      "gradientFrom": "from-blue-50/10 dark:from-slate-900/40",
+      "gradientTo": "to-blue-50/3 dark:to-slate-800/20"
     },
     "texts": {
       "sceneLabel": "Introduction Scene",
@@ -162,7 +162,7 @@
     "video": {
       "src": "https://customer-0lll6yc8omc23rbm.cloudflarestream.com/5fdb12ff1436c991f50b698a02e2faa1/manifest/video.m3u8",
       "poster": null,
-      "disableForwardSeek": true,
+      "disableForwardSeek": false,
       "showTranscript": true,
       "transcriptTitle": "Scenario Transcript",
       "transcriptLanguage": "English",

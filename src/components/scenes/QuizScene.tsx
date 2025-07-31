@@ -322,6 +322,9 @@ export const QuizScene = React.memo(function QuizScene({
     const observer = new MutationObserver(checkTheme);
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 
+    // Initial theme check
+    checkTheme();
+
     return () => {
       mediaQuery.removeEventListener('change', checkTheme);
       observer.disconnect();
@@ -428,6 +431,8 @@ export const QuizScene = React.memo(function QuizScene({
       styleType = 'default';
     }
 
+    // Force re-calculation when theme changes
+    const currentThemeState = themeState;
     colorVariant = isDarkMode ? 'dark' : 'light';
 
     const currentStyle = colorStyles[styleType][colorVariant];
@@ -449,7 +454,7 @@ export const QuizScene = React.memo(function QuizScene({
       },
       iconClassName: currentStyle.icon
     };
-  }, [config.styling?.answerOptions]);
+  }, [config.styling?.answerOptions, isDarkMode, themeState]);
 
 
 
@@ -1829,7 +1834,7 @@ export const QuizScene = React.memo(function QuizScene({
   return (
     <div
       ref={mainRef}
-      className="flex flex-col items-center justify-center p-4 relative"
+      className="flex flex-col items-center justify-center px-1 pt-0 relative"
       role="main"
       aria-label={`Quiz: ${config.title}`}
       tabIndex={-1}

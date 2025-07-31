@@ -212,7 +212,7 @@ export function ActionableContentScene({
   config = educationConfigs.smishing.actionableContentSceneConfig
 }: ActionableContentSceneProps) {
   // Default values for container classes
-  const defaultContainerClassName = "flex flex-col items-center justify-center h-full px-2 sm:px-6";
+  const defaultContainerClassName = "flex flex-col items-center justify-start min-h-full px-2 sm:px-6 py-2 sm:py-6 overflow-y-auto";
 
   const {
     title,
@@ -251,7 +251,7 @@ export function ActionableContentScene({
         {title}
       </h1>
 
-      <div className={`${cardSpacing} ${maxWidth}`}>
+      <div className={`${cardSpacing} ${maxWidth} pb-4 sm:pb-6`}>
         {actions.map((action, index) => {
           const ActionIcon = getIconComponent(action.iconName);
           const iconColor = getIconColorClass(action.colorType);

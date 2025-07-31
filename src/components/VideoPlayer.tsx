@@ -9,7 +9,7 @@ import Plyr from "plyr";
 import "plyr/dist/plyr.css";
 import Hls from "hls.js";
 import { motion } from "framer-motion";
-import { FileText } from "lucide-react";
+import { FileText, RotateCcw } from "lucide-react";
 
 // HTMLVideoElement'e _lastTime özelliği ekle
 interface VideoWithLastTime extends HTMLVideoElement {
@@ -113,6 +113,7 @@ export function VideoPlayer({
     useState(showTranscript);
   const [orientation, setOrientation] = useState<'portrait' | 'landscape'>(getOrientation());
   const [isIOSDevice] = useState(isIOS());
+  const [isVideoEnded, setIsVideoEnded] = useState(false);
 
   // Parse transcript if it's a string - useMemo ile optimize edildi
   const parsedTranscript = useMemo(() =>
@@ -239,6 +240,26 @@ export function VideoPlayer({
     }
   }, []);
 
+  // Handle play event to hide replay icon
+  const handlePlay = useCallback(() => {
+    setIsVideoEnded(false);
+  }, []);
+
+  // Handle video ended event
+  const handleVideoEnded = useCallback(() => {
+    setIsVideoEnded(true);
+  }, []);
+
+  // Handle replay button click
+  const handleReplay = useCallback(() => {
+    const video = videoRef.current;
+    if (video) {
+      video.currentTime = 0;
+      video.play();
+      setIsVideoEnded(false);
+    }
+  }, []);
+
   // Keyboard event handler to prevent forward seeking
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -351,6 +372,39 @@ export function VideoPlayer({
     color: "white",
     transform: "translateZ(0)",
     willChange: "transform",
+  }), []);
+
+  // Memoized replay button styles
+  const replayButtonStyle = useMemo(() => ({
+    position: "absolute" as const,
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    zIndex: 30,
+    background: `linear-gradient(135deg, 
+      rgba(0, 0, 0, 0.85) 0%, 
+      rgba(0, 0, 0, 0.75) 50%, 
+      rgba(0, 0, 0, 0.9) 100%
+    )`,
+    backdropFilter: "blur(16px) saturate(180%)",
+    WebkitBackdropFilter: "blur(16px) saturate(180%)",
+    border: "2px solid rgba(255, 255, 255, 0.25)",
+    borderRadius: "50%",
+    width: "80px",
+    height: "80px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+    boxShadow: `
+      0 8px 32px rgba(0, 0, 0, 0.4),
+      0 4px 16px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2)
+    `,
+    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+    transformOrigin: "center",
+    lineHeight: 0,
+    fontSize: 0,
   }), []);
 
   useEffect(() => {
@@ -488,6 +542,8 @@ export function VideoPlayer({
     }
 
     video.addEventListener("timeupdate", handleTimeUpdate);
+    video.addEventListener("ended", handleVideoEnded);
+    video.addEventListener("play", handlePlay);
 
     // Initialize player
     const initializePlayer = () => {
@@ -698,6 +754,8 @@ export function VideoPlayer({
         });
       }
       video.removeEventListener("timeupdate", handleTimeUpdate);
+      video.removeEventListener("ended", handleVideoEnded);
+      video.removeEventListener("play", handlePlay);
       if (playerRef.current) {
         playerRef.current.destroy();
         playerRef.current = null;
@@ -712,6 +770,8 @@ export function VideoPlayer({
     disableForwardSeek,
     handleTimeUpdate,
     handleKeyDown,
+    handleVideoEnded,
+    handlePlay,
     isIOSDevice,
     orientation,
   ]);
@@ -722,7 +782,7 @@ export function VideoPlayer({
       style={containerStyle}
     >
       {/* Video Player */}
-      <div style={videoContainerStyle} className="rounded-lg overflow-hidden">
+      <div style={videoContainerStyle} className="rounded-lg overflow-hidden relative">
         <video
           ref={videoRef}
           className={`plyr-react plyr rounded-lg ${disableForwardSeek ? "plyr--disable-seek" : ""}`}
@@ -743,6 +803,18 @@ export function VideoPlayer({
           }
         >
         </video>
+
+        {/* Replay Button */}
+        {isVideoEnded && (
+          <button
+            onClick={handleReplay}
+            style={replayButtonStyle}
+            title="Videoyu Tekrar Oynat"
+            className="replay-button"
+          >
+            <RotateCcw className="w-8 h-8 text-white flex-shrink-0" style={{ display: 'block' }} />
+          </button>
+        )}
 
         {/* Transcript Toggle Icon */}
         {parsedTranscript && parsedTranscript.length > 0 && (

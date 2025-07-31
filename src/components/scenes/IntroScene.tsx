@@ -560,7 +560,6 @@ export const IntroScene = React.memo(({
     )`,
     backdropFilter: 'blur(12px) saturate(150%)',
     WebkitBackdropFilter: 'blur(12px) saturate(150%)',
-    border: '1px solid rgba(71, 85, 105, 0.15)',
     boxShadow: `
       0 2px 8px rgba(71, 85, 105, 0.06),
       inset 0 1px 0 rgba(255, 255, 255, 0.10)
@@ -899,38 +898,6 @@ export const IntroScene = React.memo(({
           className="absolute inset-0 rounded-2xl sm:rounded-3xl overflow-hidden"
           style={cardStyles}
         >
-          {/* Ultra-fine noise texture for authentic glass feel */}
-          <div
-            className="absolute inset-0 opacity-[0.015] dark:opacity-[0.008] rounded-2xl sm:rounded-3xl mix-blend-overlay pointer-events-none"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='innerGlassNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23innerGlassNoise)'/%3E%3C/svg%3E")`,
-              backgroundSize: '256px 256px'
-            }}
-          />
-
-          {/* Multi-layer liquid glass gradients */}
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/20 via-indigo-50/12 to-purple-50/8 dark:from-blue-900/15 dark:via-indigo-900/8 dark:to-purple-900/5 rounded-2xl sm:rounded-3xl transition-colors duration-500"></div>
-          <div className="absolute inset-0 bg-gradient-to-tl from-cyan-50/15 via-transparent to-violet-50/10 dark:from-cyan-900/8 dark:via-transparent dark:to-violet-900/5 rounded-2xl sm:rounded-3xl transition-colors duration-500"></div>
-
-          {/* Apple-style inner highlight with color tinting */}
-          <div
-            className="absolute inset-0 rounded-2xl sm:rounded-3xl pointer-events-none"
-            style={{
-              background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(59, 130, 246, 0.20) 0%, rgba(99, 102, 241, 0.12) 30%, rgba(255, 255, 255, 0.08) 60%, transparent 80%)`,
-              mixBlendMode: 'overlay'
-            }}
-          />
-
-          {/* Enhanced inner depth with colored gradients */}
-          <div
-            className="absolute inset-0 rounded-2xl sm:rounded-3xl pointer-events-none"
-            style={{
-              background: `linear-gradient(135deg, rgba(59, 130, 246, 0.10) 0%, rgba(255, 255, 255, 0.15) 30%, transparent 70%)`
-            }}
-          />
-
-          {/* Traditional inner glow maintained for compatibility */}
-          <div className="absolute inset-0 bg-gradient-to-b from-white/25 via-transparent to-transparent dark:from-white/12 rounded-2xl sm:rounded-3xl"></div>
         </div>
 
         <div className="relative z-10">
@@ -1035,7 +1002,7 @@ export const IntroScene = React.memo(({
           >
             <div className="flex justify-between items-center">
               <motion.div
-                className="relative flex items-center space-x-2 px-2 py-1 rounded-lg overflow-hidden transition-all duration-500 ease-out group"
+                className="relative flex items-center space-x-2 px-2 py-1 rounded-lg overflow-hidden transition-all duration-500 ease-out group dark:border-white border-[rgba(71, 85, 105, 0.15)] border-[1px]"
                 whileHover={{ scale: 1.05 }}
                 style={statsStyles}
               >
@@ -1050,7 +1017,7 @@ export const IntroScene = React.memo(({
 
                 {/* Apple-style highlight */}
                 <div
-                  className="absolute inset-0 rounded-lg pointer-events-none"
+                  className="absolute inset-0 rounded-lg pointer-events-none dark:border-white dark:border-1"
                   style={{
                     background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 30%, transparent 70%)`,
                     mixBlendMode: 'overlay'
@@ -1061,7 +1028,7 @@ export const IntroScene = React.memo(({
               </motion.div>
 
               <motion.div
-                className="relative flex items-center space-x-2 px-2 py-1 rounded-lg overflow-hidden transition-all duration-500 ease-out group"
+                className="relative flex items-center space-x-2 px-2 py-1 rounded-lg overflow-hidden transition-all duration-500 ease-out group dark:border-white border-[rgba(71, 85, 105, 0.15)] border-[1px]"
                 whileHover={{ scale: 1.05 }}
                 style={statsStyles}
               >
@@ -1076,7 +1043,7 @@ export const IntroScene = React.memo(({
 
                 {/* Apple-style highlight */}
                 <div
-                  className="absolute inset-0 rounded-lg pointer-events-none"
+                  className="absolute inset-0 rounded-lg pointer-events-none dark:border-white dark:border-1"
                   style={{
                     background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 30%, transparent 70%)`,
                     mixBlendMode: 'overlay'
