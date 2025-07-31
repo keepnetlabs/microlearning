@@ -109,7 +109,7 @@ export function VideoPlayer({
       : transcript || [],
     [transcript]
   );
-  console.log("captions",captions)
+  console.log("captions", captions)
   // Find current transcript row - useMemo ile optimize edildi
   const currentRowIndex = useMemo(() =>
     parsedTranscript.findIndex(
@@ -454,6 +454,7 @@ export function VideoPlayer({
           global: !disableForwardSeek,
         },
         seekTime: disableForwardSeek ? 0 : 10,
+        playsinline: true,
         clickToPlay: !disableForwardSeek,
         listeners: disableForwardSeek
           ? {
@@ -782,15 +783,13 @@ export function VideoPlayer({
                         ? "rgba(226, 232, 240, 0.3)"
                         : "rgba(156, 163, 175, 0.08)",
                     }}
-                    className={`transition-all duration-200 mx-3 my-1 rounded-lg ${
-                      canAccess
+                    className={`transition-all duration-200 mx-3 my-1 rounded-lg ${canAccess
                         ? "cursor-pointer"
                         : "cursor-not-allowed"
-                    } ${
-                      isActive
+                      } ${isActive
                         ? "border border-gray-300/50 dark:border-slate-500/50"
                         : "border border-transparent"
-                    }`}
+                      }`}
                     style={{
                       padding: "8px 12px",
                       backgroundColor: "transparent",
@@ -801,13 +800,12 @@ export function VideoPlayer({
                       {/* Timestamp */}
                       <div className="flex-shrink-0">
                         <span
-                          className={`font-medium transition-colors duration-200 text-xs ${
-                            isActive
+                          className={`font-medium transition-colors duration-200 text-xs ${isActive
                               ? "text-gray-600 dark:text-slate-300"
                               : canAccess
                                 ? "text-gray-600 dark:text-slate-300"
                                 : "text-gray-400 dark:text-slate-500"
-                          }`}
+                            }`}
                           style={{
                             fontSize: "12px",
                             fontWeight: "500",
@@ -836,13 +834,12 @@ export function VideoPlayer({
                           </div>
 
                           <p
-                            className={`leading-relaxed transition-colors duration-200 ${
-                              isActive
+                            className={`leading-relaxed transition-colors duration-200 ${isActive
                                 ? "text-black dark:text-slate-100"
                                 : canAccess
                                   ? "text-gray-700 dark:text-slate-200"
                                   : "text-gray-400 dark:text-slate-500"
-                            }`}
+                              }`}
                             style={{
                               fontSize: "13px",
                               lineHeight: "1.4",
