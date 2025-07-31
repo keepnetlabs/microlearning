@@ -449,6 +449,7 @@ export function VideoPlayer({
           update: true,
           language: 'en'
         },
+        hideControls: false,
         keyboard: {
           focused: !disableForwardSeek,
           global: !disableForwardSeek,
