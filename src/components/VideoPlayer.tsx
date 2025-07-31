@@ -586,7 +586,7 @@ export function VideoPlayer({
           global: !disableForwardSeek,
         },
         seekTime: disableForwardSeek ? 0 : 10,
-        clickToPlay: !disableForwardSeek,
+        clickToPlay: false,
         listeners: disableForwardSeek
           ? {
             seek: (e: Event) => {
