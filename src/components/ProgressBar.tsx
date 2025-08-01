@@ -184,41 +184,44 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
           {/* Progress Bar for Mobile - Using the same design as desktop but simplified */}
           <div className="flex-1">
             <div
-              className="relative w-full h-2 rounded-full overflow-hidden transition-all duration-500 ease-out group"
+              className="relative w-full h-2 overflow-hidden transition-all duration-500 ease-out group"
               style={{
-                background: finalConfig.containerBackground,
+                background: 'rgba(242, 242, 247, 0.10)',
                 backdropFilter: 'blur(20px) saturate(180%)',
                 WebkitBackdropFilter: 'blur(20px) saturate(180%)',
                 border: finalConfig.containerBorder,
                 boxShadow: finalConfig.containerBoxShadow,
                 transform: 'translateZ(0)',
-                willChange: 'transform'
+                willChange: 'transform',
+                borderRadius: '4px'
               }}
             >
               {/* Ultra-fine noise texture */}
               <div
-                className="absolute inset-0 opacity-[0.015] dark:opacity-[0.008] rounded-full mix-blend-overlay pointer-events-none"
+                className="absolute inset-0 opacity-[0.015] dark:opacity-[0.008] mix-blend-overlay pointer-events-none"
                 style={{
                   backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='progressNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23progressNoise)'/%3E%3C/svg%3E")`,
-                  backgroundSize: '128px 128px'
+                  backgroundSize: '128px 128px',
+                  borderRadius: '4px'
                 }}
               />
 
               {/* Optimized background gradients - Better visibility */}
-              <div className={`absolute inset-0 ${finalConfig.backgroundGradient} ${finalConfig.backgroundGradientDark} rounded-full transition-colors duration-500`}></div>
+              <div className={`absolute inset-0 ${finalConfig.backgroundGradient} ${finalConfig.backgroundGradientDark} transition-colors duration-500`} style={{ borderRadius: '4px' }}></div>
 
               {/* Enhanced Apple-style highlight - More prominent */}
               <div
-                className="absolute inset-0 rounded-full pointer-events-none"
+                className="absolute inset-0 pointer-events-none"
                 style={{
                   background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.12) 30%, transparent 70%)`,
-                  mixBlendMode: 'overlay'
+                  mixBlendMode: 'overlay',
+                  borderRadius: '4px'
                 }}
               />
 
               {/* INDUSTRY STANDARD LIQUID GLASS PROGRESS FILL */}
               <motion.div
-                className="relative h-full rounded-full overflow-hidden"
+                className="relative h-full overflow-hidden"
                 initial={{ width: 0 }}
                 animate={{ width: `${progress}%` }}
                 transition={{ duration: 1.2, ease: "easeOut", type: "spring", stiffness: 80 }}
@@ -228,21 +231,23 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
                   backdropFilter: 'blur(16px) saturate(160%)',
                   WebkitBackdropFilter: 'blur(16px) saturate(160%)',
                   border: finalConfig.progressFillBorder,
-                  boxShadow: finalConfig.progressFillBoxShadow
+                  boxShadow: finalConfig.progressFillBoxShadow,
+                  borderRadius: '4px'
                 }}
               >
                 {/* Ultra-fine noise texture for fill */}
                 <div
-                  className="absolute inset-0 opacity-[0.020] dark:opacity-[0.012] rounded-full mix-blend-overlay pointer-events-none"
+                  className="absolute inset-0 opacity-[0.020] dark:opacity-[0.012] mix-blend-overlay pointer-events-none"
                   style={{
                     backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='fillNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23fillNoise)'/%3E%3C/svg%3E")`,
-                    backgroundSize: '128px 128px'
+                    backgroundSize: '128px 128px',
+                    borderRadius: '4px'
                   }}
                 />
 
                 {/* Enhanced flowing animation with liquid glass effect */}
                 <motion.div
-                  className="absolute inset-0 rounded-full"
+                  className="absolute inset-0"
                   animate={{
                     x: ['-100%', '200%'],
                     opacity: [0, 0.6, 0]
@@ -262,103 +267,39 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
                       rgba(255, 255, 255, 0.40) 70%, 
                       transparent 100%
                     )`,
-                    mixBlendMode: 'overlay'
+                    mixBlendMode: 'overlay',
+                    borderRadius: '4px'
                   }}
                 />
 
                 {/* Clean depth layer - Industry standard approach */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-50/15 via-blue-100/8 to-blue-200/5 dark:from-blue-900/12 dark:via-blue-800/6 dark:to-blue-700/4 rounded-full transition-colors duration-500"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-50/15 via-blue-100/8 to-blue-200/5 dark:from-blue-900/12 dark:via-blue-800/6 dark:to-blue-700/4 transition-colors duration-500" style={{ borderRadius: '4px' }}></div>
 
                 {/* Enhanced Apple-style top highlight */}
                 <div
-                  className="absolute top-0 left-0 right-0 h-1/2 rounded-t-full pointer-events-none"
+                  className="absolute top-0 left-0 right-0 h-1/2 pointer-events-none"
                   style={{
                     background: `linear-gradient(180deg, 
                       rgba(255, 255, 255, 0.50) 0%, 
                       rgba(255, 255, 255, 0.25) 30%, 
                       transparent 70%
                     )`,
-                    mixBlendMode: 'soft-light'
+                    mixBlendMode: 'soft-light',
+                    borderRadius: '4px'
                   }}
                 />
 
                 {/* Clean inner glow - Single color approach */}
                 <div
-                  className="absolute inset-0 rounded-full pointer-events-none"
+                  className="absolute inset-0 pointer-events-none"
                   style={{
                     background: `radial-gradient(ellipse 120% 50% at 50% 0%, rgba(59, 130, 246, 0.25) 0%, rgba(59, 130, 246, 0.15) 25%, transparent 60%)`,
-                    mixBlendMode: 'overlay'
+                    mixBlendMode: 'overlay',
+                    borderRadius: '4px'
                   }}
                 />
               </motion.div>
 
-              {/* Dots for mobile */}
-              <div className="absolute inset-0 flex items-center">
-                {Array.from({ length: 8 }, (_, index) => {
-                  const dotPosition = ((index + 1) / 8) * 100;
-                  const isCompleted = (index + 1) <= currentScene;
-                  const isActive = (index + 1) === currentScene;
-
-                  return (
-                    <motion.div
-                      key={index}
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: index * 0.08, type: "spring", stiffness: 300 }}
-                      className="absolute flex items-center justify-center"
-                      style={{
-                        left: `${dotPosition}%`,
-                        transform: 'translateX(-50%)'
-                      }}
-                    >
-                      {/* ENHANCED LIQUID GLASS DOT */}
-                      <motion.div
-                        className={`rounded-full transition-all duration-500 ease-out ${isCompleted
-                          ? "w-1.5 h-1.5 sm:w-2 sm:h-2"
-                          : isActive
-                            ? "w-1.5 h-1.5 sm:w-2 sm:h-2"
-                            : "w-1 h-1 sm:w-1.5 sm:h-1.5"
-                          }`}
-                        style={{
-                          // All dots have the same #C7C7CC color
-                          background: '#C7C7CC',
-                          backdropFilter: 'blur(4px)',
-                          WebkitBackdropFilter: 'blur(4px)',
-                          border: '0.5px solid rgba(199, 199, 204, 0.40)',
-                          boxShadow: '0 1px 3px rgba(148, 163, 184, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.20)',
-                          transform: 'translateZ(0)',
-                          willChange: 'transform'
-                        }}
-                      >
-                        {/* Ultra-fine noise texture for dots */}
-                        <div
-                          className="absolute inset-0 opacity-[0.015] dark:opacity-[0.008] rounded-full mix-blend-overlay pointer-events-none"
-                          style={{
-                            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='dotNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23dotNoise)'/%3E%3C/svg%3E")`,
-                            backgroundSize: '64px 64px'
-                          }}
-                        />
-
-                        {/* Apple-style inner highlight for dots */}
-                        <div
-                          className="absolute inset-0 rounded-full pointer-events-none"
-                          style={{
-                            background: `radial-gradient(ellipse at 30% 20%, 
-                              ${isCompleted
-                                ? 'rgba(255, 255, 255, 0.60) 0%, rgba(255, 255, 255, 0.30) 50%, transparent 80%'
-                                : isActive
-                                  ? 'rgba(59, 130, 246, 0.50) 0%, rgba(255, 255, 255, 0.25) 50%, transparent 80%'
-                                  : 'rgba(255, 255, 255, 0.30) 0%, rgba(255, 255, 255, 0.15) 50%, transparent 80%'
-                              }
-                            )`,
-                            mixBlendMode: 'overlay'
-                          }}
-                        />
-                      </motion.div>
-                    </motion.div>
-                  );
-                })}
-              </div>
             </div>
           </div>
         </div>
@@ -368,80 +309,112 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
       <div className="hidden md:block">
         {/* Responsive Container with Margins */}
         <div className="relative mx-4 mt-3 md:mt-5 sm:mx-8 md:mx-16 lg:mx-20 xl:mx-24 2xl:mx-32">
-          {/* Progress Tooltip - Positioned relative to progress bar */}
+          {/* Progress Tooltip - Pill-shaped thumb on progress bar */}
           <div className="relative w-full">
             <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="absolute -top-8 left-0 transform transition-all duration-300 -translate-x-1/2 z-20"
+              className="absolute z-20"
               style={{
-                left: `${progress === 100 ? progress - 2 : progress - 1.5}%`,
-                top: '-24px'
+                left: `${progress}%`,
+                top: '50%',
+                transform: 'translate(-50%, -50%)',
+                marginTop: '-1px'
               }}
             >
-              {/* Tooltip Container */}
-              <div className="relative">
-                {/* Tooltip Background */}
-                <div className="h-5 w-8 sm:h-5 sm:w-8 md:h-5 md:w-8 flex items-center justify-center bg-[#3B82F6] dark:bg-[#3B82F6] rounded-[2px] shadow-lg">
-                  <div className="text-[10px] sm:text-xs font-semibold text-white">
-                    {formatPercent(progress, language)}
-                  </div>
-                </div>
-
-                {/* Tooltip Arrow */}
+              {/* Pill-shaped thumb indicator */}
+              <div
+                className="flex items-center justify-center px-3 py-1 rounded-full shadow-lg relative"
+                style={{
+                  background: 'rgba(242, 242, 247, 0.15)',
+                  backdropFilter: 'blur(25px) saturate(200%)',
+                  WebkitBackdropFilter: 'blur(25px) saturate(200%)',
+                  border: '1px solid rgba(199, 199, 204, 0.60)',
+                  boxShadow: '0 4px 12px rgba(148, 163, 184, 0.20), 0 2px 6px rgba(148, 163, 184, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.30)',
+                  transform: 'translateZ(0)',
+                  willChange: 'transform',
+                  minWidth: '44px',
+                  height: '28px'
+                }}
+              >
+                {/* Ultra-fine noise texture for thumb */}
                 <div
-                  className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0"
+                  className="absolute inset-0 opacity-[0.020] dark:opacity-[0.012] mix-blend-overlay pointer-events-none rounded-full"
                   style={{
-                    borderLeft: '4px solid transparent',
-                    borderRight: '4px solid transparent',
-                    borderTop: '4px solid rgb(37, 99, 235)',
-                    filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='thumbNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23thumbNoise)'/%3E%3C/svg%3E")`,
+                    backgroundSize: '64px 64px'
                   }}
                 />
+
+                {/* Enhanced Apple-style highlight for thumb */}
+                <div
+                  className="absolute inset-0 rounded-full pointer-events-none"
+                  style={{
+                    background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.20) 30%, transparent 70%)`,
+                    mixBlendMode: 'overlay'
+                  }}
+                />
+
+                {/* Additional glass layer */}
+                <div
+                  className="absolute inset-0 rounded-full pointer-events-none"
+                  style={{
+                    background: `linear-gradient(135deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%)`,
+                    mixBlendMode: 'soft-light'
+                  }}
+                />
+
+                {/* Percentage text */}
+                <span className="relative z-10 text-xs font-semibold text-[#1C1C1E] dark:text-white">
+                  {formatPercent(progress, language)}
+                </span>
               </div>
             </motion.div>
           </div>
 
           {/* INDUSTRY STANDARD LIQUID GLASS PROGRESS CONTAINER */}
           <div
-            className="relative w-full h-1.5 sm:h-2 rounded-full overflow-hidden transition-all duration-500 ease-out group"
+            className="relative w-full h-1.5 sm:h-2 overflow-hidden transition-all duration-500 ease-out group"
             style={{
               // OPTIMIZED BACKGROUND - More visible but still premium
-              background: finalConfig.containerBackground,
+              background: 'rgba(242, 242, 247, 0.10)',
               backdropFilter: 'blur(20px) saturate(180%)',
               WebkitBackdropFilter: 'blur(20px) saturate(180%)',
               border: finalConfig.containerBorder,
               boxShadow: finalConfig.containerBoxShadow,
               transform: 'translateZ(0)',
-              willChange: 'transform'
+              willChange: 'transform',
+              borderRadius: '4px'
             }}
           >
 
             {/* Ultra-fine noise texture */}
             <div
-              className="absolute inset-0 opacity-[0.015] dark:opacity-[0.008] rounded-full mix-blend-overlay pointer-events-none"
+              className="absolute inset-0 opacity-[0.015] dark:opacity-[0.008] mix-blend-overlay pointer-events-none"
               style={{
                 backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='progressNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23progressNoise)'/%3E%3C/svg%3E")`,
-                backgroundSize: '128px 128px'
+                backgroundSize: '128px 128px',
+                borderRadius: '4px'
               }}
             />
 
             {/* Optimized background gradients - Better visibility */}
-            <div className={`absolute inset-0 ${finalConfig.backgroundGradient} ${finalConfig.backgroundGradientDark} rounded-full transition-colors duration-500`}></div>
+            <div className={`absolute inset-0 ${finalConfig.backgroundGradient} ${finalConfig.backgroundGradientDark} transition-colors duration-500`} style={{ borderRadius: '4px' }}></div>
 
             {/* Enhanced Apple-style highlight - More prominent */}
             <div
-              className="absolute inset-0 rounded-full pointer-events-none"
+              className="absolute inset-0 pointer-events-none"
               style={{
                 background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.12) 30%, transparent 70%)`,
-                mixBlendMode: 'overlay'
+                mixBlendMode: 'overlay',
+                borderRadius: '4px'
               }}
             />
 
             {/* INDUSTRY STANDARD LIQUID GLASS PROGRESS FILL */}
             <motion.div
-              className="relative h-full rounded-full overflow-hidden"
+              className="relative h-full overflow-hidden"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 1.2, ease: "easeOut", type: "spring", stiffness: 80 }}
@@ -451,21 +424,23 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
                 backdropFilter: 'blur(16px) saturate(160%)',
                 WebkitBackdropFilter: 'blur(16px) saturate(160%)',
                 border: finalConfig.progressFillBorder,
-                boxShadow: finalConfig.progressFillBoxShadow
+                boxShadow: finalConfig.progressFillBoxShadow,
+                borderRadius: '4px'
               }}
             >
               {/* Ultra-fine noise texture for fill */}
               <div
-                className="absolute inset-0 opacity-[0.020] dark:opacity-[0.012] rounded-full mix-blend-overlay pointer-events-none"
+                className="absolute inset-0 opacity-[0.020] dark:opacity-[0.012] mix-blend-overlay pointer-events-none"
                 style={{
                   backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='fillNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23fillNoise)'/%3E%3C/svg%3E")`,
-                  backgroundSize: '128px 128px'
+                  backgroundSize: '128px 128px',
+                  borderRadius: '4px'
                 }}
               />
 
               {/* Enhanced flowing animation with liquid glass effect */}
               <motion.div
-                className="absolute inset-0 rounded-full"
+                className="absolute inset-0"
                 animate={{
                   x: ['-100%', '200%'],
                   opacity: [0, 0.6, 0]
@@ -485,102 +460,38 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
                     rgba(255, 255, 255, 0.40) 70%, 
                     transparent 100%
                   )`,
-                  mixBlendMode: 'overlay'
+                  mixBlendMode: 'overlay',
+                  borderRadius: '4px'
                 }}
               />
 
               {/* Clean depth layer - Industry standard approach */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-50/15 via-blue-100/8 to-blue-200/5 dark:from-blue-900/12 dark:via-blue-800/6 dark:to-blue-700/4 rounded-full transition-colors duration-500"></div>
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-50/15 via-blue-100/8 to-blue-200/5 dark:from-blue-900/12 dark:via-blue-800/6 dark:to-blue-700/4 transition-colors duration-500" style={{ borderRadius: '4px' }}></div>
 
               {/* Enhanced Apple-style top highlight */}
               <div
-                className="absolute top-0 left-0 right-0 h-1/2 rounded-t-full pointer-events-none"
+                className="absolute top-0 left-0 right-0 h-1/2 pointer-events-none"
                 style={{
                   background: `linear-gradient(180deg, 
                     rgba(255, 255, 255, 0.50) 0%, 
                     rgba(255, 255, 255, 0.25) 30%, 
                     transparent 70%
                   )`,
-                  mixBlendMode: 'soft-light'
+                  mixBlendMode: 'soft-light',
+                  borderRadius: '4px'
                 }}
               />
 
               {/* Clean inner glow - Single color approach */}
               <div
-                className="absolute inset-0 rounded-full pointer-events-none"
+                className="absolute inset-0 pointer-events-none"
                 style={{
                   background: `radial-gradient(ellipse 120% 50% at 50% 0%, rgba(59, 130, 246, 0.25) 0%, rgba(59, 130, 246, 0.15) 25%, transparent 60%)`,
-                  mixBlendMode: 'overlay'
+                  mixBlendMode: 'overlay',
+                  borderRadius: '4px'
                 }}
               />
             </motion.div>
-
-            <div className="absolute inset-0 flex items-center">
-              {Array.from({ length: 8 }, (_, index) => {
-                const dotPosition = ((index + 1) / 8) * 100;
-                const isCompleted = (index + 1) <= currentScene;
-                const isActive = (index + 1) === currentScene;
-
-                return (
-                  <motion.div
-                    key={index}
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: index * 0.08, type: "spring", stiffness: 300 }}
-                    className="absolute flex items-center justify-center"
-                    style={{
-                      left: `${dotPosition}%`,
-                      transform: 'translateX(-50%)'
-                    }}
-                  >
-                    {/* ENHANCED LIQUID GLASS DOT */}
-                    <motion.div
-                      className={`rounded-full transition-all duration-500 ease-out ${isCompleted
-                        ? "w-1.5 h-1.5 sm:w-2 sm:h-2"
-                        : isActive
-                          ? "w-1.5 h-1.5 sm:w-2 sm:h-2"
-                          : "w-1 h-1 sm:w-1.5 sm:h-1.5"
-                        }`}
-                      style={{
-                        // All dots have the same #C7C7CC color
-                        background: '#C7C7CC',
-                        backdropFilter: 'blur(4px)',
-                        WebkitBackdropFilter: 'blur(4px)',
-                        border: '0.5px solid rgba(199, 199, 204, 0.40)',
-                        boxShadow: '0 1px 3px rgba(148, 163, 184, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.20)',
-                        transform: 'translateZ(0)',
-                        willChange: 'transform'
-                      }}
-                    >
-                      {/* Ultra-fine noise texture for dots */}
-                      <div
-                        className="absolute inset-0 opacity-[0.015] dark:opacity-[0.008] rounded-full mix-blend-overlay pointer-events-none"
-                        style={{
-                          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='dotNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23dotNoise)'/%3E%3C/svg%3E")`,
-                          backgroundSize: '64px 64px'
-                        }}
-                      />
-
-                      {/* Apple-style inner highlight for dots */}
-                      <div
-                        className="absolute inset-0 rounded-full pointer-events-none"
-                        style={{
-                          background: `radial-gradient(ellipse at 30% 20%, 
-                            ${isCompleted
-                              ? 'rgba(255, 255, 255, 0.60) 0%, rgba(255, 255, 255, 0.30) 50%, transparent 80%'
-                              : isActive
-                                ? 'rgba(59, 130, 246, 0.50) 0%, rgba(255, 255, 255, 0.25) 50%, transparent 80%'
-                                : 'rgba(255, 255, 255, 0.30) 0%, rgba(255, 255, 255, 0.15) 50%, transparent 80%'
-                            }
-                          )`,
-                          mixBlendMode: 'overlay'
-                        }}
-                      />
-                    </motion.div>
-                  </motion.div>
-                );
-              })}
-            </div>
           </div>
         </div>
       </div>

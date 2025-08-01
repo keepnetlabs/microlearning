@@ -224,7 +224,7 @@ export default function App() {
   // Dynamic CSS classes - Sadece themeConfig değiştiğinde yeniden hesaplanır
   const dynamicCssClasses = useMemo(() => ({
     // Ana container
-    mainContainer: `min-h-screen bg-gradient-to-br bg-[${themeConfig.colors?.background}] bg-[linear-gradient(106deg,_#76B2D7_0%,_#3178A5_100%)] dark:from-gray-800 dark:via-gray-850 dark:to-gray-900 flex flex-col relative overflow-hidden transition-colors duration-300`,
+    mainContainer: `min-h-screen bg-[${themeConfig.colors?.background}] bg-[linear-gradient(106deg,_#76B2D7_0%,_#3178A5_100%)] dark:from-gray-800 dark:via-gray-850 dark:to-gray-900 flex flex-col relative overflow-hidden transition-colors duration-300`,
 
     // Loading container
     loadingContainer: `flex items-center space-x-3 px-6 py-4 bg-${themeConfig.colors?.surface || 'white'}/90 dark:bg-gray-900/90 ${themeConfig.effects?.backdropBlur || 'backdrop-blur-xl'} ${themeConfig.effects?.borderRadius || 'rounded-2xl'} border border-${themeConfig.colors?.surface || 'white'}/${themeConfig.effects?.borderOpacity || '60'} dark:border-gray-600/60 ${themeConfig.effects?.shadow || 'shadow-xl'} transition-colors duration-300`,
@@ -1113,32 +1113,35 @@ export default function App() {
             {/* Header Layout - Logo Left, Progress Center, Controls Right */}
             <div className="flex items-center justify-between">
               {/* Left - Logo */}
-              <div className="flex items-center" role="banner">
+              <div className="flex items-center justify-center" role="banner">
                 <motion.div
-                  className="flex items-center"
-                  whileHover={{
-                    scale: 1.02,
-                    y: -1
-                  }}
+                  className="relative flex items-center group"
+                  whileHover={{ scale: 1.02, y: -1 }}
                   transition={{ duration: 0.2 }}
                 >
-                  {/* Logo Image - Industry Standard */}
-                  <img
-                    src={isDarkMode ? themeConfig.logo?.darkSrc : themeConfig.logo?.src}
-                    alt={themeConfig.logo?.alt || "Application Logo"}
-                    className="h-8 sm:h-10 md:h-12 w-auto max-h-12 object-contain"
+                  {/* Cam Panel */}
+                  <div
+                    className="relative rounded-2xl bg-transparent border border-white/60 p-1"
                     style={{
-                      display: 'block',
-                      maxWidth: '120px',
-                      height: 'auto',
-                      background: "rgba(242, 242, 247, 0.10)",
-                      borderRadius: "16px",
-                      padding: "8px"
+                      filter: "drop-shadow(-8px - 10px 46px #000)"
                     }}
-                    aria-label={appConfig.theme?.ariaTexts?.logoLabel || "Application logo"}
-                  />
+                  >
+                    <img
+                      src={isDarkMode ? themeConfig.logo?.darkSrc : themeConfig.logo?.src}
+                      alt={themeConfig.logo?.alt || "Application Logo"}
+                      aria-label={appConfig.theme?.ariaTexts?.logoLabel || "Application logo"}
+                      className="relative z-10 h-8 sm:h-10 md:h-12 w-auto object-contain"
+                      style={{
+                        mixBlendMode: 'luminosity',
+                        // Opsiyonel: logo etrafına ekstra iç padding
+                        padding: '4px',
+                      }}
+                    />
+                  </div>
                 </motion.div>
               </div>
+
+
 
               {/* Center - Progress Bar */}
               <div className="flex-1 hidden md:block" role="progressbar" aria-label={appConfig.theme?.ariaTexts?.progressLabel || "Training progress"}>

@@ -618,29 +618,6 @@ export const IntroScene = React.memo(({
           } ${card?.borderColor || 'border-white/60 dark:border-gray-600/60'
           }`}
       >
-        {/* Enhanced Card Background Effects with Noise */}
-        <div className={`absolute inset-0 bg-gradient-to-br ${card?.gradientFrom || 'from-white/50'
-          } via-white/30 ${card?.gradientTo || 'to-white/20'
-          } dark:from-gray-800/30 dark:via-gray-800/20 dark:to-gray-800/10 rounded-2xl sm:rounded-3xl`}></div>
-        <div className={`absolute inset-0 bg-gradient-to-t ${card?.gradientFrom || 'from-blue-50/40'
-          } via-transparent ${card?.gradientTo || 'to-purple-50/30'
-          } dark:from-blue-900/10 dark:via-transparent dark:to-purple-900/8 rounded-2xl sm:rounded-3xl`}></div>
-
-        {/* Noise texture overlay */}
-        <div
-          className="absolute inset-0 opacity-10 dark:opacity-5 rounded-2xl sm:rounded-3xl mix-blend-overlay"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-            backgroundSize: '128px 128px'
-          }}
-        ></div>
-
-        {/* ENHANCED LIQUID GLASS BORDER EFFECTS */}
-        <div
-          className="absolute inset-0 rounded-2xl sm:rounded-3xl overflow-hidden"
-          style={cardStyles}
-        >
-        </div>
 
         <div className="relative z-10">
           <motion.h3
