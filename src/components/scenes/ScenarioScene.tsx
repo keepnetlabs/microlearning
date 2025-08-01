@@ -1,8 +1,9 @@
-import { useMemo, useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import * as LucideIcons from "lucide-react";
 import { LucideIcon } from "lucide-react";
 import { VideoPlayer } from "../VideoPlayer";
+import { FontWrapper } from "../common/FontWrapper";
 
 export interface TranscriptRow {
   start: number;
@@ -198,121 +199,123 @@ export function ScenarioScene({
   }, [config.icon?.component, config.icon?.sceneIconName, config.icon?.size, config.icon?.className]);
 
   return (
-    <main
-      className={config.containerClassName || defaultContainerClassName}
-      role="main"
-      aria-labelledby="scenario-scene-title"
-      aria-describedby="scenario-scene-description"
-      aria-label={config.ariaTexts?.mainLabel || "Scenario Scene"}
-    >
-      {/* Header Icon */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8, y: -20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="mb-2 sm:mb-3"
-        aria-hidden="true"
+    <FontWrapper>
+      <main
+        className={config.containerClassName || defaultContainerClassName}
+        role="main"
+        aria-labelledby="scenario-scene-title"
+        aria-describedby="scenario-scene-description"
+        aria-label={config.ariaTexts?.mainLabel || "Scenario Scene"}
       >
-        {iconComponent}
-      </motion.div>
+        {/* Header Icon */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8, y: -20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="mb-2 sm:mb-3"
+          aria-hidden="true"
+        >
+          {iconComponent}
+        </motion.div>
 
-      {/* Title */}
-      <motion.h1
-        id="scenario-scene-title"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
-        className="text-2xl mb-1 sm:mb-3 text-gray-900 dark:text-white text-center"
-      >
-        {config.title}
-      </motion.h1>
-
-      {/* Description */}
-      {config.description && (
-        <motion.p
-          id="scenario-scene-description"
+        {/* Title */}
+        <motion.h1
+          id="scenario-scene-title"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="text-sm text-gray-600 dark:text-gray-400 text-center mb-4"
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="text-2xl mb-1 sm:mb-3 text-[#1C1C1E] dark:text-white text-center"
         >
-          {config.description}
-        </motion.p>
-      )}
+          {config.title}
+        </motion.h1>
 
-      {/* Loading State */}
-      {isLoadingTranscript && (
+        {/* Description */}
+        {config.description && (
+          <motion.p
+            id="scenario-scene-description"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="text-sm text-gray-600 dark:text-white text-center mb-4"
+          >
+            {config.description}
+          </motion.p>
+        )}
+
+        {/* Loading State */}
+        {isLoadingTranscript && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-8"
+            role="status"
+            aria-live="polite"
+            aria-label={config.ariaTexts?.loadingLabel || "Loading transcript"}
+          >
+            <div className="inline-flex items-center space-x-2">
+              <div
+                className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"
+                aria-hidden="true"
+              ></div>
+              <span className="text-gray-600 dark:text-gray-400">
+                {config.texts?.transcriptLoading || "Transcript yükleniyor..."}
+              </span>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Error State */}
+        {transcriptError && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-8"
+            role="alert"
+            aria-live="assertive"
+            aria-label={config.ariaTexts?.errorLabel || "Transcript loading error"}
+          >
+            <div className="inline-flex items-center space-x-2 text-red-600 dark:text-red-400">
+              <span>⚠️ {transcriptError}</span>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Video Player */}
+        {!isLoadingTranscript && !transcriptError && (
+          <motion.section
+            initial={{ opacity: 0, y: 40, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className={config.videoContainerClassName || defaultVideoContainerClassName}
+            role="region"
+            aria-label={config.ariaTexts?.videoPlayerLabel || "Video Player"}
+          >
+            <VideoPlayer
+              src={config.video.src}
+              poster={config.video.poster || undefined}
+              disableForwardSeek={config.video.disableForwardSeek}
+              transcript={tactiqTranscript}
+              showTranscript={config.video.showTranscript}
+              transcriptTitle={config.video.transcriptTitle}
+              className="w-full"
+            />
+          </motion.section>
+        )}
+
+        {/* Mobile Hint */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="text-center py-8"
-          role="status"
-          aria-live="polite"
-          aria-label={config.ariaTexts?.loadingLabel || "Loading transcript"}
+          transition={{ delay: 1.2 }}
+          className={config.mobileHint?.className || "sm:hidden mt-2"}
+          role="note"
+          aria-label={config.ariaTexts?.mobileHintLabel || "Mobile user hint"}
         >
-          <div className="inline-flex items-center space-x-2">
-            <div
-              className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"
-              aria-hidden="true"
-            ></div>
-            <span className="text-gray-600 dark:text-gray-400">
-              {config.texts?.transcriptLoading || "Transcript yükleniyor..."}
-            </span>
-          </div>
+          <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+            {config.mobileHint?.text || "💡 Videoyu izleyip transkripti inceleyin"}
+          </p>
         </motion.div>
-      )}
-
-      {/* Error State */}
-      {transcriptError && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center py-8"
-          role="alert"
-          aria-live="assertive"
-          aria-label={config.ariaTexts?.errorLabel || "Transcript loading error"}
-        >
-          <div className="inline-flex items-center space-x-2 text-red-600 dark:text-red-400">
-            <span>⚠️ {transcriptError}</span>
-          </div>
-        </motion.div>
-      )}
-
-      {/* Video Player */}
-      {!isLoadingTranscript && !transcriptError && (
-        <motion.section
-          initial={{ opacity: 0, y: 40, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className={config.videoContainerClassName || defaultVideoContainerClassName}
-          role="region"
-          aria-label={config.ariaTexts?.videoPlayerLabel || "Video Player"}
-        >
-          <VideoPlayer
-            src={config.video.src}
-            poster={config.video.poster || undefined}
-            disableForwardSeek={config.video.disableForwardSeek}
-            transcript={tactiqTranscript}
-            showTranscript={config.video.showTranscript}
-            transcriptTitle={config.video.transcriptTitle}
-            className="w-full"
-          />
-        </motion.section>
-      )}
-
-      {/* Mobile Hint */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.2 }}
-        className={config.mobileHint?.className || "sm:hidden mt-2"}
-        role="note"
-        aria-label={config.ariaTexts?.mobileHintLabel || "Mobile user hint"}
-      >
-        <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-          {config.mobileHint?.text || "💡 Videoyu izleyip transkripti inceleyin"}
-        </p>
-      </motion.div>
-    </main>
+      </main>
+    </FontWrapper>
   );
 }

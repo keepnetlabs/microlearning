@@ -163,7 +163,7 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
   const finalConfig = { ...defaultConfig, ...config };
 
   return (
-    <div className="w-full font-['Open_Sans']" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label={`${finalConfig.ariaLabel}: %${Math.round(progress)} ${finalConfig.progressLabel}`}>
+    <div className="w-full" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label={`${finalConfig.ariaLabel}: %${Math.round(progress)} ${finalConfig.progressLabel}`}>
       {/* Mobile Progress Bar - Header Bottom Row */}
       <div className="md:hidden mt-2">
         <div className="flex items-center space-x-3">

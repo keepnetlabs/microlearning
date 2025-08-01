@@ -1,6 +1,7 @@
 import * as LucideIcons from "lucide-react";
 import { ReactNode, useMemo, memo } from "react";
 import { LucideIcon } from "lucide-react";
+import { FontWrapper } from "../common/FontWrapper";
 
 // İkon mapping fonksiyonu
 const getIconComponent = (iconName: string): LucideIcon => {
@@ -149,7 +150,6 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
       inset 0 1px 0 rgba(255, 255, 255, 0.9),
       inset 0 -1px 0 rgba(0, 0, 0, 0.06)
     `,
-    transform: 'translateZ(0)',
     willChange: 'transform'
   }), [glassEffect]);
 
@@ -266,7 +266,7 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
           <div className="flex flex-col items-start">
             <h3
               id={`goal-title-${index}`}
-              className="text-sm font-medium text-gray-900 dark:text-white transition-colors duration-300 ease-out group-hover:text-gray-800 dark:group-hover:text-gray-100"
+              className="text-sm font-medium text-[#1C1C1E] dark:text-white transition-colors duration-300 ease-out group-hover:text-gray-800 dark:group-hover:text-gray-100"
             >
               {goal.title}
             </h3>
@@ -346,37 +346,39 @@ export const GoalScene = memo(({
   );
 
   return (
-    <main
-      className={containerClassName}
-      role="main"
-      aria-labelledby="goal-scene-title"
-    >
-      <div className="mb-2 sm:mb-3 relative">
-        {iconComponent}
-      </div>
-
-      <h1
-        id="goal-scene-title"
-        className="text-2xl mb-3 sm:mb-5 text-gray-900 dark:text-white"
+    <FontWrapper>
+      <main
+        className={containerClassName}
+        role="main"
+        aria-labelledby="goal-scene-title"
       >
-        {title}
-      </h1>
+        <div className="mb-2 sm:mb-3 relative">
+          {iconComponent}
+        </div>
 
-      <section
-        className={containerClass}
-        role="region"
-        aria-label="Training Goals"
-      >
-        {memoizedGoals.map((goal, index) => (
-          <GoalCard
-            key={`${goal.title}-${index}`}
-            goal={goal}
-            index={index}
-            glassEffect={glassEffect}
-          />
-        ))}
-      </section>
-    </main>
+        <h1
+          id="goal-scene-title"
+          className="text-2xl mb-3 sm:mb-5 text-[#1C1C1E] dark:text-white"
+        >
+          {title}
+        </h1>
+
+        <section
+          className={containerClass}
+          role="region"
+          aria-label="Training Goals"
+        >
+          {memoizedGoals.map((goal, index) => (
+            <GoalCard
+              key={`${goal.title}-${index}`}
+              goal={goal}
+              index={index}
+              glassEffect={glassEffect}
+            />
+          ))}
+        </section>
+      </main>
+    </FontWrapper>
   );
 });
 

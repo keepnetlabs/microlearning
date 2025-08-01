@@ -44,7 +44,7 @@ const IconDemo = ({ name, Icon, description }: IconDemoProps) => {
 
       {/* Icon Info */}
       <div className="text-center mb-2">
-        <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{name}</h3>
+        <h3 className="font-semibold text-[#1C1C1E] dark:text-white mb-1">{name}</h3>
         <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">{description}</p>
       </div>
 
@@ -55,8 +55,8 @@ const IconDemo = ({ name, Icon, description }: IconDemoProps) => {
             key={stateOption}
             onClick={() => setState(stateOption as any)}
             className={`px-3 py-1 text-xs rounded-lg transition-all duration-200 ${state === stateOption
-                ? 'bg-blue-500 text-white shadow-sm'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+              ? 'bg-blue-500 text-white shadow-sm'
+              : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
               }`}
           >
             {stateOption.charAt(0).toUpperCase() + stateOption.slice(1)}
@@ -115,7 +115,7 @@ export const IconShowcase = () => {
     <div className="max-w-7xl mx-auto p-6">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+        <h1 className="text-3xl font-bold text-[#1C1C1E] dark:text-white mb-2">
           Cybersecurity Training Icon System
         </h1>
         <p className="text-lg text-gray-600 dark:text-gray-300 mb-4">
@@ -184,7 +184,7 @@ export const IconShowcase = () => {
             className="p-4 bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-xl border border-white/40 dark:border-gray-600/40 shadow-sm transition-colors duration-300"
           >
             <div className="text-2xl mb-2">{feature.icon}</div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{feature.title}</h3>
+            <h3 className="font-semibold text-[#1C1C1E] dark:text-white mb-1">{feature.title}</h3>
             <p className="text-sm text-gray-600 dark:text-gray-300">{feature.description}</p>
           </motion.div>
         ))}

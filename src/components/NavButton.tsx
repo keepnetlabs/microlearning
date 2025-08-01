@@ -21,7 +21,7 @@ export function NavButton({ direction, onClick, disabled, label, isDarkMode = fa
       onClick={onClick}
       disabled={disabled}
       className={`
-        relative flex items-center justify-center rounded-2xl font-['Open_Sans'] overflow-hidden
+        relative flex items-center justify-center rounded-2xl overflow-hidden
         transition-all duration-500 ease-out group
         focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:ring-offset-2 focus:ring-offset-transparent
         w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16

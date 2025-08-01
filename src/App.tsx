@@ -15,12 +15,14 @@ import { ChevronDown, Search, Loader2, ChevronDown as ChevronDownIcon, Star, X, 
 import ReactCountryFlag from "react-country-flag";
 import { getCountryCode, getSearchPlaceholder, detectBrowserLanguage, useIsMobile, priorityLanguages, languages } from "./utils/languageUtils";
 import { loadAppConfig, createConfigChangeEvent } from "./components/configs/appConfigLoader";
+import { useFontFamily } from "./hooks/useFontFamily";
+import { FontFamilyProvider } from "./contexts/FontFamilyContext";
 
 // Static CSS classes - Component dışında tanımlandı çünkü hiç değişmiyor
 const STATIC_CSS_CLASSES = {
   // Loading overlay
   loadingOverlay: "fixed inset-0 bg-white/50 dark:bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center transition-colors duration-300",
-  loadingText: "text-sm font-medium text-gray-900 dark:text-white",
+  loadingText: "text-sm font-medium text-[#1C1C1E] dark:text-white",
 
 
   // Background
@@ -44,7 +46,7 @@ const STATIC_CSS_CLASSES = {
 
   // Title
   titleContainer: "absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 max-w-[120px] sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg px-1 sm:px-2",
-  titleText: "text-[10px] sm:text-xs md:text-base lg:text-lg font-semibold text-gray-900 dark:text-white tracking-tight transition-colors duration-300 text-center truncate",
+  titleText: "text-[10px] sm:text-xs md:text-base lg:text-lg font-semibold text-[#1C1C1E] dark:text-white tracking-tight transition-colors duration-300 text-center truncate",
 
   // Controls
   controlsContainer: "flex items-center space-x-1.5 md:space-x-3 flex-shrink-0 z-20",
@@ -64,10 +66,10 @@ const STATIC_CSS_CLASSES = {
   languageChevron: "w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4 text-gray-500 dark:text-white transition-colors duration-300",
 
   // Language dropdown
-  languageSearch: "w-full px-3 py-2 text-sm bg-transparent border-0 focus:outline-none focus:ring-0 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400",
+  languageSearch: "w-full px-3 py-2 text-sm bg-transparent border-0 focus:outline-none focus:ring-0 text-[#1C1C1E] dark:text-white placeholder-gray-500 dark:placeholder-gray-400",
   languageList: "max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent",
   languageItem: "flex items-center space-x-2 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 cursor-pointer",
-  languageItemText: "text-sm text-gray-900 dark:text-white",
+  languageItemText: "text-sm text-[#1C1C1E] dark:text-white",
   languageItemFlag: "w-4 h-4 rounded-sm",
 
   // Content area
@@ -218,12 +220,15 @@ export default function App() {
     setThemeConfig(appConfig.theme);
   }, [appConfig]);
 
+  // Font family configuration
+  const fontStyles = useFontFamily(themeConfig.fontFamily);
+
 
 
   // Dynamic CSS classes - Sadece themeConfig değiştiğinde yeniden hesaplanır
   const dynamicCssClasses = useMemo(() => ({
     // Ana container
-    mainContainer: `min-h-screen bg-gradient-to-br from-${themeConfig.colors?.background || 'slate'}-100/90 via-${themeConfig.colors?.primary || 'blue'}-50/60 to-${themeConfig.colors?.secondary || 'indigo'}-100/75 dark:from-gray-800 dark:via-gray-850 dark:to-gray-900 flex flex-col relative overflow-hidden font-['Open_Sans'] transition-colors duration-300`,
+    mainContainer: `min-h-screen bg-gradient-to-br from-${themeConfig.colors?.background || 'slate'}-100/90 via-${themeConfig.colors?.primary || 'blue'}-50/60 to-${themeConfig.colors?.secondary || 'indigo'}-100/75 dark:from-gray-800 dark:via-gray-850 dark:to-gray-900 flex flex-col relative overflow-hidden transition-colors duration-300`,
 
     // Loading container
     loadingContainer: `flex items-center space-x-3 px-6 py-4 bg-${themeConfig.colors?.surface || 'white'}/90 dark:bg-gray-900/90 ${themeConfig.effects?.backdropBlur || 'backdrop-blur-xl'} ${themeConfig.effects?.borderRadius || 'rounded-2xl'} border border-${themeConfig.colors?.surface || 'white'}/${themeConfig.effects?.borderOpacity || '60'} dark:border-gray-600/60 ${themeConfig.effects?.shadow || 'shadow-xl'} transition-colors duration-300`,
@@ -1010,400 +1015,478 @@ export default function App() {
   }), [isMobile]);
 
   return (
-    <div
-      className={cssClasses.mainContainer}
-      style={{
-        // Hardware acceleration for better mobile performance
-        transform: 'translateZ(0)',
-        willChange: 'transform'
-      }}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      role="application"
-      aria-label={appConfig.theme?.ariaTexts?.appLabel || "Cyber Security Training Application"}
-      aria-describedby="app-description"
-    >
-      {/* Hidden description for screen readers */}
-      <div id="app-description" className="sr-only">
-        {appConfig.theme?.ariaTexts?.appDescription || "Interactive cyber security training application with multiple learning modules and progress tracking"}
-      </div>
-      {/* Loading Overlay - Only show on desktop */}
-      <AnimatePresence>
-        {isLoading && !isMobile && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className={cssClasses.loadingOverlay}
-            role="status"
-            aria-live="polite"
-            aria-label={appConfig.theme?.ariaTexts?.loadingLabel || "Loading content"}
-          >
-            <div className={cssClasses.loadingContainer}>
-              <Loader2 size={20} className={cssClasses.loadingSpinner} aria-hidden="true" />
-              <span className={cssClasses.loadingText}>
-                {themeConfig.texts?.loading}
-              </span>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ENHANCED BACKGROUND - More depth and contrast for glass cards */}
-      <motion.div
-        className={cssClasses.backgroundContainer}
+    <FontFamilyProvider fontFamilyConfig={themeConfig.fontFamily}>
+      <div
+        className={cssClasses.mainContainer}
         style={{
-          // Background moves at slower speed when scrolling - creating proper parallax
-          transform: `translateY(${scrollY * 0.3}px)`,
-          transition: 'transform 0.1s ease-out'
+          // Hardware acceleration for better mobile performance
+          transform: 'translateZ(0)',
+          willChange: 'transform',
+          ...fontStyles.primary
         }}
-        aria-hidden="true"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        role="application"
+        aria-label={appConfig.theme?.ariaTexts?.appLabel || "Cyber Security Training Application"}
+        aria-describedby="app-description"
       >
-        {!isMobile && (
-          <>
-            {/* Deep layered background elements - Enhanced with more depth */}
+        {/* Hidden description for screen readers */}
+        <div id="app-description" className="sr-only">
+          {appConfig.theme?.ariaTexts?.appDescription || "Interactive cyber security training application with multiple learning modules and progress tracking"}
+        </div>
+        {/* Loading Overlay - Only show on desktop */}
+        <AnimatePresence>
+          {isLoading && !isMobile && (
             <motion.div
-              className={cssClasses.backgroundGradient1}
-              style={{
-                animationDuration: '12s',
-                transform: `translateY(${scrollY * 0.4}px) translateX(${scrollY * 0.1}px)` // Different parallax speed
-              }}
-              aria-hidden="true"
-            />
-
-            <motion.div
-              className={cssClasses.backgroundGradient2}
-              style={{
-                animationDuration: '16s',
-                animationDelay: '3s',
-                transform: `translateY(${scrollY * -0.2}px) translateX(${scrollY * -0.05}px)` // Opposite direction
-              }}
-              aria-hidden="true"
-            />
-
-            {/* Additional depth layers - Enhanced contrast */}
-            <motion.div
-              className={cssClasses.backgroundGradient3}
-              style={{
-                transform: `translateY(${scrollY * 0.5}px) translateX(${scrollY * 0.08}px) scale(${1 + scrollY * 0.0002})`
-              }}
-              aria-hidden="true"
-            />
-
-            <motion.div
-              className={cssClasses.backgroundGradient4}
-              style={{
-                transform: `translateY(${scrollY * -0.25}px) translateX(${scrollY * -0.04}px) scale(${1 + scrollY * 0.0001})`
-              }}
-              aria-hidden="true"
-            />
-
-            {/* Enhanced floating ambient particles */}
-            <motion.div
-              className="absolute top-1/2 left-1/2 w-6 h-6 bg-blue-200/15 dark:bg-blue-700/10 rounded-full blur-sm"
-              style={{
-                transform: `translateY(${scrollY * 0.6}px) translateX(${Math.sin(scrollY * 0.01) * 20}px)`
-              }}
-              aria-hidden="true"
-            />
-
-            <motion.div
-              className="absolute top-2/3 right-1/3 w-4 h-4 bg-purple-200/12 dark:bg-purple-700/8 rounded-full blur-sm"
-              style={{
-                transform: `translateY(${scrollY * -0.35}px) translateX(${Math.cos(scrollY * 0.008) * 15}px)`
-              }}
-              aria-hidden="true"
-            />
-
-            {/* Additional background texture layers for more depth */}
-            <motion.div
-              className="absolute top-1/4 left-1/6 w-24 h-24 bg-gradient-radial from-indigo-100/20 to-transparent dark:from-indigo-900/12 dark:to-transparent rounded-full blur-xl"
-              style={{
-                transform: `translateY(${scrollY * 0.35}px) translateX(${scrollY * 0.06}px) rotate(${scrollY * 0.05}deg)`
-              }}
-              aria-hidden="true"
-            />
-
-            <motion.div
-              className="absolute bottom-1/6 right-1/6 w-18 h-18 bg-gradient-radial from-violet-100/18 to-transparent dark:from-violet-900/10 dark:to-transparent rounded-full blur-lg"
-              style={{
-                transform: `translateY(${scrollY * -0.4}px) translateX(${scrollY * -0.07}px) rotate(${scrollY * -0.03}deg)`
-              }}
-              aria-hidden="true"
-            />
-          </>
-        )}
-      </motion.div>
-
-      {/* Optimized Mobile Header - Enhanced dark mode contrast */}
-      <header
-        className={`${cssClasses.headerContainer} ${isIOS && currentScene === 4 ? 'pt-2' : ''}`}
-        role="banner"
-        aria-label={appConfig.theme?.ariaTexts?.headerLabel || "Application header"}
-      >
-        <div className={cssClasses.headerBackground} aria-hidden="true"></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-50/30 via-transparent to-purple-50/20 dark:from-blue-900/10 dark:via-transparent dark:to-purple-900/8 transition-colors duration-300" aria-hidden="true"></div>
-        <div className={cssClasses.headerBorder} aria-hidden="true"></div>
-
-        <div className={cssClasses.headerContent}>
-          {/* Header Layout - Logo Left, Progress Center, Controls Right */}
-          <div className="flex items-center justify-between">
-            {/* Left - Logo */}
-            <div className="flex items-center" role="banner">
-              <motion.div
-                className="flex items-center"
-                whileHover={{
-                  scale: 1.02,
-                  y: -1
-                }}
-                transition={{ duration: 0.2 }}
-              >
-                {/* Logo Image - Industry Standard */}
-                <img
-                  src={isDarkMode ? themeConfig.logo?.darkSrc : themeConfig.logo?.src}
-                  alt={themeConfig.logo?.alt || "Application Logo"}
-                  className="h-8 sm:h-10 md:h-12 w-auto max-h-12 object-contain"
-                  style={{
-                    display: 'block',
-                    maxWidth: '120px',
-                    height: 'auto'
-                  }}
-                  aria-label={appConfig.theme?.ariaTexts?.logoLabel || "Application logo"}
-                />
-              </motion.div>
-            </div>
-
-            {/* Center - Progress Bar */}
-            <div className="flex-1 hidden md:block" role="progressbar" aria-label={appConfig.theme?.ariaTexts?.progressLabel || "Training progress"}>
-              <div className="relative">
-                <MemoizedProgressBar
-                  currentScene={currentScene + 1}
-                  totalScenes={scenes.length}
-                  language={selectedLanguage}
-                  config={progressBarConfig}
-                />
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className={cssClasses.loadingOverlay}
+              role="status"
+              aria-live="polite"
+              aria-label={appConfig.theme?.ariaTexts?.loadingLabel || "Loading content"}
+            >
+              <div className={cssClasses.loadingContainer}>
+                <Loader2 size={20} className={cssClasses.loadingSpinner} aria-hidden="true" />
+                <span className={cssClasses.loadingText}>
+                  {themeConfig.texts?.loading}
+                </span>
               </div>
-            </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-            {/* Right - Controls */}
-            <div className={cssClasses.controlsContainer}>
-              {/* ENHANCED LIQUID GLASS POINTS BADGE - Mobile Optimized */}
+        {/* ENHANCED BACKGROUND - More depth and contrast for glass cards */}
+        <motion.div
+          className={cssClasses.backgroundContainer}
+          style={{
+            // Background moves at slower speed when scrolling - creating proper parallax
+            transform: `translateY(${scrollY * 0.3}px)`,
+            transition: 'transform 0.1s ease-out'
+          }}
+          aria-hidden="true"
+        >
+          {!isMobile && (
+            <>
+              {/* Deep layered background elements - Enhanced with more depth */}
               <motion.div
-                className={cssClasses.pointsBadge}
-                whileHover={{
-                  scale: 1.02,
-                  y: -1
+                className={cssClasses.backgroundGradient1}
+                style={{
+                  animationDuration: '12s',
+                  transform: `translateY(${scrollY * 0.4}px) translateX(${scrollY * 0.1}px)` // Different parallax speed
                 }}
-                role="status"
-                aria-label={appConfig.theme?.ariaTexts?.pointsLabel || "Total points earned"}
-                aria-live="polite"
-              >
-                {/* Badge Content */}
-                <div className="relative z-10 flex items-center space-x-1 sm:space-x-1.5 md:space-x-1.5">
-                  <Award size={isMobile ? 16 : 20} className="text-[#F59E0B] dark:text-[#F59E0B] sm:w-4 sm:h-4 md:w-5 md:h-5 transition-colors duration-300" aria-hidden="true" />
-                  <span className={cssClasses.pointsText} aria-label={`${totalPoints} ${appConfig.theme?.ariaTexts?.pointsDescription || "points earned"}`}>
-                    {totalPoints}
-                  </span>
-                </div>
-              </motion.div>
+                aria-hidden="true"
+              />
 
-              {/* ENHANCED LIQUID GLASS THEME TOGGLE BUTTON - Mobile Optimized */}
-              <motion.button
-                onClick={toggleTheme}
-                className={cssClasses.themeButton}
-                whileHover={{
-                  scale: 1.05,
-                  y: -2
+              <motion.div
+                className={cssClasses.backgroundGradient2}
+                style={{
+                  animationDuration: '16s',
+                  animationDelay: '3s',
+                  transform: `translateY(${scrollY * -0.2}px) translateX(${scrollY * -0.05}px)` // Opposite direction
                 }}
-                whileTap={{ scale: 0.95 }}
-                aria-label={isDarkMode ? themeConfig.texts?.toggleButtonLightMode : themeConfig.texts?.toggleButtonDarkMode}
-                title={isDarkMode ? themeConfig.texts?.toggleButtonLightMode : themeConfig.texts?.toggleButtonDarkMode}
-                aria-checked={isDarkMode}
-                role="switch"
-                aria-describedby="theme-toggle-description"
-              >
+                aria-hidden="true"
+              />
 
+              {/* Additional depth layers - Enhanced contrast */}
+              <motion.div
+                className={cssClasses.backgroundGradient3}
+                style={{
+                  transform: `translateY(${scrollY * 0.5}px) translateX(${scrollY * 0.08}px) scale(${1 + scrollY * 0.0002})`
+                }}
+                aria-hidden="true"
+              />
 
-                {/* Hover glow effect */}
+              <motion.div
+                className={cssClasses.backgroundGradient4}
+                style={{
+                  transform: `translateY(${scrollY * -0.25}px) translateX(${scrollY * -0.04}px) scale(${1 + scrollY * 0.0001})`
+                }}
+                aria-hidden="true"
+              />
+
+              {/* Enhanced floating ambient particles */}
+              <motion.div
+                className="absolute top-1/2 left-1/2 w-6 h-6 bg-blue-200/15 dark:bg-blue-700/10 rounded-full blur-sm"
+                style={{
+                  transform: `translateY(${scrollY * 0.6}px) translateX(${Math.sin(scrollY * 0.01) * 20}px)`
+                }}
+                aria-hidden="true"
+              />
+
+              <motion.div
+                className="absolute top-2/3 right-1/3 w-4 h-4 bg-purple-200/12 dark:bg-purple-700/8 rounded-full blur-sm"
+                style={{
+                  transform: `translateY(${scrollY * -0.35}px) translateX(${Math.cos(scrollY * 0.008) * 15}px)`
+                }}
+                aria-hidden="true"
+              />
+
+              {/* Additional background texture layers for more depth */}
+              <motion.div
+                className="absolute top-1/4 left-1/6 w-24 h-24 bg-gradient-radial from-indigo-100/20 to-transparent dark:from-indigo-900/12 dark:to-transparent rounded-full blur-xl"
+                style={{
+                  transform: `translateY(${scrollY * 0.35}px) translateX(${scrollY * 0.06}px) rotate(${scrollY * 0.05}deg)`
+                }}
+                aria-hidden="true"
+              />
+
+              <motion.div
+                className="absolute bottom-1/6 right-1/6 w-18 h-18 bg-gradient-radial from-violet-100/18 to-transparent dark:from-violet-900/10 dark:to-transparent rounded-full blur-lg"
+                style={{
+                  transform: `translateY(${scrollY * -0.4}px) translateX(${scrollY * -0.07}px) rotate(${scrollY * -0.03}deg)`
+                }}
+                aria-hidden="true"
+              />
+            </>
+          )}
+        </motion.div>
+
+        {/* Optimized Mobile Header - Enhanced dark mode contrast */}
+        <header
+          className={`${cssClasses.headerContainer} ${isIOS && currentScene === 4 ? 'pt-2' : ''}`}
+          role="banner"
+          aria-label={appConfig.theme?.ariaTexts?.headerLabel || "Application header"}
+        >
+          <div className={cssClasses.headerBackground} aria-hidden="true"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-50/30 via-transparent to-purple-50/20 dark:from-blue-900/10 dark:via-transparent dark:to-purple-900/8 transition-colors duration-300" aria-hidden="true"></div>
+          <div className={cssClasses.headerBorder} aria-hidden="true"></div>
+
+          <div className={cssClasses.headerContent}>
+            {/* Header Layout - Logo Left, Progress Center, Controls Right */}
+            <div className="flex items-center justify-between">
+              {/* Left - Logo */}
+              <div className="flex items-center" role="banner">
                 <motion.div
-                  className="absolute inset-0 rounded-lg sm:rounded-xl opacity-0 pointer-events-none"
-                  style={{
-                    background: `linear-gradient(135deg, 
-                      rgba(59, 130, 246, 0.20) 0%, 
-                      rgba(99, 102, 241, 0.15) 50%, 
-                      rgba(139, 92, 246, 0.12) 100%
-                    )`
-                  }}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
-                />
-
-                {/* Icon Container */}
-                <div className="relative z-10">
-                  <AnimatePresence mode="wait">
-                    {isDarkMode ? (
-                      <motion.div
-                        key="light"
-                        initial={{ scale: 0, rotate: -90 }}
-                        animate={{ scale: 1, rotate: 0 }}
-                        exit={{ scale: 0, rotate: 90 }}
-                        transition={{ duration: 0.3, ease: "easeOut" }}
-                      >
-                        <Sun
-                          size={40}
-                          className="text-yellow-600 group-hover:text-yellow-700 dark:text-white dark:group-hover:text-white transition-colors duration-300 w-5 h-5 sm:w-6 sm:h-6"
-                          aria-hidden="true"
-                        />
-                      </motion.div>
-                    ) : (
-                      <motion.div
-                        key="dark"
-                        initial={{ scale: 0, rotate: 90 }}
-                        animate={{ scale: 1, rotate: 0 }}
-                        exit={{ scale: 0, rotate: -90 }}
-                        transition={{ duration: 0.3, ease: "easeOut" }}
-                      >
-                        <Moon
-                          size={40}
-                          className="text-[#8E8E93] dark:text-[#8E8E93] transition-colors duration-300 w-5 h-5 sm:w-6 sm:h-6"
-                          aria-hidden="true"
-                        />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-                {/* Hidden description for screen readers */}
-                <div id="theme-toggle-description" className="sr-only">
-                  {appConfig.theme?.ariaTexts?.themeToggleDescription || "Toggle between light and dark theme"}
-                </div>
-              </motion.button>
-
-              {/* ENHANCED LIQUID GLASS LANGUAGE SELECTOR - Mobile Optimized */}
-              <div className="relative" ref={dropdownRef} role="combobox" aria-haspopup="listbox" aria-expanded={isLanguageDropdownOpen} aria-controls="language-dropdown-list">
-                <motion.button
-                  onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
-                  className={cssClasses.languageButton}
+                  className="flex items-center"
                   whileHover={{
                     scale: 1.02,
                     y: -1
                   }}
-                  whileTap={{ scale: 0.98 }}
-                  aria-label={appConfig.theme?.ariaTexts?.languageSelectorLabel || "Language selector"}
-                  aria-expanded={isLanguageDropdownOpen}
-                  aria-describedby="language-selector-description"
-                  style={{
-                    transform: 'translateZ(0)',
-                    willChange: 'transform',
-                    touchAction: 'manipulation'
+                  transition={{ duration: 0.2 }}
+                >
+                  {/* Logo Image - Industry Standard */}
+                  <img
+                    src={isDarkMode ? themeConfig.logo?.darkSrc : themeConfig.logo?.src}
+                    alt={themeConfig.logo?.alt || "Application Logo"}
+                    className="h-8 sm:h-10 md:h-12 w-auto max-h-12 object-contain"
+                    style={{
+                      display: 'block',
+                      maxWidth: '120px',
+                      height: 'auto'
+                    }}
+                    aria-label={appConfig.theme?.ariaTexts?.logoLabel || "Application logo"}
+                  />
+                </motion.div>
+              </div>
+
+              {/* Center - Progress Bar */}
+              <div className="flex-1 hidden md:block" role="progressbar" aria-label={appConfig.theme?.ariaTexts?.progressLabel || "Training progress"}>
+                <div className="relative">
+                  <MemoizedProgressBar
+                    currentScene={currentScene + 1}
+                    totalScenes={scenes.length}
+                    language={selectedLanguage}
+                    config={progressBarConfig}
+                  />
+                </div>
+              </div>
+
+              {/* Right - Controls */}
+              <div className={cssClasses.controlsContainer}>
+                {/* ENHANCED LIQUID GLASS POINTS BADGE - Mobile Optimized */}
+                <motion.div
+                  className={cssClasses.pointsBadge}
+                  whileHover={{
+                    scale: 1.02,
+                    y: -1
                   }}
+                  role="status"
+                  aria-label={appConfig.theme?.ariaTexts?.pointsLabel || "Total points earned"}
+                  aria-live="polite"
+                >
+                  {/* Badge Content */}
+                  <div className="relative z-10 flex items-center space-x-1 sm:space-x-1.5 md:space-x-1.5">
+                    <Award size={isMobile ? 16 : 20} className="text-[#F59E0B] dark:text-[#F59E0B] sm:w-4 sm:h-4 md:w-5 md:h-5 transition-colors duration-300" aria-hidden="true" />
+                    <span className={cssClasses.pointsText} aria-label={`${totalPoints} ${appConfig.theme?.ariaTexts?.pointsDescription || "points earned"}`}>
+                      {totalPoints}
+                    </span>
+                  </div>
+                </motion.div>
+
+                {/* ENHANCED LIQUID GLASS THEME TOGGLE BUTTON - Mobile Optimized */}
+                <motion.button
+                  onClick={toggleTheme}
+                  className={cssClasses.themeButton}
+                  whileHover={{
+                    scale: 1.05,
+                    y: -2
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                  aria-label={isDarkMode ? themeConfig.texts?.toggleButtonLightMode : themeConfig.texts?.toggleButtonDarkMode}
+                  title={isDarkMode ? themeConfig.texts?.toggleButtonLightMode : themeConfig.texts?.toggleButtonDarkMode}
+                  aria-checked={isDarkMode}
+                  role="switch"
+                  aria-describedby="theme-toggle-description"
                 >
 
-                  {/* Content */}
-                  <div className="relative z-10 flex items-center space-x-0.5 sm:space-x-1 md:space-x-2">
-                    <ReactCountryFlag
-                      countryCode={getCountryCode(currentLanguage?.code || 'tr')}
-                      svg
-                      style={{ fontSize: isMobile ? '1rem' : '1.2rem' }}
-                      aria-hidden="true"
-                    />
-                    <span className="text-xs text-gray-800 dark:text-gray-200 font-medium transition-colors duration-300">
-                      {getCountryCode(currentLanguage?.code || 'tr')}
-                    </span>
-                    <ChevronDown
-                      size={8}
-                      className={`${cssClasses.languageChevron} hidden sm:block`}
-                      style={{ transform: isLanguageDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
-                      aria-hidden="true"
-                    />
+
+                  {/* Hover glow effect */}
+                  <motion.div
+                    className="absolute inset-0 rounded-lg sm:rounded-xl opacity-0 pointer-events-none"
+                    style={{
+                      background: `linear-gradient(135deg, 
+                      rgba(59, 130, 246, 0.20) 0%, 
+                      rgba(99, 102, 241, 0.15) 50%, 
+                      rgba(139, 92, 246, 0.12) 100%
+                    )`
+                    }}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
+                  />
+
+                  {/* Icon Container */}
+                  <div className="relative z-10">
+                    <AnimatePresence mode="wait">
+                      {isDarkMode ? (
+                        <motion.div
+                          key="light"
+                          initial={{ scale: 0, rotate: -90 }}
+                          animate={{ scale: 1, rotate: 0 }}
+                          exit={{ scale: 0, rotate: 90 }}
+                          transition={{ duration: 0.3, ease: "easeOut" }}
+                        >
+                          <Sun
+                            size={40}
+                            className="text-yellow-600 group-hover:text-yellow-700 dark:text-white dark:group-hover:text-white transition-colors duration-300 w-5 h-5 sm:w-6 sm:h-6"
+                            aria-hidden="true"
+                          />
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          key="dark"
+                          initial={{ scale: 0, rotate: 90 }}
+                          animate={{ scale: 1, rotate: 0 }}
+                          exit={{ scale: 0, rotate: -90 }}
+                          transition={{ duration: 0.3, ease: "easeOut" }}
+                        >
+                          <Moon
+                            size={40}
+                            className="text-[#8E8E93] dark:text-[#8E8E93] transition-colors duration-300 w-5 h-5 sm:w-6 sm:h-6"
+                            aria-hidden="true"
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                   {/* Hidden description for screen readers */}
-                  <div id="language-selector-description" className="sr-only">
-                    {appConfig.theme?.ariaTexts?.languageSelectorDescription || "Select your preferred language for the application"}
+                  <div id="theme-toggle-description" className="sr-only">
+                    {appConfig.theme?.ariaTexts?.themeToggleDescription || "Toggle between light and dark theme"}
                   </div>
                 </motion.button>
 
-                {/* Enhanced Language Dropdown */}
-                <AnimatePresence>
-                  {isLanguageDropdownOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.95, y: -8 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.95, y: -8 }}
-                      transition={{ duration: 0.2, ease: "easeOut" }}
-                      className={`absolute top-full right-0 mt-2 w-64 sm:w-72 bg-white/95 border border-white/50 dark:border-gray-600/60 rounded-2xl shadow-2xl shadow-black/10 dark:shadow-black/30 z-50 overflow-hidden transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-3xl'}`}
-                      style={{
-                        background: isDarkMode
-                          ? 'linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.06) 100%)'
-                          : undefined
-                      }}
-                      role="listbox"
-                      id="language-dropdown-list"
-                      aria-label={appConfig.theme?.ariaTexts?.languageListLabel || "Language Selector"}
-                      aria-describedby="language-list-description"
-                    >
-                      {/* Enhanced Search Input */}
-                      <div className="relative p-2.5 border-b border-gray-200/50 dark:border-gray-600/50 transition-colors duration-300">
-                        <div className="relative">
-                          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 pointer-events-none z-10">
-                            <Search size={12} />
-                          </span>
-                          <input
-                            ref={searchInputRef}
-                            type="text"
-                            placeholder={getSearchPlaceholder(currentLanguage?.code || 'tr')}
-                            value={languageSearchTerm}
-                            onChange={(e) => setLanguageSearchTerm(e.target.value)}
-                            className={`w-full pl-6 pr-3 py-1.5 text-xs bg-white/60 dark:bg-white border border-white/40 dark:border-blue-500/60 rounded-lg  placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-xl'}`}
-                            aria-label={getSearchPlaceholder(currentLanguage?.code || 'tr')}
-                            aria-describedby="language-search-description"
-                            role="searchbox"
-                          />
-                          {/* Hidden description for search input */}
-                          <div id="language-search-description" className="sr-only">
-                            {appConfig.theme?.ariaTexts?.languageSearchDescription || "Search for languages by name or country code"}
-                          </div>
-                        </div>
-                      </div>
+                {/* ENHANCED LIQUID GLASS LANGUAGE SELECTOR - Mobile Optimized */}
+                <div className="relative" ref={dropdownRef} role="combobox" aria-haspopup="listbox" aria-expanded={isLanguageDropdownOpen} aria-controls="language-dropdown-list">
+                  <motion.button
+                    onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
+                    className={cssClasses.languageButton}
+                    whileHover={{
+                      scale: 1.02,
+                      y: -1
+                    }}
+                    whileTap={{ scale: 0.98 }}
+                    aria-label={appConfig.theme?.ariaTexts?.languageSelectorLabel || "Language selector"}
+                    aria-expanded={isLanguageDropdownOpen}
+                    aria-describedby="language-selector-description"
+                    style={{
+                      transform: 'translateZ(0)',
+                      willChange: 'transform',
+                      touchAction: 'manipulation'
+                    }}
+                  >
 
-                      {/* Enhanced Language List */}
-                      <div
-                        className={cssClasses.languageList}
+                    {/* Content */}
+                    <div className="relative z-10 flex items-center space-x-0.5 sm:space-x-1 md:space-x-2">
+                      <ReactCountryFlag
+                        countryCode={getCountryCode(currentLanguage?.code || 'tr')}
+                        svg
+                        style={{ fontSize: isMobile ? '1rem' : '1.2rem' }}
+                        aria-hidden="true"
+                      />
+                      <span className="text-xs text-gray-800 dark:text-gray-200 font-medium transition-colors duration-300">
+                        {getCountryCode(currentLanguage?.code || 'tr')}
+                      </span>
+                      <ChevronDown
+                        size={8}
+                        className={`${cssClasses.languageChevron} hidden sm:block`}
+                        style={{ transform: isLanguageDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                        aria-hidden="true"
+                      />
+                    </div>
+                    {/* Hidden description for screen readers */}
+                    <div id="language-selector-description" className="sr-only">
+                      {appConfig.theme?.ariaTexts?.languageSelectorDescription || "Select your preferred language for the application"}
+                    </div>
+                  </motion.button>
+
+                  {/* Enhanced Language Dropdown */}
+                  <AnimatePresence>
+                    {isLanguageDropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.95, y: -8 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: -8 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className={`absolute top-full right-0 mt-2 w-64 sm:w-72 bg-white/95 border border-white/50 dark:border-gray-600/60 rounded-2xl shadow-2xl shadow-black/10 dark:shadow-black/30 z-50 overflow-hidden transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-3xl'}`}
                         style={{
-                          WebkitOverflowScrolling: 'touch',
-                          touchAction: 'pan-y'
+                          background: isDarkMode
+                            ? 'linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.06) 100%)'
+                            : undefined
                         }}
                         role="listbox"
-                        aria-label="Available languages"
+                        id="language-dropdown-list"
+                        aria-label={appConfig.theme?.ariaTexts?.languageListLabel || "Language Selector"}
+                        aria-describedby="language-list-description"
                       >
-                        {/* Hidden description for screen readers */}
-                        <div id="language-list-description" className="sr-only">
-                          {appConfig.theme?.ariaTexts?.languageListDescription || "List of available languages for the application"}
-                        </div>
-                        {filteredLanguages.length === 0 ? (
-                          <div className="px-3 py-2 text-xs text-gray-600 dark:text-gray-300 text-center transition-colors duration-300">
-                            {themeConfig.texts?.languageNotFound}
+                        {/* Enhanced Search Input */}
+                        <div className="relative p-2.5 border-b border-gray-200/50 dark:border-gray-600/50 transition-colors duration-300">
+                          <div className="relative">
+                            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 pointer-events-none z-10">
+                              <Search size={12} />
+                            </span>
+                            <input
+                              ref={searchInputRef}
+                              type="text"
+                              placeholder={getSearchPlaceholder(currentLanguage?.code || 'tr')}
+                              value={languageSearchTerm}
+                              onChange={(e) => setLanguageSearchTerm(e.target.value)}
+                              className={`w-full pl-6 pr-3 py-1.5 text-xs bg-white/60 dark:bg-white border border-white/40 dark:border-blue-500/60 rounded-lg  placeholder-gray-500 dark:placeholder-gray-400 text-[#1C1C1E] dark:text-white transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-xl'}`}
+                              aria-label={getSearchPlaceholder(currentLanguage?.code || 'tr')}
+                              aria-describedby="language-search-description"
+                              role="searchbox"
+                            />
+                            {/* Hidden description for search input */}
+                            <div id="language-search-description" className="sr-only">
+                              {appConfig.theme?.ariaTexts?.languageSearchDescription || "Search for languages by name or country code"}
+                            </div>
                           </div>
-                        ) : (
-                          <>
-                            {/* Priority Languages Section */}
-                            {priorityLangs.length > 0 && !languageSearchTerm && (
-                              <>
-                                <div className="px-3 py-1.5 text-xs font-medium text-[#3B82F6] dark:text-white bg-gray-50/50 dark:bg-gray-800/40 border-b border-gray-200/50 dark:border-gray-700/50 flex items-center transition-colors duration-300">
-                                  <Star size={10} className="mr-1.5" aria-hidden="true" />
-                                  {themeConfig.texts?.popularLanguages}
-                                </div>
-                                {priorityLangs.map((language, index) => (
+                        </div>
+
+                        {/* Enhanced Language List */}
+                        <div
+                          className={cssClasses.languageList}
+                          style={{
+                            WebkitOverflowScrolling: 'touch',
+                            touchAction: 'pan-y'
+                          }}
+                          role="listbox"
+                          aria-label="Available languages"
+                        >
+                          {/* Hidden description for screen readers */}
+                          <div id="language-list-description" className="sr-only">
+                            {appConfig.theme?.ariaTexts?.languageListDescription || "List of available languages for the application"}
+                          </div>
+                          {filteredLanguages.length === 0 ? (
+                            <div className="px-3 py-2 text-xs text-gray-600 dark:text-gray-300 text-center transition-colors duration-300">
+                              {themeConfig.texts?.languageNotFound}
+                            </div>
+                          ) : (
+                            <>
+                              {/* Priority Languages Section */}
+                              {priorityLangs.length > 0 && !languageSearchTerm && (
+                                <>
+                                  <div className="px-3 py-1.5 text-xs font-medium text-[#3B82F6] dark:text-white bg-gray-50/50 dark:bg-gray-800/40 border-b border-gray-200/50 dark:border-gray-700/50 flex items-center transition-colors duration-300">
+                                    <Star size={10} className="mr-1.5" aria-hidden="true" />
+                                    {themeConfig.texts?.popularLanguages}
+                                  </div>
+                                  {priorityLangs.map((language, index) => (
+                                    <motion.button
+                                      key={`priority-${language.code}`}
+                                      initial={{ opacity: 0, x: -8 }}
+                                      animate={{ opacity: 1, x: 0 }}
+                                      transition={{ delay: index * 0.02 }}
+                                      onClick={() => {
+                                        handleLanguageChange(language.code);
+                                        setIsLanguageDropdownOpen(false);
+                                        setLanguageSearchTerm('');
+                                      }}
+                                      className={`relative z-10 w-full flex items-center space-x-2.5 px-3 py-3 text-left hover:bg-[#3b82f633] dark:hover:bg-gray-700/40 active:bg-gray-200/50 dark:active:bg-gray-600/60 transition-all duration-200 focus:outline-none focus:bg-gray-100/50 dark:focus:bg-gray-700/40 ${selectedLanguage === language.code ? 'bg-gray-100/60 dark:bg-gray-700/50' : ''
+                                        }`}
+                                      style={{ touchAction: 'manipulation' }}
+                                      role="option"
+                                      aria-selected={selectedLanguage === language.code}
+                                    >
+                                      <ReactCountryFlag
+                                        countryCode={getCountryCode(language.code)}
+                                        svg
+                                        style={{ fontSize: '0.75rem' }}
+                                        aria-hidden="true"
+                                      />
+                                      <span className={`text-xs text-[#1C1C1E] dark:text-white font-medium flex-1 min-w-0 truncate transition-colors duration-300 ${selectedLanguage === language.code ? 'text-[#3B82F6]' : ''}`}>
+                                        {language.name}
+                                      </span>
+                                      <span className="text-xs text-gray-600 dark:text-gray-300 flex-shrink-0 transition-colors duration-300">
+                                        {getCountryCode(language.code)}
+                                      </span>
+                                      {selectedLanguage === language.code && (
+                                        <div className="w-1 h-1 bg-blue-500 dark:bg-blue-400 rounded-full flex-shrink-0"></div>
+                                      )}
+                                    </motion.button>
+                                  ))}
+
+                                  {/* Separator */}
+                                  {otherLangs.length > 0 && (
+                                    <div className="border-b border-gray-200/30 dark:border-gray-600/30 transition-colors duration-300"></div>
+                                  )}
+                                </>
+                              )}
+
+                              {/* Other Languages */}
+                              {languageSearchTerm ? (
+                                // Show all filtered results when searching
+                                filteredLanguages.map((language, index) => (
                                   <motion.button
-                                    key={`priority-${language.code}`}
+                                    key={`search-${language.code}`}
                                     initial={{ opacity: 0, x: -8 }}
                                     animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: index * 0.02 }}
+                                    transition={{ delay: Math.min(index * 0.01, 0.2) }}
                                     onClick={() => {
                                       handleLanguageChange(language.code);
                                       setIsLanguageDropdownOpen(false);
                                       setLanguageSearchTerm('');
                                     }}
-                                    className={`relative z-10 w-full flex items-center space-x-2.5 px-3 py-3 text-left hover:bg-[#3b82f633] dark:hover:bg-gray-700/40 active:bg-gray-200/50 dark:active:bg-gray-600/60 transition-all duration-200 focus:outline-none focus:bg-gray-100/50 dark:focus:bg-gray-700/40 ${selectedLanguage === language.code ? 'bg-gray-100/60 dark:bg-gray-700/50' : ''
+                                    className={`relative z-10 w-full flex items-center space-x-2.5 px-3 py-3 text-left hover:bg-blue-50/50 dark:hover:bg-gray-700/40 active:bg-blue-100/50 dark:active:bg-gray-600/60 transition-all duration-200 focus:outline-none focus:bg-blue-50/50 dark:focus:bg-gray-700/40 ${selectedLanguage === language.code ? 'bg-blue-50/60 dark:bg-gray-700/50' : ''
+                                      }`}
+                                    style={{ touchAction: 'manipulation' }}
+                                    role="option"
+                                    aria-selected={selectedLanguage === language.code}
+                                  >
+                                    <span className="text-xs">{language.flag}</span>
+                                    <span className="text-xs text-[#1C1C1E] dark:text-white font-medium flex-1 min-w-0 truncate transition-colors duration-300">
+                                      {language.name}
+                                    </span>
+                                    <span className="text-xs text-gray-600 dark:text-gray-300 flex-shrink-0 transition-colors duration-300">
+                                      {language.code.toUpperCase()}
+                                    </span>
+                                    {selectedLanguage === language.code && (
+                                      <div className="w-1 h-1 bg-blue-500 dark:bg-gray-400 rounded-full flex-shrink-0"></div>
+                                    )}
+                                  </motion.button>
+                                ))
+                              ) : (
+                                // Show other languages when not searching
+                                otherLangs.map((language, index) => (
+                                  <motion.button
+                                    key={`other-${language.code}`}
+                                    initial={{ opacity: 0, x: -8 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: (priorityLangs.length + index) * 0.01 }}
+                                    onClick={() => {
+                                      handleLanguageChange(language.code);
+                                      setIsLanguageDropdownOpen(false);
+                                      setLanguageSearchTerm('');
+                                    }}
+                                    className={`relative z-10 w-full flex items-center space-x-2.5 px-3 py-3 text-left hover:bg-blue-50/50 dark:hover:bg-gray-700/40 active:bg-blue-100/50 dark:active:bg-gray-600/60 transition-all duration-200 focus:outline-none focus:bg-blue-50/50 dark:focus:bg-gray-700/40 ${selectedLanguage === language.code ? 'bg-blue-50/60 dark:bg-gray-700/50' : ''
                                       }`}
                                     style={{ touchAction: 'manipulation' }}
                                     role="option"
@@ -1413,622 +1496,547 @@ export default function App() {
                                       countryCode={getCountryCode(language.code)}
                                       svg
                                       style={{ fontSize: '0.75rem' }}
-                                      aria-hidden="true"
                                     />
-                                    <span className={`text-xs text-gray-900 dark:text-white font-medium flex-1 min-w-0 truncate transition-colors duration-300 ${selectedLanguage === language.code ? 'text-[#3B82F6]' : ''}`}>
+                                    <span className="text-xs text-[#1C1C1E] dark:text-white font-medium flex-1 min-w-0 truncate transition-colors duration-300">
                                       {language.name}
                                     </span>
                                     <span className="text-xs text-gray-600 dark:text-gray-300 flex-shrink-0 transition-colors duration-300">
                                       {getCountryCode(language.code)}
                                     </span>
                                     {selectedLanguage === language.code && (
-                                      <div className="w-1 h-1 bg-blue-500 dark:bg-blue-400 rounded-full flex-shrink-0"></div>
+                                      <div className="w-1 h-1 bg-blue-500 dark:bg-gray-400 rounded-full flex-shrink-0"></div>
                                     )}
                                   </motion.button>
-                                ))}
+                                ))
+                              )}
+                            </>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
 
-                                {/* Separator */}
-                                {otherLangs.length > 0 && (
-                                  <div className="border-b border-gray-200/30 dark:border-gray-600/30 transition-colors duration-300"></div>
-                                )}
-                              </>
-                            )}
 
-                            {/* Other Languages */}
-                            {languageSearchTerm ? (
-                              // Show all filtered results when searching
-                              filteredLanguages.map((language, index) => (
-                                <motion.button
-                                  key={`search-${language.code}`}
-                                  initial={{ opacity: 0, x: -8 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  transition={{ delay: Math.min(index * 0.01, 0.2) }}
-                                  onClick={() => {
-                                    handleLanguageChange(language.code);
-                                    setIsLanguageDropdownOpen(false);
-                                    setLanguageSearchTerm('');
-                                  }}
-                                  className={`relative z-10 w-full flex items-center space-x-2.5 px-3 py-3 text-left hover:bg-blue-50/50 dark:hover:bg-gray-700/40 active:bg-blue-100/50 dark:active:bg-gray-600/60 transition-all duration-200 focus:outline-none focus:bg-blue-50/50 dark:focus:bg-gray-700/40 ${selectedLanguage === language.code ? 'bg-blue-50/60 dark:bg-gray-700/50' : ''
-                                    }`}
-                                  style={{ touchAction: 'manipulation' }}
-                                  role="option"
-                                  aria-selected={selectedLanguage === language.code}
-                                >
-                                  <span className="text-xs">{language.flag}</span>
-                                  <span className="text-xs text-gray-900 dark:text-white font-medium flex-1 min-w-0 truncate transition-colors duration-300">
-                                    {language.name}
-                                  </span>
-                                  <span className="text-xs text-gray-600 dark:text-gray-300 flex-shrink-0 transition-colors duration-300">
-                                    {language.code.toUpperCase()}
-                                  </span>
-                                  {selectedLanguage === language.code && (
-                                    <div className="w-1 h-1 bg-blue-500 dark:bg-gray-400 rounded-full flex-shrink-0"></div>
-                                  )}
-                                </motion.button>
-                              ))
-                            ) : (
-                              // Show other languages when not searching
-                              otherLangs.map((language, index) => (
-                                <motion.button
-                                  key={`other-${language.code}`}
-                                  initial={{ opacity: 0, x: -8 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  transition={{ delay: (priorityLangs.length + index) * 0.01 }}
-                                  onClick={() => {
-                                    handleLanguageChange(language.code);
-                                    setIsLanguageDropdownOpen(false);
-                                    setLanguageSearchTerm('');
-                                  }}
-                                  className={`relative z-10 w-full flex items-center space-x-2.5 px-3 py-3 text-left hover:bg-blue-50/50 dark:hover:bg-gray-700/40 active:bg-blue-100/50 dark:active:bg-gray-600/60 transition-all duration-200 focus:outline-none focus:bg-blue-50/50 dark:focus:bg-gray-700/40 ${selectedLanguage === language.code ? 'bg-blue-50/60 dark:bg-gray-700/50' : ''
-                                    }`}
-                                  style={{ touchAction: 'manipulation' }}
-                                  role="option"
-                                  aria-selected={selectedLanguage === language.code}
-                                >
-                                  <ReactCountryFlag
-                                    countryCode={getCountryCode(language.code)}
-                                    svg
-                                    style={{ fontSize: '0.75rem' }}
-                                  />
-                                  <span className="text-xs text-gray-900 dark:text-white font-medium flex-1 min-w-0 truncate transition-colors duration-300">
-                                    {language.name}
-                                  </span>
-                                  <span className="text-xs text-gray-600 dark:text-gray-300 flex-shrink-0 transition-colors duration-300">
-                                    {getCountryCode(language.code)}
-                                  </span>
-                                  {selectedLanguage === language.code && (
-                                    <div className="w-1 h-1 bg-blue-500 dark:bg-gray-400 rounded-full flex-shrink-0"></div>
-                                  )}
-                                </motion.button>
-                              ))
-                            )}
-                          </>
-                        )}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
               </div>
-
-
             </div>
+            {isMobile && (
+              <div className="flex-1 relative flex items-center">
+                <MemoizedProgressBar
+                  currentScene={currentScene + 1}
+                  totalScenes={scenes.length}
+                  language={selectedLanguage}
+                  config={progressBarConfig}
+                />
+              </div>
+            )}
+
+
           </div>
-          {isMobile && (
-            <div className="flex-1 relative flex items-center">
-              <MemoizedProgressBar
-                currentScene={currentScene + 1}
-                totalScenes={scenes.length}
-                language={selectedLanguage}
-                config={progressBarConfig}
+        </header>
+
+        {/* Navigation Area - Optimized spacing */}
+        <main className="flex-1 relative flex items-center" role="main" aria-label={appConfig.theme?.ariaTexts?.contentLabel || "Training content area"}>
+          {/* Left Navigation - Hidden on mobile and only show when active */}
+          {currentScene > 0 && (
+            <div className="absolute left-2 sm:left-4 z-30 top-1/2 transform -translate-y-1/2 hidden md:block">
+              <MemoizedNavButton
+                direction="prev"
+                onClick={prevScene}
+                disabled={false}
+                label="Önceki bölüm"
+                isDarkMode={isDarkMode}
               />
             </div>
           )}
 
+          {/* APPLE VISIONOS FLOATING GLASS CARD - Enhanced prominence with darker background */}
+          <div className="flex-1 mx-2 sm:mx-4 md:mx-16 lg:mx-20 xl:mx-24 sm:my-3 md:my-6 flex items-center justify-center">
+            <div className="w-full h-[calc(100vh-140px)] relative">
+              <AnimatePresence initial={false} custom={direction} mode="wait">
+                <motion.div
+                  key={currentScene}
+                  custom={direction}
+                  variants={slideVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{
+                    // OPTIMIZED ANIMATIONS for mobile performance - Memoized constants
+                    x: {
+                      type: isMobile ? "tween" : "spring",
+                      duration: isMobile ? MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.MOBILE : MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.DESKTOP,
+                      ease: isMobile ? [0.25, 0.46, 0.45, 0.94] : "easeOut",
+                      stiffness: isMobile ? undefined : 300,
+                      damping: isMobile ? undefined : 25
+                    },
+                    opacity: {
+                      duration: isMobile ? MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.FADE : MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.SCALE,
+                      ease: [0.25, 0.46, 0.45, 0.94]
+                    },
+                    scale: {
+                      duration: isMobile ? MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.FADE : MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.SCALE,
+                      ease: [0.25, 0.46, 0.45, 0.94]
+                    }
+                  }}
+                  className={cssClasses.contentCard}
+                  onAnimationComplete={handleAnimationComplete}
+                  whileHover={!isMobile ? {
+                    y: -4,
+                    scale: 1.005,
+                    transition: { type: "spring", stiffness: 400, damping: 25 }
+                  } : undefined}
+                  style={{
+                    // Hardware acceleration + Card stays anchored during scroll
+                    transform: 'translateZ(0)',
+                    willChange: 'transform',
+                    transformStyle: "preserve-3d",
+                    transformOrigin: "center center",
+                    // Dark mode specific styling
+                    ...(isDarkMode && {
+                      borderRadius: '24px',
+                      border: '1px solid rgba(255, 255, 255, 0.50)',
+                      background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.06) 100%)',
+                      backdropFilter: 'blur(24px)',
+                      WebkitBackdropFilter: 'blur(24px)'
+                    }),
+                    // Light mode styling
+                    ...(!isDarkMode && {
+                      background: isMobile
+                        ? 'rgba(255, 255, 255, 0.90)'
+                        : 'rgba(255, 255, 255, 0.75)',
+                      backdropFilter: isMobile ? 'blur(12px)' : 'blur(24px)',
+                      WebkitBackdropFilter: isMobile ? 'blur(12px)' : 'blur(24px)'
+                    })
+                  }}
+                >
+                  {/* ENHANCED APPLE VISIONOS GLASS EFFECTS - Light mode only */}
+                  {!isMobile && !isDarkMode && (
+                    <>
+                      {/* 1. VERY SUBTLE NOISE TEXTURE - Simulates glass imperfections */}
+                      <div
+                        className="absolute inset-0 opacity-[0.018] rounded-2xl sm:rounded-3xl mix-blend-overlay pointer-events-none"
+                        style={{
+                          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 800 800' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='glassNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='8' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23glassNoise)'/%3E%3C/svg%3E")`,
+                          backgroundSize: '300px 300px',
+                          backgroundRepeat: 'repeat'
+                        }}
+                      />
 
-        </div>
-      </header>
+                      {/* 2. ENHANCED GRADIENT BLUR - Better depth with darker background */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-white/15 to-white/8 rounded-2xl sm:rounded-3xl transition-colors duration-500" />
+                      <div className="absolute inset-0 bg-gradient-to-tl from-blue-50/20 via-transparent to-purple-50/15 rounded-2xl sm:rounded-3xl transition-colors duration-500" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-gray-100/12 via-transparent to-transparent rounded-2xl sm:rounded-3xl transition-colors duration-500" />
 
-      {/* Navigation Area - Optimized spacing */}
-      <main className="flex-1 relative flex items-center" role="main" aria-label={appConfig.theme?.ariaTexts?.contentLabel || "Training content area"}>
-        {/* Left Navigation - Hidden on mobile and only show when active */}
-        {currentScene > 0 && (
-          <div className="absolute left-2 sm:left-4 z-30 top-1/2 transform -translate-y-1/2 hidden md:block">
-            <MemoizedNavButton
-              direction="prev"
-              onClick={prevScene}
-              disabled={false}
-              label="Önceki bölüm"
-              isDarkMode={isDarkMode}
-            />
-          </div>
-        )}
+                      {/* 3. ENHANCED APPLE-STYLE INNER GLOSS - More prominent with darker background */}
+                      <div
+                        className="absolute inset-0 rounded-2xl sm:rounded-3xl pointer-events-none"
+                        style={{
+                          background: `radial-gradient(ellipse 120% 50% at 50% 0%, rgba(255, 255, 255, 0.40) 0%, rgba(255, 255, 255, 0.20) 25%, rgba(255, 255, 255, 0.08) 50%, transparent 75%)`,
+                          mixBlendMode: 'soft-light'
+                        }}
+                      />
 
-        {/* APPLE VISIONOS FLOATING GLASS CARD - Enhanced prominence with darker background */}
-        <div className="flex-1 mx-2 sm:mx-4 md:mx-16 lg:mx-20 xl:mx-24 sm:my-3 md:my-6 flex items-center justify-center">
-          <div className="w-full h-[calc(100vh-140px)] relative">
-            <AnimatePresence initial={false} custom={direction} mode="wait">
-              <motion.div
-                key={currentScene}
-                custom={direction}
-                variants={slideVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{
-                  // OPTIMIZED ANIMATIONS for mobile performance - Memoized constants
-                  x: {
-                    type: isMobile ? "tween" : "spring",
-                    duration: isMobile ? MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.MOBILE : MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.DESKTOP,
-                    ease: isMobile ? [0.25, 0.46, 0.45, 0.94] : "easeOut",
-                    stiffness: isMobile ? undefined : 300,
-                    damping: isMobile ? undefined : 25
-                  },
-                  opacity: {
-                    duration: isMobile ? MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.FADE : MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.SCALE,
-                    ease: [0.25, 0.46, 0.45, 0.94]
-                  },
-                  scale: {
-                    duration: isMobile ? MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.FADE : MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.SCALE,
-                    ease: [0.25, 0.46, 0.45, 0.94]
-                  }
-                }}
-                className={cssClasses.contentCard}
-                onAnimationComplete={handleAnimationComplete}
-                whileHover={!isMobile ? {
-                  y: -4,
-                  scale: 1.005,
-                  transition: { type: "spring", stiffness: 400, damping: 25 }
-                } : undefined}
-                style={{
-                  // Hardware acceleration + Card stays anchored during scroll
-                  transform: 'translateZ(0)',
-                  willChange: 'transform',
-                  transformStyle: "preserve-3d",
-                  transformOrigin: "center center",
-                  // Dark mode specific styling
-                  ...(isDarkMode && {
-                    borderRadius: '24px',
-                    border: '1px solid rgba(255, 255, 255, 0.50)',
-                    background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.06) 100%)',
-                    backdropFilter: 'blur(24px)',
-                    WebkitBackdropFilter: 'blur(24px)'
-                  }),
-                  // Light mode styling
-                  ...(!isDarkMode && {
-                    background: isMobile
-                      ? 'rgba(255, 255, 255, 0.90)'
-                      : 'rgba(255, 255, 255, 0.75)',
-                    backdropFilter: isMobile ? 'blur(12px)' : 'blur(24px)',
-                    WebkitBackdropFilter: isMobile ? 'blur(12px)' : 'blur(24px)'
-                  })
-                }}
-              >
-                {/* ENHANCED APPLE VISIONOS GLASS EFFECTS - Light mode only */}
-                {!isMobile && !isDarkMode && (
-                  <>
-                    {/* 1. VERY SUBTLE NOISE TEXTURE - Simulates glass imperfections */}
-                    <div
-                      className="absolute inset-0 opacity-[0.018] rounded-2xl sm:rounded-3xl mix-blend-overlay pointer-events-none"
-                      style={{
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 800 800' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='glassNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='8' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23glassNoise)'/%3E%3C/svg%3E")`,
-                        backgroundSize: '300px 300px',
-                        backgroundRepeat: 'repeat'
-                      }}
-                    />
+                      {/* 4. ENHANCED WHITE STROKE - More visible with darker background */}
+                      <div
+                        className="absolute inset-0 rounded-2xl sm:rounded-3xl pointer-events-none"
+                        style={{
+                          border: '0.5px solid rgba(255, 255, 255, 0.5)',
+                          boxShadow: 'inset 0 0 0 0.5px rgba(255, 255, 255, 0.20)'
+                        }}
+                      />
 
-                    {/* 2. ENHANCED GRADIENT BLUR - Better depth with darker background */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-white/15 to-white/8 rounded-2xl sm:rounded-3xl transition-colors duration-500" />
-                    <div className="absolute inset-0 bg-gradient-to-tl from-blue-50/20 via-transparent to-purple-50/15 rounded-2xl sm:rounded-3xl transition-colors duration-500" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-gray-100/12 via-transparent to-transparent rounded-2xl sm:rounded-3xl transition-colors duration-500" />
-
-                    {/* 3. ENHANCED APPLE-STYLE INNER GLOSS - More prominent with darker background */}
-                    <div
-                      className="absolute inset-0 rounded-2xl sm:rounded-3xl pointer-events-none"
-                      style={{
-                        background: `radial-gradient(ellipse 120% 50% at 50% 0%, rgba(255, 255, 255, 0.40) 0%, rgba(255, 255, 255, 0.20) 25%, rgba(255, 255, 255, 0.08) 50%, transparent 75%)`,
-                        mixBlendMode: 'soft-light'
-                      }}
-                    />
-
-                    {/* 4. ENHANCED WHITE STROKE - More visible with darker background */}
-                    <div
-                      className="absolute inset-0 rounded-2xl sm:rounded-3xl pointer-events-none"
-                      style={{
-                        border: '0.5px solid rgba(255, 255, 255, 0.5)',
-                        boxShadow: 'inset 0 0 0 0.5px rgba(255, 255, 255, 0.20)'
-                      }}
-                    />
-
-                    {/* 5. ENHANCED SOFT WHITE GLOW - More prominent against darker background */}
-                    <div
-                      className="absolute inset-0 rounded-2xl sm:rounded-3xl pointer-events-none"
-                      style={{
-                        boxShadow: `
+                      {/* 5. ENHANCED SOFT WHITE GLOW - More prominent against darker background */}
+                      <div
+                        className="absolute inset-0 rounded-2xl sm:rounded-3xl pointer-events-none"
+                        style={{
+                          boxShadow: `
                           0 0 0 1px rgba(255, 255, 255, 0.12),
                           0 0 24px rgba(255, 255, 255, 0.16), 
                           0 0 48px rgba(255, 255, 255, 0.08), 
                           0 0 96px rgba(59, 130, 246, 0.06),
                           0 12px 40px rgba(0, 0, 0, 0.08)
                         `
-                      }}
-                    />
+                        }}
+                      />
 
-                    {/* Enhanced inner depth effect - More pronounced */}
-                    <div className="absolute inset-1 bg-gradient-to-br from-white/20 via-transparent to-transparent rounded-xl sm:rounded-2xl pointer-events-none" />
-                  </>
-                )}
-
-                {/* ENHANCED MOBILE GLASS EFFECTS - Light mode only */}
-                {isMobile && !isDarkMode && (
-                  <>
-                    {/* Enhanced glass background for mobile with better contrast */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-white/40 to-white/35 rounded-2xl transition-colors duration-300" />
-
-                    {/* Enhanced border for mobile with better visibility */}
-                    <div
-                      className="absolute inset-0 rounded-2xl border border-white/40"
-                      style={{
-                        boxShadow: '0 6px 20px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.20)'
-                      }}
-                    />
-                  </>
-                )}
-
-                {/* Content Scroll Container - ANCHORED (doesn't move with parallax) */}
-                <div
-                  ref={scrollContainerRef}
-                  className="relative z-10 h-full overflow-y-auto overflow-x-hidden scroll-smooth custom-scrollbar"
-                  onScroll={handleScroll}
-                  role="main"
-                  aria-label={appConfig.theme?.ariaTexts?.contentLabel || "Training content"}
-                  aria-describedby="content-description"
-                  style={{
-                    scrollbarWidth: 'thin',
-                    scrollbarColor: isDarkMode ? 'rgba(59, 130, 246, 0.4) transparent' : 'rgba(59, 130, 246, 0.3) transparent',
-                    WebkitOverflowScrolling: 'touch',
-                    touchAction: 'pan-y',
-                    overscrollBehavior: 'contain',
-                    // Hardware acceleration
-                    transform: 'translateZ(0)',
-                    willChange: 'scroll-position'
-                  }}
-                >
-                  {/* Hidden description for screen readers */}
-                  <div id="content-description" className="sr-only">
-                    {appConfig.theme?.ariaTexts?.contentDescription || "Scrollable training content area with interactive learning modules"}
-                  </div>
-                  {/* Optimized Content Padding - Industry Standards */}
-                  <div className="p-2 sm:p-3 md:p-4 lg:p-5">
-                    <motion.div
-                      initial={{ opacity: 0, y: isMobile ? 20 : 30 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{
-                        duration: isMobile ? 0.4 : 0.6,
-                        delay: isMobile ? 0.2 : 0.4,
-                        ease: [0.25, 0.46, 0.45, 0.94]
-                      }}
-                      className="w-full"
-                    >
-                      {/* Quiz Scene - Always mounted to preserve state */}
-                      <div style={{ display: currentScene === 4 ? 'block' : 'none' }}>
-                        <MemoizedQuizScene
-                          config={(appConfig as any).quizSceneConfig}
-                          onQuizCompleted={handleQuizCompleted}
-                          currentQuestionIndex={quizCurrentQuestionIndex}
-                          setCurrentQuestionIndex={setQuizCurrentQuestionIndex}
-                          answers={quizAnswers}
-                          setAnswers={setQuizAnswersStable}
-                          showResult={quizShowResult}
-                          setShowResult={setQuizShowResultStable}
-                          attempts={quizAttempts}
-                          setAttempts={setQuizAttemptsStable}
-                          isAnswerLocked={quizIsAnswerLocked}
-                          setIsAnswerLocked={setQuizIsAnswerLockedStable}
-                          isLoading={quizIsLoading}
-                          setIsLoading={setQuizIsLoadingStable}
-                          multiSelectAnswers={quizMultiSelectAnswers}
-                          setMultiSelectAnswers={setQuizMultiSelectAnswers}
-                          sliderValue={quizSliderValue}
-                          setSliderValue={setQuizSliderValue}
-                          draggedItems={quizDraggedItems}
-                          setDraggedItems={setQuizDraggedItems}
-                          selectedItem={quizSelectedItem}
-                          setSelectedItem={setQuizSelectedItem}
-                          questionLoadingText={themeConfig.texts?.questionLoading}
-                          isDarkMode={isDarkMode}
-                        />
-                      </div>
-
-                      {/* Other scenes */}
-                      {currentScene !== 4 && (
-                        <CurrentSceneComponent config={currentSceneConfig}
-                          onSurveySubmitted={handleSurveySubmitted}
-                          isSubmitted={isSurveySubmitted}
-                          completionData={currentScene === 7 ? completionData : undefined}
-                        />
-                      )}
-                    </motion.div>
-                  </div>
-                </div>
-
-                {/* Enhanced Scroll Indicator */}
-                <AnimatePresence>
-                  {showScrollIndicator && !scrollPosition.bottom && currentScene !== 2 && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className="absolute bottom-4 left-0 right-0 mx-auto z-20 pointer-events-none flex justify-center"
-                    >
-                      <div className={`flex items-center space-x-2 px-4 py-2.5 bg-white/90 dark:bg-gray-900/90 rounded-full border border-white/40 dark:border-gray-600/60 shadow-lg transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-xl'} min-w-fit`}>
-                        <span className="text-xs text-blue-800 dark:text-blue-200 font-medium transition-colors duration-300 whitespace-nowrap">
-                          {themeConfig.texts?.scrollHint}
-                        </span>
-                        <ChevronDownIcon size={14} className="text-blue-700 dark:text-blue-300 animate-bounce flex-shrink-0" style={{ animationDuration: '2s' }} />
-                      </div>
-                    </motion.div>
+                      {/* Enhanced inner depth effect - More pronounced */}
+                      <div className="absolute inset-1 bg-gradient-to-br from-white/20 via-transparent to-transparent rounded-xl sm:rounded-2xl pointer-events-none" />
+                    </>
                   )}
-                </AnimatePresence>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </div>
 
-        {/* Right Navigation - Hidden on mobile and on last scene */}
-        {currentScene < scenes.length - 1 && (
-          <div className="absolute right-2 sm:right-4 z-30 top-1/2 transform -translate-y-1/2 hidden md:block">
-            <MemoizedNavButton
-              direction="next"
-              onClick={nextScene}
-              disabled={!canProceedNext()}
-              label={themeConfig.texts?.nextSection}
-              isDarkMode={isDarkMode}
+                  {/* ENHANCED MOBILE GLASS EFFECTS - Light mode only */}
+                  {isMobile && !isDarkMode && (
+                    <>
+                      {/* Enhanced glass background for mobile with better contrast */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-white/40 to-white/35 rounded-2xl transition-colors duration-300" />
+
+                      {/* Enhanced border for mobile with better visibility */}
+                      <div
+                        className="absolute inset-0 rounded-2xl border border-white/40"
+                        style={{
+                          boxShadow: '0 6px 20px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.20)'
+                        }}
+                      />
+                    </>
+                  )}
+
+                  {/* Content Scroll Container - ANCHORED (doesn't move with parallax) */}
+                  <div
+                    ref={scrollContainerRef}
+                    className="relative z-10 h-full overflow-y-auto overflow-x-hidden scroll-smooth custom-scrollbar"
+                    onScroll={handleScroll}
+                    role="main"
+                    aria-label={appConfig.theme?.ariaTexts?.contentLabel || "Training content"}
+                    aria-describedby="content-description"
+                    style={{
+                      scrollbarWidth: 'thin',
+                      scrollbarColor: isDarkMode ? 'rgba(59, 130, 246, 0.4) transparent' : 'rgba(59, 130, 246, 0.3) transparent',
+                      WebkitOverflowScrolling: 'touch',
+                      touchAction: 'pan-y',
+                      overscrollBehavior: 'contain',
+                      // Hardware acceleration
+                      transform: 'translateZ(0)',
+                      willChange: 'scroll-position'
+                    }}
+                  >
+                    {/* Hidden description for screen readers */}
+                    <div id="content-description" className="sr-only">
+                      {appConfig.theme?.ariaTexts?.contentDescription || "Scrollable training content area with interactive learning modules"}
+                    </div>
+                    {/* Optimized Content Padding - Industry Standards */}
+                    <div className="p-2 sm:p-3 md:p-4 lg:p-5">
+                      <motion.div
+                        initial={{ opacity: 0, y: isMobile ? 20 : 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{
+                          duration: isMobile ? 0.4 : 0.6,
+                          delay: isMobile ? 0.2 : 0.4,
+                          ease: [0.25, 0.46, 0.45, 0.94]
+                        }}
+                        className="w-full"
+                      >
+                        {/* Quiz Scene - Always mounted to preserve state */}
+                        <div style={{ display: currentScene === 4 ? 'block' : 'none' }}>
+                          <MemoizedQuizScene
+                            config={(appConfig as any).quizSceneConfig}
+                            onQuizCompleted={handleQuizCompleted}
+                            currentQuestionIndex={quizCurrentQuestionIndex}
+                            setCurrentQuestionIndex={setQuizCurrentQuestionIndex}
+                            answers={quizAnswers}
+                            setAnswers={setQuizAnswersStable}
+                            showResult={quizShowResult}
+                            setShowResult={setQuizShowResultStable}
+                            attempts={quizAttempts}
+                            setAttempts={setQuizAttemptsStable}
+                            isAnswerLocked={quizIsAnswerLocked}
+                            setIsAnswerLocked={setQuizIsAnswerLockedStable}
+                            isLoading={quizIsLoading}
+                            setIsLoading={setQuizIsLoadingStable}
+                            multiSelectAnswers={quizMultiSelectAnswers}
+                            setMultiSelectAnswers={setQuizMultiSelectAnswers}
+                            sliderValue={quizSliderValue}
+                            setSliderValue={setQuizSliderValue}
+                            draggedItems={quizDraggedItems}
+                            setDraggedItems={setQuizDraggedItems}
+                            selectedItem={quizSelectedItem}
+                            setSelectedItem={setQuizSelectedItem}
+                            questionLoadingText={themeConfig.texts?.questionLoading}
+                            isDarkMode={isDarkMode}
+                          />
+                        </div>
+
+                        {/* Other scenes */}
+                        {currentScene !== 4 && (
+                          <CurrentSceneComponent config={currentSceneConfig}
+                            onSurveySubmitted={handleSurveySubmitted}
+                            isSubmitted={isSurveySubmitted}
+                            completionData={currentScene === 7 ? completionData : undefined}
+                          />
+                        )}
+                      </motion.div>
+                    </div>
+                  </div>
+
+                  {/* Enhanced Scroll Indicator */}
+                  <AnimatePresence>
+                    {showScrollIndicator && !scrollPosition.bottom && currentScene !== 2 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        className="absolute bottom-4 left-0 right-0 mx-auto z-20 pointer-events-none flex justify-center"
+                      >
+                        <div className={`flex items-center space-x-2 px-4 py-2.5 bg-white/90 dark:bg-gray-900/90 rounded-full border border-white/40 dark:border-gray-600/60 shadow-lg transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-xl'} min-w-fit`}>
+                          <span className="text-xs text-blue-800 dark:text-blue-200 font-medium transition-colors duration-300 whitespace-nowrap">
+                            {themeConfig.texts?.scrollHint}
+                          </span>
+                          <ChevronDownIcon size={14} className="text-blue-700 dark:text-blue-300 animate-bounce flex-shrink-0" style={{ animationDuration: '2s' }} />
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
+
+          {/* Right Navigation - Hidden on mobile and on last scene */}
+          {currentScene < scenes.length - 1 && (
+            <div className="absolute right-2 sm:right-4 z-30 top-1/2 transform -translate-y-1/2 hidden md:block">
+              <MemoizedNavButton
+                direction="next"
+                onClick={nextScene}
+                disabled={!canProceedNext()}
+                label={themeConfig.texts?.nextSection}
+                isDarkMode={isDarkMode}
+              />
+            </div>
+          )}
+
+          {/* ULTRA RESPONSIVE Mobile Touch Gesture Layer */}
+          <div
+            className="absolute inset-0 pointer-events-none md:hidden z-10"
+            style={{
+              pointerEvents: 'none'
+            }}
+          >
+            {/* Left Gesture Area - HYPER RESPONSIVE */}
+            <div
+              className="absolute left-0 top-0 bottom-0 w-20 pointer-events-auto"
+              style={{
+                touchAction: 'pan-x',
+                background: 'transparent',
+                pointerEvents: currentScene === 2 ? 'none' : 'auto' // Disable on video scene
+              }}
+              onTouchStart={(e) => {
+                const startX = e.touches[0].clientX;
+                const startY = e.touches[0].clientY;
+                const threshold = MEMOIZED_CONSTANTS.TOUCH_THRESHOLDS.HORIZONTAL;
+                let hasMovedHorizontally = false;
+
+                const handleTouchMove = (moveEvent: TouchEvent) => {
+                  const currentX = moveEvent.touches[0].clientX;
+                  const currentY = moveEvent.touches[0].clientY;
+                  const diffX = Math.abs(startX - currentX);
+                  const diffY = Math.abs(startY - currentY);
+
+                  // ULTRA sensitive horizontal detection
+                  if (diffX > diffY && diffX > MEMOIZED_CONSTANTS.TOUCH_THRESHOLDS.MIN_MOVEMENT) {
+                    hasMovedHorizontally = true;
+                  }
+                };
+
+                const handleTouchEnd = (endEvent: TouchEvent) => {
+                  if (!hasMovedHorizontally) {
+                    document.removeEventListener('touchmove', handleTouchMove);
+                    document.removeEventListener('touchend', handleTouchEnd);
+                    return;
+                  }
+
+                  const endX = endEvent.changedTouches[0].clientX;
+                  const diffX = startX - endX;
+
+                  // HYPER responsive threshold
+                  if (diffX < -threshold && currentScene > 0) {
+                    prevScene();
+                  }
+
+                  document.removeEventListener('touchmove', handleTouchMove);
+                  document.removeEventListener('touchend', handleTouchEnd);
+                };
+
+                document.addEventListener('touchmove', handleTouchMove, { passive: true });
+                document.addEventListener('touchend', handleTouchEnd);
+              }}
+            />
+
+            {/* Right Gesture Area - HYPER RESPONSIVE */}
+            <div
+              className="absolute right-0 top-0 bottom-0 w-20 pointer-events-auto"
+              style={{
+                touchAction: 'pan-x',
+                background: 'transparent',
+                pointerEvents: currentScene === 2 ? 'none' : 'auto' // Disable on video scene
+              }}
+              onTouchStart={(e) => {
+                const startX = e.touches[0].clientX;
+                const startY = e.touches[0].clientY;
+                const threshold = MEMOIZED_CONSTANTS.TOUCH_THRESHOLDS.HORIZONTAL;
+                let hasMovedHorizontally = false;
+
+                const handleTouchMove = (moveEvent: TouchEvent) => {
+                  const currentX = moveEvent.touches[0].clientX;
+                  const currentY = moveEvent.touches[0].clientY;
+                  const diffX = Math.abs(startX - currentX);
+                  const diffY = Math.abs(startY - currentY);
+
+                  // ULTRA sensitive horizontal detection
+                  if (diffX > diffY && diffX > MEMOIZED_CONSTANTS.TOUCH_THRESHOLDS.MIN_MOVEMENT) {
+                    hasMovedHorizontally = true;
+                  }
+                };
+
+                const handleTouchEnd = (endEvent: TouchEvent) => {
+                  if (!hasMovedHorizontally) {
+                    document.removeEventListener('touchmove', handleTouchMove);
+                    document.removeEventListener('touchend', handleTouchEnd);
+                    return;
+                  }
+
+                  const endX = endEvent.changedTouches[0].clientX;
+                  const diffX = startX - endX;
+
+                  // HYPER responsive threshold
+                  if (diffX > threshold && canProceedNext() && currentScene < scenes.length - 1) {
+                    nextScene();
+                  }
+
+                  document.removeEventListener('touchmove', handleTouchMove);
+                  document.removeEventListener('touchend', handleTouchEnd);
+                };
+
+                document.addEventListener('touchmove', handleTouchMove, { passive: true });
+                document.addEventListener('touchend', handleTouchEnd);
+              }}
             />
           </div>
-        )}
+        </main>
 
-        {/* ULTRA RESPONSIVE Mobile Touch Gesture Layer */}
-        <div
-          className="absolute inset-0 pointer-events-none md:hidden z-10"
-          style={{
-            pointerEvents: 'none'
-          }}
-        >
-          {/* Left Gesture Area - HYPER RESPONSIVE */}
-          <div
-            className="absolute left-0 top-0 bottom-0 w-20 pointer-events-auto"
-            style={{
-              touchAction: 'pan-x',
-              background: 'transparent',
-              pointerEvents: currentScene === 2 ? 'none' : 'auto' // Disable on video scene
-            }}
-            onTouchStart={(e) => {
-              const startX = e.touches[0].clientX;
-              const startY = e.touches[0].clientY;
-              const threshold = MEMOIZED_CONSTANTS.TOUCH_THRESHOLDS.HORIZONTAL;
-              let hasMovedHorizontally = false;
-
-              const handleTouchMove = (moveEvent: TouchEvent) => {
-                const currentX = moveEvent.touches[0].clientX;
-                const currentY = moveEvent.touches[0].clientY;
-                const diffX = Math.abs(startX - currentX);
-                const diffY = Math.abs(startY - currentY);
-
-                // ULTRA sensitive horizontal detection
-                if (diffX > diffY && diffX > MEMOIZED_CONSTANTS.TOUCH_THRESHOLDS.MIN_MOVEMENT) {
-                  hasMovedHorizontally = true;
-                }
-              };
-
-              const handleTouchEnd = (endEvent: TouchEvent) => {
-                if (!hasMovedHorizontally) {
-                  document.removeEventListener('touchmove', handleTouchMove);
-                  document.removeEventListener('touchend', handleTouchEnd);
-                  return;
-                }
-
-                const endX = endEvent.changedTouches[0].clientX;
-                const diffX = startX - endX;
-
-                // HYPER responsive threshold
-                if (diffX < -threshold && currentScene > 0) {
-                  prevScene();
-                }
-
-                document.removeEventListener('touchmove', handleTouchMove);
-                document.removeEventListener('touchend', handleTouchEnd);
-              };
-
-              document.addEventListener('touchmove', handleTouchMove, { passive: true });
-              document.addEventListener('touchend', handleTouchEnd);
-            }}
-          />
-
-          {/* Right Gesture Area - HYPER RESPONSIVE */}
-          <div
-            className="absolute right-0 top-0 bottom-0 w-20 pointer-events-auto"
-            style={{
-              touchAction: 'pan-x',
-              background: 'transparent',
-              pointerEvents: currentScene === 2 ? 'none' : 'auto' // Disable on video scene
-            }}
-            onTouchStart={(e) => {
-              const startX = e.touches[0].clientX;
-              const startY = e.touches[0].clientY;
-              const threshold = MEMOIZED_CONSTANTS.TOUCH_THRESHOLDS.HORIZONTAL;
-              let hasMovedHorizontally = false;
-
-              const handleTouchMove = (moveEvent: TouchEvent) => {
-                const currentX = moveEvent.touches[0].clientX;
-                const currentY = moveEvent.touches[0].clientY;
-                const diffX = Math.abs(startX - currentX);
-                const diffY = Math.abs(startY - currentY);
-
-                // ULTRA sensitive horizontal detection
-                if (diffX > diffY && diffX > MEMOIZED_CONSTANTS.TOUCH_THRESHOLDS.MIN_MOVEMENT) {
-                  hasMovedHorizontally = true;
-                }
-              };
-
-              const handleTouchEnd = (endEvent: TouchEvent) => {
-                if (!hasMovedHorizontally) {
-                  document.removeEventListener('touchmove', handleTouchMove);
-                  document.removeEventListener('touchend', handleTouchEnd);
-                  return;
-                }
-
-                const endX = endEvent.changedTouches[0].clientX;
-                const diffX = startX - endX;
-
-                // HYPER responsive threshold
-                if (diffX > threshold && canProceedNext() && currentScene < scenes.length - 1) {
-                  nextScene();
-                }
-
-                document.removeEventListener('touchmove', handleTouchMove);
-                document.removeEventListener('touchend', handleTouchEnd);
-              };
-
-              document.addEventListener('touchmove', handleTouchMove, { passive: true });
-              document.addEventListener('touchend', handleTouchEnd);
-            }}
-          />
-        </div>
-      </main>
-
-      {/* Enhanced Achievement Notifications */}
-      <AnimatePresence>
-        {showAchievementNotification && achievements.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, x: 300 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 300 }}
-            className={cssClasses.achievementContainer}
-            role="alert"
-            aria-live="polite"
-            aria-label={appConfig.theme?.ariaTexts?.achievementLabel || "Achievement notification"}
-          >
-            <div className={cssClasses.achievementContent}>
-              <div className="flex items-center space-x-3 relative z-10">
-                <Award size={16} className="text-yellow-600 dark:text-yellow-300 flex-shrink-0" aria-hidden="true" />
-                <span className="text-sm text-yellow-900 dark:text-yellow-100 font-medium transition-colors duration-300">
-                  {themeConfig.texts?.achievementNotification}
-                </span>
-                <button
-                  onClick={() => setShowAchievementNotification(false)}
-                  className={cssClasses.achievementClose}
-                  aria-label={themeConfig.texts?.closeNotification}
-                  style={{ touchAction: 'manipulation' }}
-                >
-                  <X size={14} className="text-yellow-800 dark:text-yellow-200" aria-hidden="true" />
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Enhanced Quiz Completion Notification - Industry Standard Position */}
-      <AnimatePresence>
-        {currentScene === 4 && !quizCompleted && showQuizCompletionHint && (
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className={cssClasses.quizNotificationContainer}
-            role="alert"
-            aria-live="polite"
-            aria-label={appConfig.theme?.ariaTexts?.quizCompletionLabel || "Quiz completion hint"}
-          >
-            <div className={cssClasses.quizNotificationContent}>
-              <div className="flex items-center space-x-2.5 relative z-10">
-                <div className="w-2 h-2 bg-amber-500 dark:bg-amber-400 rounded-full animate-pulse" aria-hidden="true"></div>
-                <p className="text-sm text-[#D97706] dark:text-[#D97706] font-medium transition-colors duration-300">
-                  {(appConfig as any).quizSceneConfig?.texts?.quizCompletionHint}
-                </p>
-                {/* Industry Standard: Close Button */}
-                <button
-                  onClick={() => setShowQuizCompletionHint(false)}
-                  className={cssClasses.quizNotificationClose}
-                  aria-label={themeConfig.texts?.closeNotification}
-                  style={{ touchAction: 'manipulation' }}
-                >
-                  <X size={12} className="text-amber-700 dark:text-amber-300" aria-hidden="true" />
-                </button>
-              </div>
-              {/* Industry Standard: Subtle Glow Effect */}
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-400/5 to-orange-400/5 dark:from-amber-400/10 dark:to-orange-400/10 pointer-events-none" aria-hidden="true"></div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Industry Standard Mobile Navigation Hint - Visual Only */}
-      {currentScene === 0 && (
-        <div className={cssClasses.mobileNavHintContainer} aria-hidden="true">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.5 }}
-            className="flex items-center justify-center"
-          >
-            {/* Industry Standard: Visual Gesture Indicator Only */}
+        {/* Enhanced Achievement Notifications */}
+        <AnimatePresence>
+          {showAchievementNotification && achievements.length > 0 && (
             <motion.div
-              className={cssClasses.mobileNavHintContent}
-              animate={{
-                x: [0, 8, 0],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 2
-              }}
+              initial={{ opacity: 0, x: 300 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 300 }}
+              className={cssClasses.achievementContainer}
+              role="alert"
+              aria-live="polite"
+              aria-label={appConfig.theme?.ariaTexts?.achievementLabel || "Achievement notification"}
             >
-              {/* Left Arrow - Animated Swipe Gesture Hint */}
+              <div className={cssClasses.achievementContent}>
+                <div className="flex items-center space-x-3 relative z-10">
+                  <Award size={16} className="text-yellow-600 dark:text-yellow-300 flex-shrink-0" aria-hidden="true" />
+                  <span className="text-sm text-yellow-900 dark:text-yellow-100 font-medium transition-colors duration-300">
+                    {themeConfig.texts?.achievementNotification}
+                  </span>
+                  <button
+                    onClick={() => setShowAchievementNotification(false)}
+                    className={cssClasses.achievementClose}
+                    aria-label={themeConfig.texts?.closeNotification}
+                    style={{ touchAction: 'manipulation' }}
+                  >
+                    <X size={14} className="text-yellow-800 dark:text-yellow-200" aria-hidden="true" />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Enhanced Quiz Completion Notification - Industry Standard Position */}
+        <AnimatePresence>
+          {currentScene === 4 && !quizCompleted && showQuizCompletionHint && (
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              className={cssClasses.quizNotificationContainer}
+              role="alert"
+              aria-live="polite"
+              aria-label={appConfig.theme?.ariaTexts?.quizCompletionLabel || "Quiz completion hint"}
+            >
+              <div className={cssClasses.quizNotificationContent}>
+                <div className="flex items-center space-x-2.5 relative z-10">
+                  <div className="w-2 h-2 bg-amber-500 dark:bg-amber-400 rounded-full animate-pulse" aria-hidden="true"></div>
+                  <p className="text-sm text-[#D97706] dark:text-[#D97706] font-medium transition-colors duration-300">
+                    {(appConfig as any).quizSceneConfig?.texts?.quizCompletionHint}
+                  </p>
+                  {/* Industry Standard: Close Button */}
+                  <button
+                    onClick={() => setShowQuizCompletionHint(false)}
+                    className={cssClasses.quizNotificationClose}
+                    aria-label={themeConfig.texts?.closeNotification}
+                    style={{ touchAction: 'manipulation' }}
+                  >
+                    <X size={12} className="text-amber-700 dark:text-amber-300" aria-hidden="true" />
+                  </button>
+                </div>
+                {/* Industry Standard: Subtle Glow Effect */}
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-400/5 to-orange-400/5 dark:from-amber-400/10 dark:to-orange-400/10 pointer-events-none" aria-hidden="true"></div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Industry Standard Mobile Navigation Hint - Visual Only */}
+        {currentScene === 0 && (
+          <div className={cssClasses.mobileNavHintContainer} aria-hidden="true">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.5 }}
+              className="flex items-center justify-center"
+            >
+              {/* Industry Standard: Visual Gesture Indicator Only */}
               <motion.div
-                className="flex items-center space-x-1"
+                className={cssClasses.mobileNavHintContent}
                 animate={{
-                  opacity: [0.4, 1, 0.4],
+                  x: [0, 8, 0],
                 }}
                 transition={{
                   duration: 2,
                   repeat: Infinity,
-                  ease: "easeInOut"
+                  ease: "easeInOut",
+                  delay: 2
                 }}
               >
-                <div className="w-2 h-2 bg-blue-500/60 dark:bg-blue-400/60 rounded-full"></div>
-                <div className="w-1 h-1 bg-blue-500/40 dark:bg-blue-400/40 rounded-full"></div>
-                <div className="w-0.5 h-0.5 bg-blue-500/20 dark:bg-blue-400/20 rounded-full"></div>
+                {/* Left Arrow - Animated Swipe Gesture Hint */}
+                <motion.div
+                  className="flex items-center space-x-1"
+                  animate={{
+                    opacity: [0.4, 1, 0.4],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                >
+                  <div className="w-2 h-2 bg-blue-500/60 dark:bg-blue-400/60 rounded-full"></div>
+                  <div className="w-1 h-1 bg-blue-500/40 dark:bg-blue-400/40 rounded-full"></div>
+                  <div className="w-0.5 h-0.5 bg-blue-500/20 dark:bg-blue-400/20 rounded-full"></div>
+                </motion.div>
               </motion.div>
             </motion.div>
-          </motion.div>
-        </div>
-      )}
-
-      {/* Mobile Floating Scroll-to-Top Button */}
-      <AnimatePresence>
-        {showScrollToTop && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            className="md:hidden fixed bottom-4 right-4 z-[9999]"
-          >
-            <motion.button
-              onClick={handleScrollToTop}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className="flex items-center justify-center w-14 h-14 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border border-white/40 dark:border-gray-600/60 rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
-              title={appConfig.theme?.ariaTexts?.scrollToTopLabel || "Sayfanın Başına Dön"}
-              aria-label={appConfig.theme?.ariaTexts?.scrollToTopLabel || "Scroll to top of page"}
-            >
-              <ChevronUp className="w-6 h-6 text-blue-600 dark:text-blue-400" aria-hidden="true" />
-            </motion.button>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
-      <Toaster />
-    </div>
+
+        {/* Mobile Floating Scroll-to-Top Button */}
+        <AnimatePresence>
+          {showScrollToTop && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="md:hidden fixed bottom-4 right-4 z-[9999]"
+            >
+              <motion.button
+                onClick={handleScrollToTop}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                className="flex items-center justify-center w-14 h-14 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border border-white/40 dark:border-gray-600/60 rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
+                title={appConfig.theme?.ariaTexts?.scrollToTopLabel || "Sayfanın Başına Dön"}
+                aria-label={appConfig.theme?.ariaTexts?.scrollToTopLabel || "Scroll to top of page"}
+              >
+                <ChevronUp className="w-6 h-6 text-blue-600 dark:text-blue-400" aria-hidden="true" />
+              </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <Toaster />
+      </div>
+    </FontFamilyProvider>
   );
 }

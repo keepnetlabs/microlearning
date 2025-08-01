@@ -2,6 +2,7 @@ import * as LucideIcons from "lucide-react";
 import { motion } from "framer-motion";
 import React, { ReactNode, useMemo, useCallback } from "react";
 import { LucideIcon } from "lucide-react"
+import { FontWrapper } from "../common/FontWrapper";
 
 // İkon mapping fonksiyonu
 const getIconComponent = (iconName: string): LucideIcon => {
@@ -157,7 +158,7 @@ export const IntroScene = React.memo(({
     drifting: { count: 6, opacity: 15, size: 0.5, duration: 18, delay: 5 },
     breathing: { count: 7, opacity: 12, size: 0.5, duration: 11, delay: 6 }
   };
-  const defaultContainerClassName = "flex flex-col items-center justify-center h-full text-center relative font-['Open_Sans'] overflow-hidden px-2 sm:px-4";
+  const defaultContainerClassName = "flex flex-col items-center justify-center h-full text-center relative overflow-hidden px-2 sm:px-4";
   const defaultAnimationDelays = { welcomeDelay: 1.0, iconDelay: 0.2, titleDelay: 0.3, subtitleDelay: 1.0, cardDelay: 0.5, statsDelay: 0.8, ctaDelay: 1.0 };
 
   const {
@@ -328,7 +329,7 @@ export const IntroScene = React.memo(({
   }), []);
 
   return (
-    <div className={containerClassName}>
+    <FontWrapper variant="primary" className={containerClassName}>
       {/* Apple-style Background Sparkles - Balanced */}
       {sparkles?.enabled && (
         <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
@@ -567,7 +568,7 @@ export const IntroScene = React.memo(({
           transition={{ duration: 0.8, delay: delays.title }}
         >
           <motion.h1
-            className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-900 dark:text-white"
+            className="text-2xl sm:text-3xl md:text-4xl font-semibold text-[#1C1C1E] dark:text-white"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: delays.titleWords }}
@@ -727,7 +728,7 @@ export const IntroScene = React.memo(({
                     <item.Icon size={14} className={`${item.textColor} relative z-10 sm:w-4 sm:h-4`} strokeWidth={2} />
                   </motion.div>
                 </div>
-                <span className="text-xs sm:text-sm text-gray-700 dark:text-gray-200 font-medium leading-relaxed group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+                <span className="text-xs sm:text-sm text-gray-700 dark:text-gray-200 font-medium leading-relaxed group-hover:text-[#1C1C1E] dark:group-hover:text-white transition-colors">
                   {item.text}
                 </span>
               </motion.div>
@@ -861,6 +862,6 @@ export const IntroScene = React.memo(({
           <span className="relative z-10 text-xs text-gray-600 dark:text-gray-300 font-medium">{callToActionText}</span>
         </motion.div>
       </motion.div>
-    </div>
+    </FontWrapper>
   );
 });

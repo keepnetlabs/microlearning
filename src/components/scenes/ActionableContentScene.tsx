@@ -1,6 +1,7 @@
 import { LucideIcon } from "lucide-react";
 import { useMemo } from "react";
 import * as LucideIcons from "lucide-react";
+import { FontWrapper } from "../common/FontWrapper";
 
 // Props interfaces
 interface ActionItem {
@@ -150,121 +151,123 @@ export function ActionableContentScene({
   }, [tipConfig.iconName, tipConfig.iconSize]);
 
   return (
-    <main
-      className={defaultContainerClassName}
-      role="main"
-      aria-label={ariaTexts?.mainLabel || "Actionable Content"}
-      aria-describedby="actionable-content-description"
-    >
-      <div
-        id="actionable-content-description"
-        className="sr-only"
-        aria-live="polite"
-      >
-        {ariaTexts?.mainDescription || "Actionable content section with interactive cards containing tips and guidance"}
-      </div>
-
-      <header role="banner" aria-label={ariaTexts?.headerLabel || "Scene header"}>
-        <div className="mb-2 sm:mb-3 flex items-center justify-center" aria-hidden="true">
-          {sceneIconComponent}
-        </div>
-        <h1
-          className="text-2xl mb-2 sm:mb-3 text-center text-gray-900 dark:text-white"
-          id="actionable-content-title"
-        >
-          {title}
-        </h1>
-      </header>
-
-      <section
-        className={`${finalCardSpacing} ${finalMaxWidth} pb-4 sm:pb-6`}
-        aria-label={ariaTexts?.actionCardsLabel || "Action cards"}
-        aria-describedby="actionable-content-title"
+    <FontWrapper>
+      <main
+        className={defaultContainerClassName}
+        role="main"
+        aria-label={ariaTexts?.mainLabel || "Actionable Content"}
+        aria-describedby="actionable-content-description"
       >
         <div
-          role="list"
-          aria-label={ariaTexts?.actionCardsDescription || "Actionable content cards"}
-          className={finalCardSpacing}
+          id="actionable-content-description"
+          className="sr-only"
+          aria-live="polite"
         >
-          {actions.map((action, index) => {
-            const ActionIcon = getIconComponent(action.iconName);
-            const cardId = `action-card-${index}`;
-            const tipId = `tip-${index}`;
+          {ariaTexts?.mainDescription || "Actionable content section with interactive cards containing tips and guidance"}
+        </div>
 
-            return (
-              <article
-                key={index}
-                id={cardId}
-                role="listitem"
-                aria-labelledby={`${cardId}-title`}
-                aria-describedby={`${cardId}-description ${tipId}`}
-                className={`relative p-5 rounded-2xl ${finalGlassEffect.cardBackground} ${finalGlassEffect.backdropBlur} border ${finalGlassEffect.cardBorder} ${finalGlassEffect.shadow} transition-all duration-300 hover:scale-105`}
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    // Focus management for keyboard navigation
-                    const nextCard = e.currentTarget.nextElementSibling as HTMLElement;
-                    if (nextCard) {
-                      nextCard.focus();
+        <header role="banner" aria-label={ariaTexts?.headerLabel || "Scene header"}>
+          <div className="mb-2 sm:mb-3 flex items-center justify-center" aria-hidden="true">
+            {sceneIconComponent}
+          </div>
+          <h1
+            className="text-2xl mb-2 sm:mb-3 text-center text-[#1C1C1E] dark:text-white"
+            id="actionable-content-title"
+          >
+            {title}
+          </h1>
+        </header>
+
+        <section
+          className={`${finalCardSpacing} ${finalMaxWidth} pb-4 sm:pb-6`}
+          aria-label={ariaTexts?.actionCardsLabel || "Action cards"}
+          aria-describedby="actionable-content-title"
+        >
+          <div
+            role="list"
+            aria-label={ariaTexts?.actionCardsDescription || "Actionable content cards"}
+            className={finalCardSpacing}
+          >
+            {actions.map((action, index) => {
+              const ActionIcon = getIconComponent(action.iconName);
+              const cardId = `action-card-${index}`;
+              const tipId = `tip-${index}`;
+
+              return (
+                <article
+                  key={index}
+                  id={cardId}
+                  role="listitem"
+                  aria-labelledby={`${cardId}-title`}
+                  aria-describedby={`${cardId}-description ${tipId}`}
+                  className={`relative p-5 rounded-2xl ${finalGlassEffect.cardBackground} ${finalGlassEffect.backdropBlur} border ${finalGlassEffect.cardBorder} ${finalGlassEffect.shadow} transition-all duration-300 hover:scale-105`}
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      // Focus management for keyboard navigation
+                      const nextCard = e.currentTarget.nextElementSibling as HTMLElement;
+                      if (nextCard) {
+                        nextCard.focus();
+                      }
                     }
-                  }
-                }}
-              >
-                <div className={`absolute inset-0 bg-gradient-to-br ${action.bgGradientClass} dark:opacity-50 rounded-2xl`} aria-hidden="true"></div>
-                <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent dark:from-gray-800/20 dark:to-transparent rounded-2xl" aria-hidden="true"></div>
+                  }}
+                >
+                  <div className={`absolute inset-0 bg-gradient-to-br ${action.bgGradientClass} dark:opacity-50 rounded-2xl`} aria-hidden="true"></div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent dark:from-gray-800/20 dark:to-transparent rounded-2xl" aria-hidden="true"></div>
 
-                {/* Apple Dark Mode Depth Layers */}
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-800/20 via-gray-900/12 to-gray-900/8 dark:from-gray-700/30 dark:via-gray-800/20 dark:to-gray-900/15 rounded-2xl opacity-0 dark:opacity-100 transition-opacity duration-500" aria-hidden="true" />
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-100/25 via-transparent to-transparent dark:from-gray-800/20 rounded-2xl transition-colors duration-500" aria-hidden="true" />
+                  {/* Apple Dark Mode Depth Layers */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-gray-800/20 via-gray-900/12 to-gray-900/8 dark:from-gray-700/30 dark:via-gray-800/20 dark:to-gray-900/15 rounded-2xl opacity-0 dark:opacity-100 transition-opacity duration-500" aria-hidden="true" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-gray-100/25 via-transparent to-transparent dark:from-gray-800/20 rounded-2xl transition-colors duration-500" aria-hidden="true" />
 
-                <div className="relative z-10">
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 mr-4" aria-hidden="true">
-                      <div className="p-3 rounded-xl bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm border border-white/30 dark:border-gray-600/50 shadow-sm">
-                        <ActionIcon size={20} className={action.iconColorClass} aria-hidden="true" />
+                  <div className="relative z-10">
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0 mr-4" aria-hidden="true">
+                        <div className="p-3 rounded-xl bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm border border-white/30 dark:border-gray-600/50 shadow-sm">
+                          <ActionIcon size={20} className={action.iconColorClass} aria-hidden="true" />
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex-1">
-                      <h3
-                        id={`${cardId}-title`}
-                        className="text-sm text-gray-900 dark:text-white font-medium mb-2"
-                      >
-                        {action.title}
-                      </h3>
-                      <p
-                        id={`${cardId}-description`}
-                        className="text-xs text-gray-700 dark:text-gray-200 mb-3 leading-relaxed"
-                      >
-                        {action.description}
-                      </p>
-                      <div
-                        id={tipId}
-                        className={`relative p-3 rounded-xl bg-gradient-to-r ${action.tipColorClass} backdrop-blur-sm border`}
-                        role="note"
-                        aria-label={ariaTexts?.tipLabel || "Tip"}
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent dark:from-gray-800/10 dark:to-transparent rounded-xl" aria-hidden="true"></div>
+                      <div className="flex-1">
+                        <h3
+                          id={`${cardId}-title`}
+                          className="text-sm text-[#1C1C1E] dark:text-white font-medium mb-2"
+                        >
+                          {action.title}
+                        </h3>
+                        <p
+                          id={`${cardId}-description`}
+                          className="text-xs text-gray-700 dark:text-gray-200 mb-3 leading-relaxed"
+                        >
+                          {action.description}
+                        </p>
+                        <div
+                          id={tipId}
+                          className={`relative p-3 rounded-xl bg-gradient-to-r ${action.tipColorClass} backdrop-blur-sm border`}
+                          role="note"
+                          aria-label={ariaTexts?.tipLabel || "Tip"}
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent dark:from-gray-800/10 dark:to-transparent rounded-xl" aria-hidden="true"></div>
 
-                        {/* Apple Dark Mode Tip Depth */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-gray-800/15 via-gray-900/8 to-gray-900/5 dark:from-gray-700/25 dark:via-gray-800/15 dark:to-gray-900/10 rounded-xl opacity-0 dark:opacity-100 transition-opacity duration-500" aria-hidden="true" />
-                        <div className="relative z-10 flex items-start">
-                          <div className={`${action.tipIconColorClass} mr-2 mt-0.5 flex-shrink-0`} aria-hidden="true">
-                            {tipIconComponent}
+                          {/* Apple Dark Mode Tip Depth */}
+                          <div className="absolute inset-0 bg-gradient-to-br from-gray-800/15 via-gray-900/8 to-gray-900/5 dark:from-gray-700/25 dark:via-gray-800/15 dark:to-gray-900/10 rounded-xl opacity-0 dark:opacity-100 transition-opacity duration-500" aria-hidden="true" />
+                          <div className="relative z-10 flex items-start">
+                            <div className={`${action.tipIconColorClass} mr-2 mt-0.5 flex-shrink-0`} aria-hidden="true">
+                              {tipIconComponent}
+                            </div>
+                            <span className={`text-xs ${action.tipTextColorClass}`}>
+                              {action.tip}
+                            </span>
                           </div>
-                          <span className={`text-xs ${action.tipTextColorClass}`}>
-                            {action.tip}
-                          </span>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </article>
-            );
-          })}
-        </div>
-      </section>
-    </main>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+      </main>
+    </FontWrapper>
   );
 }

@@ -469,7 +469,7 @@ export function VideoPlayer({
   }), []);
   const containerStyle = useMemo((): React.CSSProperties => ({
     maxWidth: 1200,
-    margin: "1rem auto",
+    margin: "0 auto 1rem auto",
     display: "flex",
     gap: "20px",
     flexDirection: "column",
@@ -489,7 +489,7 @@ export function VideoPlayer({
     >
       <div
         id="video-player-description"
-        className="sr-only"
+        className="sr-only mt-0"
         aria-live="polite"
       >
         {ariaTexts?.mainDescription || "Video player with transcript functionality. Use the transcript panel to navigate through video content."}
@@ -767,7 +767,7 @@ export function VideoPlayer({
 
                           <p
                             className={`leading-relaxed transition-colors duration-200 ${isActive
-                              ? "text-gray-900 dark:text-slate-50 font-medium"
+                              ? "text-[#1C1C1E] dark:text-slate-50 font-medium"
                               : canAccess
                                 ? "text-gray-700 dark:text-slate-200"
                                 : "text-gray-400 dark:text-slate-500"
