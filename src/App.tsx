@@ -48,18 +48,18 @@ const STATIC_CSS_CLASSES = {
   controlsContainer: "flex items-center space-x-1.5 md:space-x-3 flex-shrink-0 z-20",
 
   // Points badge
-  pointsBadge: "relative flex items-center justify-center min-w-[54px] sm:min-w-[60px] space-x-1 sm:space-x-1.5 md:space-x-1.5 px-1.5 sm:px-2 md:px-3 h-8 sm:h-10 rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 dark:bg-black dark:border-white border-[#F59E0B] border-[1px] ease-out group",
+  pointsBadge: "relative flex items-center justify-center min-w-[54px] sm:min-w-[70px] space-x-1 sm:space-x-1.5 md:space-x-1.5 px-1.5 sm:px-2 md:px-3 h-8 sm:h-10 rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 dark:bg-black dark:border-white background-[rgba(242, 242, 247, 0.10)] border-[1px] ease-out group",
   pointsBadgeNoise: "absolute inset-0 opacity-[0.020] dark:opacity-[0.012] rounded-lg sm:rounded-xl mix-blend-overlay pointer-events-none",
-  pointsText: "text-xs md:text-sm font-semibold text-[#D97706] dark:text-[#D97706] transition-colors duration-300",
+  pointsText: "text-xs md:text-sm font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300",
 
   // Theme button
-  themeButton: "relative dark:bg-black dark:border-white border-[#C7C7CC] border-[1px] flex items-center justify-center p-1 sm:p-1.5 md:p-2 h-[32px] sm:h-[40px] sm:max-h-[40px] rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group ",
-  themeButtonIcon: "w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 text-[#8E8E93] dark:text-gray-300 transition-colors duration-300",
+  themeButton: "relative dark:bg-black dark:border-[#F2F2F7] background-[rgba(242, 242, 247, 0.10)] border-[1px] flex items-center justify-center p-1 sm:p-1.5 md:p-2 h-[32px] sm:h-[40px] sm:max-h-[40px] rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group ",
+  themeButtonIcon: "w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300",
 
   // Language button
-  languageButton: "relative flex items-center justify-center space-x-0.5 bg-[white] border-[#C7C7CC] dark:bg-black dark:border-white border-[#C7C7CC] border-[1px] sm:space-x-1 md:space-x-2 px-1 sm:px-1.5 md:px-3 h-8 sm:h-10 sm:w-[100px] rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group",
+  languageButton: "relative flex items-center justify-center space-x-0.5 bg-[rgba(242, 242, 247, 0.10)] dark:bg-[#1C1C1E] dark:border-[#F2F2F7] border-[1px] sm:space-x-1 md:space-x-2 px-1 sm:px-1.5 md:px-3 h-8 sm:h-10 sm:w-[100px] rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group",
   languageFlag: "w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 rounded-sm transition-opacity duration-300",
-  languageChevron: "w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4 text-gray-500 dark:text-white transition-colors duration-300",
+  languageChevron: "w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4 text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300",
 
   // Language dropdown
   languageSearch: "w-full px-3 py-2 text-sm bg-transparent border-0 focus:outline-none focus:ring-0 text-[#1C1C1E] dark:text-white placeholder-gray-500 dark:placeholder-gray-400",
@@ -1164,13 +1164,16 @@ export default function App() {
                     scale: 1.02,
                     y: -1
                   }}
+                  style={{
+                    boxShadow: "4px 0 4px 0 rgba(255, 255, 255, 0.15) inset, 0 4px 4px 0 rgba(255, 255, 255, 0.15) inset"
+                  }}
                   role="status"
                   aria-label={appConfig.theme?.ariaTexts?.pointsLabel || "Total points earned"}
                   aria-live="polite"
                 >
                   {/* Badge Content */}
                   <div className="relative z-10 flex items-center space-x-1 sm:space-x-1.5 md:space-x-1.5">
-                    <Award size={isMobile ? 16 : 20} className="text-[#F59E0B] dark:text-[#F59E0B] sm:w-4 sm:h-4 md:w-5 md:h-5 transition-colors duration-300" aria-hidden="true" />
+                    <Award size={isMobile ? 16 : 20} className="text-[#1C1C1E] dark:text-[#F2F2F7] sm:w-4 sm:h-4 md:w-5 md:h-5 transition-colors duration-300" aria-hidden="true" />
                     <span className={cssClasses.pointsText} aria-label={`${totalPoints} ${appConfig.theme?.ariaTexts?.pointsDescription || "points earned"}`}>
                       {totalPoints}
                     </span>
@@ -1190,6 +1193,9 @@ export default function App() {
                   title={isDarkMode ? themeConfig.texts?.toggleButtonLightMode : themeConfig.texts?.toggleButtonDarkMode}
                   aria-checked={isDarkMode}
                   role="switch"
+                  style={{
+                    boxShadow: "4px 0 4px 0 rgba(255, 255, 255, 0.15) inset, 0 4px 4px 0 rgba(255, 255, 255, 0.15) inset"
+                  }} 
                   aria-describedby="theme-toggle-description"
                 >
 
@@ -1220,7 +1226,7 @@ export default function App() {
                         >
                           <Sun
                             size={40}
-                            className="text-yellow-600 group-hover:text-yellow-700 dark:text-white dark:group-hover:text-white transition-colors duration-300 w-5 h-5 sm:w-6 sm:h-6"
+                            className="text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 w-5 h-5 sm:w-6 sm:h-6"
                             aria-hidden="true"
                           />
                         </motion.div>
@@ -1234,7 +1240,7 @@ export default function App() {
                         >
                           <Moon
                             size={40}
-                            className="text-[#8E8E93] dark:text-[#8E8E93] transition-colors duration-300 w-5 h-5 sm:w-6 sm:h-6"
+                            className="text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 w-5 h-5 sm:w-6 sm:h-6"
                             aria-hidden="true"
                           />
                         </motion.div>
@@ -1263,7 +1269,8 @@ export default function App() {
                     style={{
                       transform: 'translateZ(0)',
                       willChange: 'transform',
-                      touchAction: 'manipulation'
+                      touchAction: 'manipulation',
+                      boxShadow: "4px 0 4px 0 rgba(255, 255, 255, 0.15) inset, 0 4px 4px 0 rgba(255, 255, 255, 0.15) inset"
                     }}
                   >
 
@@ -1275,7 +1282,7 @@ export default function App() {
                         style={{ fontSize: isMobile ? '1rem' : '1.2rem' }}
                         aria-hidden="true"
                       />
-                      <span className="text-xs text-gray-800 dark:text-gray-200 font-medium transition-colors duration-300">
+                      <span className="text-[14px] text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold transition-colors duration-300">
                         {getCountryCode(currentLanguage?.code || 'tr')}
                       </span>
                       <ChevronDown
