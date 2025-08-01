@@ -601,6 +601,25 @@
       "successMessage3": "Continue enhancing your security awareness!",
       "thankYouMessage": "Stay secure! 🛡️"
     },
+    "ariaTexts": {
+      "mainLabel": "Survey completion",
+      "successDescription": "Survey completed successfully. Thank you for your feedback.",
+      "successRegionLabel": "Success message",
+      "successIconLabel": "Success checkmark icon",
+      "formDescription": "Survey form with rating, topic selection, and feedback sections",
+      "headerLabel": "Survey header",
+      "formContentDescription": "Survey form containing rating stars, topic checkboxes, and feedback textarea",
+      "ratingDescription": "Rate the training from 1 to 5 stars",
+      "starLabel": "star",
+      "topicsDescription": "Select topics you would like to learn more about",
+      "topicLabel": "Select",
+      "feedbackDescription": "Optional feedback textarea for additional comments",
+      "feedbackLabel": "Additional feedback",
+      "submitSectionLabel": "Submit survey",
+      "submittingLabel": "Submitting survey",
+      "submitLabel": "Submit survey",
+      "securityNoticeLabel": "Data security notice"
+    },
     "topics": [
       "SMS Security",
       "Email Security",

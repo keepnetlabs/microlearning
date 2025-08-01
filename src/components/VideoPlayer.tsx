@@ -9,7 +9,7 @@ import Plyr from "plyr";
 import "plyr/dist/plyr.css";
 import Hls from "hls.js";
 import { motion } from "framer-motion";
-import { Lock, RotateCcw, RotateCw } from "lucide-react";
+import { FileText, Lock, RotateCw } from "lucide-react";
 
 // HTMLVideoElement'e _lastTime özelliği ekle
 interface VideoWithLastTime extends HTMLVideoElement {
@@ -113,6 +113,8 @@ export function VideoPlayer({
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isReplaying, setIsReplaying] = useState(false);
   const [isVideoEnded, setIsVideoEnded] = useState(false);
+  const [hasReplayed, setHasReplayed] = useState(false);
+  const [watchedRows, setWatchedRows] = useState<Set<number>>(new Set());
   const transcriptContainerRef = useRef<HTMLDivElement>(null);
 
   // Dark mode detection
@@ -174,6 +176,9 @@ export function VideoPlayer({
   useEffect(() => {
     const video = videoRef.current;
     if (video) {
+      // Initialize _lastTime to 0
+      video._lastTime = 0;
+
       if (Hls.isSupported()) {
         const hls = new Hls();
         hls.loadSource(src);
@@ -297,23 +302,33 @@ export function VideoPlayer({
   }, [currentRowIndex]);
 
   const handleTranscriptRowClick = useCallback(
-    (startTime: number) => {
+    (startTime: number, rowIndex: number) => {
       const video = videoRef.current;
       if (video && playerRef.current) {
         if (
           disableForwardSeek &&
-          startTime > (video._lastTime || 0)
+          !watchedRows.has(rowIndex)
         ) {
           console.warn(
-            "Forward seeking disabled - cannot jump to future timestamp",
+            "Forward seeking disabled - cannot jump to unwatched timestamp",
           );
           return;
         }
         video.currentTime = startTime;
+        // Update current time state immediately to reflect the change
+        setCurrentTime(startTime);
+
+        // Mark this row and all previous rows as watched
+        const newWatchedRows = new Set(watchedRows);
+        for (let i = 0; i <= rowIndex; i++) {
+          newWatchedRows.add(i);
+        }
+        setWatchedRows(newWatchedRows);
+
         playerRef.current.play();
       }
     },
-    [disableForwardSeek],
+    [disableForwardSeek, watchedRows],
   );
 
   const handleReplay = useCallback(() => {
@@ -321,7 +336,17 @@ export function VideoPlayer({
     if (video && playerRef.current) {
       setIsReplaying(true);
       setIsVideoEnded(false);
+      setHasReplayed(true);
       video.currentTime = 0;
+      // Reset _lastTime when replaying to remove all lock icons
+      video._lastTime = 0;
+      // Reset current time state to trigger re-render
+      setCurrentTime(0);
+
+      // Mark all rows as watched when replaying
+      const allWatchedRows = new Set(parsedTranscript.map((_, index) => index));
+      setWatchedRows(allWatchedRows);
+
       playerRef.current.play();
 
       // Reset transcript scroll to top
@@ -335,13 +360,32 @@ export function VideoPlayer({
       // Reset replay state after a short delay
       setTimeout(() => setIsReplaying(false), 1000);
     }
-  }, []);
+  }, [parsedTranscript]);
   const handleTimeUpdate = useCallback(() => {
     const video = videoRef.current;
     if (video) {
       setCurrentTime(video.currentTime);
+      // Update _lastTime to the current time to unlock transcript rows
+      video._lastTime = video.currentTime;
+
+      // Track which rows have been watched
+      const currentTime = video.currentTime;
+      const newWatchedRows = new Set(watchedRows);
+
+      parsedTranscript.forEach((row, index) => {
+        if (currentTime >= row.start) {
+          newWatchedRows.add(index);
+        }
+      });
+
+      setWatchedRows(newWatchedRows);
+
+      // Reset hasReplayed when video progresses normally
+      if (hasReplayed && video.currentTime > 0) {
+        setHasReplayed(false);
+      }
     }
-  }, []);
+  }, [hasReplayed, watchedRows, parsedTranscript]);
 
   const handleVideoEnded = useCallback(() => {
     setIsVideoEnded(true);
@@ -508,7 +552,7 @@ export function VideoPlayer({
               }
             }}
           >
-            <Lock className="w-5 h-5" aria-hidden="true" />
+            <FileText className="w-5 h-5" aria-hidden="true" />
           </motion.button>
         )}
 
@@ -578,7 +622,7 @@ export function VideoPlayer({
                     className="p-2 rounded-lg bg-blue-50/90 dark:bg-blue-900/60 border border-blue-200/60 dark:border-blue-600/60 shadow-sm"
                     aria-hidden="true"
                   >
-                    <Lock className="w-4 h-4 text-blue-600 dark:text-blue-200" />
+                    <FileText className="w-4 h-4 text-blue-600 dark:text-blue-200" />
                   </div>
                   <div>
                     <h3
@@ -635,15 +679,16 @@ export function VideoPlayer({
                 const isActive = index === currentRowIndex;
                 const video = videoRef.current;
                 const canAccess =
+                  hasReplayed ||
                   !disableForwardSeek ||
-                  row.start <= (video?._lastTime || 0);
+                  watchedRows.has(index);
 
                 return (
                   <motion.div
                     key={index}
                     data-row-index={index}
                     onClick={() =>
-                      handleTranscriptRowClick(row.start)
+                      handleTranscriptRowClick(row.start, index)
                     }
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -651,12 +696,10 @@ export function VideoPlayer({
                       delay: index * 0.02,
                       duration: 0.2,
                     }}
-                    whileHover={{
-                      backgroundColor: canAccess
-                        ? "rgba(226, 232, 240, 0.3)"
-                        : "rgba(156, 163, 175, 0.08)",
-                    }}
-                    className={`transition-all duration-200 mx-3 my-1 rounded-lg transcript-row-hover ${canAccess
+                    whileHover={isActive ? {
+                      backgroundColor: "rgba(226, 232, 240, 0.3)",
+                    } : {}}
+                    className={`transition-all duration-200 mx-3 my-1 rounded-lg ${isActive ? "transcript-row-hover" : ""} ${canAccess
                       ? "cursor-pointer"
                       : "cursor-not-allowed"
                       } ${isActive
@@ -665,9 +708,7 @@ export function VideoPlayer({
                       }`}
                     style={{
                       padding: "8px 12px",
-                      backgroundColor: isActive
-                        ? "var(--tw-bg-opacity, 1) rgba(59, 130, 246, 0.1)"
-                        : "transparent",
+                      backgroundColor: "transparent",
                       opacity: canAccess ? 1 : 0.5,
                       boxShadow: isActive
                         ? "0 2px 8px rgba(59, 130, 246, 0.15)"
@@ -681,15 +722,15 @@ export function VideoPlayer({
                     onKeyDown={(e) => {
                       if (canAccess && (e.key === 'Enter' || e.key === ' ')) {
                         e.preventDefault();
-                        handleTranscriptRowClick(row.start);
+                        handleTranscriptRowClick(row.start, index);
                       }
                     }}
                   >
                     <div className="flex space-x-3">
                       {/* Timestamp */}
-                      <div className="flex-shrink-0">
+                      <div className="flex-shrink-0 self-center">
                         <span
-                          className={`font-medium transition-colors duration-200 text-xs ${isActive
+                          className={`font-medium transition-colors duration-200 flex items-center gap-1 text-xs ${isActive
                             ? "text-blue-600 dark:text-blue-300 font-semibold"
                             : canAccess
                               ? "text-gray-600 dark:text-slate-300"
@@ -702,7 +743,7 @@ export function VideoPlayer({
                           aria-label={`${ariaTexts?.timestampLabel || "Timestamp"}: ${formatTime(row.start)}${!canAccess ? ` - ${ariaTexts?.lockedLabel || "Locked"}` : ''}`}
                         >
                           {formatTime(row.start)}
-                          {!canAccess && " 🔒"}
+                          {!canAccess && <Lock className="w-4 h-4 text-gray-600 dark:text-slate-300" />}
                         </span>
                       </div>
 
@@ -734,6 +775,7 @@ export function VideoPlayer({
                               fontSize: "13px",
                               lineHeight: "1.5",
                               fontWeight: isActive ? "500" : "400",
+                              marginTop: "0"
                             }}
                             aria-label={`${ariaTexts?.transcriptTextLabel || "Transcript text"}: ${row.text}`}
                           >

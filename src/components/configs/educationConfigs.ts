@@ -103,6 +103,43 @@ export interface SurveySceneConfig {
         successMessage2?: string;
         successMessage3?: string;
         thankYouMessage?: string;
+        // Accessibility texts
+        mainLabel?: string;
+        successDescription?: string;
+        successRegionLabel?: string;
+        successIconLabel?: string;
+        formDescription?: string;
+        headerLabel?: string;
+        formContentDescription?: string;
+        ratingDescription?: string;
+        starLabel?: string;
+        topicsDescription?: string;
+        topicLabel?: string;
+        feedbackDescription?: string;
+        feedbackLabel?: string;
+        submitSectionLabel?: string;
+        submittingLabel?: string;
+        submitLabel?: string;
+        securityNoticeLabel?: string;
+    };
+    ariaTexts?: {
+        mainLabel?: string;
+        successDescription?: string;
+        successRegionLabel?: string;
+        successIconLabel?: string;
+        formDescription?: string;
+        headerLabel?: string;
+        formContentDescription?: string;
+        ratingDescription?: string;
+        starLabel?: string;
+        topicsDescription?: string;
+        topicLabel?: string;
+        feedbackDescription?: string;
+        feedbackLabel?: string;
+        submitSectionLabel?: string;
+        submittingLabel?: string;
+        submitLabel?: string;
+        securityNoticeLabel?: string;
     };
     topics?: string[];
     icon?: {

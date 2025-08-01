@@ -705,6 +705,25 @@
       "successMessage3": "Güvenlik farkındalığınızı artırmaya devam edin!",
       "thankYouMessage": "Güvenli kalın! 🛡️"
     },
+    "ariaTexts": {
+      "mainLabel": "Anket tamamlama",
+      "successDescription": "Anket başarıyla tamamlandı. Geri bildiriminiz için teşekkür ederiz.",
+      "successRegionLabel": "Başarı mesajı",
+      "successIconLabel": "Başarı onay işareti ikonu",
+      "formDescription": "Değerlendirme, konu seçimi ve geri bildirim bölümleri olan anket formu",
+      "headerLabel": "Anket başlığı",
+      "formContentDescription": "Değerlendirme yıldızları, konu onay kutuları ve geri bildirim metin alanı içeren anket formu",
+      "ratingDescription": "Eğitimi 1'den 5'e kadar yıldızla değerlendirin",
+      "starLabel": "yıldız",
+      "topicsDescription": "Daha detaylı öğrenmek istediğiniz konuları seçin",
+      "topicLabel": "Seç",
+      "feedbackDescription": "Ek yorumlar için isteğe bağlı geri bildirim metin alanı",
+      "feedbackLabel": "Ek geri bildirim",
+      "submitSectionLabel": "Anketi gönder",
+      "submittingLabel": "Anket gönderiliyor",
+      "submitLabel": "Anketi gönder",
+      "securityNoticeLabel": "Veri güvenliği bildirimi"
+    },
     "topics": [
       "SMS Güvenliği",
       "E-posta Güvenliği",

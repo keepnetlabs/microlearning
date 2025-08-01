@@ -178,7 +178,6 @@ export function ActionableContentScene({
 
       <section
         className={`${finalCardSpacing} ${finalMaxWidth} pb-4 sm:pb-6`}
-        role="region"
         aria-label={ariaTexts?.actionCardsLabel || "Action cards"}
         aria-describedby="actionable-content-title"
       >
