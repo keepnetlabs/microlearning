@@ -271,7 +271,7 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
               {goal.title}
             </h3>
             {goal.subtitle && (
-              <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-300 ease-out group-hover:text-gray-600 dark:group-hover:text-gray-200 mt-0.5">
+              <p className="text-xs font-semibold text-[#1C1C1E] dark:text-gray-300 transition-colors duration-300 ease-out group-hover:text-gray-600 dark:group-hover:text-gray-200 mt-0.5">
                 {goal.subtitle}
               </p>
             )}
@@ -281,7 +281,7 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
         {/* APPLE DESCRIPTION TEXT - Perfect readability */}
         <p
           id={`goal-description-${index}`}
-          className="text-xs text-left text-gray-800 dark:text-gray-200 leading-relaxed transition-colors duration-300 ease-out group-hover:text-gray-700 dark:group-hover:text-gray-100 font-medium"
+          className="text-xs text-left text-gray-800 dark:text-gray-200 leading-relaxed transition-colors duration-300 ease-out group-hover:text-[#1C1C1E] dark:group-hover:text-gray-100 font-medium"
         >
           {goal.description}
         </p>

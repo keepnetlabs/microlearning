@@ -27,14 +27,10 @@ const STATIC_CSS_CLASSES = {
 
   // Background
   backgroundContainer: "fixed inset-0 pointer-events-none overflow-hidden",
-  backgroundGradient3: "absolute top-1/3 right-1/5 w-40 h-40 bg-gradient-radial from-cyan-100/25 to-transparent dark:from-cyan-900/15 dark:to-transparent rounded-full blur-2xl",
-  backgroundGradient4: "absolute bottom-1/4 left-1/4 w-32 h-32 bg-gradient-radial from-emerald-100/30 to-transparent dark:from-emerald-900/18 dark:to-transparent rounded-full blur-xl",
 
   // Header
   headerContainer: "relative shrink-0",
-  headerBackground: "absolute inset-0 bg-gradient-to-b from-white/95 via-white/90 to-white/85 dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-900/85 transition-colors duration-300",
-  headerBorder: "absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gray-200/60 dark:via-gray-600/60 to-transparent transition-colors duration-300",
-  headerContent: "relative z-10 px-4 py-4 pt-safe bg-white dark:bg-gray-900 lg:px-16 xl:px-20 2xl:px-24 min-h-[106px] md:min-h-[72px]",
+  headerContent: "relative z-10 px-4 py-4 pt-safe dark:bg-gray-900 lg:px-16 xl:px-20 2xl:px-24 min-h-[106px] md:min-h-[72px]",
 
   // Logo
   logoContainer: "flex-shrink-0 z-20",
@@ -228,7 +224,7 @@ export default function App() {
   // Dynamic CSS classes - Sadece themeConfig değiştiğinde yeniden hesaplanır
   const dynamicCssClasses = useMemo(() => ({
     // Ana container
-    mainContainer: `min-h-screen bg-gradient-to-br from-${themeConfig.colors?.background || 'slate'}-100/90 via-${themeConfig.colors?.primary || 'blue'}-50/60 to-${themeConfig.colors?.secondary || 'indigo'}-100/75 dark:from-gray-800 dark:via-gray-850 dark:to-gray-900 flex flex-col relative overflow-hidden transition-colors duration-300`,
+    mainContainer: `min-h-screen bg-gradient-to-br bg-[${themeConfig.colors?.background}] bg-[linear-gradient(106deg,_#76B2D7_0%,_#3178A5_100%)] dark:from-gray-800 dark:via-gray-850 dark:to-gray-900 flex flex-col relative overflow-hidden transition-colors duration-300`,
 
     // Loading container
     loadingContainer: `flex items-center space-x-3 px-6 py-4 bg-${themeConfig.colors?.surface || 'white'}/90 dark:bg-gray-900/90 ${themeConfig.effects?.backdropBlur || 'backdrop-blur-xl'} ${themeConfig.effects?.borderRadius || 'rounded-2xl'} border border-${themeConfig.colors?.surface || 'white'}/${themeConfig.effects?.borderOpacity || '60'} dark:border-gray-600/60 ${themeConfig.effects?.shadow || 'shadow-xl'} transition-colors duration-300`,
@@ -1069,42 +1065,6 @@ export default function App() {
         >
           {!isMobile && (
             <>
-              {/* Deep layered background elements - Enhanced with more depth */}
-              <motion.div
-                className={cssClasses.backgroundGradient1}
-                style={{
-                  animationDuration: '12s',
-                  transform: `translateY(${scrollY * 0.4}px) translateX(${scrollY * 0.1}px)` // Different parallax speed
-                }}
-                aria-hidden="true"
-              />
-
-              <motion.div
-                className={cssClasses.backgroundGradient2}
-                style={{
-                  animationDuration: '16s',
-                  animationDelay: '3s',
-                  transform: `translateY(${scrollY * -0.2}px) translateX(${scrollY * -0.05}px)` // Opposite direction
-                }}
-                aria-hidden="true"
-              />
-
-              {/* Additional depth layers - Enhanced contrast */}
-              <motion.div
-                className={cssClasses.backgroundGradient3}
-                style={{
-                  transform: `translateY(${scrollY * 0.5}px) translateX(${scrollY * 0.08}px) scale(${1 + scrollY * 0.0002})`
-                }}
-                aria-hidden="true"
-              />
-
-              <motion.div
-                className={cssClasses.backgroundGradient4}
-                style={{
-                  transform: `translateY(${scrollY * -0.25}px) translateX(${scrollY * -0.04}px) scale(${1 + scrollY * 0.0001})`
-                }}
-                aria-hidden="true"
-              />
 
               {/* Enhanced floating ambient particles */}
               <motion.div
@@ -1145,14 +1105,10 @@ export default function App() {
 
         {/* Optimized Mobile Header - Enhanced dark mode contrast */}
         <header
-          className={`${cssClasses.headerContainer} ${isIOS && currentScene === 4 ? 'pt-2' : ''}`}
+          className={`${cssClasses.headerContainer} ${isIOS && currentScene === 4 ? 'pt-2.5' : ''}`}
           role="banner"
           aria-label={appConfig.theme?.ariaTexts?.headerLabel || "Application header"}
         >
-          <div className={cssClasses.headerBackground} aria-hidden="true"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-50/30 via-transparent to-purple-50/20 dark:from-blue-900/10 dark:via-transparent dark:to-purple-900/8 transition-colors duration-300" aria-hidden="true"></div>
-          <div className={cssClasses.headerBorder} aria-hidden="true"></div>
-
           <div className={cssClasses.headerContent}>
             {/* Header Layout - Logo Left, Progress Center, Controls Right */}
             <div className="flex items-center justify-between">
@@ -1174,7 +1130,10 @@ export default function App() {
                     style={{
                       display: 'block',
                       maxWidth: '120px',
-                      height: 'auto'
+                      height: 'auto',
+                      background: "rgba(242, 242, 247, 0.10)",
+                      borderRadius: "16px",
+                      padding: "8px"
                     }}
                     aria-label={appConfig.theme?.ariaTexts?.logoLabel || "Application logo"}
                   />
@@ -1602,9 +1561,6 @@ export default function App() {
                     }),
                     // Light mode styling
                     ...(!isDarkMode && {
-                      background: isMobile
-                        ? 'rgba(255, 255, 255, 0.90)'
-                        : 'rgba(255, 255, 255, 0.75)',
                       backdropFilter: isMobile ? 'blur(12px)' : 'blur(24px)',
                       WebkitBackdropFilter: isMobile ? 'blur(12px)' : 'blur(24px)'
                     })

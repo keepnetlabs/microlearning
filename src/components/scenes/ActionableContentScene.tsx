@@ -236,7 +236,7 @@ export function ActionableContentScene({
                         </h3>
                         <p
                           id={`${cardId}-description`}
-                          className="text-xs text-gray-700 dark:text-gray-200 mb-3 leading-relaxed"
+                          className="text-xs text-[#1C1C1E] dark:text-gray-200 mb-3 leading-relaxed"
                         >
                           {action.description}
                         </p>

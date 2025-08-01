@@ -332,7 +332,7 @@ export function SurveyScene({
                         )}
                       </div>
                     </div>
-                    <span className={`group-hover:text-[#1C1C1E] dark:group-hover:text-white transition-colors text-left flex-1 text-gray-700 dark:text-gray-200`}>
+                    <span className={`group-hover:text-[#1C1C1E] dark:group-hover:text-white transition-colors text-left flex-1 text-[#1C1C1E] dark:text-gray-200`}>
                       {topic}
                     </span>
                   </motion.button>

@@ -728,7 +728,7 @@ export const IntroScene = React.memo(({
                     <item.Icon size={14} className={`${item.textColor} relative z-10 sm:w-4 sm:h-4`} strokeWidth={2} />
                   </motion.div>
                 </div>
-                <span className="text-xs sm:text-sm text-gray-700 dark:text-gray-200 font-medium leading-relaxed group-hover:text-[#1C1C1E] dark:group-hover:text-white transition-colors">
+                <span className="text-xs sm:text-sm text-[#1C1C1E] dark:text-gray-200 font-medium leading-relaxed group-hover:text-[#1C1C1E] dark:group-hover:text-white transition-colors">
                   {item.text}
                 </span>
               </motion.div>

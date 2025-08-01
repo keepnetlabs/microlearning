@@ -455,7 +455,7 @@ export function NudgeScene({ config, completionData }: NudgeSceneProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-base sm:text-lg text-gray-700 dark:text-gray-100 mb-6 font-medium leading-relaxed dark:font-semibold"
+            className="text-base sm:text-lg text-[#1C1C1E] dark:text-gray-100 mb-6 font-medium leading-relaxed dark:font-semibold"
           >
             {config.texts?.completionSubtitle}
           </motion.p>
@@ -623,7 +623,7 @@ export function NudgeScene({ config, completionData }: NudgeSceneProps) {
                   >
                     <IconComponent size={14} className={`${achievement.color} ${achievement.color.includes('yellow') ? 'dark:text-yellow-400' : achievement.color.includes('green') ? 'dark:text-green-400' : 'dark:text-blue-400'} relative z-10`} />
                   </motion.div>
-                  <span className={`text-xs text-center ${config.styling?.achievements?.textColor || 'text-gray-700 dark:text-gray-200'} leading-tight relative z-10 transition-colors`}>
+                  <span className={`text-xs text-center ${config.styling?.achievements?.textColor || 'text-[#1C1C1E] dark:text-gray-200'} leading-tight relative z-10 transition-colors`}>
                     {achievement.name}
                   </span>
                 </motion.div>
@@ -716,7 +716,7 @@ export function NudgeScene({ config, completionData }: NudgeSceneProps) {
                         {action.timeframe}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-700 dark:text-gray-200 leading-relaxed ml-8">
+                    <p className="text-xs text-[#1C1C1E] dark:text-gray-200 leading-relaxed ml-8">
                       {action.description}
                     </p>
                   </div>

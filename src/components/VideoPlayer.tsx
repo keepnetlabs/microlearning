@@ -769,7 +769,7 @@ export function VideoPlayer({
                             className={`leading-relaxed transition-colors duration-200 ${isActive
                               ? "text-[#1C1C1E] dark:text-slate-50 font-medium"
                               : canAccess
-                                ? "text-gray-700 dark:text-slate-200"
+                                ? "text-[#1C1C1E] dark:text-slate-200"
                                 : "text-gray-400 dark:text-slate-500"
                               }`}
                             style={{
