@@ -152,8 +152,9 @@ export function VideoPlayer({
         captions: {
           active: true,
           update: true,
+          language: 'en',
         },
-        fullscreen: { fallback: true, iosNative: false },
+        fullscreen: { fallback: true, iosNative: true },
         hideControls: false,
         keyboard: {
           focused: !disableForwardSeek,

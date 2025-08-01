@@ -434,6 +434,11 @@ export default function App() {
   // Mobile detection
   const isMobile = useIsMobile();
 
+  // iOS detection
+  const isIOS = useMemo(() => {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent);
+  }, []);
+
   // Mobile swipe gesture support - ONLY FOR MOBILE
   const touchStartX = useRef<number>(0);
   const touchEndX = useRef<number>(0);
@@ -1132,7 +1137,11 @@ export default function App() {
       </motion.div>
 
       {/* Optimized Mobile Header - Enhanced dark mode contrast */}
-      <header className={cssClasses.headerContainer} role="banner" aria-label={appConfig.theme?.ariaTexts?.headerLabel || "Application header"}>
+      <header
+        className={`${cssClasses.headerContainer} ${isIOS && currentScene === 4 ? 'pt-2' : ''}`}
+        role="banner"
+        aria-label={appConfig.theme?.ariaTexts?.headerLabel || "Application header"}
+      >
         <div className={cssClasses.headerBackground} aria-hidden="true"></div>
         <div className="absolute inset-0 bg-gradient-to-r from-blue-50/30 via-transparent to-purple-50/20 dark:from-blue-900/10 dark:via-transparent dark:to-purple-900/8 transition-colors duration-300" aria-hidden="true"></div>
         <div className={cssClasses.headerBorder} aria-hidden="true"></div>
