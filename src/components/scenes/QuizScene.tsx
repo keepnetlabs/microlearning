@@ -240,6 +240,46 @@ interface QuizSceneConfig {
     removeItem?: string;
     previousQuestion?: string;
   };
+  // Accessibility configuration (optional - will use defaults if not provided)
+  ariaTexts?: {
+    mainLabel?: string;
+    mainDescription?: string;
+    headerLabel?: string;
+    questionLabel?: string;
+    questionDescription?: string;
+    multipleChoiceLabel?: string;
+    multipleChoiceDescription?: string;
+    trueFalseLabel?: string;
+    trueFalseDescription?: string;
+    multiSelectLabel?: string;
+    multiSelectDescription?: string;
+    sliderLabel?: string;
+    sliderDescription?: string;
+    dragDropLabel?: string;
+    dragDropDescription?: string;
+    optionsLabel?: string;
+    categoriesLabel?: string;
+    resultPanelLabel?: string;
+    resultPanelDescription?: string;
+    explanationLabel?: string;
+    tipsLabel?: string;
+    navigationLabel?: string;
+    previousQuestionLabel?: string;
+    nextQuestionLabel?: string;
+    retryQuestionLabel?: string;
+    checkAnswerLabel?: string;
+    correctAnswerLabel?: string;
+    incorrectAnswerLabel?: string;
+    attemptsLeftLabel?: string;
+    noAttemptsLeftLabel?: string;
+    quizCompletedLabel?: string;
+    mobileHintLabel?: string;
+    mobileInstructionsLabel?: string;
+    desktopInstructionsLabel?: string;
+    tapHereLabel?: string;
+    clearCategoryLabel?: string;
+    removeItemLabel?: string;
+  };
 }
 
 interface QuizSceneProps {
@@ -299,6 +339,8 @@ export const QuizScene = React.memo(function QuizScene({
   questionLoadingText,
   isDarkMode,
 }: QuizSceneProps) {
+  // Destructure ariaTexts from config for accessibility
+  const { ariaTexts } = config;
   // Theme state for forcing re-renders when theme changes
   const [themeState, setThemeState] = React.useState(0);
 
@@ -609,7 +651,17 @@ export const QuizScene = React.memo(function QuizScene({
   const handleNextQuestion = useCallback(() => {
     setCurrentQuestionIndex((prev) => prev + 1);
     resetQuestionState();
-  }, [setCurrentQuestionIndex, resetQuestionState]);
+
+    // Scroll to top on mobile devices
+    if (isMobile) {
+      setTimeout(() => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      }, 100); // Small delay to ensure state updates are complete
+    }
+  }, [setCurrentQuestionIndex, resetQuestionState, isMobile]);
 
   const retryQuestion = useCallback(() => {
     if (isAnswerLocked) return;
@@ -655,7 +707,14 @@ export const QuizScene = React.memo(function QuizScene({
     const userAnswer = currentAnswer;
 
     return (
-      <div className="space-y-2" role="radiogroup" aria-label="Multiple choice options">
+      <div className="space-y-2" role="radiogroup" aria-label={ariaTexts?.multipleChoiceLabel || "Multiple choice options"} aria-describedby="multiple-choice-description">
+        <div
+          id="multiple-choice-description"
+          className="sr-only"
+          aria-live="polite"
+        >
+          {ariaTexts?.multipleChoiceDescription || "Select one answer from the available options"}
+        </div>
         {question.options.map((option, index) => {
           const isSelected = userAnswer === option.id;
           const isCorrect = option.isCorrect;
@@ -721,11 +780,11 @@ export const QuizScene = React.memo(function QuizScene({
                     aria-live="polite"
                   >
                     {isCorrect ? (
-                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30" aria-label="Correct answer">
+                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30" aria-label={ariaTexts?.correctAnswerLabel || "Correct answer"}>
                         <CheckCircle className={`w-4 h-4 ${optionStyle.iconClassName}`} aria-hidden="true" />
                       </div>
                     ) : isSelected ? (
-                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-red-100 dark:bg-red-900/30" aria-label="Incorrect answer">
+                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-red-100 dark:bg-red-900/30" aria-label={ariaTexts?.incorrectAnswerLabel || "Incorrect answer"}>
                         <XCircle className={`w-4 h-4 ${optionStyle.iconClassName}`} aria-hidden="true" />
                       </div>
                     ) : null}
@@ -737,7 +796,7 @@ export const QuizScene = React.memo(function QuizScene({
               {isLoading && isSelected && (
                 <div
                   className="absolute inset-0 bg-card/80 backdrop-blur-sm rounded-xl flex items-center justify-center"
-                  aria-label="Processing answer"
+                  aria-label={ariaTexts?.checkAnswerLabel || "Processing answer"}
                   role="status"
                   aria-live="polite"
                 >
@@ -770,7 +829,14 @@ export const QuizScene = React.memo(function QuizScene({
 
 
     return (
-      <div className="space-y-2.5">
+      <div className="space-y-2.5" role="radiogroup" aria-label={ariaTexts?.trueFalseLabel || "True or false options"} aria-describedby="true-false-description">
+        <div
+          id="true-false-description"
+          className="sr-only"
+          aria-live="polite"
+        >
+          {ariaTexts?.trueFalseDescription || "Select true or false for the given statement"}
+        </div>
         <div
           className="p-3 rounded-lg border-2 border-border/60"
           style={{
@@ -1816,15 +1882,25 @@ export const QuizScene = React.memo(function QuizScene({
       ref={mainRef}
       className="flex flex-col items-center justify-center px-1 pt-0 relative"
       role="main"
-      aria-label={`Quiz: ${config.title}`}
+      aria-label={ariaTexts?.mainLabel || `Quiz: ${config.title}`}
+      aria-describedby="quiz-description"
       tabIndex={-1}
     >
+      <div
+        id="quiz-description"
+        className="sr-only"
+        aria-live="polite"
+      >
+        {ariaTexts?.mainDescription || "Interactive quiz with multiple question types and real-time feedback"}
+      </div>
 
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-4"
+        role="banner"
+        aria-label={ariaTexts?.headerLabel || "Quiz header"}
       >
         <div className="flex items-center justify-center mb-3" aria-hidden="true">
           {iconNode}
@@ -1847,7 +1923,7 @@ export const QuizScene = React.memo(function QuizScene({
             animate={{ opacity: 1, y: 0 }}
             className="flex items-center justify-center space-x-3 mt-4"
             role="navigation"
-            aria-label="Question navigation"
+            aria-label={ariaTexts?.navigationLabel || "Question navigation"}
           >
             <Button
               variant="outline"
@@ -1867,10 +1943,20 @@ export const QuizScene = React.memo(function QuizScene({
                   setShowResult(false);
                   setIsAnswerLocked(false);
                 }
+
+                // Scroll to top on mobile devices
+                if (isMobile) {
+                  setTimeout(() => {
+                    window.scrollTo({
+                      top: 0,
+                      behavior: 'smooth'
+                    });
+                  }, 100);
+                }
               }}
               disabled={currentQuestionIndex === 0}
               className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}
-              aria-label={currentQuestionIndex === 0 ? "Previous question (disabled)" : `Go to previous question ${currentQuestionIndex}`}
+              aria-label={currentQuestionIndex === 0 ? ariaTexts?.previousQuestionLabel || "Previous question (disabled)" : ariaTexts?.previousQuestionLabel || `Go to previous question ${currentQuestionIndex}`}
               style={{
                 background: currentQuestionIndex === 0
                   ? isDarkMode
@@ -1926,10 +2012,20 @@ export const QuizScene = React.memo(function QuizScene({
                   setShowResult(false);
                   setIsAnswerLocked(false);
                 }
+
+                // Scroll to top on mobile devices
+                if (isMobile) {
+                  setTimeout(() => {
+                    window.scrollTo({
+                      top: 0,
+                      behavior: 'smooth'
+                    });
+                  }, 100);
+                }
               }}
               disabled={currentQuestionIndex === questions.length - 1}
               className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}
-              aria-label={currentQuestionIndex === questions.length - 1 ? "Next question (disabled)" : `Go to next question ${currentQuestionIndex + 2}`}
+              aria-label={currentQuestionIndex === questions.length - 1 ? ariaTexts?.nextQuestionLabel || "Next question (disabled)" : ariaTexts?.nextQuestionLabel || `Go to next question ${currentQuestionIndex + 2}`}
               style={{
                 background: currentQuestionIndex === questions.length - 1
                   ? isDarkMode
@@ -1976,9 +2072,17 @@ export const QuizScene = React.memo(function QuizScene({
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-3xl"
         role="region"
-        aria-label="Question content"
+        aria-label={ariaTexts?.questionLabel || "Question content"}
+        aria-describedby="question-description"
         id="question-content"
       >
+        <div
+          id="question-description"
+          className="sr-only"
+          aria-live="polite"
+        >
+          {ariaTexts?.questionDescription || "Current question with answer options"}
+        </div>
         <div
           className={`p-5 md:p-6 ${cardStyle.borderRadius} 0 12px 40px rgba(0, 0, 0, 0.08), 0 6px 20px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 rgba(0, 0, 0, 0.06) ${cardStyle.borderColor || ''}`}
           style={{
@@ -2029,9 +2133,17 @@ export const QuizScene = React.memo(function QuizScene({
                   boxShadow: resultPanelStyle.boxShadow,
                 }}
                 role="region"
-                aria-label="Result and explanation"
+                aria-label={ariaTexts?.resultPanelLabel || "Result and explanation"}
+                aria-describedby="result-panel-description"
                 aria-live="polite"
               >
+                <div
+                  id="result-panel-description"
+                  className="sr-only"
+                  aria-live="polite"
+                >
+                  {ariaTexts?.resultPanelDescription || "Feedback on your answer with explanation and tips"}
+                </div>
                 {/* Explanation Section - Always show, with fallback if no explanation */}
                 <div className="flex items-start space-x-3 mb-3">
                   <div
@@ -2078,7 +2190,7 @@ export const QuizScene = React.memo(function QuizScene({
                       `
                     }}
                     role="region"
-                    aria-label="Helpful tips"
+                    aria-label={ariaTexts?.tipsLabel || "Helpful tips"}
                   >
                     <h4 className="font-semibold mb-2 text-foreground flex items-center space-x-2">
                       <span className="text-lg" aria-hidden="true">💡</span>
@@ -2173,7 +2285,7 @@ export const QuizScene = React.memo(function QuizScene({
                         <div className="flex items-center space-x-2 px-4 py-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
                           <XCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
                           <span className="text-red-700 dark:text-red-300 font-medium">
-                            {config.texts?.noAttemptsLeft || "Deneme hakkınız bitti"}
+                            {ariaTexts?.noAttemptsLeftLabel || config.texts?.noAttemptsLeft || "Deneme hakkınız bitti"}
                           </span>
                         </div>
                       )}
@@ -2183,7 +2295,7 @@ export const QuizScene = React.memo(function QuizScene({
                         <div className="flex items-center space-x-2 px-4 py-3 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800">
                           <XCircle className="w-5 h-5 text-orange-600 dark:text-orange-400" />
                           <span className="text-orange-700 dark:text-orange-300 font-medium">
-                            {maxAttempts - attempts} {config.texts?.attemptsLeft || "deneme hakkınız kaldı"}
+                            {maxAttempts - attempts} {ariaTexts?.attemptsLeftLabel || config.texts?.attemptsLeft || "deneme hakkınız kaldı"}
                           </span>
                         </div>
                       )}
@@ -2200,7 +2312,7 @@ export const QuizScene = React.memo(function QuizScene({
                             variant="outline"
                             onClick={retryQuestion}
                             className={`flex items-center space-x-2 transition-all duration-300 ${'px-4 py-2.5'} ${'rounded-lg'} ${'text-sm'} ${'font-medium'}`}
-                            aria-label="Try this question again"
+                            aria-label={ariaTexts?.retryQuestionLabel || "Try this question again"}
                             style={{
                               background: config.styling?.buttons?.retryQuestion?.gradientFrom && config.styling?.buttons?.retryQuestion?.gradientTo
                                 ? `linear-gradient(135deg, ${config.styling?.buttons?.retryQuestion?.gradientFrom} 0%, ${config.styling?.buttons?.retryQuestion?.gradientTo} 100%)`
@@ -2241,7 +2353,7 @@ export const QuizScene = React.memo(function QuizScene({
                           <Button
                             onClick={handleNextQuestion}
                             className={`flex items-center space-x-2 transition-all duration-300 ${'px-4 py-2.5'} ${'rounded-lg'} ${'text-sm'} ${'font-medium'}`}
-                            aria-label="Go to next question"
+                            aria-label={ariaTexts?.nextQuestionLabel || "Go to next question"}
                             style={{
                               background: config.styling?.buttons?.nextQuestion?.gradientFrom && config.styling?.buttons?.nextQuestion?.gradientTo
                                 ? `linear-gradient(135deg, ${config.styling?.buttons?.nextQuestion?.gradientFrom} 0%, ${config.styling?.buttons?.nextQuestion?.gradientTo} 100%)`
@@ -2292,10 +2404,10 @@ export const QuizScene = React.memo(function QuizScene({
         transition={{ delay: 1 }}
         className="md:hidden mt-4 text-center"
         role="complementary"
-        aria-label="Mobile usage tip"
+        aria-label={ariaTexts?.mobileHintLabel || "Mobile usage tip"}
       >
         <p className="text-xs text-muted-foreground dark:text-white">
-          <span aria-hidden="true">💡</span> {config.texts?.mobileHint || "En iyi deneyim için soruları dikkatle okuyun"}
+          <span aria-hidden="true">💡</span> {ariaTexts?.mobileHintLabel || config.texts?.mobileHint || "En iyi deneyim için soruları dikkatle okuyun"}
         </p>
       </motion.div>
     </div>

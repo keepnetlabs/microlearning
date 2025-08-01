@@ -165,7 +165,7 @@ export function ActionableContentScene({
       </div>
 
       <header role="banner" aria-label={ariaTexts?.headerLabel || "Scene header"}>
-        <div className="mb-2 sm:mb-3" aria-hidden="true">
+        <div className="mb-2 sm:mb-3 flex items-center justify-center" aria-hidden="true">
           {sceneIconComponent}
         </div>
         <h1
