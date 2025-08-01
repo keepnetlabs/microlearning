@@ -624,11 +624,7 @@
       "SMS Security",
       "Email Security",
       "Password Management",
-      "Two-Factor Authentication",
-      "Social Engineering",
-      "Network Security",
-      "Mobile Security",
-      "Data Protection"
+      "Two-Factor Authentication"
     ],
     "icon": {
       "name": "clipboard-list",

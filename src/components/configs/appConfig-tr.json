@@ -728,11 +728,7 @@
       "SMS Güvenliği",
       "E-posta Güvenliği",
       "Parola Yönetimi",
-      "İki Faktörlü Doğrulama",
-      "Sosyal Mühendislik",
-      "Ağ Güvenliği",
-      "Mobil Güvenlik",
-      "Veri Koruma"
+      "İki Faktörlü Doğrulama"
     ],
     "icon": {
       "name": "clipboard-list",
