@@ -68,7 +68,7 @@
     "points": 10,
     "title": {
       "words": ["SMS", "Phishing", "Protection"],
-      "highlightLastWord": true,
+      "highlightLastWord": false,
       "gradientClasses": "bg-gradient-to-r from-blue-500 to-blue-500 dark:from-blue-500 dark:to-blue-300 bg-clip-text text-transparent"
     },
     "subtitle": "Recognize SMS-based phishing attacks and protection methods",
@@ -80,7 +80,7 @@
       "sparkleEnabled": true,
       "sparkleIconName": "alert-triangle",
       "sceneIconName": "smartphone",
-      "className": "text-blue-500 dark:text-blue-500"
+      "className": "text-[#1C1C1E] dark:text-[#F2F2F7]"
     },
     "highlights": [
       {

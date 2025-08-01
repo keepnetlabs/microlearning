@@ -77,16 +77,10 @@ const defaultConfig: ProgressBarConfig = {
   backgroundGradientDark: 'dark:from-slate-700/18 dark:via-slate-600/12 dark:to-slate-500/8',
 
   // Progress fill colors
-  progressFillBackground: `linear-gradient(135deg, 
-    #3B82F6 0%, 
-    #3B82F6 50%,
-    #3B82F6 100%
-  )`,
+  progressFillBackground: `rgba(242, 242, 247, 0.30)`,
   progressFillBorder: '0.5px solid rgba(59, 130, 246, 0.40)',
   progressFillBoxShadow: `
-    0 2px 8px rgba(59, 130, 246, 0.30),
-    0 1px 4px rgba(59, 130, 246, 0.20),
-    inset 0 1px 0 rgba(255, 255, 255, 0.30)
+ 4px 0 4px 0 rgba(255, 255, 255, 0.15) inset, 0 4px 4px 0 rgba(255, 255, 255, 0.15) inset
   `,
 
   // Dot colors
@@ -227,7 +221,7 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
                 transition={{ duration: 1.2, ease: "easeOut", type: "spring", stiffness: 80 }}
                 style={{
                   // CLEAN INDUSTRY STANDARD PROGRESS FILL - Apple/Google style
-                  background: finalConfig.progressFillBackground,
+                  background: "rgba(242, 242, 247, 0.30)",
                   backdropFilter: 'blur(16px) saturate(160%)',
                   WebkitBackdropFilter: 'blur(16px) saturate(160%)',
                   border: finalConfig.progressFillBorder,
@@ -317,7 +311,7 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
               transition={{ duration: 0.3, ease: "easeOut" }}
               className="absolute z-20"
               style={{
-                left: `${progress}%`,
+                left: `${progress - 1.5}%`,
                 top: '50%',
                 transform: 'translate(-50%, -50%)',
                 marginTop: '-1px'
@@ -325,17 +319,18 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
             >
               {/* Pill-shaped thumb indicator */}
               <div
-                className="flex items-center justify-center px-3 py-1 rounded-full shadow-lg relative"
+                className="flex items-center justify-center px-1.5 py-1 rounded-full shadow-lg relative"
                 style={{
                   background: 'rgba(242, 242, 247, 0.15)',
                   backdropFilter: 'blur(25px) saturate(200%)',
                   WebkitBackdropFilter: 'blur(25px) saturate(200%)',
-                  border: '1px solid rgba(199, 199, 204, 0.60)',
+                  border: '0.5 solid rgba(199, 199, 204, 0.60)',
                   boxShadow: '0 4px 12px rgba(148, 163, 184, 0.20), 0 2px 6px rgba(148, 163, 184, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.30)',
                   transform: 'translateZ(0)',
                   willChange: 'transform',
                   minWidth: '44px',
-                  height: '28px'
+                  height: '28px',
+                  top:"-9px"
                 }}
               >
                 {/* Ultra-fine noise texture for thumb */}
@@ -360,7 +355,7 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
                 <div
                   className="absolute inset-0 rounded-full pointer-events-none"
                   style={{
-                    background: `linear-gradient(135deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%)`,
+                    background: `rgba(242, 242, 247, 0.30)`,
                     mixBlendMode: 'soft-light'
                   }}
                 />
@@ -378,7 +373,7 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
             className="relative w-full h-1.5 sm:h-2 overflow-hidden transition-all duration-500 ease-out group"
             style={{
               // OPTIMIZED BACKGROUND - More visible but still premium
-              background: 'rgba(242, 242, 247, 0.10)',
+              background: 'rgba(242, 242, 247, 0.30)',
               backdropFilter: 'blur(20px) saturate(180%)',
               WebkitBackdropFilter: 'blur(20px) saturate(180%)',
               border: finalConfig.containerBorder,
@@ -391,7 +386,7 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
 
             {/* Ultra-fine noise texture */}
             <div
-              className="absolute inset-0 opacity-[0.015] dark:opacity-[0.008] mix-blend-overlay pointer-events-none"
+              className="absolute inset-0 mix-blend-overlay pointer-events-none"
               style={{
                 backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='progressNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23progressNoise)'/%3E%3C/svg%3E")`,
                 backgroundSize: '128px 128px',
@@ -420,7 +415,7 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
               transition={{ duration: 1.2, ease: "easeOut", type: "spring", stiffness: 80 }}
               style={{
                 // CLEAN INDUSTRY STANDARD PROGRESS FILL - Apple/Google style
-                background: finalConfig.progressFillBackground,
+                background: "rgba(242, 242, 247, 0.30)",
                 backdropFilter: 'blur(16px) saturate(160%)',
                 WebkitBackdropFilter: 'blur(16px) saturate(160%)',
                 border: finalConfig.progressFillBorder,
@@ -464,9 +459,6 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
                   borderRadius: '4px'
                 }}
               />
-
-              {/* Clean depth layer - Industry standard approach */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-50/15 via-blue-100/8 to-blue-200/5 dark:from-blue-900/12 dark:via-blue-800/6 dark:to-blue-700/4 transition-colors duration-500" style={{ borderRadius: '4px' }}></div>
 
               {/* Enhanced Apple-style top highlight */}
               <div

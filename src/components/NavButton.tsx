@@ -23,7 +23,7 @@ export function NavButton({ direction, onClick, disabled, label, isDarkMode = fa
       className={`
         relative flex items-center justify-center rounded-2xl overflow-hidden
         transition-all duration-500 ease-out group
-        focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:ring-offset-2 focus:ring-offset-transparent
+        focus:outline-none
         w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16
         ${disabled 
           ? "cursor-not-allowed" 
@@ -36,13 +36,13 @@ export function NavButton({ direction, onClick, disabled, label, isDarkMode = fa
         background: disabled 
           ? 'rgba(71, 85, 105, 0.10)'
           : isDarkMode 
-            ? 'rgba(255, 255, 255, 0.10)' // White background for dark mode
-            : 'rgba(255, 255, 255, 0.10)',
+            ? '#1C1C1E' // White background for dark mode
+            : 'rgba(242, 242, 247, 0.10)',
         border: disabled 
           ? '1px solid rgba(71, 85, 105, 0.50)'
           : isDarkMode 
-            ? '1px solid rgba(255, 255, 255, 0.50)' // White border for dark mode
-            : '1px solid rgba(59, 130, 246, 0.50)',
+            ? '1px solid #fff' // White border for dark mode
+            : '1px solid #fff',
         boxShadow: disabled 
           ? '-4px -4px 10px 0 rgba(71, 85, 105, 0.10), 4px 4px 10px 0 rgba(71, 85, 105, 0.10), 0 4px 4px 0 rgba(71, 85, 105, 0.10) inset'
           : isDarkMode 
@@ -100,7 +100,7 @@ export function NavButton({ direction, onClick, disabled, label, isDarkMode = fa
           <Icon 
             size={18} 
             strokeWidth={2.5} 
-            className="drop-shadow-sm sm:w-5 sm:h-5 md:w-6 md:h-6 transition-all duration-300" 
+            className="drop-shadow-sm sm:w-5 text-[#1C1C1E] dark:text-[#F2F2F7] sm:h-5 md:w-6 md:h-6 transition-all duration-300" 
           />
         </div>
       </div>
