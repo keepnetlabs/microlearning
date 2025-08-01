@@ -167,8 +167,10 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="bg-white dark:bg-blue-900/20 max-w-[40px] h-[27px] rounded-lg flex justify-center items-center p-1 border border-blue-200 dark:border-blue-700/50 rounded-lg px-3 py-1.5 shadow-sm"
+              className="bg-white glass-border-1 dark:bg-blue-900/20 max-w-[40px] h-[27px] rounded-lg flex justify-center items-center p-1 border border-blue-200 dark:border-blue-700/50 rounded-lg px-3 py-1.5 shadow-sm"
             >
+              <div className="corner-top-left"></div>
+              <div className="corner-bottom-right"></div>
               <span className="text-sm font-medium text-blue-600 dark:text-blue-300">
                 {formatPercent(progress, language)}
               </span>
@@ -178,7 +180,7 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
           {/* Progress Bar for Mobile - Using the same design as desktop but simplified */}
           <div className="flex-1">
             <div
-              className="relative w-full h-2 overflow-hidden transition-all duration-500 ease-out group"
+              className="relative w-full glass-border-1 h-2 overflow-hidden transition-all duration-500 ease-out group"
               style={{
                 background: 'rgba(242, 242, 247, 0.10)',
                 backdropFilter: 'blur(20px) saturate(180%)',
@@ -190,28 +192,9 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
                 borderRadius: '4px'
               }}
             >
-              {/* Ultra-fine noise texture */}
-              <div
-                className="absolute inset-0 opacity-[0.015] dark:opacity-[0.008] mix-blend-overlay pointer-events-none"
-                style={{
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='progressNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23progressNoise)'/%3E%3C/svg%3E")`,
-                  backgroundSize: '128px 128px',
-                  borderRadius: '4px'
-                }}
-              />
+              <div className="corner-top-left"></div>
+              <div className="corner-bottom-right"></div>
 
-              {/* Optimized background gradients - Better visibility */}
-              <div className={`absolute inset-0 ${finalConfig.backgroundGradient} ${finalConfig.backgroundGradientDark} transition-colors duration-500`} style={{ borderRadius: '4px' }}></div>
-
-              {/* Enhanced Apple-style highlight - More prominent */}
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.12) 30%, transparent 70%)`,
-                  mixBlendMode: 'overlay',
-                  borderRadius: '4px'
-                }}
-              />
 
               {/* INDUSTRY STANDARD LIQUID GLASS PROGRESS FILL */}
               <motion.div
@@ -229,16 +212,6 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
                   borderRadius: '4px'
                 }}
               >
-                {/* Ultra-fine noise texture for fill */}
-                <div
-                  className="absolute inset-0 opacity-[0.020] dark:opacity-[0.012] mix-blend-overlay pointer-events-none"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='fillNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23fillNoise)'/%3E%3C/svg%3E")`,
-                    backgroundSize: '128px 128px',
-                    borderRadius: '4px'
-                  }}
-                />
-
                 {/* Enhanced flowing animation with liquid glass effect */}
                 <motion.div
                   className="absolute inset-0"
@@ -262,23 +235,6 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
                       transparent 100%
                     )`,
                     mixBlendMode: 'overlay',
-                    borderRadius: '4px'
-                  }}
-                />
-
-                {/* Clean depth layer - Industry standard approach */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-50/15 via-blue-100/8 to-blue-200/5 dark:from-blue-900/12 dark:via-blue-800/6 dark:to-blue-700/4 transition-colors duration-500" style={{ borderRadius: '4px' }}></div>
-
-                {/* Enhanced Apple-style top highlight */}
-                <div
-                  className="absolute top-0 left-0 right-0 h-1/2 pointer-events-none"
-                  style={{
-                    background: `linear-gradient(180deg, 
-                      rgba(255, 255, 255, 0.50) 0%, 
-                      rgba(255, 255, 255, 0.25) 30%, 
-                      transparent 70%
-                    )`,
-                    mixBlendMode: 'soft-light',
                     borderRadius: '4px'
                   }}
                 />
@@ -311,7 +267,7 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
               transition={{ duration: 0.3, ease: "easeOut" }}
               className="absolute z-20"
               style={{
-                left: `${progress - 1.5}%`,
+                left: `${progress - 3}%`,
                 top: '50%',
                 transform: 'translate(-50%, -50%)',
                 marginTop: '-1px'
@@ -319,46 +275,18 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
             >
               {/* Pill-shaped thumb indicator */}
               <div
-                className="flex items-center justify-center px-1.5 py-1 rounded-full shadow-lg relative"
+                className="flex items-center glass-border-1 justify-center px-1.5 py-1 rounded-full shadow-lg relative"
                 style={{
                   background: 'rgba(242, 242, 247, 0.15)',
-                  backdropFilter: 'blur(25px) saturate(200%)',
-                  WebkitBackdropFilter: 'blur(25px) saturate(200%)',
                   border: '0.5 solid rgba(199, 199, 204, 0.60)',
                   boxShadow: '0 4px 12px rgba(148, 163, 184, 0.20), 0 2px 6px rgba(148, 163, 184, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.30)',
                   transform: 'translateZ(0)',
                   willChange: 'transform',
-                  minWidth: '44px',
-                  height: '28px',
-                  top:"-9px"
+                  minWidth: '38px',
+                  height: '24px',
+                  top: "-9px"
                 }}
               >
-                {/* Ultra-fine noise texture for thumb */}
-                <div
-                  className="absolute inset-0 opacity-[0.020] dark:opacity-[0.012] mix-blend-overlay pointer-events-none rounded-full"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='thumbNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23thumbNoise)'/%3E%3C/svg%3E")`,
-                    backgroundSize: '64px 64px'
-                  }}
-                />
-
-                {/* Enhanced Apple-style highlight for thumb */}
-                <div
-                  className="absolute inset-0 rounded-full pointer-events-none"
-                  style={{
-                    background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.20) 30%, transparent 70%)`,
-                    mixBlendMode: 'overlay'
-                  }}
-                />
-
-                {/* Additional glass layer */}
-                <div
-                  className="absolute inset-0 rounded-full pointer-events-none"
-                  style={{
-                    background: `rgba(242, 242, 247, 0.30)`,
-                    mixBlendMode: 'soft-light'
-                  }}
-                />
 
                 {/* Percentage text */}
                 <span className="relative z-10 text-xs font-semibold text-[#1C1C1E] dark:text-white">
@@ -370,42 +298,19 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
 
           {/* INDUSTRY STANDARD LIQUID GLASS PROGRESS CONTAINER */}
           <div
-            className="relative w-full h-1.5 sm:h-2 overflow-hidden transition-all duration-500 ease-out group"
+            className="relative w-full h-1.5 sm:h-2 glass-border-1 overflow-hidden transition-all duration-500 ease-out group"
             style={{
               // OPTIMIZED BACKGROUND - More visible but still premium
-              background: 'rgba(242, 242, 247, 0.30)',
-              backdropFilter: 'blur(20px) saturate(180%)',
-              WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+              background: '',
               border: finalConfig.containerBorder,
-              boxShadow: finalConfig.containerBoxShadow,
+              boxShadow: '',
               transform: 'translateZ(0)',
               willChange: 'transform',
               borderRadius: '4px'
             }}
           >
+            <div className="corner-top-left"></div>
 
-            {/* Ultra-fine noise texture */}
-            <div
-              className="absolute inset-0 mix-blend-overlay pointer-events-none"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='progressNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23progressNoise)'/%3E%3C/svg%3E")`,
-                backgroundSize: '128px 128px',
-                borderRadius: '4px'
-              }}
-            />
-
-            {/* Optimized background gradients - Better visibility */}
-            <div className={`absolute inset-0 ${finalConfig.backgroundGradient} ${finalConfig.backgroundGradientDark} transition-colors duration-500`} style={{ borderRadius: '4px' }}></div>
-
-            {/* Enhanced Apple-style highlight - More prominent */}
-            <div
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.12) 30%, transparent 70%)`,
-                mixBlendMode: 'overlay',
-                borderRadius: '4px'
-              }}
-            />
 
             {/* INDUSTRY STANDARD LIQUID GLASS PROGRESS FILL */}
             <motion.div
@@ -423,15 +328,6 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
                 borderRadius: '4px'
               }}
             >
-              {/* Ultra-fine noise texture for fill */}
-              <div
-                className="absolute inset-0 opacity-[0.020] dark:opacity-[0.012] mix-blend-overlay pointer-events-none"
-                style={{
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='fillNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23fillNoise)'/%3E%3C/svg%3E")`,
-                  backgroundSize: '128px 128px',
-                  borderRadius: '4px'
-                }}
-              />
 
               {/* Enhanced flowing animation with liquid glass effect */}
               <motion.div

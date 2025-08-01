@@ -30,7 +30,7 @@ const STATIC_CSS_CLASSES = {
 
   // Header
   headerContainer: "relative shrink-0",
-  headerContent: "relative z-10 px-4 py-4 pt-safe dark:bg-gray-900 lg:px-16 xl:px-20 2xl:px-24 min-h-[106px] md:min-h-[72px]",
+  headerContent: "relative z-10 px-4 py-4 pt-safe lg:px-16 xl:px-20 2xl:px-24 min-h-[106px] md:min-h-[72px]",
 
   // Logo
   logoContainer: "flex-shrink-0 z-20",
@@ -145,49 +145,77 @@ export default function App() {
     return appConfig.theme;
   });
 
-  // Scenes array'ini appConfig'e bağlı olarak oluştur - Memoized components
+  // Individual scene configs for better memoization
+
+  // Individual scene configs for better memoization
+  const introSceneConfig = useMemo(() => ({
+    component: MemoizedIntroScene,
+    points: appConfig.introSceneConfig.points || 10,
+    config: appConfig.introSceneConfig
+  }), [appConfig.introSceneConfig]);
+
+  const goalSceneConfig = useMemo(() => ({
+    component: MemoizedGoalScene,
+    points: appConfig.goalSceneConfig.points || 15,
+    config: appConfig.goalSceneConfig
+  }), [appConfig.goalSceneConfig]);
+
+  const scenarioSceneConfig = useMemo(() => ({
+    component: MemoizedScenarioScene,
+    points: appConfig.scenarioSceneConfig.points || 20,
+    config: appConfig.scenarioSceneConfig
+  }), [appConfig.scenarioSceneConfig]);
+
+  const actionableContentSceneConfig = useMemo(() => ({
+    component: MemoizedActionableContentScene,
+    points: appConfig.actionableContentSceneConfig.points || 25,
+    config: appConfig.actionableContentSceneConfig
+  }), [appConfig.actionableContentSceneConfig]);
+
+  const quizSceneConfig = useMemo(() => ({
+    component: MemoizedQuizScene,
+    points: appConfig.quizSceneConfig.points || 50,
+    config: appConfig.quizSceneConfig
+  }), [appConfig.quizSceneConfig]);
+
+  const surveySceneConfig = useMemo(() => ({
+    component: MemoizedSurveyScene,
+    points: appConfig.surveySceneConfig.points || 20,
+    config: appConfig.surveySceneConfig
+  }), [appConfig.surveySceneConfig]);
+
+  const summarySceneConfig = useMemo(() => ({
+    component: MemoizedSummaryScene,
+    points: appConfig.summarySceneConfig.points || 30,
+    config: appConfig.summarySceneConfig
+  }), [appConfig.summarySceneConfig]);
+
+  const nudgeSceneConfig = useMemo(() => ({
+    component: MemoizedNudgeScene,
+    points: appConfig.nudgeSceneConfig.points || 40,
+    config: appConfig.nudgeSceneConfig
+  }), [appConfig.nudgeSceneConfig]);
+
+  // Memoized scenes array using individual configs
   const scenes = useMemo(() => [
-    {
-      component: MemoizedIntroScene,
-      points: appConfig.introSceneConfig.points || 10,
-      config: appConfig.introSceneConfig
-    },
-    {
-      component: MemoizedGoalScene,
-      points: appConfig.goalSceneConfig.points || 15,
-      config: appConfig.goalSceneConfig
-    },
-    {
-      component: MemoizedScenarioScene,
-      points: appConfig.scenarioSceneConfig.points || 20,
-      config: appConfig.scenarioSceneConfig
-    },
-    {
-      component: MemoizedActionableContentScene,
-      points: appConfig.actionableContentSceneConfig.points || 25,
-      config: appConfig.actionableContentSceneConfig
-    },
-    {
-      component: MemoizedQuizScene,
-      points: appConfig.quizSceneConfig.points || 50,
-      config: appConfig.quizSceneConfig
-    },
-    {
-      component: MemoizedSurveyScene,
-      points: appConfig.surveySceneConfig.points || 20,
-      config: appConfig.surveySceneConfig
-    },
-    {
-      component: MemoizedSummaryScene,
-      points: appConfig.summarySceneConfig.points || 30,
-      config: appConfig.summarySceneConfig
-    },
-    {
-      component: MemoizedNudgeScene,
-      points: appConfig.nudgeSceneConfig.points || 40,
-      config: appConfig.nudgeSceneConfig
-    }
-  ], [appConfig]);
+    introSceneConfig,
+    goalSceneConfig,
+    scenarioSceneConfig,
+    actionableContentSceneConfig,
+    quizSceneConfig,
+    surveySceneConfig,
+    summarySceneConfig,
+    nudgeSceneConfig
+  ], [
+    introSceneConfig,
+    goalSceneConfig,
+    scenarioSceneConfig,
+    actionableContentSceneConfig,
+    quizSceneConfig,
+    surveySceneConfig,
+    summarySceneConfig,
+    nudgeSceneConfig
+  ]);
 
   // Backend'den tema config'ini güncelleme fonksiyonu
   const updateThemeConfig = useCallback((newConfig: any) => {
@@ -224,7 +252,7 @@ export default function App() {
   // Dynamic CSS classes - Sadece themeConfig değiştiğinde yeniden hesaplanır
   const dynamicCssClasses = useMemo(() => ({
     // Ana container
-    mainContainer: `min-h-screen bg-[${themeConfig.colors?.background}] bg-[linear-gradient(106deg,_#76B2D7_0%,_#3178A5_100%)] dark:from-gray-800 dark:via-gray-850 dark:to-gray-900 flex flex-col relative overflow-hidden transition-colors duration-300`,
+    mainContainer: `min-h-screen bg-[${themeConfig.colors?.background}] bg-[linear-gradient(106deg,_#76B2D7_0%,_#3178A5_100%)]  dark:bg-gradient-to-br dark:from-gray-600 dark:via-gray-850 dark:to-gray-900 flex flex-col relative overflow-hidden transition-colors duration-300`,
 
     // Loading container
     loadingContainer: `flex items-center space-x-3 px-6 py-4 bg-${themeConfig.colors?.surface || 'white'}/90 dark:bg-gray-900/90 ${themeConfig.effects?.backdropBlur || 'backdrop-blur-xl'} ${themeConfig.effects?.borderRadius || 'rounded-2xl'} border border-${themeConfig.colors?.surface || 'white'}/${themeConfig.effects?.borderOpacity || '60'} dark:border-gray-600/60 ${themeConfig.effects?.shadow || 'shadow-xl'} transition-colors duration-300`,
@@ -1121,20 +1149,20 @@ export default function App() {
                 >
                   {/* Cam Panel */}
                   <div
-                    className="relative rounded-2xl bg-transparent border border-white/60 p-1"
+                    className="relative rounded-2xl bg-transparent border glass-border-1 border-white/60"
                     style={{
                       filter: "drop-shadow(-8px - 10px 46px #000)"
                     }}
                   >
+                    <div className="corner-top-left"></div>
+                    <div className="corner-bottom-right"></div>
                     <img
                       src={isDarkMode ? themeConfig.logo?.darkSrc : themeConfig.logo?.src}
                       alt={themeConfig.logo?.alt || "Application Logo"}
                       aria-label={appConfig.theme?.ariaTexts?.logoLabel || "Application logo"}
                       className="relative z-10 h-8 sm:h-10 md:h-12 w-auto object-contain"
                       style={{
-                        mixBlendMode: 'luminosity',
-                        // Opsiyonel: logo etrafına ekstra iç padding
-                        padding: '4px',
+                        padding: '8px',
                       }}
                     />
                   </div>
@@ -1195,7 +1223,7 @@ export default function App() {
                   role="switch"
                   style={{
                     boxShadow: "4px 0 4px 0 rgba(255, 255, 255, 0.15) inset, 0 4px 4px 0 rgba(255, 255, 255, 0.15) inset"
-                  }} 
+                  }}
                   aria-describedby="theme-toggle-description"
                 >
 
@@ -1579,30 +1607,6 @@ export default function App() {
                   {/* ENHANCED APPLE VISIONOS GLASS EFFECTS - Light mode only */}
                   {!isMobile && !isDarkMode && (
                     <>
-                      {/* 1. VERY SUBTLE NOISE TEXTURE - Simulates glass imperfections */}
-                      <div
-                        className="absolute inset-0 opacity-[0.018] rounded-2xl sm:rounded-3xl mix-blend-overlay pointer-events-none"
-                        style={{
-                          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 800 800' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='glassNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='8' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23glassNoise)'/%3E%3C/svg%3E")`,
-                          backgroundSize: '300px 300px',
-                          backgroundRepeat: 'repeat'
-                        }}
-                      />
-
-                      {/* 2. ENHANCED GRADIENT BLUR - Better depth with darker background */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-white/15 to-white/8 rounded-2xl sm:rounded-3xl transition-colors duration-500" />
-                      <div className="absolute inset-0 bg-gradient-to-tl from-blue-50/20 via-transparent to-purple-50/15 rounded-2xl sm:rounded-3xl transition-colors duration-500" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-gray-100/12 via-transparent to-transparent rounded-2xl sm:rounded-3xl transition-colors duration-500" />
-
-                      {/* 3. ENHANCED APPLE-STYLE INNER GLOSS - More prominent with darker background */}
-                      <div
-                        className="absolute inset-0 rounded-2xl sm:rounded-3xl pointer-events-none"
-                        style={{
-                          background: `radial-gradient(ellipse 120% 50% at 50% 0%, rgba(255, 255, 255, 0.40) 0%, rgba(255, 255, 255, 0.20) 25%, rgba(255, 255, 255, 0.08) 50%, transparent 75%)`,
-                          mixBlendMode: 'soft-light'
-                        }}
-                      />
-
                       {/* 4. ENHANCED WHITE STROKE - More visible with darker background */}
                       <div
                         className="absolute inset-0 rounded-2xl sm:rounded-3xl pointer-events-none"
@@ -1612,22 +1616,6 @@ export default function App() {
                         }}
                       />
 
-                      {/* 5. ENHANCED SOFT WHITE GLOW - More prominent against darker background */}
-                      <div
-                        className="absolute inset-0 rounded-2xl sm:rounded-3xl pointer-events-none"
-                        style={{
-                          boxShadow: `
-                          0 0 0 1px rgba(255, 255, 255, 0.12),
-                          0 0 24px rgba(255, 255, 255, 0.16), 
-                          0 0 48px rgba(255, 255, 255, 0.08), 
-                          0 0 96px rgba(59, 130, 246, 0.06),
-                          0 12px 40px rgba(0, 0, 0, 0.08)
-                        `
-                        }}
-                      />
-
-                      {/* Enhanced inner depth effect - More pronounced */}
-                      <div className="absolute inset-1 bg-gradient-to-br from-white/20 via-transparent to-transparent rounded-xl sm:rounded-2xl pointer-events-none" />
                     </>
                   )}
 

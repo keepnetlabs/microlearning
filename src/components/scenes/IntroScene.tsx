@@ -1,7 +1,7 @@
 import * as LucideIcons from "lucide-react";
 import { motion } from "framer-motion";
 import React, { ReactNode, useMemo, useCallback } from "react";
-import { LucideIcon } from "lucide-react"
+import { LucideIcon, ClockIcon, ChartBarIcon } from "lucide-react"
 import { FontWrapper } from "../common/FontWrapper";
 
 // İkon mapping fonksiyonu
@@ -21,6 +21,20 @@ const getIconComponent = (iconName: string): LucideIcon => {
   console.warn(`Icon "${iconName}" not found, using default icon`);
   return LucideIcons.HelpCircle;
 };
+
+// Default değerleri component dışına taşı - her render'da yeniden oluşturulmasın
+const DEFAULT_PARTICLES = { enabled: true, count: 15, color: "bg-red-400/60", baseDuration: 5 };
+const DEFAULT_SPARKLES = {
+  enabled: true,
+  ambient: { count: 6, opacity: 30, size: 0.5, duration: 10, delay: 1 },
+  floating: { count: 8, opacity: 25, size: 0.5, duration: 12, delay: 2 },
+  twinkling: { count: 10, opacity: 20, size: 0.5, duration: 8, delay: 3 },
+  gradient: { count: 4, opacity: 18, size: 1, duration: 15, delay: 4 },
+  drifting: { count: 6, opacity: 15, size: 0.5, duration: 18, delay: 5 },
+  breathing: { count: 7, opacity: 12, size: 0.5, duration: 11, delay: 6 }
+};
+const DEFAULT_CONTAINER_CLASSNAME = "flex flex-col items-center justify-center h-full text-center relative overflow-hidden px-2 sm:px-4";
+const DEFAULT_ANIMATION_DELAYS = { welcomeDelay: 1.0, iconDelay: 0.2, titleDelay: 0.3, subtitleDelay: 1.0, cardDelay: 0.5, statsDelay: 0.8, ctaDelay: 1.0 };
 
 // Props interfaces
 interface HighlightItem {
@@ -147,19 +161,8 @@ export const IntroScene = React.memo(({
   config
 }: { config: IntroSceneConfig }) => {
 
-  // Default values for removed config properties
-  const defaultParticles = { enabled: true, count: 15, color: "bg-red-400/60", baseDuration: 5 };
-  const defaultSparkles = {
-    enabled: true,
-    ambient: { count: 6, opacity: 30, size: 0.5, duration: 10, delay: 1 },
-    floating: { count: 8, opacity: 25, size: 0.5, duration: 12, delay: 2 },
-    twinkling: { count: 10, opacity: 20, size: 0.5, duration: 8, delay: 3 },
-    gradient: { count: 4, opacity: 18, size: 1, duration: 15, delay: 4 },
-    drifting: { count: 6, opacity: 15, size: 0.5, duration: 18, delay: 5 },
-    breathing: { count: 7, opacity: 12, size: 0.5, duration: 11, delay: 6 }
-  };
-  const defaultContainerClassName = "flex flex-col items-center justify-center h-full text-center relative overflow-hidden px-2 sm:px-4";
-  const defaultAnimationDelays = { welcomeDelay: 1.0, iconDelay: 0.2, titleDelay: 0.3, subtitleDelay: 1.0, cardDelay: 0.5, statsDelay: 0.8, ctaDelay: 1.0 };
+  // Debug: Render sayısını takip et
+  console.log('IntroScene rendered', new Date().toISOString());
 
   const {
     title,
@@ -173,13 +176,13 @@ export const IntroScene = React.memo(({
     card
   } = config;
 
-  // Use default values for removed properties
-  const particles = defaultParticles;
-  const sparkles = defaultSparkles;
-  const containerClassName = defaultContainerClassName;
-  const animationDelays = defaultAnimationDelays;
+  // Use default values for removed properties - artık component dışından geliyor
+  const particles = DEFAULT_PARTICLES;
+  const sparkles = DEFAULT_SPARKLES;
+  const containerClassName = DEFAULT_CONTAINER_CLASSNAME;
+  const animationDelays = DEFAULT_ANIMATION_DELAYS;
 
-  // Memoize getIconComponent function
+  // Memoize getIconComponent function - dependency array'i boş bırak
   const memoizedGetIconComponent = useCallback(getIconComponent, []);
 
   // Memoize icon components to prevent unnecessary re-renders
@@ -311,11 +314,6 @@ export const IntroScene = React.memo(({
   }), []);
 
   const ctaStyles = useMemo(() => ({
-    background: `linear-gradient(135deg, 
-      rgba(71, 85, 105, 0.12) 0%, 
-      rgba(100, 116, 139, 0.08) 50%, 
-      rgba(148, 163, 184, 0.06) 100%
-    )`,
     backdropFilter: 'blur(20px) saturate(180%)',
     WebkitBackdropFilter: 'blur(20px) saturate(180%)',
     border: '1px solid rgba(71, 85, 105, 0.20)',
@@ -614,17 +612,19 @@ export const IntroScene = React.memo(({
           scale: 1.02,
           transition: { type: "spring", stiffness: 400 }
         }}
-        className={`relative p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl backdrop-blur-3xl border shadow-2xl shadow-black/5 dark:shadow-black/30 max-w-xs sm:max-w-md w-full mx-2 ${card?.backgroundColor || 'bg-white/60 dark:bg-gray-800/80'
+        className={`relative p-4 sm:p-6 md:p-8 rounded-2xl glass-border-1 backdrop-blur-3xl border shadow-2xl shadow-black/5 dark:shadow-black/30 max-w-xs sm:max-w-md w-full mx-2 ${card?.backgroundColor || 'bg-white/60 dark:bg-gray-800/80'
           } ${card?.borderColor || 'border-white/60 dark:border-gray-600/60'
           }`}
       >
+        <div className="corner-top-left"></div>
+        <div className="corner-bottom-right"></div>
 
         <div className="relative z-10">
           <motion.h3
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: delays.cardTitle }}
-            className="mb-3 sm:mb-4 text-gray-800 dark:text-gray-100 font-semibold text-center text-sm sm:text-base"
+            className="mb-3 sm:mb-4 text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold text-center text-sm sm:text-base"
           >
             {sectionTitle}
           </motion.h3>
@@ -649,63 +649,25 @@ export const IntroScene = React.memo(({
               >
                 <div className="flex-shrink-0 mr-3 sm:mr-4">
                   <motion.div
-                    className="relative p-2 sm:p-3 rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-500 ease-out group-item"
+                    className="relative p-2 sm:p-3 rounded-[10px] overflow-hidden transition-all duration-500 ease-out group-item bg-[rgba(242, 242, 247, 0.30)] dark:bg-[#1C1C1E] border border-[#F2F2F7] dark:border-[#1C1C1E] border-1"
                     whileHover={{
                       scale: 1.1,
                       rotate: 5,
                       transition: { type: "spring", stiffness: 400 }
                     }}
                     style={{
-                      background: item.liquidGlassBackground,
                       backdropFilter: 'blur(16px) saturate(150%)',
                       WebkitBackdropFilter: 'blur(16px) saturate(150%)',
-                      border: item.liquidGlassBorder,
-                      boxShadow: item.liquidGlassBoxShadow,
                       transform: 'translateZ(0)',
                       willChange: 'transform'
                     }}
                   >
-                    {/* Ultra-fine noise texture */}
-                    <div
-                      className="absolute inset-0 opacity-[0.020] dark:opacity-[0.012] rounded-xl sm:rounded-2xl mix-blend-overlay pointer-events-none"
-                      style={{
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='iconNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23iconNoise)'/%3E%3C/svg%3E")`,
-                        backgroundSize: '128px 128px'
-                      }}
-                    />
 
-                    {/* Multi-layer gradients with color theming */}
-                    <div
-                      className="absolute inset-0 rounded-xl sm:rounded-2xl transition-colors duration-500"
-                      style={{
-                        background: item.multiLayerGradient
-                      }}
-                    />
 
-                    {/* Apple-style highlight with color tinting */}
-                    <div
-                      className="absolute inset-0 rounded-xl sm:rounded-2xl pointer-events-none"
-                      style={{
-                        background: item.radialHighlight,
-                        mixBlendMode: 'overlay'
-                      }}
-                    />
-
-                    {/* Enhanced inner depth with themed colors */}
-                    <div
-                      className="absolute inset-0 rounded-xl sm:rounded-2xl pointer-events-none"
-                      style={{
-                        background: item.innerDepthGradient
-                      }}
-                    />
-
-                    {/* Traditional background gradients maintained for compatibility */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent rounded-xl sm:rounded-2xl"></div>
-
-                    <item.Icon size={14} className={`${item.textColor} relative z-10 sm:w-4 sm:h-4`} strokeWidth={2} />
+                    <item.Icon size={14} className={`text-[#1C1C1E] dark:text-[#F2F2F7] relative z-10 sm:w-4 sm:h-4`} strokeWidth={2} />
                   </motion.div>
                 </div>
-                <span className="text-xs sm:text-sm text-[#1C1C1E] dark:text-gray-200 font-medium leading-relaxed group-hover:text-[#1C1C1E] dark:group-hover:text-white transition-colors">
+                <span className="text-xs sm:text-[12px] max-h-[24px] text-[#1C1C1E] dark:text-[#F2F2F7] font-medium leading-relaxed group-hover:text-[#1C1C1E] dark:group-hover:text-white transition-colors">
                   {item.text}
                 </span>
               </motion.div>
@@ -743,7 +705,7 @@ export const IntroScene = React.memo(({
                   }}
                 />
 
-                <span className="relative z-10 text-xs text-gray-600 dark:text-gray-300 font-medium">⏱ {duration}</span>
+                <span className="relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7] text-[12px] max-h-[24px] flex items-center gap-1 font-medium"><ClockIcon size={14} className="text-[#1C1C1E] dark:text-[#F2F2F7] relative z-10 sm:w-4 sm:h-4" strokeWidth={2} /> {duration}</span>
               </motion.div>
 
               <motion.div
@@ -769,14 +731,12 @@ export const IntroScene = React.memo(({
                   }}
                 />
 
-                <span className="relative z-10 text-xs text-gray-600 dark:text-gray-300 font-medium">📊 {level}</span>
+                <span className="relative z-10 text-xs text-[#1C1C1E] dark:text-[#F2F2F7] font-medium flex items-center gap-1"><ChartBarIcon size={14} className="text-[#1C1C1E] dark:text-[#F2F2F7] relative z-10 sm:w-4 sm:h-4 transform rotate-270" strokeWidth={2} /> {level}</span>
               </motion.div>
             </div>
           </motion.div>
         </div>
 
-        {/* Floating card shadow */}
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-2xl sm:rounded-3xl blur-xl -z-10 opacity-50 animate-pulse"></div>
       </motion.div>
 
       {/* Enhanced Call to Action */}
@@ -791,52 +751,16 @@ export const IntroScene = React.memo(({
         className="mt-4 sm:mt-6 relative"
       >
         <motion.div
-          className="relative flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-full overflow-hidden transition-all duration-500 ease-out group"
+          className="relative glass-border-1 flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-full overflow-hidden transition-all bg-[rgba(242, 242, 247, 0.30)] dark:bg-[#1C1C1E] duration-500 ease-out group"
           whileHover={{
             scale: 1.05,
             y: -2
           }}
-          animate={{
-            y: [0, -2, 0],
-          }}
-          transition={{
-            duration: 3,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
           style={ctaStyles}
         >
-          {/* Ultra-fine noise texture */}
-          <div
-            className="absolute inset-0 opacity-[0.015] dark:opacity-[0.008] rounded-full mix-blend-overlay pointer-events-none"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='ctaNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23ctaNoise)'/%3E%3C/svg%3E")`,
-              backgroundSize: '128px 128px'
-            }}
-          />
-
-          {/* Multi-layer gradients - Light & Dark Mode */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-gray-50/20 to-gray-100/10 dark:from-gray-800/25 dark:via-gray-700/15 dark:to-gray-600/8 rounded-full transition-colors duration-500"></div>
-
-          {/* Apple-style highlight - Light Mode */}
-          <div
-            className="absolute inset-0 rounded-full pointer-events-none"
-            style={{
-              background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.12) 40%, transparent 70%)`,
-              mixBlendMode: 'overlay'
-            }}
-          />
-
-          {/* Apple-style highlight - Dark Mode */}
-          <div
-            className="absolute inset-0 rounded-full pointer-events-none hidden dark:block"
-            style={{
-              background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.06) 40%, transparent 70%)`,
-              mixBlendMode: 'overlay'
-            }}
-          />
-
-          <span className="relative z-10 text-xs text-gray-600 dark:text-gray-300 font-medium">{callToActionText}</span>
+          <div className="corner-top-left"></div>
+          <div className="corner-bottom-right"></div>
+          <span className="relative z-10 text-xs text-[#1C1C1E] dark:text-[#F2F2F7] font-medium">{callToActionText}</span>
         </motion.div>
       </motion.div>
     </FontWrapper>

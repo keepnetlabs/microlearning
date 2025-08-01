@@ -77,7 +77,7 @@
       "component": null,
       "size": 48,
       "sparkleCount": 8,
-      "sparkleEnabled": true,
+      "sparkleEnabled": false,
       "sparkleIconName": "alert-triangle",
       "sceneIconName": "smartphone",
       "className": "text-[#1C1C1E] dark:text-[#F2F2F7]"
