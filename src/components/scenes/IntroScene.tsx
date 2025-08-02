@@ -298,17 +298,6 @@ export const IntroScene = React.memo(({
   }), []);
 
   const statsStyles = useMemo(() => ({
-    background: `linear-gradient(135deg, 
-      rgba(71, 85, 105, 0.08) 0%, 
-      rgba(100, 116, 139, 0.05) 50%, 
-      rgba(148, 163, 184, 0.03) 100%
-    )`,
-    backdropFilter: 'blur(12px) saturate(150%)',
-    WebkitBackdropFilter: 'blur(12px) saturate(150%)',
-    boxShadow: `
-      0 2px 8px rgba(71, 85, 105, 0.06),
-      inset 0 1px 0 rgba(255, 255, 255, 0.10)
-    `,
     transform: 'translateZ(0)',
     willChange: 'transform'
   }), []);

@@ -97,8 +97,7 @@
     "points": 10,
     "title": {
       "words": ["SMS", "Phishing", "Korunma"],
-      "highlightLastWord": true,
-      "gradientClasses": "bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent"
+      "highlightLastWord": false
     },
     "subtitle": "SMS tabanlı dolandırıcılık saldırılarını tanıma ve korunma yöntemleri",
     "sectionTitle": "Bu Eğitimde Öğrenecekleriniz:",
