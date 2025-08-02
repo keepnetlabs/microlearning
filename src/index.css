@@ -223,7 +223,7 @@
   backdrop-filter: blur(5px);
 }
 
-.glass-border-2 .corner-bottom-right {
+.glass-border-3 .corner-bottom-right {
   position: absolute;
   bottom: 0;
   right: 0;
@@ -234,5 +234,63 @@
     transparent 80%
   );
   border-radius: 0 100px 12px 0;
+  backdrop-filter: blur(5px);
+}
+.glass-border-4 {
+  position: relative;
+  /*background: rgba(255, 255, 255, 0.1);*/
+  backdrop-filter: blur(15px);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+.glass-border-4::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 8px;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 1) 0%,
+    /* Sol üst - belirgin beyaz */ rgba(255, 255, 255, 0) 25%,
+    /* Sağ üst geçiş - saydam */ rgba(255, 255, 255, 0.15) 50%,
+    /* Sağ üst - çok saydam */ rgba(255, 255, 255, 0.05) 75%,
+    /* Sol alt - çok saydam */ rgba(255, 255, 255, 1) 100%
+  );
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: xor;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+}
+
+.glass-border-4 .corner-top-left {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 80%
+  );
+  border-radius: 8px 0 100px 0;
+  backdrop-filter: blur(5px);
+}
+
+.glass-border-4 .corner-bottom-right {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(
+    315deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 80%
+  );
+  border-radius: 0 100px 8px 0;
   backdrop-filter: blur(5px);
 }

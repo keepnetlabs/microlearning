@@ -13,7 +13,7 @@ import { SummaryScene } from "./components/scenes/SummaryScene";
 import { NudgeScene } from "./components/scenes/NudgeScene";
 import { ChevronDown, Search, Loader2, ChevronDown as ChevronDownIcon, Star, X, Moon, Sun, Award, ChevronUp } from "lucide-react";
 import ReactCountryFlag from "react-country-flag";
-import { getCountryCode, detectBrowserLanguage, useIsMobile, priorityLanguages, languages } from "./utils/languageUtils";
+import { getCountryCode, detectBrowserLanguage, useIsMobile, languages } from "./utils/languageUtils";
 import { loadAppConfig, createConfigChangeEvent } from "./components/configs/appConfigLoader";
 import { useFontFamily } from "./hooks/useFontFamily";
 import { FontFamilyProvider } from "./contexts/FontFamilyContext";
@@ -263,7 +263,7 @@ export default function App() {
     backgroundGradient2: `absolute -bottom-60 -right-60 w-[500px] h-[500px] bg-gradient-to-tl from-${themeConfig.colors?.accent || 'purple'}-100/35 via-pink-100/25 to-transparent dark:from-${themeConfig.colors?.accent || 'purple'}-900/20 dark:via-pink-900/15 dark:to-transparent ${themeConfig.effects?.borderRadius || 'rounded-full'} blur-3xl animate-pulse transition-colors duration-500`,
 
     // Content card
-    contentCard: `absolute inset-0 w-full h-full ${themeConfig.effects?.borderRadius || 'rounded-2xl'} sm:rounded-3xl overflow-hidden transition-colors duration-300`,
+    contentCard: `absolute inset-0 w-full h-full rounded-2xl sm:rounded-3xl glass-border-2 sm:glass-border-1 overflow-hidden transition-colors duration-300`,
 
     // Navigation button
     navButton: `relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full backdrop-blur-xl border border-${themeConfig.colors?.surface || 'white'}/60 dark:border-gray-600/60 shadow-lg transition-all duration-300 focus:outline-none`,
@@ -696,20 +696,6 @@ export default function App() {
   const filteredLanguages = useMemo(() => {
     if (!languageSearchTerm) {
       return languages.sort((a, b) => {
-        const aPriority = priorityLanguages.indexOf(a.code);
-        const bPriority = priorityLanguages.indexOf(b.code);
-
-        if (aPriority !== -1 && bPriority !== -1) {
-          return aPriority - bPriority;
-        }
-
-        if (aPriority !== -1 && bPriority === -1) {
-          return -1;
-        }
-        if (aPriority === -1 && bPriority !== -1) {
-          return 1;
-        }
-
         return a.name.localeCompare(b.name);
       });
     }
@@ -721,30 +707,9 @@ export default function App() {
           lang.code.toLowerCase().includes(searchTerm);
       })
       .sort((a, b) => {
-        const aPriority = priorityLanguages.indexOf(a.code);
-        const bPriority = priorityLanguages.indexOf(b.code);
-
-        if (aPriority !== -1 && bPriority !== -1) {
-          return aPriority - bPriority;
-        }
-
-        if (aPriority !== -1 && bPriority === -1) {
-          return -1;
-        }
-        if (aPriority === -1 && bPriority !== -1) {
-          return 1;
-        }
-
         return a.name.localeCompare(b.name);
       });
   }, [languageSearchTerm]);
-
-  // Separate priority and other languages for display
-  const { priorityLangs, otherLangs } = useMemo(() => {
-    const priority = filteredLanguages.filter(lang => priorityLanguages.includes(lang.code));
-    const others = filteredLanguages.filter(lang => !priorityLanguages.includes(lang.code));
-    return { priorityLangs: priority, otherLangs: others };
-  }, [filteredLanguages]);
 
   const canProceedNext = useCallback(() => {
     if (currentScene === 4) {
@@ -1327,21 +1292,19 @@ export default function App() {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: -8 }}
                         transition={{ duration: 0.2, ease: "easeOut" }}
-                        className={`absolute top-full right-0 mt-2 w-64 sm:w-72 bg-white/95 border border-white/50 dark:border-gray-600/60 rounded-2xl shadow-2xl shadow-black/10 dark:shadow-black/30 z-50 overflow-hidden transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-3xl'}`}
-                        style={{
-                          background: isDarkMode
-                            ? 'linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.06) 100%)'
-                            : undefined
-                        }}
+                        className={`glass-border-2 absolute top-full right-0 mt-2 w-64 sm:w-72 rounded-2xl z-50 overflow-hidden transition-colors duration-300`}
                         role="listbox"
                         id="language-dropdown-list"
                         aria-label={appConfig.theme?.ariaTexts?.languageListLabel || "Language Selector"}
                         aria-describedby="language-list-description"
+                        style={{
+                          position: 'absolute'
+                        }}
                       >
                         {/* Enhanced Search Input */}
-                        <div className="relative p-2.5 border-b border-gray-200/50 dark:border-gray-600/50 transition-colors duration-300">
-                          <div className="relative">
-                            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 pointer-events-none z-10">
+                        <div className="relative p-2.5 border-b transition-colors duration-300">
+                          <div className="relative glass-border-2">
+                            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[#1C1C1E] dark:text-[#F2F2F7] pointer-events-none z-10">
                               <Search size={12} />
                             </span>
                             <input
@@ -1350,7 +1313,7 @@ export default function App() {
                               placeholder="..."
                               value={languageSearchTerm}
                               onChange={(e) => setLanguageSearchTerm(e.target.value)}
-                              className={`w-full pl-6 pr-3 py-1.5 text-xs bg-white/60 dark:bg-white border border-white/40 dark:border-blue-500/60 rounded-lg  placeholder-gray-500 dark:placeholder-gray-400 text-[#1C1C1E] dark:text-white transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-xl'}`}
+                              className={`w-full pl-6 pr-3 py-1.5 bg-transparent text-xs rounded-lg placeholder-gray-[#1C1C1E] dark:placeholder-gray-[#F2F2F7] text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 focus:outline-none`}
                               aria-label="..."
                               aria-describedby="language-search-description"
                               role="searchbox"
@@ -1377,57 +1340,12 @@ export default function App() {
                             {appConfig.theme?.ariaTexts?.languageListDescription || "List of available languages for the application"}
                           </div>
                           {filteredLanguages.length === 0 ? (
-                            <div className="px-3 py-2 text-xs text-gray-600 dark:text-gray-300 text-center transition-colors duration-300">
+                            <div className="px-3 py-2 text-xs text-[#1C1C1E] dark:text-[#F2F2F7] text-center transition-colors duration-300">
                               {themeConfig.texts?.languageNotFound}
                             </div>
                           ) : (
                             <>
-                              {/* Priority Languages Section */}
-                              {priorityLangs.length > 0 && !languageSearchTerm && (
-                                <>
-                                  {priorityLangs.map((language, index) => (
-                                    <motion.button
-                                      key={`priority-${language.code}`}
-                                      initial={{ opacity: 0, x: -8 }}
-                                      animate={{ opacity: 1, x: 0 }}
-                                      transition={{ delay: index * 0.02 }}
-                                      onClick={() => {
-                                        handleLanguageChange(language.code);
-                                        setIsLanguageDropdownOpen(false);
-                                        setLanguageSearchTerm('');
-                                      }}
-                                      className={`relative z-10 w-full flex items-center space-x-2.5 px-3 py-3 text-left hover:bg-[#3b82f633] dark:hover:bg-gray-700/40 active:bg-gray-200/50 dark:active:bg-gray-600/60 transition-all duration-200 focus:outline-none focus:bg-gray-100/50 dark:focus:bg-gray-700/40 ${selectedLanguage === language.code ? 'bg-gray-100/60 dark:bg-gray-700/50' : ''
-                                        }`}
-                                      style={{ touchAction: 'manipulation' }}
-                                      role="option"
-                                      aria-selected={selectedLanguage === language.code}
-                                    >
-                                      <ReactCountryFlag
-                                        countryCode={getCountryCode(language.code)}
-                                        svg
-                                        style={{ fontSize: '0.75rem' }}
-                                        aria-hidden="true"
-                                      />
-                                      <span className={`text-xs text-[#1C1C1E] dark:text-white font-medium flex-1 min-w-0 truncate transition-colors duration-300 ${selectedLanguage === language.code ? 'text-[#3B82F6]' : ''}`}>
-                                        {language.name}
-                                      </span>
-                                      <span className="text-xs text-gray-600 dark:text-gray-300 flex-shrink-0 transition-colors duration-300">
-                                        {getCountryCode(language.code)}
-                                      </span>
-                                      {selectedLanguage === language.code && (
-                                        <div className="w-1 h-1 bg-blue-500 dark:bg-blue-400 rounded-full flex-shrink-0"></div>
-                                      )}
-                                    </motion.button>
-                                  ))}
-
-                                  {/* Separator */}
-                                  {otherLangs.length > 0 && (
-                                    <div className="border-b border-gray-200/30 dark:border-gray-600/30 transition-colors duration-300"></div>
-                                  )}
-                                </>
-                              )}
-
-                              {/* Other Languages */}
+                              {/*Languages */}
                               {languageSearchTerm ? (
                                 // Show all filtered results when searching
                                 filteredLanguages.map((language, index) => (
@@ -1441,8 +1359,7 @@ export default function App() {
                                       setIsLanguageDropdownOpen(false);
                                       setLanguageSearchTerm('');
                                     }}
-                                    className={`relative z-10 w-full flex items-center space-x-2.5 px-3 py-3 text-left hover:bg-blue-50/50 dark:hover:bg-gray-700/40 active:bg-blue-100/50 dark:active:bg-gray-600/60 transition-all duration-200 focus:outline-none focus:bg-blue-50/50 dark:focus:bg-gray-700/40 ${selectedLanguage === language.code ? 'bg-blue-50/60 dark:bg-gray-700/50' : ''
-                                      }`}
+                                    className={`relative z-10 w-full flex items-center space-x-2.5 px-3 py-3 text-left transition-all duration-200 focus:outline-none`}
                                     style={{ touchAction: 'manipulation' }}
                                     role="option"
                                     aria-selected={selectedLanguage === language.code}
@@ -1454,26 +1371,22 @@ export default function App() {
                                     <span className="text-xs text-gray-600 dark:text-gray-300 flex-shrink-0 transition-colors duration-300">
                                       {language.code.toUpperCase()}
                                     </span>
-                                    {selectedLanguage === language.code && (
-                                      <div className="w-1 h-1 bg-blue-500 dark:bg-gray-400 rounded-full flex-shrink-0"></div>
-                                    )}
                                   </motion.button>
                                 ))
                               ) : (
                                 // Show other languages when not searching
-                                otherLangs.map((language, index) => (
+                                filteredLanguages.map((language, index) => (
                                   <motion.button
                                     key={`other-${language.code}`}
                                     initial={{ opacity: 0, x: -8 }}
                                     animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: (priorityLangs.length + index) * 0.01 }}
+                                    transition={{ delay: index * 0.01 }}
                                     onClick={() => {
                                       handleLanguageChange(language.code);
                                       setIsLanguageDropdownOpen(false);
                                       setLanguageSearchTerm('');
                                     }}
-                                    className={`relative z-10 w-full flex items-center space-x-2.5 px-3 py-3 text-left hover:bg-blue-50/50 dark:hover:bg-gray-700/40 active:bg-blue-100/50 dark:active:bg-gray-600/60 transition-all duration-200 focus:outline-none focus:bg-blue-50/50 dark:focus:bg-gray-700/40 ${selectedLanguage === language.code ? 'bg-blue-50/60 dark:bg-gray-700/50' : ''
-                                      }`}
+                                    className={`relative z-10 w-full flex items-center space-x-2.5 px-3 py-3 text-left transition-all duration-200 focus:outline-none`}
                                     style={{ touchAction: 'manipulation' }}
                                     role="option"
                                     aria-selected={selectedLanguage === language.code}
@@ -1593,20 +1506,6 @@ export default function App() {
                     })
                   }}
                 >
-                  {/* ENHANCED APPLE VISIONOS GLASS EFFECTS - Light mode only */}
-                  {!isMobile && !isDarkMode && (
-                    <>
-                      {/* 4. ENHANCED WHITE STROKE - More visible with darker background */}
-                      <div
-                        className="absolute inset-0 rounded-2xl sm:rounded-3xl pointer-events-none"
-                        style={{
-                          border: '0.5px solid rgba(255, 255, 255, 0.5)',
-                          boxShadow: 'inset 0 0 0 0.5px rgba(255, 255, 255, 0.20)'
-                        }}
-                      />
-
-                    </>
-                  )}
 
                   {/* ENHANCED MOBILE GLASS EFFECTS - Light mode only */}
                   {isMobile && !isDarkMode && (

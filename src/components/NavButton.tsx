@@ -24,7 +24,7 @@ export function NavButton({ direction, onClick, disabled, label, isDarkMode = fa
         relative flex items-center justify-center rounded-2xl overflow-hidden
         transition-all duration-500 ease-out group
         focus:outline-none
-        w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16
+        w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 glass-border-2
         ${disabled 
           ? "cursor-not-allowed" 
           : "cursor-pointer"
@@ -33,21 +33,6 @@ export function NavButton({ direction, onClick, disabled, label, isDarkMode = fa
       style={{
         // Clean neumorphic design
         borderRadius: '16px',
-        background: disabled 
-          ? 'rgba(71, 85, 105, 0.10)'
-          : isDarkMode 
-            ? '#1C1C1E' // White background for dark mode
-            : 'rgba(242, 242, 247, 0.10)',
-        border: disabled 
-          ? '1px solid rgba(71, 85, 105, 0.50)'
-          : isDarkMode 
-            ? '1px solid #fff' // White border for dark mode
-            : '1px solid #fff',
-        boxShadow: disabled 
-          ? '-4px -4px 10px 0 rgba(71, 85, 105, 0.10), 4px 4px 10px 0 rgba(71, 85, 105, 0.10), 0 4px 4px 0 rgba(71, 85, 105, 0.10) inset'
-          : isDarkMode 
-            ? '-4px -4px 10px 0 rgba(255, 255, 255, 0.10), 4px 4px 10px 0 rgba(255, 255, 255, 0.10), 0 4px 4px 0 rgba(255, 255, 255, 0.10) inset'
-            : '-4px -4px 10px 0 rgba(59, 130, 246, 0.10), 4px 4px 10px 0 rgba(59, 130, 246, 0.10), 0 4px 4px 0 rgba(59, 130, 246, 0.10) inset',
         // Hardware acceleration
         transform: 'translateZ(0)',
         willChange: 'transform'

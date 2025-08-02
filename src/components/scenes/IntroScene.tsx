@@ -612,9 +612,7 @@ export const IntroScene = React.memo(({
           scale: 1.02,
           transition: { type: "spring", stiffness: 400 }
         }}
-        className={`relative p-4 sm:p-6 md:p-8 rounded-2xl glass-border-1 backdrop-blur-3xl border shadow-2xl shadow-black/5 dark:shadow-black/30 max-w-xs sm:max-w-md w-full mx-2 ${card?.backgroundColor || 'bg-white/60 dark:bg-gray-800/80'
-          } ${card?.borderColor || 'border-white/60 dark:border-gray-600/60'
-          }`}
+        className={`relative p-4 sm:p-6 md:p-8 rounded-2xl glass-border-2 max-w-xs sm:max-w-md w-full mx-2`}
       >
         <div className="corner-top-left"></div>
         <div className="corner-bottom-right"></div>
@@ -649,15 +647,13 @@ export const IntroScene = React.memo(({
               >
                 <div className="flex-shrink-0 mr-3 sm:mr-4">
                   <motion.div
-                    className="relative p-2 sm:p-3 rounded-[10px] overflow-hidden transition-all duration-500 ease-out group-item bg-[rgba(242, 242, 247, 0.30)] dark:bg-[#1C1C1E] border border-[#F2F2F7] dark:border-[#1C1C1E] border-1"
+                    className="relative p-2 sm:p-3 rounded-[10px] overflow-hidden transition-all duration-500 ease-out group-item glass-border-4"
                     whileHover={{
                       scale: 1.1,
                       rotate: 5,
                       transition: { type: "spring", stiffness: 400 }
                     }}
                     style={{
-                      backdropFilter: 'blur(16px) saturate(150%)',
-                      WebkitBackdropFilter: 'blur(16px) saturate(150%)',
                       transform: 'translateZ(0)',
                       willChange: 'transform'
                     }}
@@ -683,7 +679,7 @@ export const IntroScene = React.memo(({
           >
             <div className="flex justify-between items-center">
               <motion.div
-                className="relative flex items-center space-x-2 px-2 py-1 rounded-lg overflow-hidden transition-all duration-500 ease-out group dark:border-white border-[rgba(71, 85, 105, 0.15)] border-[1px]"
+                className="relative flex items-center space-x-2 px-2 py-1 rounded-lg overflow-hidden transition-all duration-500 ease-out group glass-border-4"
                 whileHover={{ scale: 1.05 }}
                 style={statsStyles}
               >
@@ -709,7 +705,7 @@ export const IntroScene = React.memo(({
               </motion.div>
 
               <motion.div
-                className="relative flex items-center space-x-2 px-2 py-1 rounded-lg overflow-hidden transition-all duration-500 ease-out group dark:border-white border-[rgba(71, 85, 105, 0.15)] border-[1px]"
+                className="relative flex items-center space-x-2 px-2 py-1 rounded-lg overflow-hidden transition-all duration-500 ease-out group glass-border-4"
                 whileHover={{ scale: 1.05 }}
                 style={statsStyles}
               >
@@ -751,7 +747,7 @@ export const IntroScene = React.memo(({
         className="mt-4 sm:mt-6 relative"
       >
         <motion.div
-          className="relative glass-border-1 flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-full overflow-hidden transition-all bg-[rgba(242, 242, 247, 0.30)] dark:bg-[#1C1C1E] duration-500 ease-out group"
+          className="relative glass-border-1 flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-full overflow-hidden transition-all duration-500 ease-out group"
           whileHover={{
             scale: 1.05,
             y: -2

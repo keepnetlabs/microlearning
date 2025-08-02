@@ -142,11 +142,6 @@ export const useIsMobile = () => {
     return isMobile;
 };
 
-// Priority languages that appear at the top
-export const priorityLanguages = [
-    'tr', 'en', 'en-gb', 'es', 'fr', 'de', 'pt', 'it', 'nl', 'ru', 'zh', 'ja', 'ko', 'ar'
-];
-
 // Complete list of supported languages
 export const languages = [
     { code: 'af', name: 'Afrikaans', flag: '🇿🇦' },
