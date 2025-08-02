@@ -555,7 +555,7 @@ export const IntroScene = React.memo(({
           transition={{ duration: 0.8, delay: delays.title }}
         >
           <motion.h1
-            className="text-2xl sm:text-3xl md:text-4xl font-semibold text-[#1C1C1E] dark:text-white"
+            className="text-2xl sm:text-3xl md:text-4xl font-semibold text-[#1C1C1E] dark:text-[#F2F2F7]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: delays.titleWords }}
@@ -668,7 +668,7 @@ export const IntroScene = React.memo(({
           >
             <div className="flex justify-between items-center">
               <motion.div
-                className="relative flex items-center space-x-2 px-2 py-1 rounded-lg overflow-hidden transition-all duration-500 ease-out group glass-border-4"
+                className="relative flex items-center space-x-2 max-h-[24px] px-2 py-1 rounded-lg overflow-hidden transition-all duration-500 ease-out group glass-border-4"
                 whileHover={{ scale: 1.05 }}
                 style={statsStyles}
               >
@@ -694,7 +694,7 @@ export const IntroScene = React.memo(({
               </motion.div>
 
               <motion.div
-                className="relative flex items-center space-x-2 px-2 py-1 rounded-lg overflow-hidden transition-all duration-500 ease-out group glass-border-4"
+                className="relative flex items-center space-x-2 px-2 py-1 rounded-lg overflow-hidden transition-all duration-500 ease-out group glass-border-4 max-h-[24px]"
                 whileHover={{ scale: 1.05 }}
                 style={statsStyles}
               >

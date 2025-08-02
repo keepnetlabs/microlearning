@@ -53,7 +53,7 @@ export function SummaryScene({ config }: SummarySceneProps) {
         <h1 className="text-2xl mb-2 text-center text-[#1C1C1E] dark:text-white">
           {config.texts?.title || "Artık Daha Güvenlisiniz!"}
         </h1>
-        <p className="text-sm text-gray-600 dark:text-gray-300 mb-8 text-center">
+        <p className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] mb-8 text-center">
           {config.texts?.subtitle || "Bu bilgileri ekibinizle paylaşma ve uygulamaya başlama zamanı"}
         </p>
 

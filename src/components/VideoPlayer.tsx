@@ -403,43 +403,13 @@ export function VideoPlayer({
     }
   }, [handleTimeUpdate, handleVideoEnded]);
   const transcriptPanelStyle = useMemo(() => ({
-    background: `linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.85) 0%, 
-      rgba(255, 255, 255, 0.75) 50%, 
-      rgba(248, 250, 252, 0.80) 100%
-    )`,
-    backdropFilter: "blur(20px) saturate(180%)",
-    WebkitBackdropFilter: "blur(20px) saturate(180%)",
-    border: "1px solid rgba(226, 232, 240, 0.40)",
-    borderRadius: "16px",
-    boxShadow: `
-      0 8px 32px rgba(15, 23, 42, 0.08),
-      0 4px 16px rgba(15, 23, 42, 0.04),
-      inset 0 1px 0 rgba(255, 255, 255, 0.20)
-    `,
+    background: `rgba(242, 242, 247, 0.06)`,
     maxHeight: "480px",
-    transform: "translateZ(0)",
-    willChange: "transform",
   }), []);
 
   const transcriptPanelDarkStyle = useMemo(() => ({
-    background: `linear-gradient(135deg, 
-      rgba(30, 41, 59, 0.95) 0%, 
-      rgba(51, 65, 85, 0.90) 50%, 
-      rgba(71, 85, 105, 0.85) 100%
-    )`,
-    backdropFilter: "blur(20px) saturate(180%)",
-    WebkitBackdropFilter: "blur(20px) saturate(180%)",
-    border: "1px solid rgba(148, 163, 184, 0.30)",
-    borderRadius: "16px",
-    boxShadow: `
-      0 8px 32px rgba(0, 0, 0, 0.4),
-      0 4px 16px rgba(0, 0, 0, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.08)
-    `,
+    background: `rgba(242, 242, 247, 0.06)`,
     maxHeight: "480px",
-    transform: "translateZ(0)",
-    willChange: "transform",
   }), []);
 
   const toggleButtonStyle = useMemo(() => ({
@@ -597,7 +567,7 @@ export function VideoPlayer({
             height: isTranscriptOpen ? "auto" : 0,
           }}
           transition={{ duration: 0.3, ease: "easeOut" }}
-          className="relative overflow-hidden"
+          className="relative overflow-hidden glass-border-2"
           style={{
             display: isTranscriptOpen ? "block" : "none",
           }}
@@ -620,14 +590,14 @@ export function VideoPlayer({
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <div
-                    className="p-2 rounded-lg bg-blue-50/90 dark:bg-blue-900/60 border border-blue-200/60 dark:border-blue-600/60 shadow-sm"
+                    className="p-2 glass-border-2"
                     aria-hidden="true"
                   >
-                    <FileText className="w-4 h-4 text-blue-600 dark:text-blue-200" />
+                    <FileText className="w-4 h-4 text-[#1C1C1E] dark:text-[#F2F2F7]" />
                   </div>
                   <div>
                     <h3
-                      className="text-sm font-medium text-slate-900 dark:text-slate-100"
+                      className="text-sm font-medium text-[#1C1C1E] dark:text-[#F2F2F7]"
                       id="transcript-title"
                     >
                       {transcriptTitle}

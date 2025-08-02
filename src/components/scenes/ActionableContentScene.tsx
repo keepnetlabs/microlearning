@@ -125,7 +125,7 @@ export function ActionableContentScene({
       return (
         <SceneIcon
           size={icon.size || 40}
-          className={icon.className || "text-blue-500"}
+          className={`text-[#1C1C1E] dark:text-[#F2F2F7]`}
           aria-hidden="true"
         />
       );
@@ -134,7 +134,7 @@ export function ActionableContentScene({
       return (
         <SceneIcon
           size={icon.size || 40}
-          className={icon.className || "text-blue-500"}
+          className={`text-[#1C1C1E] dark:text-[#F2F2F7]`}
           aria-hidden="true"
         />
       );
@@ -171,7 +171,7 @@ export function ActionableContentScene({
             {sceneIconComponent}
           </div>
           <h1
-            className="text-2xl mb-2 sm:mb-3 text-center text-[#1C1C1E] dark:text-white"
+            className="text-2xl mb-2 sm:mb-3 text-center text-[#1C1C1E] dark:text-[#F2F2F7]"
             id="actionable-content-title"
           >
             {title}
@@ -230,7 +230,7 @@ export function ActionableContentScene({
                       <div className="flex-1">
                         <h3
                           id={`${cardId}-title`}
-                          className="text-sm text-[#1C1C1E] dark:text-white font-medium mb-2"
+                          className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] font-medium mb-2"
                         >
                           {action.title}
                         </h3>

@@ -320,7 +320,6 @@
               "text": "password123",
               "isCorrect": false,
               "explanation": "Too simple and predictable",
-              "strength": "Very Weak",
               "color": "red"
             },
             {
@@ -328,7 +327,6 @@
               "text": "P@ssw0rd!",
               "isCorrect": false,
               "explanation": "A common pattern",
-              "strength": "Medium",
               "color": "yellow"
             },
             {
@@ -336,7 +334,6 @@
               "text": "Coffee!very7Good#2024",
               "isCorrect": true,
               "explanation": "Long, complex, and memorable",
-              "strength": "Very Strong",
               "color": "green"
             },
             {
@@ -344,7 +341,6 @@
               "text": "123456789",
               "isCorrect": false,
               "explanation": "Only numbers",
-              "strength": "Very Weak",
               "color": "red"
             }
           ],

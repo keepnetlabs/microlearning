@@ -388,31 +388,31 @@ export const QuizScene = React.memo(function QuizScene({
   const getAnswerOptionStyle = useCallback((isSelected: boolean, isCorrect?: boolean, showResult?: boolean) => {
     // Mobile-first color palette with proper dark mode support
     const colorStyles = {
-      // Correct answer - Green tones
+      // Correct answer - Green tones (Enhanced for microlearning)
       correct: {
         light: {
-          background: "linear-gradient(135deg, rgba(34, 197, 94, 0.12) 0%, rgba(34, 197, 94, 0.08) 50%, rgba(34, 197, 94, 0.04) 100%)",
-          border: "1px solid rgba(34, 197, 94, 0.3)",
+          background: "linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.10) 30%, rgba(34, 197, 94, 0.06) 70%, rgba(34, 197, 94, 0.03) 100%)",
+          border: "1px solid rgba(34, 197, 94, 0.4)",
           text: "text-green-700",
           icon: "text-green-600"
         },
         dark: {
-          background: "linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.10) 50%, rgba(34, 197, 94, 0.05) 100%)",
+          background: "linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.10) 30%, rgba(34, 197, 94, 0.06) 70%, rgba(34, 197, 94, 0.03) 100%)",
           border: "1px solid rgba(34, 197, 94, 0.4)",
           text: "text-green-300",
           icon: "text-green-400"
         }
       },
-      // Incorrect answer - Red tones
+      // Incorrect answer - Red tones (Enhanced for microlearning)
       incorrect: {
         light: {
-          background: "linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(239, 68, 68, 0.08) 50%, rgba(239, 68, 68, 0.04) 100%)",
-          border: "1px solid rgba(239, 68, 68, 0.3)",
+          background: "linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.10) 30%, rgba(239, 68, 68, 0.06) 70%, rgba(239, 68, 68, 0.03) 100%)",
+          border: "1px solid rgba(239, 68, 68, 0.4)",
           text: "text-red-700",
           icon: "text-red-600"
         },
         dark: {
-          background: "linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.10) 50%, rgba(239, 68, 68, 0.05) 100%)",
+          background: "linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.10) 30%, rgba(239, 68, 68, 0.06) 70%, rgba(239, 68, 68, 0.03) 100%)",
           border: "1px solid rgba(239, 68, 68, 0.4)",
           text: "text-red-300",
           icon: "text-red-400"
@@ -434,20 +434,20 @@ export const QuizScene = React.memo(function QuizScene({
         }
       },
       // Default state - Neutral tones (Mobile-optimized glass morphism)
-      default: {
-        light: {
-          background: "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.90) 25%, rgba(255, 255, 255, 0.85) 50%, rgba(255, 255, 255, 0.80) 75%, rgba(255, 255, 255, 0.75) 100%)",
-          border: "1px solid rgba(255, 255, 255, 0.6)",
-          text: "text-[#1C1C1E]",
-          icon: "text-gray-600"
-        },
-        dark: {
-          background: "linear-gradient(135deg, rgba(31, 41, 55, 0.95) 0%, rgba(31, 41, 55, 0.90) 25%, rgba(31, 41, 55, 0.85) 50%, rgba(31, 41, 55, 0.80) 75%, rgba(31, 41, 55, 0.75) 100%)",
-          border: "1px solid rgba(75, 85, 99, 0.6)",
-          text: "text-gray-100",
-          icon: "text-gray-400"
+              default: {
+          light: {
+            background: "transparent",
+            border: "transparent",
+            text: "text-[#1C1C1E]",
+            icon: "text-[#1C1C1E]"
+          },
+          dark: {
+            background: "transparent",
+            border: "transparent",
+            text: "text-[#F2F2F7]",
+            icon: "text-[#F2F2F7]"
+          }
         }
-      }
     };
 
     // Use centralized isDarkMode prop
@@ -465,30 +465,19 @@ export const QuizScene = React.memo(function QuizScene({
       styleType = 'default';
     }
 
-    // Force re-calculation when theme changes
-    const currentThemeState = themeState;
     colorVariant = isDarkMode ? 'dark' : 'light';
 
     const currentStyle = colorStyles[styleType][colorVariant];
 
     return {
       className: currentStyle.text,
-      style: {
+      style: styleType === 'default' ? {} : {
         background: currentStyle.background,
         border: currentStyle.border,
-        backdropFilter: "blur(20px) saturate(180%)",
-        WebkitBackdropFilter: "blur(20px) saturate(180%)",
-        boxShadow: `
-          0 4px 16px rgba(0, 0, 0, 0.06),
-          0 2px 8px rgba(0, 0, 0, 0.04),
-          0 1px 4px rgba(0, 0, 0, 0.02),
-          inset 0 1px 0 rgba(255, 255, 255, 0.8),
-          inset 0 -1px 0 rgba(0, 0, 0, 0.04)
-        `,
       },
       iconClassName: currentStyle.icon
     };
-  }, [config.styling?.answerOptions, isDarkMode, themeState]);
+  }, [config.styling?.answerOptions, isDarkMode]);
 
 
 
@@ -742,7 +731,7 @@ export const QuizScene = React.memo(function QuizScene({
                 handleAnswer(option.id)
               }
               disabled={showResult || isLoading}
-              className={`group relative w-full p-3 text-left rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-ring/20 disabled:cursor-not-allowed ${optionStyle.className}`}
+              className={`group relative w-full p-3 text-left glass-border-3 transition-all duration-300 focus:outline-none disabled:cursor-not-allowed`}
               style={optionStyle.style}
               role="radio"
               aria-checked={isSelected}
@@ -756,12 +745,7 @@ export const QuizScene = React.memo(function QuizScene({
                   </span>
                   {option.strength && (
                     <span
-                      className={`text-xs font-medium transition-colors duration-300 ${option.color === "green"
-                        ? "text-green-600 dark:text-green-400"
-                        : option.color === "yellow"
-                          ? "text-yellow-600 dark:text-yellow-400"
-                          : "text-red-600 dark:text-red-400"
-                        }`}
+                      className={`text-base font-medium text-[#1C1C1E] dark:text-[#F2F2F7]`}
                     >
                       {option.strength}
                     </span>
@@ -781,11 +765,11 @@ export const QuizScene = React.memo(function QuizScene({
                     aria-live="polite"
                   >
                     {isCorrect ? (
-                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30" aria-label={ariaTexts?.correctAnswerLabel || "Correct answer"}>
+                      <div className="flex items-center justify-center w-6 h-6 glass-border-0" aria-label={ariaTexts?.correctAnswerLabel || "Correct answer"}>
                         <CheckCircle className={`w-4 h-4 ${optionStyle.iconClassName}`} aria-hidden="true" />
                       </div>
                     ) : isSelected ? (
-                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-red-100 dark:bg-red-900/30" aria-label={ariaTexts?.incorrectAnswerLabel || "Incorrect answer"}>
+                      <div className="flex items-center justify-center w-6 h-6 glass-border-0" aria-label={ariaTexts?.incorrectAnswerLabel || "Incorrect answer"}>
                         <XCircle className={`w-4 h-4 ${optionStyle.iconClassName}`} aria-hidden="true" />
                       </div>
                     ) : null}
@@ -884,7 +868,7 @@ export const QuizScene = React.memo(function QuizScene({
                   handleAnswer(option.value)
                 }
                 disabled={showResult || isLoading}
-                className={`relative p-4 rounded-xl text-center font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-ring/20 ${optionStyle.className}`}
+                className={`relative p-4 rounded-xl text-center font-medium transition-all duration-300 focus:outline-none glass-border-0`}
                 style={optionStyle.style}
               >
                 <div className="flex flex-col items-center space-y-2">
@@ -967,21 +951,25 @@ export const QuizScene = React.memo(function QuizScene({
                 }}
                 onClick={() => handleMultiSelectToggle(option.id)}
                 disabled={showResult || isLoading}
-                className={`w-full p-2.5 text-left rounded-lg transition-all duration-200 ${optionStyle.className}`}
+                className={`w-full p-3 text-left rounded-lg transition-all duration-200 glass-border-1 hover:scale-[1.02] ${isSelected ? 'bg-[#1C1C1E]/10 dark:bg-[#F2F2F7]/10' : ''}`}
                 style={optionStyle.style}
               >
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-4">
                   <div
-                    className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all duration-300 ${isSelected
-                      ? "bg-primary border-primary dark:bg-black dark:border-black"
-                      : "border-border"
+                    className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all duration-300 cursor-pointer glass-border-0 ${isSelected
+                      ? "bg-[#1C1C1E]/30 dark:bg-[#F2F2F7]/30 border-[#1C1C1E] dark:border-[#F2F2F7]"
+                      : "border-[#1C1C1E] dark:border-[#F2F2F7] hover:border-[#1C1C1E]/60 dark:hover:border-[#F2F2F7]/60"
                       }`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleMultiSelectToggle(option.id);
+                    }}
                   >
                     {isSelected && (
-                      <CheckCircle className="w-3 h-3 text-blue-600 dark:text-white" />
+                      <CheckCircle className="w-4 h-4 text-[#1C1C1E] dark:text-[#F2F2F7]" />
                     )}
                   </div>
-                  <span className="flex-1 text-foreground">
+                  <span className="flex-1 text-[#1C1C1E] dark:text-[#F2F2F7] text-sm leading-relaxed">
                     {option.text}
                   </span>
 
@@ -1008,31 +996,18 @@ export const QuizScene = React.memo(function QuizScene({
               isLoading ||
               multiSelectAnswers.length < question.minCorrect
             }
-            className={`transition-all duration-300 ${'px-4 py-2.5'} ${'text-sm'} ${'font-medium'} ${'rounded-lg'}`}
-            style={{
-              background: config.styling?.buttons?.checkAnswer?.gradientFrom && config.styling?.buttons?.checkAnswer?.gradientTo
-                ? `linear-gradient(135deg, ${config.styling?.buttons?.checkAnswer?.gradientFrom} 0%, ${config.styling?.buttons?.checkAnswer?.gradientTo} 100%)`
-                : config.styling?.buttons?.checkAnswer?.backgroundColor || "linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.08) 100%)",
-              border: config.styling?.buttons?.checkAnswer?.borderColor || "1px solid rgba(59, 130, 246, 0.3)",
-              backdropFilter: "blur(16px) saturate(160%)",
-              WebkitBackdropFilter: "blur(16px) saturate(160%)",
-              boxShadow: `
-                0 4px 16px rgba(59, 130, 246, 0.2),
-                0 2px 8px rgba(59, 130, 246, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.05)
-              `
-            }}
+            className="text-base px-4 py-2 glass-border-2"
+            style={{ background: "transparent" }}
           >
             {isLoading ? (
               <div className="flex items-center space-x-2">
                 <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                <span className={config.styling?.buttons?.checkAnswer?.textColor || 'text-white dark:text-blue-100'}>
+                <span className="text-[#1C1C1E] dark:text-[#F2F2F7]">
                   {config.texts?.checkAnswer || "Kontrol ediliyor..."}
                 </span>
               </div>
             ) : (
-              <span className={config.styling?.buttons?.checkAnswer?.textColor || 'text-blue-800 dark:text-white'}>
+              <span className="text-[#1C1C1E] dark:text-[#F2F2F7]">
                 {`${config.texts?.checkAnswer || "Cevabı Kontrol Et"} (${multiSelectAnswers.length}/${question.minCorrect})`}
               </span>
             )}
@@ -1852,7 +1827,7 @@ export const QuizScene = React.memo(function QuizScene({
     iconNode = (
       <LucideIconComponent
         size={iconConfig.size ?? 48}
-        className={iconConfig.className}
+        className={`text-[#1C1C1E] dark:text-[#F2F2F7]`}
         strokeWidth={2}
       />
     );
@@ -1917,155 +1892,6 @@ export const QuizScene = React.memo(function QuizScene({
               {config.texts?.question} {currentQuestionIndex + 1}/{questions.length}
             </span>
           </div>
-
-          {/* Navigation Buttons - Only show when quiz is completed */}
-          {isAnswerLocked && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex items-center justify-center space-x-3 mt-4"
-              role="navigation"
-              aria-label={ariaTexts?.navigationLabel || "Question navigation"}
-            >
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  const previousIndex = Math.max(0, currentQuestionIndex - 1);
-                  const previousQuestion = questions[previousIndex];
-                  const hasPreviousAnswer = answers.has(previousQuestion?.id);
-
-                  setCurrentQuestionIndex(previousIndex);
-
-                  // If the previous question has been answered, show the result
-                  if (hasPreviousAnswer) {
-                    setShowResult(true);
-                    setIsAnswerLocked(true);
-                  } else {
-                    setShowResult(false);
-                    setIsAnswerLocked(false);
-                  }
-
-                  // Scroll to top on mobile devices
-                  if (isMobile) {
-                    setTimeout(() => {
-                      window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                      });
-                    }, 100);
-                  }
-                }}
-                disabled={currentQuestionIndex === 0}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}
-                aria-label={currentQuestionIndex === 0 ? ariaTexts?.previousQuestionLabel || "Previous question (disabled)" : ariaTexts?.previousQuestionLabel || `Go to previous question ${currentQuestionIndex}`}
-                style={{
-                  background: currentQuestionIndex === 0
-                    ? isDarkMode
-                      ? "linear-gradient(135deg, rgba(75, 85, 99, 0.1) 0%, rgba(75, 85, 99, 0.05) 100%)"
-                      : "linear-gradient(135deg, rgba(156, 163, 175, 0.1) 0%, rgba(156, 163, 175, 0.05) 100%)"
-                    : isDarkMode
-                      ? "linear-gradient(135deg, rgba(31, 41, 55, 0.95) 0%, rgba(31, 41, 55, 0.85) 25%, rgba(31, 41, 55, 0.75) 50%, rgba(31, 41, 55, 0.65) 75%, rgba(31, 41, 55, 0.55) 100%)"
-                      : "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 25%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.65) 75%, rgba(255, 255, 255, 0.55) 100%)",
-                  backdropFilter: "blur(20px) saturate(200%)",
-                  WebkitBackdropFilter: "blur(20px) saturate(200%)",
-                  border: currentQuestionIndex === 0
-                    ? isDarkMode
-                      ? "1px solid rgba(75, 85, 99, 0.3)"
-                      : "1px solid rgba(156, 163, 175, 0.3)"
-                    : isDarkMode
-                      ? "1px solid rgba(75, 85, 99, 0.6)"
-                      : "1px solid rgba(255, 255, 255, 0.6)",
-                  boxShadow: isDarkMode
-                    ? `
-                      0 4px 12px rgba(0, 0, 0, 0.3),
-                      0 2px 6px rgba(0, 0, 0, 0.2),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.1)
-                    `
-                    : `
-                      0 4px 12px rgba(0, 0, 0, 0.08),
-                      0 2px 6px rgba(0, 0, 0, 0.04),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.8)
-                    `,
-                }}
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                <span className="hidden sm:inline">{config.texts?.previousQuestion}</span>
-                <span className="sm:hidden">{config.texts?.previousQuestion}</span>
-              </Button>
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  const nextIndex = Math.min(questions.length - 1, currentQuestionIndex + 1);
-                  const nextQuestion = questions[nextIndex];
-                  const hasNextAnswer = answers.has(nextQuestion?.id);
-
-                  setCurrentQuestionIndex(nextIndex);
-
-                  // If the next question has been answered, show the result
-                  if (hasNextAnswer) {
-                    setShowResult(true);
-                    setIsAnswerLocked(true);
-                  } else {
-                    setShowResult(false);
-                    setIsAnswerLocked(false);
-                  }
-
-                  // Scroll to top on mobile devices
-                  if (isMobile) {
-                    setTimeout(() => {
-                      window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                      });
-                    }, 100);
-                  }
-                }}
-                disabled={currentQuestionIndex === questions.length - 1}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 ${isDarkMode ? 'text-gray-100' : 'text-[#1C1C1E]'}`}
-                aria-label={currentQuestionIndex === questions.length - 1 ? ariaTexts?.nextQuestionLabel || "Next question (disabled)" : ariaTexts?.nextQuestionLabel || `Go to next question ${currentQuestionIndex + 2}`}
-                style={{
-                  background: currentQuestionIndex === questions.length - 1
-                    ? isDarkMode
-                      ? "linear-gradient(135deg, rgba(75, 85, 99, 0.1) 0%, rgba(75, 85, 99, 0.05) 100%)"
-                      : "linear-gradient(135deg, rgba(156, 163, 175, 0.1) 0%, rgba(156, 163, 175, 0.05) 100%)"
-                    : isDarkMode
-                      ? "linear-gradient(135deg, rgba(31, 41, 55, 0.95) 0%, rgba(31, 41, 55, 0.85) 25%, rgba(31, 41, 55, 0.75) 50%, rgba(31, 41, 55, 0.65) 75%, rgba(31, 41, 55, 0.55) 100%)"
-                      : "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 25%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.65) 75%, rgba(255, 255, 255, 0.55) 100%)",
-                  backdropFilter: "blur(20px) saturate(200%)",
-                  WebkitBackdropFilter: "blur(20px) saturate(200%)",
-                  border: currentQuestionIndex === questions.length - 1
-                    ? isDarkMode
-                      ? "1px solid rgba(75, 85, 99, 0.3)"
-                      : "1px solid rgba(156, 163, 175, 0.3)"
-                    : isDarkMode
-                      ? "1px solid rgba(75, 85, 99, 0.6)"
-                      : "1px solid rgba(255, 255, 255, 0.6)",
-                  boxShadow: isDarkMode
-                    ? `
-                      0 4px 12px rgba(0, 0, 0, 0.3),
-                      0 2px 6px rgba(0, 0, 0, 0.2),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.1)
-                    `
-                    : `
-                      0 4px 12px rgba(0, 0, 0, 0.08),
-                      0 2px 6px rgba(0, 0, 0, 0.04),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.8)
-                    `,
-                }}
-              >
-                <span className="hidden sm:inline">{config.texts?.nextQuestion}</span>
-                <span className="sm:hidden">{config.texts?.nextQuestion}</span>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Button>
-            </motion.div>
-          )}
         </motion.div>
 
         {/* Question Card */}
@@ -2086,16 +1912,8 @@ export const QuizScene = React.memo(function QuizScene({
             {ariaTexts?.questionDescription || "Current question with answer options"}
           </div>
           <div
-            className={`p-5 md:p-6 ${cardStyle.borderRadius} 0 12px 40px rgba(0, 0, 0, 0.08), 0 6px 20px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 rgba(0, 0, 0, 0.06) ${cardStyle.borderColor || ''}`}
-            style={{
-              background: cardStyle.gradientFrom && cardStyle.gradientTo
-                ? `linear-gradient(135deg, ${cardStyle.gradientFrom} 0%, ${cardStyle.gradientTo} 100%)`
-                : cardStyle.backgroundColor || cardStyle.background,
-              backdropFilter: cardStyle.backdropFilter,
-              WebkitBackdropFilter: cardStyle.WebkitBackdropFilter,
-              border: cardStyle.border,
-              boxShadow: cardStyle.boxShadow,
-            }}
+            className={`!isMobile && p-4 glass-border-1`}
+
             role="article"
             aria-labelledby="question-title"
           >
@@ -2125,15 +1943,7 @@ export const QuizScene = React.memo(function QuizScene({
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
-                  className={`mt-4 p-4 ${resultPanelStyle.borderRadius} border-2 ${resultPanelStyle.borderColor || 'border-border/60'} ${resultPanelStyle.shadow || ''}`}
-                  style={{
-                    background: resultPanelStyle.gradientFrom && resultPanelStyle.gradientTo
-                      ? `linear-gradient(135deg, ${resultPanelStyle.gradientFrom} 0%, ${resultPanelStyle.gradientTo} 100%)`
-                      : resultPanelStyle.backgroundColor || resultPanelStyle.background,
-                    backdropFilter: resultPanelStyle.backdropFilter,
-                    WebkitBackdropFilter: resultPanelStyle.WebkitBackdropFilter,
-                    boxShadow: resultPanelStyle.boxShadow,
-                  }}
+                  className="mt-4 p-4 glass-border-2"
                   role="region"
                   aria-label={ariaTexts?.resultPanelLabel || "Result and explanation"}
                   aria-describedby="result-panel-description"
@@ -2146,252 +1956,74 @@ export const QuizScene = React.memo(function QuizScene({
                   >
                     {ariaTexts?.resultPanelDescription || "Feedback on your answer with explanation and tips"}
                   </div>
-                  {/* Explanation Section - Always show, with fallback if no explanation */}
-                  <div className="flex items-start space-x-3 mb-3">
-                    <div
-                      className="p-2 rounded-xl flex items-center justify-center"
-                      style={{
-                        background: "linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(59, 130, 246, 0.08) 50%, rgba(59, 130, 246, 0.04) 100%)",
-                        border: "1px solid rgba(59, 130, 246, 0.25)",
-                        backdropFilter: "blur(16px) saturate(160%)",
-                        WebkitBackdropFilter: "blur(16px) saturate(160%)",
-                        boxShadow: `
-                          0 4px 16px rgba(59, 130, 246, 0.15),
-                          0 2px 8px rgba(59, 130, 246, 0.08),
-                          inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                          inset 0 -1px 0 rgba(0, 0, 0, 0.05)
-                        `
-                      }}
-                      aria-hidden="true"
-                    >
-                      <Lightbulb className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <div className="flex-1 space-y-2">
-                      <p className="font-semibold text-foreground text-base dark:text-white">
-                        {config.texts?.explanation}
-                      </p>
-                      <p className="text-sm text-muted-foreground dark:text-white leading-relaxed">
-                        {currentQuestion?.explanation}
-                      </p>
-                    </div>
+                  
+                  {/* Simple Explanation */}
+                  <div className="mb-3">
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {currentQuestion?.explanation}
+                    </p>
                   </div>
 
-                  {/* Tips */}
+                  {/* Simple Tips */}
                   {currentQuestion?.tips && (
-                    <div className="mb-4 p-3 rounded-xl"
-                      style={{
-                        background: "linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(34, 197, 94, 0.06) 30%, rgba(34, 197, 94, 0.04) 70%, rgba(34, 197, 94, 0.02) 100%)",
-                        border: "1px solid rgba(34, 197, 94, 0.2)",
-                        backdropFilter: "blur(20px) saturate(160%)",
-                        WebkitBackdropFilter: "blur(20px) saturate(160%)",
-                        boxShadow: `
-                          0 4px 16px rgba(34, 197, 94, 0.1),
-                          0 2px 8px rgba(34, 197, 94, 0.05),
-                          inset 0 1px 0 rgba(255, 255, 255, 0.2),
-                          inset 0 -1px 0 rgba(0, 0, 0, 0.03)
-                        `
-                      }}
-                      role="region"
-                      aria-label={ariaTexts?.tipsLabel || "Helpful tips"}
-                    >
-                      <h4 className="font-semibold mb-2 text-foreground flex items-center space-x-2">
-                        <span className="text-lg" aria-hidden="true">💡</span>
-                        <span className="text-foreground dark:text-white">{config.texts?.tips}</span>
-                      </h4>
-                      <div className="grid gap-2 md:grid-cols-2" role="list">
-                        {currentQuestion?.tips.map(
-                          (tip, index) => (
-                            <motion.div
-                              key={index}
-                              initial={{ opacity: 0, x: -10 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: 0.1 * index }}
-                              role="listitem"
-                              className="flex items-start space-x-2 p-2 rounded-lg"
-                              style={{
-                                background: "linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%)",
-                                border: "1px solid rgba(255, 255, 255, 0.15)",
-                                backdropFilter: "blur(12px) saturate(140%)",
-                                WebkitBackdropFilter: "blur(12px) saturate(140%)",
-                                boxShadow: `
-                                  0 2px 8px rgba(0, 0, 0, 0.04),
-                                  inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                                  inset 0 -1px 0 rgba(0, 0, 0, 0.02)
-                                `
-                              }}
-                            >
-                              <div className="w-2 h-2 bg-green-500 rounded-full mt-1.5 flex-shrink-0" />
-                              <span className="text-sm text-muted-foreground dark:text-white leading-relaxed">
-                                {tip}
-                              </span>
-                            </motion.div>
-                          ),
-                        )}
+                    <div className="mb-3">
+                      <div className="grid gap-1">
+                        {currentQuestion?.tips.map((tip, index) => (
+                          <div key={index} className="flex items-start space-x-2 text-sm">
+                            <div className="w-1.5 h-1.5 bg-[#1C1C1E] dark:bg-[#F2F2F7] rounded-full mt-2 flex-shrink-0" />
+                            <span className="text-muted-foreground">{tip}</span>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   )}
 
-                  {/* Action Buttons - Industry Standard Mobile Layout */}
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4 border-t-2 border-border/60">
-                    {/* Status Message - Simplified and Reliable */}
-                    {showResult && (
-                      <div className="flex items-center space-x-2">
-                        {/* Quiz Completed Message */}
-                        {currentQuestionIndex === questions.length - 1 && isAnswerCorrect && (
-                          <div
-                            className="flex items-center space-x-2 px-4 py-3 rounded-lg"
-                            style={{
-                              background: "linear-gradient(135deg, rgba(34, 197, 94, 0.25) 0%, rgba(34, 197, 94, 0.18) 30%, rgba(34, 197, 94, 0.12) 70%, rgba(34, 197, 94, 0.08) 100%)",
-                              border: "0.5px solid rgba(34, 197, 94, 0.6)",
-                              backdropFilter: "blur(16px) saturate(200%)",
-                              WebkitBackdropFilter: "blur(16px) saturate(200%)",
-                              boxShadow: `
-                                0 4px 16px rgba(34, 197, 94, 0.15),
-                                0 2px 8px rgba(34, 197, 94, 0.1),
-                                inset 0 1px 0 rgba(255, 255, 255, 0.2)
-                              `
-                            }}
+                  {/* Simple Action Buttons */}
+                  <div className="flex justify-between items-center pt-3 border-t">
+                    {/* Status */}
+                    <div className="text-sm">
+                      {isAnswerCorrect ? (
+                        <span className="text-[#1C1C1E] dark:text-[#F2F2F7] font-medium">
+                          {currentQuestionIndex === questions.length - 1 
+                            ? (config.texts?.quizCompleted || "Tamamlandı! 🎉")
+                            : (config.texts?.correctAnswer || "Doğru! 🎉")
+                          }
+                        </span>
+                      ) : (
+                        <span className="text-[#1C1C1E] dark:text-[#F2F2F7]">
+                          {attempts >= maxAttempts 
+                            ? (config.texts?.noAttemptsLeft || "Deneme hakkınız bitti")
+                            : `${maxAttempts - attempts} ${config.texts?.attemptsLeft || "deneme kaldı"}`
+                          }
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Buttons */}
+                    <div className="flex gap-2">
+                      {!isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={retryQuestion}
+                          className="text-xs"
+                        >
+                          {config.texts?.retryQuestion}
+                        </Button>
+                      )}
+
+                      {(isAnswerCorrect || (!isAnswerCorrect && attempts >= maxAttempts) || isAnswerLocked) &&
+                        currentQuestionIndex < questions.length - 1 && (
+                          <Button
+                            size="sm"
+                            onClick={handleNextQuestion}
+                            className="text-base px-4 py-2 glass-border-2"
+                            style={{ background: "transparent" }}
                           >
-                            <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
-                            <span className="font-medium text-green-700 dark:text-green-300">
-                              {config.texts?.quizCompleted || "Quiz Tamamlandı! 🎉"}
-                            </span>
-                          </div>
+                            {config.texts?.nextQuestion || "Sonraki"}
+                          </Button>
                         )}
-
-                        {/* Correct Answer Message - Always show if correct */}
-                        {isAnswerCorrect && currentQuestionIndex < questions.length - 1 && (
-                          <div
-                            className="flex items-center space-x-2 px-4 py-3 rounded-lg"
-                            style={{
-                              background: "linear-gradient(135deg, rgba(34, 197, 94, 0.25) 0%, rgba(34, 197, 94, 0.18) 30%, rgba(34, 197, 94, 0.12) 70%, rgba(34, 197, 94, 0.08) 100%)",
-                              border: "0.5px solid rgba(34, 197, 94, 0.6)",
-                              backdropFilter: "blur(16px) saturate(200%)",
-                              WebkitBackdropFilter: "blur(16px) saturate(200%)",
-                              boxShadow: `
-                                0 4px 16px rgba(34, 197, 94, 0.15),
-                                0 2px 8px rgba(34, 197, 94, 0.1),
-                                inset 0 1px 0 rgba(255, 255, 255, 0.2)
-                              `
-                            }}
-                          >
-                            <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
-                            <span className="font-medium text-green-700 dark:text-green-300">
-                              {config.texts?.correctAnswer || "Doğru! 🎉"}
-                            </span>
-                          </div>
-                        )}
-
-                        {/* No Attempts Left Message */}
-                        {!isAnswerCorrect && attempts >= maxAttempts && (
-                          <div className="flex items-center space-x-2 px-4 py-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-                            <XCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
-                            <span className="text-red-700 dark:text-red-300 font-medium">
-                              {ariaTexts?.noAttemptsLeftLabel || config.texts?.noAttemptsLeft || "Deneme hakkınız bitti"}
-                            </span>
-                          </div>
-                        )}
-
-                        {/* Attempts Left Message */}
-                        {!isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked && (
-                          <div className="flex items-center space-x-2 px-4 py-3 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800">
-                            <XCircle className="w-5 h-5 text-orange-600 dark:text-orange-400" />
-                            <span className="text-orange-700 dark:text-orange-300 font-medium">
-                              {maxAttempts - attempts} {ariaTexts?.attemptsLeftLabel || config.texts?.attemptsLeft || "deneme hakkınız kaldı"}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Action Buttons - Enhanced with proper conditions */}
-                    {showResult && (
-                      <div className="flex flex-col sm:flex-row gap-3 sm:space-x-3" role="group" aria-label="Quiz action buttons">
-                        {!isAnswerCorrect &&
-                          attempts < maxAttempts &&
-                          !isAnswerLocked && (
-                            <Button
-                              variant="outline"
-                              onClick={retryQuestion}
-                              className={`flex items-center space-x-2 transition-all duration-300 ${'px-4 py-2.5'} ${'rounded-lg'} ${'text-sm'} ${'font-medium'}`}
-                              aria-label={ariaTexts?.retryQuestionLabel || "Try this question again"}
-                              style={{
-                                background: config.styling?.buttons?.retryQuestion?.gradientFrom && config.styling?.buttons?.retryQuestion?.gradientTo
-                                  ? `linear-gradient(135deg, ${config.styling?.buttons?.retryQuestion?.gradientFrom} 0%, ${config.styling?.buttons?.retryQuestion?.gradientTo} 100%)`
-                                  : config.styling?.buttons?.retryQuestion?.backgroundColor || "linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%)",
-                                border: config.styling?.buttons?.retryQuestion?.borderColor || "1px solid rgba(0, 0, 0, 0.1)",
-                                backdropFilter: "blur(16px) saturate(160%)",
-                                WebkitBackdropFilter: "blur(16px) saturate(160%)",
-                                boxShadow: `
-                                  0 4px 16px rgba(0, 0, 0, 0.1),
-                                  0 2px 8px rgba(0, 0, 0, 0.05),
-                                  inset 0 1px 0 rgba(255, 255, 255, 0.8),
-                                  inset 0 -1px 0 rgba(0, 0, 0, 0.02)
-                                `,
-                                // Dark mode overrides
-                                ...(isDarkMode && {
-                                  background: "linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(51, 65, 85, 0.6) 100%)",
-                                  border: "1px solid rgba(148, 163, 184, 0.2)",
-                                  boxShadow: `
-                                    0 4px 16px rgba(0, 0, 0, 0.3),
-                                    0 2px 8px rgba(0, 0, 0, 0.2),
-                                    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                                    inset 0 -1px 0 rgba(0, 0, 0, 0.1)
-                                  `
-                                })
-                              }}
-                            >
-                              <RotateCcw className={`w-4 h-4 ${config.styling?.buttons?.retryQuestion?.iconColor || 'text-gray-600 dark:text-gray-300'}`} aria-hidden="true" />
-                              <span className={config.styling?.buttons?.retryQuestion?.textColor || 'text-gray-800 dark:text-gray-200'}>
-                                {config.texts?.retryQuestion}
-                              </span>
-                            </Button>
-                          )}
-
-                        {(isAnswerCorrect ||
-                          (!isAnswerCorrect && attempts >= maxAttempts) ||
-                          isAnswerLocked) &&
-                          currentQuestionIndex < questions.length - 1 && (
-                            <Button
-                              onClick={handleNextQuestion}
-                              className={`flex items-center space-x-2 transition-all duration-300 ${'px-4 py-2.5'} ${'rounded-lg'} ${'text-sm'} ${'font-medium'}`}
-                              aria-label={ariaTexts?.nextQuestionLabel || "Go to next question"}
-                              style={{
-                                background: config.styling?.buttons?.nextQuestion?.gradientFrom && config.styling?.buttons?.nextQuestion?.gradientTo
-                                  ? `linear-gradient(135deg, ${config.styling?.buttons?.nextQuestion?.gradientFrom} 0%, ${config.styling?.buttons?.nextQuestion?.gradientTo} 100%)`
-                                  : config.styling?.buttons?.nextQuestion?.backgroundColor || "linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.08) 100%)",
-                                border: config.styling?.buttons?.nextQuestion?.borderColor || "1px solid rgba(59, 130, 246, 0.3)",
-                                backdropFilter: "blur(16px) saturate(160%)",
-                                WebkitBackdropFilter: "blur(16px) saturate(160%)",
-                                boxShadow: `
-                                  0 4px 16px rgba(59, 130, 246, 0.2),
-                                  0 2px 8px rgba(59, 130, 246, 0.1),
-                                  inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                                  inset 0 -1px 0 rgba(0, 0, 0, 0.05)
-                                `
-                              }}
-                            >
-                              <span className={config.styling?.buttons?.nextQuestion?.textColor || 'text-blue-800 dark:text-white'}>
-                                {config.texts?.nextQuestion || "Sonraki Soru"}
-                              </span>
-                              <svg
-                                className={`w-4 h-4 ${config.styling?.buttons?.nextQuestion?.iconColor || 'text-blue-600 dark:text-blue-400'}`}
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                                aria-hidden="true"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M9 5l7 7-7 7"
-                                />
-                              </svg>
-                            </Button>
-                          )}
-                      </div>
-                    )}
+                    </div>
                   </div>
                 </motion.div>
               )}

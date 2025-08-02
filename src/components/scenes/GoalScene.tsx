@@ -266,7 +266,7 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
           <div className="flex flex-col items-start">
             <h3
               id={`goal-title-${index}`}
-              className="text-sm font-medium text-[#1C1C1E] dark:text-white transition-colors duration-300 ease-out group-hover:text-gray-800 dark:group-hover:text-gray-100"
+              className="text-sm font-medium text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 ease-out group-hover:text-gray-800 dark:group-hover:text-gray-100"
             >
               {goal.title}
             </h3>
@@ -330,11 +330,11 @@ export const GoalScene = memo(({
     return (
       <SceneIcon
         size={icon?.size || 48}
-        className={icon?.className || "text-blue-500"}
+        className={`text-[#1C1C1E] dark:text-[#F2F2F7]`}
         aria-hidden="true"
       />
     );
-  }, [icon?.component, icon?.sceneIconName, icon?.size, icon?.className]);
+  }, [icon?.component, icon?.sceneIconName, icon?.size]);
 
   // Memoize the goals array to prevent unnecessary re-renders
   const memoizedGoals = useMemo(() => goals || [], [goals]);
@@ -358,7 +358,7 @@ export const GoalScene = memo(({
 
         <h1
           id="goal-scene-title"
-          className="text-2xl mb-3 sm:mb-5 text-[#1C1C1E] dark:text-white"
+          className="text-2xl mb-3 sm:mb-5 text-[#1C1C1E] dark:text-[#F2F2F7]"
         >
           {title}
         </h1>

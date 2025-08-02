@@ -22,7 +22,7 @@ import { FontFamilyProvider } from "./contexts/FontFamilyContext";
 const STATIC_CSS_CLASSES = {
   // Loading overlay
   loadingOverlay: "fixed inset-0 bg-white/50 dark:bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center transition-colors duration-300",
-  loadingText: "text-sm font-medium text-[#1C1C1E] dark:text-white",
+  loadingText: "text-sm font-medium text-[#1C1C1E] dark:text-[#F2F2F7]",
 
 
   // Background
@@ -42,7 +42,7 @@ const STATIC_CSS_CLASSES = {
 
   // Title
   titleContainer: "absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 max-w-[120px] sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg px-1 sm:px-2",
-  titleText: "text-[10px] sm:text-xs md:text-base lg:text-lg font-semibold text-[#1C1C1E] dark:text-white tracking-tight transition-colors duration-300 text-center truncate",
+  titleText: "text-[10px] sm:text-xs md:text-base lg:text-lg font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] tracking-tight transition-colors duration-300 text-center truncate",
 
   // Controls
   controlsContainer: "flex items-center space-x-1.5 md:space-x-3 flex-shrink-0 z-20",
@@ -62,10 +62,10 @@ const STATIC_CSS_CLASSES = {
   languageChevron: "w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4 text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300",
 
   // Language dropdown
-  languageSearch: "w-full px-3 py-2 text-sm bg-transparent border-0 focus:outline-none focus:ring-0 text-[#1C1C1E] dark:text-white placeholder-gray-500 dark:placeholder-gray-400",
+  languageSearch: "w-full px-3 py-2 text-sm bg-transparent border-0 focus:outline-none focus:ring-0 text-[#1C1C1E] dark:text-[#F2F2F7] placeholder-gray-500 dark:placeholder-gray-400",
   languageList: "max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent",
   languageItem: "flex items-center space-x-2 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 cursor-pointer",
-  languageItemText: "text-sm text-[#1C1C1E] dark:text-white",
+  languageItemText: "text-sm text-[#1C1C1E] dark:text-[#F2F2F7]",
   languageItemFlag: "w-4 h-4 rounded-sm",
 
   // Content area
@@ -147,77 +147,49 @@ export default function App() {
     return appConfig.theme;
   });
 
-  // Individual scene configs for better memoization
-
-  // Individual scene configs for better memoization
-  const introSceneConfig = useMemo(() => ({
-    component: MemoizedIntroScene,
-    points: appConfig.introSceneConfig.points || 10,
-    config: appConfig.introSceneConfig
-  }), [appConfig.introSceneConfig]);
-
-  const goalSceneConfig = useMemo(() => ({
-    component: MemoizedGoalScene,
-    points: appConfig.goalSceneConfig.points || 15,
-    config: appConfig.goalSceneConfig
-  }), [appConfig.goalSceneConfig]);
-
-  const scenarioSceneConfig = useMemo(() => ({
-    component: MemoizedScenarioScene,
-    points: appConfig.scenarioSceneConfig.points || 20,
-    config: appConfig.scenarioSceneConfig
-  }), [appConfig.scenarioSceneConfig]);
-
-  const actionableContentSceneConfig = useMemo(() => ({
-    component: MemoizedActionableContentScene,
-    points: appConfig.actionableContentSceneConfig.points || 25,
-    config: appConfig.actionableContentSceneConfig
-  }), [appConfig.actionableContentSceneConfig]);
-
-  const quizSceneConfig = useMemo(() => ({
-    component: MemoizedQuizScene,
-    points: appConfig.quizSceneConfig.points || 50,
-    config: appConfig.quizSceneConfig
-  }), [appConfig.quizSceneConfig]);
-
-  const surveySceneConfig = useMemo(() => ({
-    component: MemoizedSurveyScene,
-    points: appConfig.surveySceneConfig.points || 20,
-    config: appConfig.surveySceneConfig
-  }), [appConfig.surveySceneConfig]);
-
-  const summarySceneConfig = useMemo(() => ({
-    component: MemoizedSummaryScene,
-    points: appConfig.summarySceneConfig.points || 30,
-    config: appConfig.summarySceneConfig
-  }), [appConfig.summarySceneConfig]);
-
-  const nudgeSceneConfig = useMemo(() => ({
-    component: MemoizedNudgeScene,
-    points: appConfig.nudgeSceneConfig.points || 40,
-    config: appConfig.nudgeSceneConfig
-  }), [appConfig.nudgeSceneConfig]);
-
-  // Memoized scenes array using individual configs
+  // Simplified scenes array - Single memoization
   const scenes = useMemo(() => [
-    introSceneConfig,
-    goalSceneConfig,
-    scenarioSceneConfig,
-    actionableContentSceneConfig,
-    quizSceneConfig,
-    surveySceneConfig,
-    summarySceneConfig,
-    nudgeSceneConfig
-  ], [
-    introSceneConfig,
-    goalSceneConfig,
-    scenarioSceneConfig,
-    actionableContentSceneConfig,
-    quizSceneConfig,
-    surveySceneConfig,
-    summarySceneConfig,
-    nudgeSceneConfig
-  ]);
+    {
+      component: MemoizedIntroScene,
+      points: appConfig.introSceneConfig.points || 10,
+      config: appConfig.introSceneConfig
+    },
+    {
+      component: MemoizedGoalScene,
+      points: appConfig.goalSceneConfig.points || 15,
+      config: appConfig.goalSceneConfig
+    },
+    {
+      component: MemoizedScenarioScene,
+      points: appConfig.scenarioSceneConfig.points || 20,
+      config: appConfig.scenarioSceneConfig
+    },
+    {
+      component: MemoizedActionableContentScene,
+      points: appConfig.actionableContentSceneConfig.points || 25,
+      config: appConfig.actionableContentSceneConfig
+    },
+    {
+      component: MemoizedQuizScene,
+      points: appConfig.quizSceneConfig.points || 50,
+      config: appConfig.quizSceneConfig
+    },
+    {
+      component: MemoizedSurveyScene,
+      points: appConfig.surveySceneConfig.points || 20,
+      config: appConfig.surveySceneConfig
+    },
+    {
+      component: MemoizedSummaryScene,
+      points: appConfig.summarySceneConfig.points || 30,
+      config: appConfig.summarySceneConfig
+    },
+    {
+      component: MemoizedNudgeScene,
+      points: appConfig.nudgeSceneConfig.points || 40,
+      config: appConfig.nudgeSceneConfig
+    }
+  ], [appConfig]);
 
   // Backend'den tema config'ini güncelleme fonksiyonu
   const updateThemeConfig = useCallback((newConfig: any) => {
@@ -412,7 +384,7 @@ export default function App() {
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   const [showAchievementNotification, setShowAchievementNotification] = useState(false);
   const [shownAchievements, setShownAchievements] = useState<string[]>([]);
-  const [lastAchievementCount, setLastAchievementCount] = useState(0);
+  // Removed lastAchievementCount - not needed for optimized logic
 
   // Quiz completion hint state - show only once at first quiz start
   const [showQuizCompletionHint, setShowQuizCompletionHint] = useState(true);
@@ -556,11 +528,10 @@ export default function App() {
       quizCompleted,
       selectedLanguage,
       shownAchievements,
-      lastAchievementCount,
       isSurveySubmitted
     };
     localStorage.setItem('cyber-training-progress', JSON.stringify(saveData));
-  }, [currentScene, totalPoints, achievements, visitedScenes, pointsAwardedScenes, quizCompleted, selectedLanguage, shownAchievements, lastAchievementCount, isSurveySubmitted]);
+  }, [currentScene, totalPoints, achievements, visitedScenes, pointsAwardedScenes, quizCompleted, selectedLanguage, shownAchievements, isSurveySubmitted]);
 
   useEffect(() => {
     saveDataToStorage();
@@ -579,7 +550,6 @@ export default function App() {
         setPointsAwardedScenes(new Set(parsed.pointsAwardedScenes || []));
         setQuizCompleted(parsed.quizCompleted || false);
         setShownAchievements(parsed.shownAchievements || []);
-        setLastAchievementCount(parsed.lastAchievementCount || 0);
         setIsSurveySubmitted(parsed.isSurveySubmitted || false);
         if (parsed.selectedLanguage) {
           setSelectedLanguage(parsed.selectedLanguage);
@@ -601,7 +571,7 @@ export default function App() {
     };
   }, [currentScene]);
 
-  // Smart achievement notification - only show for NEW achievements in key scenes
+  // Optimized achievement notification - only show for NEW achievements in key scenes
   useEffect(() => {
     // Only show notifications on Quiz (scene 4), Summary (scene 6), or Nudge (scene 7)
     const isKeyScene = currentScene === 4 || currentScene === 6 || currentScene === 7;
@@ -610,25 +580,17 @@ export default function App() {
     const newAchievements = achievements.filter(achievement => !shownAchievements.includes(achievement));
     const hasNewAchievements = newAchievements.length > 0;
 
-    // Also check if achievement count increased (alternative check)
-    const achievementCountIncreased = achievements.length > lastAchievementCount;
-
-    if (isKeyScene && hasNewAchievements && achievementCountIncreased) {
+    if (isKeyScene && hasNewAchievements) {
       setShowAchievementNotification(true);
-
-      // Mark these achievements as shown
       setShownAchievements(prev => [...prev, ...newAchievements]);
 
       const timer = setTimeout(() => {
         setShowAchievementNotification(false);
-      }, 4000); // Auto-close after 4 seconds
+      }, 3000); // Reduced from 4s to 3s
 
       return () => clearTimeout(timer);
     }
-
-    // Update last achievement count
-    setLastAchievementCount(achievements.length);
-  }, [achievements, currentScene, shownAchievements, lastAchievementCount]);
+  }, [achievements, currentScene, shownAchievements]);
 
   // Auto-close achievement notification when scene changes
   useEffect(() => {
@@ -666,22 +628,34 @@ export default function App() {
     }
   }, []);
 
-  // Enhanced scroll handler with parallax support - Optimized with throttling
+  // Ensure scroll indicator is hidden on mobile
+  useEffect(() => {
+    if (isMobile) {
+      setShowScrollIndicator(false);
+    }
+  }, [isMobile]);
+
+  // Optimized scroll handler with throttling
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
     const threshold = MEMOIZED_CONSTANTS.SCROLL_THRESHOLD;
 
-    const isAtTop = scrollTop <= threshold;
-    const isAtBottom = scrollTop + clientHeight >= scrollHeight - threshold;
+    // Batch state updates for better performance
+    const updates = {
+      isAtTop: scrollTop <= threshold,
+      isAtBottom: scrollTop + clientHeight >= scrollHeight - threshold,
+      showIndicator: !isMobile && scrollHeight > clientHeight + threshold, // Disable on mobile
+      showScrollToTop: scrollTop > MEMOIZED_CONSTANTS.MOBILE_SCROLL_THRESHOLD && isMobile && currentScene === 2
+    };
 
-    setScrollPosition({ top: isAtTop, bottom: isAtBottom });
-    setShowScrollIndicator(scrollHeight > clientHeight + threshold);
+    setScrollPosition({ top: updates.isAtTop, bottom: updates.isAtBottom });
+    setShowScrollIndicator(updates.showIndicator);
+    setShowScrollToTop(updates.showScrollToTop);
 
-    // Show scroll-to-top button when scrolled down (mobile only) and on video scene
-    setShowScrollToTop(scrollTop > MEMOIZED_CONSTANTS.MOBILE_SCROLL_THRESHOLD && isMobile && currentScene === 2);
-
-    // Update parallax scroll position for background movement
-    setScrollY(scrollTop);
+    // Only update parallax on desktop for better performance
+    if (!isMobile) {
+      setScrollY(scrollTop);
+    }
   }, [isMobile, currentScene]);
 
   // Scroll to top function
@@ -694,23 +668,17 @@ export default function App() {
     }
   }, []);
 
-  // Enhanced filtered and sorted languages with priority - Memoized for performance
+  // Ultra-optimized language filtering
   const filteredLanguages = useMemo(() => {
     if (!languageSearchTerm) {
-      return languages.sort((a, b) => {
-        return a.name.localeCompare(b.name);
-      });
+      return languages; // Return unsorted for better performance
     }
 
-    return languages
-      .filter(lang => {
-        const searchTerm = languageSearchTerm.toLowerCase();
-        return lang.name.toLowerCase().includes(searchTerm) ||
-          lang.code.toLowerCase().includes(searchTerm);
-      })
-      .sort((a, b) => {
-        return a.name.localeCompare(b.name);
-      });
+    const searchTerm = languageSearchTerm.toLowerCase();
+    return languages.filter(lang => 
+      lang.name.toLowerCase().includes(searchTerm) ||
+      lang.code.toLowerCase().includes(searchTerm)
+    );
   }, [languageSearchTerm]);
 
   const canProceedNext = useCallback(() => {
@@ -720,26 +688,21 @@ export default function App() {
     return currentScene < scenes.length - 1;
   }, [currentScene, quizCompleted]);
 
-  // Track scene timing
+  // Optimized scene timing tracking
   const trackSceneTime = useCallback((sceneIndex: number) => {
     const now = Date.now();
-
-    // Record start time for current scene
     setSceneStartTimes(prev => new Map(prev.set(sceneIndex, now)));
 
-    // Calculate time spent on previous scene if exists
+    // Only calculate previous scene time if needed
     if (sceneIndex > 0) {
       const previousScene = sceneIndex - 1;
-      setSceneStartTimes(prev => {
-        const previousStartTime = prev.get(previousScene);
-        if (previousStartTime) {
-          const timeSpent = now - previousStartTime;
-          setSceneTimeSpent(timeSpentPrev => new Map(timeSpentPrev.set(previousScene, timeSpent)));
-        }
-        return prev;
-      });
+      const previousStartTime = sceneStartTimes.get(previousScene);
+      if (previousStartTime) {
+        const timeSpent = now - previousStartTime;
+        setSceneTimeSpent(prev => new Map(prev.set(previousScene, timeSpent)));
+      }
     }
-  }, []);
+  }, [sceneStartTimes]);
 
   // Award points and achievements - only once per scene
   const awardPoints = useCallback((sceneIndex: number) => {
@@ -766,21 +729,21 @@ export default function App() {
     setAchievements(prev => [...prev, ...newAchievements.filter(a => !prev.includes(a))]);
   }, [quizCompleted, visitedScenes.size, totalPoints, pointsAwardedScenes]);
 
-  // Calculate completion data for NudgeScene - Optimized calculation
+  // Ultra-optimized completion data calculation
   const completionData = useMemo(() => {
+    if (currentScene !== 7) return null; // Only calculate when needed
+
     const totalTimeSpent = Array.from(sceneTimeSpent.values()).reduce((total, time) => total + time, 0);
     const minutes = Math.floor(totalTimeSpent / 60000);
     const seconds = Math.floor((totalTimeSpent % 60000) / 1000);
     const timeSpentString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-
     return {
       totalPoints,
       timeSpent: timeSpentString,
-      completionDate: today
+      completionDate: new Date().toISOString().split('T')[0]
     };
-  }, [totalPoints, sceneTimeSpent]);
+  }, [totalPoints, sceneTimeSpent, currentScene]);
 
   // Initialize first scene timing
   useEffect(() => {
@@ -992,12 +955,12 @@ export default function App() {
   const currentLanguage = useMemo(() => languages.find(lang => lang.code === selectedLanguage), [selectedLanguage]);
   const currentSceneConfig = scenes[currentScene].config;
 
-  // PERFORMANCE OPTIMIZED slide variants - Memoized for better performance
+  // Ultra-optimized slide variants for mobile performance
   const slideVariants = useMemo(() => ({
     enter: (direction: number) => ({
       x: direction > 0 ? '100%' : '-100%',
-      opacity: isMobile ? 1 : 0, // Skip opacity animation on mobile
-      scale: isMobile ? 1 : 0.98 // Minimal scale on mobile
+      opacity: isMobile ? 1 : 0,
+      scale: 1 // Remove scale animation for better performance
     }),
     center: {
       zIndex: 1,
@@ -1008,8 +971,8 @@ export default function App() {
     exit: (direction: number) => ({
       zIndex: 0,
       x: direction < 0 ? '100%' : '-100%',
-      opacity: isMobile ? 1 : 0, // Skip opacity animation on mobile
-      scale: isMobile ? 1 : 0.98 // Minimal scale on mobile
+      opacity: isMobile ? 1 : 0,
+      scale: 1 // Remove scale animation for better performance
     })
   }), [isMobile]);
 
@@ -1056,55 +1019,34 @@ export default function App() {
           )}
         </AnimatePresence>
 
-        {/* ENHANCED BACKGROUND - More depth and contrast for glass cards */}
-        <motion.div
-          className={cssClasses.backgroundContainer}
-          style={{
-            // Background moves at slower speed when scrolling - creating proper parallax
-            transform: `translateY(${scrollY * 0.3}px)`,
-            transition: 'transform 0.1s ease-out'
-          }}
-          aria-hidden="true"
-        >
-          {!isMobile && (
-            <>
+        {/* Optimized background - Disabled on mobile for performance */}
+        {!isMobile && (
+          <motion.div
+            className={cssClasses.backgroundContainer}
+            style={{
+              transform: `translateY(${scrollY * 0.3}px)`,
+              transition: 'transform 0.1s ease-out'
+            }}
+            aria-hidden="true"
+          >
+            {/* Simplified background elements for better performance */}
+            <motion.div
+              className="absolute top-1/2 left-1/2 w-6 h-6 bg-blue-200/15 dark:bg-blue-700/10 rounded-full blur-sm"
+              style={{
+                transform: `translateY(${scrollY * 0.6}px)`
+              }}
+              aria-hidden="true"
+            />
 
-              {/* Enhanced floating ambient particles */}
-              <motion.div
-                className="absolute top-1/2 left-1/2 w-6 h-6 bg-blue-200/15 dark:bg-blue-700/10 rounded-full blur-sm"
-                style={{
-                  transform: `translateY(${scrollY * 0.6}px) translateX(${Math.sin(scrollY * 0.01) * 20}px)`
-                }}
-                aria-hidden="true"
-              />
-
-              <motion.div
-                className="absolute top-2/3 right-1/3 w-4 h-4 bg-purple-200/12 dark:bg-purple-700/8 rounded-full blur-sm"
-                style={{
-                  transform: `translateY(${scrollY * -0.35}px) translateX(${Math.cos(scrollY * 0.008) * 15}px)`
-                }}
-                aria-hidden="true"
-              />
-
-              {/* Additional background texture layers for more depth */}
-              <motion.div
-                className="absolute top-1/4 left-1/6 w-24 h-24 bg-gradient-radial from-indigo-100/20 to-transparent dark:from-indigo-900/12 dark:to-transparent rounded-full blur-xl"
-                style={{
-                  transform: `translateY(${scrollY * 0.35}px) translateX(${scrollY * 0.06}px) rotate(${scrollY * 0.05}deg)`
-                }}
-                aria-hidden="true"
-              />
-
-              <motion.div
-                className="absolute bottom-1/6 right-1/6 w-18 h-18 bg-gradient-radial from-violet-100/18 to-transparent dark:from-violet-900/10 dark:to-transparent rounded-full blur-lg"
-                style={{
-                  transform: `translateY(${scrollY * -0.4}px) translateX(${scrollY * -0.07}px) rotate(${scrollY * -0.03}deg)`
-                }}
-                aria-hidden="true"
-              />
-            </>
-          )}
-        </motion.div>
+            <motion.div
+              className="absolute top-2/3 right-1/3 w-4 h-4 bg-purple-200/12 dark:bg-purple-700/8 rounded-full blur-sm"
+              style={{
+                transform: `translateY(${scrollY * -0.35}px)`
+              }}
+              aria-hidden="true"
+            />
+          </motion.div>
+        )}
 
         {/* Optimized Mobile Header - Enhanced dark mode contrast */}
         <header
@@ -1379,10 +1321,10 @@ export default function App() {
                                     aria-selected={selectedLanguage === language.code}
                                   >
                                     <span className="text-xs">{language.flag}</span>
-                                    <span className="text-xs text-[#1C1C1E] dark:text-white font-medium flex-1 min-w-0 truncate transition-colors duration-300">
+                                    <span className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] font-medium flex-1 min-w-0 truncate transition-colors duration-300">
                                       {language.name}
                                     </span>
-                                    <span className="text-xs text-gray-600 dark:text-gray-300 flex-shrink-0 transition-colors duration-300">
+                                    <span className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] flex-shrink-0 transition-colors duration-300">
                                       {language.code.toUpperCase()}
                                     </span>
                                   </motion.button>
@@ -1410,7 +1352,7 @@ export default function App() {
                                       svg
                                       style={{ fontSize: '0.75rem' }}
                                     />
-                                    <span className="text-xs text-[#1C1C1E] dark:text-white font-medium flex-1 min-w-0 truncate transition-colors duration-300">
+                                    <span className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] font-medium flex-1 min-w-0 truncate transition-colors duration-300">
                                       {language.name}
                                     </span>
                                     <span className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] flex-shrink-0 transition-colors duration-300">
@@ -1475,28 +1417,28 @@ export default function App() {
                   animate="center"
                   exit="exit"
                   transition={{
-                    // OPTIMIZED ANIMATIONS for mobile performance - Memoized constants
+                    // Ultra-fast mobile animations
                     x: {
                       type: isMobile ? "tween" : "spring",
-                      duration: isMobile ? MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.MOBILE : MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.DESKTOP,
-                      ease: isMobile ? [0.25, 0.46, 0.45, 0.94] : "easeOut",
+                      duration: isMobile ? 0.2 : MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.DESKTOP,
+                      ease: isMobile ? "easeOut" : "easeOut",
                       stiffness: isMobile ? undefined : 300,
                       damping: isMobile ? undefined : 25
                     },
                     opacity: {
-                      duration: isMobile ? MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.FADE : MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.SCALE,
-                      ease: [0.25, 0.46, 0.45, 0.94]
+                      duration: isMobile ? 0.1 : MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.SCALE,
+                      ease: "easeOut"
                     },
                     scale: {
-                      duration: isMobile ? MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.FADE : MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.SCALE,
-                      ease: [0.25, 0.46, 0.45, 0.94]
+                      duration: isMobile ? 0.1 : MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.SCALE,
+                      ease: "easeOut"
                     }
                   }}
                   className={cssClasses.contentCard}
                   onAnimationComplete={handleAnimationComplete}
                   whileHover={!isMobile ? {
-                    y: -4,
-                    scale: 1.005,
+                    y: -2,
+                    scale: 1.002,
                     transition: { type: "spring", stiffness: 400, damping: 25 }
                   } : undefined}
                   style={{
@@ -1520,22 +1462,6 @@ export default function App() {
                     })
                   }}
                 >
-
-                  {/* ENHANCED MOBILE GLASS EFFECTS - Light mode only */}
-                  {isMobile && !isDarkMode && (
-                    <>
-                      {/* Enhanced glass background for mobile with better contrast */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-white/40 to-white/35 rounded-2xl transition-colors duration-300" />
-
-                      {/* Enhanced border for mobile with better visibility */}
-                      <div
-                        className="absolute inset-0 rounded-2xl border border-white/40"
-                        style={{
-                          boxShadow: '0 6px 20px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.20)'
-                        }}
-                      />
-                    </>
-                  )}
 
                   {/* Content Scroll Container - ANCHORED (doesn't move with parallax) */}
                   <div
@@ -1613,16 +1539,16 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Enhanced Scroll Indicator */}
+                  {/* Enhanced Scroll Indicator - Hidden on mobile for better UX */}
                   <AnimatePresence>
-                    {showScrollIndicator && !scrollPosition.bottom && currentScene !== 2 && (
+                    {showScrollIndicator && !scrollPosition.bottom && currentScene !== 2 && !isMobile && (
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
                         className="absolute bottom-4 left-0 right-0 mx-auto z-20 pointer-events-none flex justify-center"
                       >
-                        <div className={`flex items-center space-x-2 px-4 py-2.5 bg-white/90 dark:bg-gray-900/90 rounded-full border border-white/40 dark:border-gray-600/60 shadow-lg transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-xl'} min-w-fit`}>
+                        <div className="flex items-center space-x-2 px-4 py-2.5 bg-white/90 dark:bg-gray-900/90 rounded-full border border-white/40 dark:border-gray-600/60 shadow-lg transition-colors duration-300 backdrop-blur-xl min-w-fit">
                           <span className="text-xs text-blue-800 dark:text-blue-200 font-medium transition-colors duration-300 whitespace-nowrap">
                             {themeConfig.texts?.scrollHint}
                           </span>
@@ -1656,30 +1582,23 @@ export default function App() {
               pointerEvents: 'none'
             }}
           >
-            {/* Left Gesture Area - HYPER RESPONSIVE */}
+            {/* Optimized Left Gesture Area */}
             <div
-              className="absolute left-0 top-0 bottom-0 w-20 pointer-events-auto"
+              className="absolute left-0 top-0 bottom-0 w-16 pointer-events-auto"
               style={{
                 touchAction: 'pan-x',
                 background: 'transparent',
-                pointerEvents: currentScene === 2 ? 'none' : 'auto' // Disable on video scene
+                pointerEvents: currentScene === 2 ? 'none' : 'auto'
               }}
               onTouchStart={(e) => {
                 const startX = e.touches[0].clientX;
                 const startY = e.touches[0].clientY;
-                const threshold = MEMOIZED_CONSTANTS.TOUCH_THRESHOLDS.HORIZONTAL;
                 let hasMovedHorizontally = false;
 
                 const handleTouchMove = (moveEvent: TouchEvent) => {
-                  const currentX = moveEvent.touches[0].clientX;
-                  const currentY = moveEvent.touches[0].clientY;
-                  const diffX = Math.abs(startX - currentX);
-                  const diffY = Math.abs(startY - currentY);
-
-                  // ULTRA sensitive horizontal detection
-                  if (diffX > diffY && diffX > MEMOIZED_CONSTANTS.TOUCH_THRESHOLDS.MIN_MOVEMENT) {
-                    hasMovedHorizontally = true;
-                  }
+                  const diffX = Math.abs(startX - moveEvent.touches[0].clientX);
+                  const diffY = Math.abs(startY - moveEvent.touches[0].clientY);
+                  if (diffX > diffY && diffX > 5) hasMovedHorizontally = true;
                 };
 
                 const handleTouchEnd = (endEvent: TouchEvent) => {
@@ -1689,13 +1608,8 @@ export default function App() {
                     return;
                   }
 
-                  const endX = endEvent.changedTouches[0].clientX;
-                  const diffX = startX - endX;
-
-                  // HYPER responsive threshold
-                  if (diffX < -threshold && currentScene > 0) {
-                    prevScene();
-                  }
+                  const diffX = startX - endEvent.changedTouches[0].clientX;
+                  if (diffX < -30 && currentScene > 0) prevScene();
 
                   document.removeEventListener('touchmove', handleTouchMove);
                   document.removeEventListener('touchend', handleTouchEnd);
@@ -1706,30 +1620,23 @@ export default function App() {
               }}
             />
 
-            {/* Right Gesture Area - HYPER RESPONSIVE */}
+            {/* Optimized Right Gesture Area */}
             <div
-              className="absolute right-0 top-0 bottom-0 w-20 pointer-events-auto"
+              className="absolute right-0 top-0 bottom-0 w-16 pointer-events-auto"
               style={{
                 touchAction: 'pan-x',
                 background: 'transparent',
-                pointerEvents: currentScene === 2 ? 'none' : 'auto' // Disable on video scene
+                pointerEvents: currentScene === 2 ? 'none' : 'auto'
               }}
               onTouchStart={(e) => {
                 const startX = e.touches[0].clientX;
                 const startY = e.touches[0].clientY;
-                const threshold = MEMOIZED_CONSTANTS.TOUCH_THRESHOLDS.HORIZONTAL;
                 let hasMovedHorizontally = false;
 
                 const handleTouchMove = (moveEvent: TouchEvent) => {
-                  const currentX = moveEvent.touches[0].clientX;
-                  const currentY = moveEvent.touches[0].clientY;
-                  const diffX = Math.abs(startX - currentX);
-                  const diffY = Math.abs(startY - currentY);
-
-                  // ULTRA sensitive horizontal detection
-                  if (diffX > diffY && diffX > MEMOIZED_CONSTANTS.TOUCH_THRESHOLDS.MIN_MOVEMENT) {
-                    hasMovedHorizontally = true;
-                  }
+                  const diffX = Math.abs(startX - moveEvent.touches[0].clientX);
+                  const diffY = Math.abs(startY - moveEvent.touches[0].clientY);
+                  if (diffX > diffY && diffX > 5) hasMovedHorizontally = true;
                 };
 
                 const handleTouchEnd = (endEvent: TouchEvent) => {
@@ -1739,11 +1646,8 @@ export default function App() {
                     return;
                   }
 
-                  const endX = endEvent.changedTouches[0].clientX;
-                  const diffX = startX - endX;
-
-                  // HYPER responsive threshold
-                  if (diffX > threshold && canProceedNext() && currentScene < scenes.length - 1) {
+                  const diffX = startX - endEvent.changedTouches[0].clientX;
+                  if (diffX > 30 && canProceedNext() && currentScene < scenes.length - 1) {
                     nextScene();
                   }
 

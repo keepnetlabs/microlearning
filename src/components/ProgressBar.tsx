@@ -277,7 +277,7 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
               >
 
                 {/* Percentage text */}
-                <span className="relative z-10 text-xs font-semibold text-[#1C1C1E] dark:text-white">
+                <span className="relative z-10 text-xs font-semibold text-[#1C1C1E] dark:text-[#F2F2F7]">
                   {formatPercent(progress, language)}
                 </span>
               </div>

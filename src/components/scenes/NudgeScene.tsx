@@ -780,7 +780,7 @@ export function NudgeScene({ config, completionData }: NudgeSceneProps) {
                     </div>
                   </div>
                 </div>
-                <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded-full relative z-10">
+                <span className="text-xs bg-gray-100 dark:bg-gray-700 text-[#1C1C1E] dark:text-[#F2F2F7] px-2 py-1 rounded-full relative z-10">
                   {resource.type}
                 </span>
               </motion.a>

@@ -192,7 +192,7 @@ export function ScenarioScene({
     return (
       <SceneIcon
         size={config.icon?.size || 40}
-        className={config.icon?.className || "text-blue-500"}
+        className={`text-[#1C1C1E] dark:text-[#F2F2F7]`}
         aria-hidden="true"
       />
     );
@@ -236,7 +236,7 @@ export function ScenarioScene({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="text-sm text-gray-600 dark:text-white text-center mb-4"
+            className="text-base text-[#1C1C1E] dark:text-[#F2F2F7] text-center mb-4"
           >
             {config.description}
           </motion.p>
