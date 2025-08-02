@@ -269,11 +269,7 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
               <div
                 className="flex items-center glass-border-1 justify-center px-1.5 py-1 rounded-full shadow-lg relative"
                 style={{
-                  background: 'rgba(242, 242, 247, 0.15)',
-                  border: '0.5 solid rgba(199, 199, 204, 0.60)',
-                  boxShadow: '0 4px 12px rgba(148, 163, 184, 0.20), 0 2px 6px rgba(148, 163, 184, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.30)',
                   transform: 'translateZ(0)',
-                  willChange: 'transform',
                   minWidth: '38px',
                   height: '24px',
                   top: "-9px"

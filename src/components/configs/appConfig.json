@@ -16,7 +16,7 @@
       "primary": "blue",
       "secondary": "indigo",
       "accent": "purple",
-      "background": "linear-gradient(106deg,_#76B2D7_0%,_#3178A5_100%)",
+      "background": "bg-gradient-blue",
       "surface": "white",
       "border": "gray"
     },
@@ -502,7 +502,7 @@
           "backgroundColor": "rgba(255, 255, 255, 0.8)",
           "borderColor": "rgba(0, 0, 0, 0.1)",
           "textColor": "text-gray-800 dark:text-gray-200",
-          "iconColor": "text-gray-600 dark:text-gray-300",
+          "iconColor": "text-[#1C1C1E] dark:text-[#F2F2F7]",
           "gradientFrom": "rgba(255, 255, 255, 0.8)",
           "gradientTo": "rgba(255, 255, 255, 0.6)"
         },
@@ -803,7 +803,7 @@
       "actionCards": {
         "backgroundColor": "bg-white/50 dark:bg-gray-800/60",
         "borderColor": "border-white/30 dark:border-gray-600/50",
-        "iconColor": "text-gray-600 dark:text-gray-300",
+        "iconColor": "text-[#1C1C1E] dark:text-[#F2F2F7]",
         "textColor": "text-[#1C1C1E] dark:text-gray-200"
       },
       "resourceCards": {

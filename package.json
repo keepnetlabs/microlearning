@@ -65,8 +65,9 @@
     "tailwindcss": "^3.3.5"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "GENERATE_SOURCEMAP=false react-scripts start",
+    "build": "GENERATE_SOURCEMAP=false react-scripts build",
+    "build:analyze": "GENERATE_SOURCEMAP=false npm run build && npx serve -s build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

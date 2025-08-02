@@ -379,7 +379,7 @@ export const QuizScene = React.memo(function QuizScene({
 
   // Get questions from config
   const questions = useMemo(() => config?.questions?.list || [], [config?.questions?.list]);
-  console.log(questions);
+  // console.log(questions);
   // Memoized constants
   const maxAttempts = useMemo(() => config?.questions?.maxAttempts || 2, [config?.questions?.maxAttempts]);
   const currentQuestion = useMemo(() => questions[currentQuestionIndex], [questions, currentQuestionIndex]);

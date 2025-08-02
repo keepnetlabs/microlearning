@@ -78,7 +78,7 @@ const STATIC_CSS_CLASSES = {
 
   // Navigation
   navContainer: "fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30",
-  navButtonIcon: "w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-gray-600 dark:text-gray-300 transition-colors duration-300",
+  navButtonIcon: "w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300",
 
   // Quiz timer
   timerContainer: "fixed top-4 right-4 z-30",
@@ -120,6 +120,8 @@ const MemoizedQuizScene = React.memo(QuizScene);
 const MemoizedSurveyScene = React.memo(SurveyScene);
 const MemoizedSummaryScene = React.memo(SummaryScene);
 const MemoizedNudgeScene = React.memo(NudgeScene);
+
+
 
 export default function App() {
   // Dinamik appConfig state'i - ileride API'den gelecek
@@ -252,7 +254,7 @@ export default function App() {
   // Dynamic CSS classes - Sadece themeConfig değiştiğinde yeniden hesaplanır
   const dynamicCssClasses = useMemo(() => ({
     // Ana container
-    mainContainer: `min-h-screen bg-[${themeConfig.colors?.background}] bg-[linear-gradient(106deg,_#76B2D7_0%,_#3178A5_100%)]  dark:bg-gradient-to-br dark:from-gray-600 dark:via-gray-850 dark:to-gray-900 flex flex-col relative overflow-hidden transition-colors duration-300`,
+    mainContainer: `min-h-screen ${themeConfig.colors?.background} dark:bg-gradient-to-br dark:from-gray-600 dark:via-gray-850 dark:to-gray-900 flex flex-col relative overflow-hidden transition-colors duration-300`,
 
     // Loading container
     loadingContainer: `flex items-center space-x-3 px-6 py-4 bg-${themeConfig.colors?.surface || 'white'}/90 dark:bg-gray-900/90 ${themeConfig.effects?.backdropBlur || 'backdrop-blur-xl'} ${themeConfig.effects?.borderRadius || 'rounded-2xl'} border border-${themeConfig.colors?.surface || 'white'}/${themeConfig.effects?.borderOpacity || '60'} dark:border-gray-600/60 ${themeConfig.effects?.shadow || 'shadow-xl'} transition-colors duration-300`,
@@ -263,7 +265,7 @@ export default function App() {
     backgroundGradient2: `absolute -bottom-60 -right-60 w-[500px] h-[500px] bg-gradient-to-tl from-${themeConfig.colors?.accent || 'purple'}-100/35 via-pink-100/25 to-transparent dark:from-${themeConfig.colors?.accent || 'purple'}-900/20 dark:via-pink-900/15 dark:to-transparent ${themeConfig.effects?.borderRadius || 'rounded-full'} blur-3xl animate-pulse transition-colors duration-500`,
 
     // Content card
-    contentCard: `absolute inset-0 w-full h-full rounded-2xl sm:rounded-3xl glass-border-2 sm:glass-border-1 overflow-hidden transition-colors duration-300`,
+    contentCard: `absolute inset-0 w-full h-full glass-border-2 sm:glass-border-1.5 overflow-hidden transition-colors duration-300`,
 
     // Navigation button
     navButton: `relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full backdrop-blur-xl border border-${themeConfig.colors?.surface || 'white'}/60 dark:border-gray-600/60 shadow-lg transition-all duration-300 focus:outline-none`,
@@ -595,7 +597,7 @@ export default function App() {
     return () => {
       // Analytics tracking could be implemented here
       const timeSpent = Date.now() - startTime;
-      console.log(`Time spent on scene ${currentScene}: ${timeSpent}ms`);
+      // console.log(`Time spent on scene ${currentScene}: ${timeSpent}ms`);
     };
   }, [currentScene]);
 
@@ -872,9 +874,17 @@ export default function App() {
   useEffect(() => {
     if (isLanguageDropdownOpen && searchInputRef.current) {
       // Small delay to ensure dropdown is rendered
-      setTimeout(() => {
-        searchInputRef.current?.focus();
-      }, 100);
+      const timer = setTimeout(() => {
+        if (searchInputRef.current) {
+          searchInputRef.current.focus();
+          // Also select the text if there's any
+          if (searchInputRef.current.value) {
+            searchInputRef.current.select();
+          }
+        }
+      }, 150);
+
+      return () => clearTimeout(timer);
     }
   }, [isLanguageDropdownOpen]);
 
@@ -1303,7 +1313,10 @@ export default function App() {
                       >
                         {/* Enhanced Search Input */}
                         <div className="relative p-2.5 border-b transition-colors duration-300">
-                          <div className="relative glass-border-2">
+                          <div
+                            className="relative glass-border-2 cursor-text"
+                            onClick={() => searchInputRef.current?.focus()}
+                          >
                             <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[#1C1C1E] dark:text-[#F2F2F7] pointer-events-none z-10">
                               <Search size={12} />
                             </span>
@@ -1313,10 +1326,11 @@ export default function App() {
                               placeholder="..."
                               value={languageSearchTerm}
                               onChange={(e) => setLanguageSearchTerm(e.target.value)}
-                              className={`w-full pl-6 pr-3 py-1.5 bg-transparent text-xs rounded-lg placeholder-gray-[#1C1C1E] dark:placeholder-gray-[#F2F2F7] text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 focus:outline-none`}
+                              className={`w-full pl-6 pr-3 py-1.5 bg-transparent text-xs rounded-lg placeholder-gray-[#1C1C1E] dark:placeholder-gray-[#F2F2F7] text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 focus:ring-inset`}
                               aria-label="..."
                               aria-describedby="language-search-description"
                               role="searchbox"
+                              onFocus={(e) => e.target.select()}
                             />
                             {/* Hidden description for search input */}
                             <div id="language-search-description" className="sr-only">
@@ -1399,7 +1413,7 @@ export default function App() {
                                     <span className="text-xs text-[#1C1C1E] dark:text-white font-medium flex-1 min-w-0 truncate transition-colors duration-300">
                                       {language.name}
                                     </span>
-                                    <span className="text-xs text-gray-600 dark:text-gray-300 flex-shrink-0 transition-colors duration-300">
+                                    <span className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] flex-shrink-0 transition-colors duration-300">
                                       {getCountryCode(language.code)}
                                     </span>
                                     {selectedLanguage === language.code && (
@@ -1533,13 +1547,12 @@ export default function App() {
                     aria-describedby="content-description"
                     style={{
                       scrollbarWidth: 'thin',
-                      scrollbarColor: isDarkMode ? 'rgba(59, 130, 246, 0.4) transparent' : 'rgba(59, 130, 246, 0.3) transparent',
                       WebkitOverflowScrolling: 'touch',
+                      scrollbarColor: 'transparent transparent',
                       touchAction: 'pan-y',
                       overscrollBehavior: 'contain',
                       // Hardware acceleration
-                      transform: 'translateZ(0)',
-                      willChange: 'scroll-position'
+                      transform: 'translateZ(0)'
                     }}
                   >
                     {/* Hidden description for screen readers */}

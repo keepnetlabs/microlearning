@@ -58,6 +58,80 @@
     touch-action: manipulation;
   }
 }
+.glass-border-0,
+.glass-border-0-outline,
+.glass-border-1,
+.glass-border-1-5,
+.glass-border-2,
+.glass-border-3,
+.glass-border-4 {
+  box-shadow: 4px 0 4px 0 rgba(255, 255, 255, 0.15) inset,
+    0 4px 4px 0 rgba(255, 255, 255, 0.15) inset;
+  background: rgba(242, 242, 247, 0.06);
+}
+.glass-border-0,
+.glass-border-0-outline {
+  position: relative;
+  /*background: rgba(255, 255, 255, 0.1);*/
+  backdrop-filter: blur(5px);
+  border-radius: 40px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Ana border - çok ince */
+.glass-border-0::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 40px;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.6) 0%,
+    /* Sol üst - belirgin beyaz */ rgba(255, 255, 255, 0.1) 25%,
+    /* Sağ üst geçiş - saydam */ rgba(255, 255, 255, 0.05) 50%,
+    /* Sağ üst - çok saydam */ rgba(255, 255, 255, 0.05) 75%,
+    /* Sol alt - çok saydam */ rgba(255, 255, 255, 0.6) 100%
+  ); /* Sağ alt - belirgin beyaz */
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: xor;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+}
+
+/* İç köşe highlight'ları */
+.glass-border-0 .corner-top-left {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 80%
+  );
+  border-radius: 40px 0 100px 0;
+  backdrop-filter: blur(5px);
+}
+
+.glass-border-0 .corner-bottom-right {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(
+    315deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 80%
+  );
+  border-radius: 0 100px 40px 0;
+  backdrop-filter: blur(5px);
+}
+
 .glass-border-1,
 .glass-border-1-outline {
   position: relative;
@@ -91,6 +165,29 @@
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
 }
+.glass-border-0::after,
+.glass-border-1::after,
+.glass-border-1-5::after,
+.glass-border-2::after,
+.glass-border-3::after,
+.glass-border-4::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: 15%;
+  right: 10%;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.01) 0%,
+    rgba(255, 255, 255, 0.1) 20%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(256, 255, 255, 0.3) 80%,
+    rgba(256, 255, 255, 0) 100%
+  );
+  backdrop-filter: blur(5px);
+  border-radius: 32px 32px 0 0;
+}
 
 /* İç köşe highlight'ları */
 .glass-border-1 .corner-top-left {
@@ -118,6 +215,68 @@
     transparent 80%
   );
   border-radius: 0 100px 32px 0;
+  backdrop-filter: blur(5px);
+}
+.glass-border-1-5,
+.glass-border-1-5-outline {
+  position: relative;
+  /*background: rgba(255, 255, 255, 0.1);*/
+  backdrop-filter: blur(5px);
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Ana border - çok ince */
+.glass-border-1-5::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 24px;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.6) 0%,
+    /* Sol üst - belirgin beyaz */ rgba(255, 255, 255, 0.1) 25%,
+    /* Sağ üst geçiş - saydam */ rgba(255, 255, 255, 0.05) 50%,
+    /* Sağ üst - çok saydam */ rgba(255, 255, 255, 0.05) 75%,
+    /* Sol alt - çok saydam */ rgba(255, 255, 255, 0.6) 100%
+  ); /* Sağ alt - belirgin beyaz */
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: xor;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+}
+
+/* İç köşe highlight'ları */
+.glass-border-1-5 .corner-top-left {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 80%
+  );
+  border-radius: 24px 0 100px 0;
+  backdrop-filter: blur(5px);
+}
+
+.glass-border-1-5 .corner-bottom-right {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(
+    315deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 80%
+  );
+  border-radius: 0 100px 24px 0;
   backdrop-filter: blur(5px);
 }
 

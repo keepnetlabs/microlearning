@@ -162,7 +162,7 @@ export const IntroScene = React.memo(({
 }: { config: IntroSceneConfig }) => {
 
   // Debug: Render sayısını takip et
-  console.log('IntroScene rendered', new Date().toISOString());
+  // console.log('IntroScene rendered', new Date().toISOString());
 
   const {
     title,
@@ -587,7 +587,7 @@ export const IntroScene = React.memo(({
           </motion.h1>
 
           <motion.p
-            className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-white max-w-sm sm:max-w-md mt-2 sm:mt-3 font-medium leading-relaxed px-2"
+            className="text-base sm:text-lg md:text-xl text-[#1C1C1E] dark:text-[#F2F2F7] max-w-sm sm:max-w-md mt-2 sm:mt-3 font-medium leading-relaxed px-2"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: delays.subtitle }}
@@ -612,7 +612,7 @@ export const IntroScene = React.memo(({
           scale: 1.02,
           transition: { type: "spring", stiffness: 400 }
         }}
-        className={`relative p-4 sm:p-6 md:p-8 rounded-2xl glass-border-2 max-w-xs sm:max-w-md w-full mx-2`}
+        className={`relative p-4 sm:p-6 md:p-8 rounded-2xl glass-border-0 max-w-xs sm:max-w-md w-full mx-2`}
       >
         <div className="corner-top-left"></div>
         <div className="corner-bottom-right"></div>
