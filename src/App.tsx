@@ -13,7 +13,7 @@ import { SummaryScene } from "./components/scenes/SummaryScene";
 import { NudgeScene } from "./components/scenes/NudgeScene";
 import { ChevronDown, Search, Loader2, ChevronDown as ChevronDownIcon, Star, X, Moon, Sun, Award, ChevronUp } from "lucide-react";
 import ReactCountryFlag from "react-country-flag";
-import { getCountryCode, getSearchPlaceholder, detectBrowserLanguage, useIsMobile, priorityLanguages, languages } from "./utils/languageUtils";
+import { getCountryCode, detectBrowserLanguage, useIsMobile, priorityLanguages, languages } from "./utils/languageUtils";
 import { loadAppConfig, createConfigChangeEvent } from "./components/configs/appConfigLoader";
 import { useFontFamily } from "./hooks/useFontFamily";
 import { FontFamilyProvider } from "./contexts/FontFamilyContext";
@@ -48,16 +48,16 @@ const STATIC_CSS_CLASSES = {
   controlsContainer: "flex items-center space-x-1.5 md:space-x-3 flex-shrink-0 z-20",
 
   // Points badge
-  pointsBadge: "relative flex items-center justify-center min-w-[54px] sm:min-w-[70px] space-x-1 sm:space-x-1.5 md:space-x-1.5 px-1.5 sm:px-2 md:px-3 h-8 sm:h-10 rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 dark:bg-black dark:border-white background-[rgba(242, 242, 247, 0.10)] border-[1px] ease-out group",
+  pointsBadge: "relative flex items-center justify-center min-w-[54px] sm:min-w-[70px] space-x-1 sm:space-x-1.5 md:space-x-1.5 px-1.5 sm:px-2 md:px-3 h-8 sm:h-10 rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 glass-border-3 ease-out group",
   pointsBadgeNoise: "absolute inset-0 opacity-[0.020] dark:opacity-[0.012] rounded-lg sm:rounded-xl mix-blend-overlay pointer-events-none",
   pointsText: "text-xs md:text-sm font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300",
 
   // Theme button
-  themeButton: "relative dark:bg-black dark:border-[#F2F2F7] background-[rgba(242, 242, 247, 0.10)] border-[1px] flex items-center justify-center p-1 sm:p-1.5 md:p-2 h-[32px] sm:h-[40px] sm:max-h-[40px] rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group ",
+  themeButton: "relative glass-border-3 flex items-center justify-center p-1 sm:p-1.5 md:p-2 h-[32px] sm:h-[40px] sm:max-h-[40px] rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group ",
   themeButtonIcon: "w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300",
 
   // Language button
-  languageButton: "relative flex items-center justify-center space-x-0.5 bg-[rgba(242, 242, 247, 0.10)] dark:bg-[#1C1C1E] dark:border-[#F2F2F7] border-[1px] sm:space-x-1 md:space-x-2 px-1 sm:px-1.5 md:px-3 h-8 sm:h-10 sm:w-[100px] rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group",
+  languageButton: "relative flex items-center justify-center space-x-0.5 glass-border-3 sm:space-x-1 md:space-x-2 px-1 sm:px-1.5 md:px-3 h-8 sm:h-10 sm:w-[100px] rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group",
   languageFlag: "w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 rounded-sm transition-opacity duration-300",
   languageChevron: "w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4 text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300",
 
@@ -1149,7 +1149,7 @@ export default function App() {
                 >
                   {/* Cam Panel */}
                   <div
-                    className="relative rounded-2xl bg-transparent border glass-border-1 border-white/60"
+                    className="relative bg-transparent glass-border-2"
                     style={{
                       filter: "drop-shadow(-8px - 10px 46px #000)"
                     }}
@@ -1192,9 +1192,6 @@ export default function App() {
                     scale: 1.02,
                     y: -1
                   }}
-                  style={{
-                    boxShadow: "4px 0 4px 0 rgba(255, 255, 255, 0.15) inset, 0 4px 4px 0 rgba(255, 255, 255, 0.15) inset"
-                  }}
                   role="status"
                   aria-label={appConfig.theme?.ariaTexts?.pointsLabel || "Total points earned"}
                   aria-live="polite"
@@ -1221,9 +1218,6 @@ export default function App() {
                   title={isDarkMode ? themeConfig.texts?.toggleButtonLightMode : themeConfig.texts?.toggleButtonDarkMode}
                   aria-checked={isDarkMode}
                   role="switch"
-                  style={{
-                    boxShadow: "4px 0 4px 0 rgba(255, 255, 255, 0.15) inset, 0 4px 4px 0 rgba(255, 255, 255, 0.15) inset"
-                  }}
                   aria-describedby="theme-toggle-description"
                 >
 
@@ -1297,8 +1291,7 @@ export default function App() {
                     style={{
                       transform: 'translateZ(0)',
                       willChange: 'transform',
-                      touchAction: 'manipulation',
-                      boxShadow: "4px 0 4px 0 rgba(255, 255, 255, 0.15) inset, 0 4px 4px 0 rgba(255, 255, 255, 0.15) inset"
+                      touchAction: 'manipulation'
                     }}
                   >
 
@@ -1354,17 +1347,17 @@ export default function App() {
                             <input
                               ref={searchInputRef}
                               type="text"
-                              placeholder={getSearchPlaceholder(currentLanguage?.code || 'tr')}
+                              placeholder="..."
                               value={languageSearchTerm}
                               onChange={(e) => setLanguageSearchTerm(e.target.value)}
                               className={`w-full pl-6 pr-3 py-1.5 text-xs bg-white/60 dark:bg-white border border-white/40 dark:border-blue-500/60 rounded-lg  placeholder-gray-500 dark:placeholder-gray-400 text-[#1C1C1E] dark:text-white transition-colors duration-300 ${isMobile ? '' : 'backdrop-blur-xl'}`}
-                              aria-label={getSearchPlaceholder(currentLanguage?.code || 'tr')}
+                              aria-label="..."
                               aria-describedby="language-search-description"
                               role="searchbox"
                             />
                             {/* Hidden description for search input */}
                             <div id="language-search-description" className="sr-only">
-                              {appConfig.theme?.ariaTexts?.languageSearchDescription || "Search for languages by name or country code"}
+                              {appConfig.theme?.ariaTexts?.languageSearchDescription}
                             </div>
                           </div>
                         </div>
@@ -1392,10 +1385,6 @@ export default function App() {
                               {/* Priority Languages Section */}
                               {priorityLangs.length > 0 && !languageSearchTerm && (
                                 <>
-                                  <div className="px-3 py-1.5 text-xs font-medium text-[#3B82F6] dark:text-white bg-gray-50/50 dark:bg-gray-800/40 border-b border-gray-200/50 dark:border-gray-700/50 flex items-center transition-colors duration-300">
-                                    <Star size={10} className="mr-1.5" aria-hidden="true" />
-                                    {themeConfig.texts?.popularLanguages}
-                                  </div>
                                   {priorityLangs.map((language, index) => (
                                     <motion.button
                                       key={`priority-${language.code}`}

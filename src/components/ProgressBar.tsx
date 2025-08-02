@@ -141,7 +141,7 @@ const defaultConfig: ProgressBarConfig = {
     0 1px 3px rgba(59, 130, 246, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.15)
   `,
-  percentageColor: 'rgb(59, 130, 246)',
+  percentageColor: '',
   percentageTextColor: 'text-blue-700',
   percentageTextColorDark: 'dark:text-blue-300',
 
@@ -180,13 +180,9 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
           {/* Progress Bar for Mobile - Using the same design as desktop but simplified */}
           <div className="flex-1">
             <div
-              className="relative w-full glass-border-1 h-2 overflow-hidden transition-all duration-500 ease-out group"
+              className="relative w-full glass-border-1-outline h-2 overflow-hidden transition-all duration-500 ease-out group"
               style={{
                 background: 'rgba(242, 242, 247, 0.10)',
-                backdropFilter: 'blur(20px) saturate(180%)',
-                WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                border: finalConfig.containerBorder,
-                boxShadow: finalConfig.containerBoxShadow,
                 transform: 'translateZ(0)',
                 willChange: 'transform',
                 borderRadius: '4px'
@@ -204,11 +200,7 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
                 transition={{ duration: 1.2, ease: "easeOut", type: "spring", stiffness: 80 }}
                 style={{
                   // CLEAN INDUSTRY STANDARD PROGRESS FILL - Apple/Google style
-                  background: "rgba(242, 242, 247, 0.30)",
-                  backdropFilter: 'blur(16px) saturate(160%)',
-                  WebkitBackdropFilter: 'blur(16px) saturate(160%)',
-                  border: finalConfig.progressFillBorder,
-                  boxShadow: finalConfig.progressFillBoxShadow,
+                  background: "rgba(242, 242, 247, 0.10);",
                   borderRadius: '4px'
                 }}
               >
@@ -298,7 +290,7 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
 
           {/* INDUSTRY STANDARD LIQUID GLASS PROGRESS CONTAINER */}
           <div
-            className="relative w-full h-1.5 sm:h-2 glass-border-1 overflow-hidden transition-all duration-500 ease-out group"
+            className="relative w-full h-1.5 sm:h-2 glass-border-1-outline overflow-hidden transition-all duration-500 ease-out group"
             style={{
               // OPTIMIZED BACKGROUND - More visible but still premium
               background: '',
@@ -320,11 +312,7 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
               transition={{ duration: 1.2, ease: "easeOut", type: "spring", stiffness: 80 }}
               style={{
                 // CLEAN INDUSTRY STANDARD PROGRESS FILL - Apple/Google style
-                background: "rgba(242, 242, 247, 0.30)",
-                backdropFilter: 'blur(16px) saturate(160%)',
-                WebkitBackdropFilter: 'blur(16px) saturate(160%)',
-                border: finalConfig.progressFillBorder,
-                boxShadow: finalConfig.progressFillBoxShadow,
+                background: "rgba(242, 242, 247, 0.10)",
                 borderRadius: '4px'
               }}
             >
