@@ -434,20 +434,20 @@ export const QuizScene = React.memo(function QuizScene({
         }
       },
       // Default state - Neutral tones (Mobile-optimized glass morphism)
-              default: {
-          light: {
-            background: "transparent",
-            border: "transparent",
-            text: "text-[#1C1C1E]",
-            icon: "text-[#1C1C1E]"
-          },
-          dark: {
-            background: "transparent",
-            border: "transparent",
-            text: "text-[#F2F2F7]",
-            icon: "text-[#F2F2F7]"
-          }
+      default: {
+        light: {
+          background: "transparent",
+          border: "transparent",
+          text: "text-[#1C1C1E]",
+          icon: "text-[#1C1C1E]"
+        },
+        dark: {
+          background: "transparent",
+          border: "transparent",
+          text: "text-[#F2F2F7]",
+          icon: "text-[#F2F2F7]"
         }
+      }
     };
 
     // Use centralized isDarkMode prop
@@ -765,12 +765,12 @@ export const QuizScene = React.memo(function QuizScene({
                     aria-live="polite"
                   >
                     {isCorrect ? (
-                      <div className="flex items-center justify-center w-6 h-6 glass-border-0" aria-label={ariaTexts?.correctAnswerLabel || "Correct answer"}>
-                        <CheckCircle className={`w-4 h-4 ${optionStyle.iconClassName}`} aria-hidden="true" />
+                      <div className="flex items-center justify-center w-6 h-6  text-[#1C1C1E] dark:text-[#F2F2F7]" aria-label={ariaTexts?.correctAnswerLabel || "Correct answer"}>
+                        <CheckCircle className={`w-4 h-4`} aria-hidden="true" />
                       </div>
                     ) : isSelected ? (
-                      <div className="flex items-center justify-center w-6 h-6 glass-border-0" aria-label={ariaTexts?.incorrectAnswerLabel || "Incorrect answer"}>
-                        <XCircle className={`w-4 h-4 ${optionStyle.iconClassName}`} aria-hidden="true" />
+                      <div className="flex items-center justify-center w-6 h-6 text-[#1C1C1E] dark:text-[#F2F2F7]" aria-label={ariaTexts?.incorrectAnswerLabel || "Incorrect answer"}>
+                        <XCircle className={`w-4 h-4`} aria-hidden="true" />
                       </div>
                     ) : null}
                   </motion.div>
@@ -823,14 +823,9 @@ export const QuizScene = React.memo(function QuizScene({
           {ariaTexts?.trueFalseDescription || "Select true or false for the given statement"}
         </div>
         <div
-          className="p-3 rounded-lg border-2 border-border/60"
-          style={{
-            background:
-              "linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--muted) / 0.5) 100%)",
-            backdropFilter: "blur(8px)",
-          }}
+          className="p-3 rounded-lg "
         >
-          <p className="text-center font-medium text-foreground dark:text-white">
+          <p className="text-center font-medium text-[#1C1C1E] dark:text-[#F2F2F7]">
             {question.statement}
           </p>
         </div>
@@ -996,7 +991,7 @@ export const QuizScene = React.memo(function QuizScene({
               isLoading ||
               multiSelectAnswers.length < question.minCorrect
             }
-            className="text-base px-4 py-2 glass-border-2"
+            className="text-sm px-4 py-2 glass-border-2"
             style={{ background: "transparent" }}
           >
             {isLoading ? (
@@ -1956,7 +1951,7 @@ export const QuizScene = React.memo(function QuizScene({
                   >
                     {ariaTexts?.resultPanelDescription || "Feedback on your answer with explanation and tips"}
                   </div>
-                  
+
                   {/* Simple Explanation */}
                   <div className="mb-3">
                     <p className="text-sm text-muted-foreground leading-relaxed">
@@ -1984,14 +1979,14 @@ export const QuizScene = React.memo(function QuizScene({
                     <div className="text-sm">
                       {isAnswerCorrect ? (
                         <span className="text-[#1C1C1E] dark:text-[#F2F2F7] font-medium">
-                          {currentQuestionIndex === questions.length - 1 
+                          {currentQuestionIndex === questions.length - 1
                             ? (config.texts?.quizCompleted || "Tamamlandı! 🎉")
                             : (config.texts?.correctAnswer || "Doğru! 🎉")
                           }
                         </span>
                       ) : (
                         <span className="text-[#1C1C1E] dark:text-[#F2F2F7]">
-                          {attempts >= maxAttempts 
+                          {attempts >= maxAttempts
                             ? (config.texts?.noAttemptsLeft || "Deneme hakkınız bitti")
                             : `${maxAttempts - attempts} ${config.texts?.attemptsLeft || "deneme kaldı"}`
                           }
@@ -2017,7 +2012,7 @@ export const QuizScene = React.memo(function QuizScene({
                           <Button
                             size="sm"
                             onClick={handleNextQuestion}
-                            className="text-base px-4 py-2 glass-border-2"
+                            className="text-sm px-4 py-2 glass-border-2"
                             style={{ background: "transparent" }}
                           >
                             {config.texts?.nextQuestion || "Sonraki"}

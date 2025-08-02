@@ -73,8 +73,8 @@ const STATIC_CSS_CLASSES = {
 
   // Achievement notification
   achievementContainer: "fixed top-24 right-4 z-40",
-  achievementContent: "relative px-4 py-3 bg-gradient-to-r from-yellow-50/98 to-orange-50/95 dark:from-gray-900/98 dark:to-gray-800/95 border border-yellow-200/70 dark:border-yellow-400/80 rounded-2xl shadow-xl shadow-yellow-500/10 dark:shadow-black/40 transition-colors duration-300",
-  achievementClose: "ml-2 p-1 rounded-full hover:bg-yellow-200/50 dark:hover:bg-yellow-900/40 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-400/30 dark:focus:ring-yellow-600/30",
+  achievementContent: "relative px-4 py-2 glass-border-1 text-sm text-[#1C1C1E] dark:text-[#F2F2F7] group",
+  achievementClose: "ml-2 p-1 rounded-full text-[#1C1C1E] dark:text-[#F2F2F7]",
 
   // Navigation
   navContainer: "fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30",
@@ -251,7 +251,7 @@ export default function App() {
     timerText: `text-sm font-semibold text-${themeConfig.colors?.badge?.timer?.text || 'red-700'} dark:text-${themeConfig.colors?.badge?.timer?.textDark || 'red-300'}`,
 
     // Quiz notification
-    quizNotificationContent: `relative px-4 py-3 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-gray-800 dark:to-gray-900 border border-amber-200/60 dark:border-amber-600/60 ${themeConfig.effects?.borderRadius || 'rounded-xl'} ${themeConfig.effects?.shadow || 'shadow-lg'} shadow-amber-500/20 dark:shadow-black/40 transition-all duration-300 backdrop-blur-xl hover:shadow-xl hover:shadow-amber-500/30 dark:hover:shadow-black/50 group`,
+    quizNotificationContent: `relative px-4 py-2 glass-border-1 text-sm text-[#1C1C1E] dark:text-[#F2F2F7] group`,
 
     // Mobile nav hint
     mobileNavHintContent: `flex items-center px-3 py-2 bg-white/85 dark:bg-gray-900/85 ${themeConfig.effects?.borderRadius || 'rounded-full'} border border-white/40 dark:border-gray-600/40 ${themeConfig.effects?.shadow || 'shadow-lg'} transition-colors duration-300 backdrop-blur-xl`
@@ -675,7 +675,7 @@ export default function App() {
     }
 
     const searchTerm = languageSearchTerm.toLowerCase();
-    return languages.filter(lang => 
+    return languages.filter(lang =>
       lang.name.toLowerCase().includes(searchTerm) ||
       lang.code.toLowerCase().includes(searchTerm)
     );
@@ -1676,8 +1676,8 @@ export default function App() {
             >
               <div className={cssClasses.achievementContent}>
                 <div className="flex items-center space-x-3 relative z-10">
-                  <Award size={16} className="text-yellow-600 dark:text-yellow-300 flex-shrink-0" aria-hidden="true" />
-                  <span className="text-sm text-yellow-900 dark:text-yellow-100 font-medium transition-colors duration-300">
+                  <Award size={16} className="text-[#1C1C1E] dark:text-[#F2F2F7] flex-shrink-0" aria-hidden="true" />
+                  <span className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold transition-colors duration-300">
                     {themeConfig.texts?.achievementNotification}
                   </span>
                   <button
@@ -1708,8 +1708,7 @@ export default function App() {
             >
               <div className={cssClasses.quizNotificationContent}>
                 <div className="flex items-center space-x-2.5 relative z-10">
-                  <div className="w-2 h-2 bg-amber-500 dark:bg-amber-400 rounded-full animate-pulse" aria-hidden="true"></div>
-                  <p className="text-sm text-[#D97706] dark:text-[#D97706] font-medium transition-colors duration-300">
+                  <p className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] font-medium transition-colors duration-300">
                     {(appConfig as any).quizSceneConfig?.texts?.quizCompletionHint}
                   </p>
                   {/* Industry Standard: Close Button */}
@@ -1719,7 +1718,7 @@ export default function App() {
                     aria-label={themeConfig.texts?.closeNotification}
                     style={{ touchAction: 'manipulation' }}
                   >
-                    <X size={12} className="text-amber-700 dark:text-amber-300" aria-hidden="true" />
+                    <X size={16} className="text-[#1C1C1E] font-semibold dark:text-[#F2F2F7]" style={{ marginBottom: '-1px' }} aria-hidden="true" />
                   </button>
                 </div>
                 {/* Industry Standard: Subtle Glow Effect */}
