@@ -26,7 +26,7 @@ export function NavButton({ direction, onClick, disabled, label, isDarkMode = fa
         focus:outline-none
         w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 glass-border-2
         ${disabled
-          ? "cursor-not-allowed"
+          ? "cursor-not-allowed opacity-50"
           : "cursor-pointer"
         }
       `}

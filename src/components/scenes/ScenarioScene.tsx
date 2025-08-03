@@ -302,19 +302,6 @@ export function ScenarioScene({
           </motion.section>
         )}
 
-        {/* Mobile Hint */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2 }}
-          className={config.mobileHint?.className || "sm:hidden mt-2"}
-          role="note"
-          aria-label={config.ariaTexts?.mobileHintLabel || "Mobile user hint"}
-        >
-          <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-            {config.mobileHint?.text || "💡 Videoyu izleyip transkripti inceleyin"}
-          </p>
-        </motion.div>
       </main>
     </FontWrapper>
   );

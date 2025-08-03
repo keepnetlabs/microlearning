@@ -167,11 +167,11 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="bg-white glass-border-1 dark:bg-blue-900/20 max-w-[40px] h-[27px] rounded-lg flex justify-center items-center p-1 border border-blue-200 dark:border-blue-700/50 rounded-lg px-3 py-1.5 shadow-sm"
+              className="glass-border-1 max-w-[40px] h-[27px] rounded-lg flex justify-center items-center p-1 px-3 py-1.5"
             >
               <div className="corner-top-left"></div>
               <div className="corner-bottom-right"></div>
-              <span className="text-sm font-medium text-blue-600 dark:text-blue-300">
+              <span className="text-sm font-medium text-[#1C1C1E] dark:text-[#F2F2F7]">
                 {formatPercent(progress, language)}
               </span>
             </motion.div>
@@ -180,9 +180,12 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
           {/* Progress Bar for Mobile - Using the same design as desktop but simplified */}
           <div className="flex-1">
             <div
-              className="relative w-full glass-border-1-outline h-2 overflow-hidden transition-all duration-500 ease-out group"
+              className="relative w-full h-1.5 sm:h-2 glass-border-1-outline overflow-hidden transition-all duration-500 ease-out group"
               style={{
-                background: 'rgba(242, 242, 247, 0.10)',
+                // OPTIMIZED BACKGROUND - More visible but still premium
+                background: '',
+                border: finalConfig.containerBorder,
+                boxShadow: '',
                 transform: 'translateZ(0)',
                 willChange: 'transform',
                 borderRadius: '4px'
@@ -190,7 +193,6 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
             >
               <div className="corner-top-left"></div>
               <div className="corner-bottom-right"></div>
-
 
               {/* INDUSTRY STANDARD LIQUID GLASS PROGRESS FILL */}
               <motion.div
@@ -200,7 +202,7 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
                 transition={{ duration: 1.2, ease: "easeOut", type: "spring", stiffness: 80 }}
                 style={{
                   // CLEAN INDUSTRY STANDARD PROGRESS FILL - Apple/Google style
-                  background: "rgba(242, 242, 247, 0.10);",
+                  background: "rgba(242, 242, 247, 0.10)",
                   borderRadius: '4px'
                 }}
               >
@@ -231,6 +233,20 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
                   }}
                 />
 
+                {/* Enhanced Apple-style top highlight */}
+                <div
+                  className="absolute top-0 left-0 right-0 h-1/2 pointer-events-none"
+                  style={{
+                    background: `linear-gradient(180deg, 
+                      rgba(255, 255, 255, 0.50) 0%, 
+                      rgba(255, 255, 255, 0.25) 30%, 
+                      transparent 70%
+                    )`,
+                    mixBlendMode: 'soft-light',
+                    borderRadius: '4px'
+                  }}
+                />
+
                 {/* Clean inner glow - Single color approach */}
                 <div
                   className="absolute inset-0 pointer-events-none"
@@ -241,7 +257,6 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
                   }}
                 />
               </motion.div>
-
             </div>
           </div>
         </div>
@@ -255,11 +270,20 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
           <div className="relative w-full">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                left: `calc(${progress}% - 8px)`
+              }}
+              transition={{
+                duration: 0.8,
+                ease: "easeOut",
+                type: "spring",
+                stiffness: 100,
+                damping: 15
+              }}
               className="absolute z-20"
               style={{
-                left: `${progress - 3}%`,
                 top: '50%',
                 transform: 'translate(-50%, -50%)',
                 marginTop: '-1px'

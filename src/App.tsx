@@ -30,7 +30,7 @@ const STATIC_CSS_CLASSES = {
 
   // Header
   headerContainer: "relative shrink-0",
-  headerContent: "relative z-10 px-4 py-4 pt-safe lg:px-16 xl:px-20 2xl:px-24 min-h-[106px] md:min-h-[72px]",
+  headerContent: "relative z-10 px-4 pt-5 pb-3 lg:px-16 xl:px-20 2xl:px-24 min-h-[106px] md:min-h-[72px]",
 
   // Logo
   logoContainer: "flex-shrink-0 z-20",
@@ -57,7 +57,7 @@ const STATIC_CSS_CLASSES = {
   themeButtonIcon: "w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300",
 
   // Language button
-  languageButton: "relative flex items-center justify-center space-x-0.5 glass-border-3 sm:space-x-1 md:space-x-2 px-1 sm:px-1.5 md:px-3 h-8 sm:h-10 sm:w-[100px] rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group",
+  languageButton: "relative flex items-center justify-center space-x-0.5 glass-border-3 sm:space-x-1 md:space-x-2 px-1 sm:px-1.5 md:px-3 h-8 sm:h-10 w-[64px] sm:w-[100px] rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group",
   languageFlag: "w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 rounded-sm transition-opacity duration-300",
   languageChevron: "w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4 text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300",
 
@@ -1391,7 +1391,7 @@ export default function App() {
         </header>
 
         {/* Navigation Area - Optimized spacing */}
-        <main className="flex-1 relative flex items-center" role="main" aria-label={appConfig.theme?.ariaTexts?.contentLabel || "Training content area"}>
+        <main className="flex-1 relative sm:flex sm:items-center" role="main" aria-label={appConfig.theme?.ariaTexts?.contentLabel || "Training content area"}>
           {/* Left Navigation - Hidden on mobile and only show when active */}
           {currentScene > 0 && (
             <div className="absolute left-2 sm:left-4 z-30 top-1/2 transform -translate-y-1/2 hidden md:block">
@@ -1406,8 +1406,8 @@ export default function App() {
           )}
 
           {/* APPLE VISIONOS FLOATING GLASS CARD - Enhanced prominence with darker background */}
-          <div className="flex-1 mx-2 sm:mx-4 md:mx-16 lg:mx-20 xl:mx-24 sm:my-3 md:my-6 flex items-center justify-center">
-            <div className="w-full h-[calc(100vh-140px)] relative">
+          <div className="flex-1 mx-2 sm:mx-4 md:mx-16 lg:mx-20 xl:mx-24 sm:my-3 md:my-6 sm:flex sm:items-center sm:justify-center">
+            <div className="w-full sm:h-[calc(100vh-140px)] relative mb-2 sm:mb-0">
               <AnimatePresence initial={false} custom={direction} mode="wait">
                 <motion.div
                   key={currentScene}
@@ -1449,8 +1449,6 @@ export default function App() {
                     transformOrigin: "center center",
                     // Dark mode specific styling
                     ...(isDarkMode && {
-                      borderRadius: '24px',
-                      border: '1px solid rgba(255, 255, 255, 0.50)',
                       background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.06) 100%)',
                       backdropFilter: 'blur(24px)',
                       WebkitBackdropFilter: 'blur(24px)'
@@ -1486,7 +1484,7 @@ export default function App() {
                       {appConfig.theme?.ariaTexts?.contentDescription || "Scrollable training content area with interactive learning modules"}
                     </div>
                     {/* Optimized Content Padding - Industry Standards */}
-                    <div className="p-2 sm:p-3 md:p-4 lg:p-5">
+                    <div className="p-2 py-4 sm:p-3 sm:py-4 md:p-4 lg:p-5">
                       <motion.div
                         initial={{ opacity: 0, y: isMobile ? 20 : 30 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -1548,11 +1546,13 @@ export default function App() {
                         exit={{ opacity: 0, y: 10 }}
                         className="absolute bottom-4 left-0 right-0 mx-auto z-20 pointer-events-none flex justify-center"
                       >
-                        <div className="flex items-center space-x-2 px-4 py-2.5 bg-white/90 dark:bg-gray-900/90 rounded-full border border-white/40 dark:border-gray-600/60 shadow-lg transition-colors duration-300 backdrop-blur-xl min-w-fit">
-                          <span className="text-xs text-blue-800 dark:text-blue-200 font-medium transition-colors duration-300 whitespace-nowrap">
+                        <div className="flex items-center space-x-2 px-4 py-2.5 transition-colors duration-300 backdrop-blur-xl glass-border-2 min-w-fit">
+                          <div className="corner-top-left"></div>
+                          <div className="corner-bottom-right"></div>
+                          <span className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] font-medium transition-colors duration-300 whitespace-nowrap">
                             {themeConfig.texts?.scrollHint}
                           </span>
-                          <ChevronDownIcon size={14} className="text-blue-700 dark:text-blue-300 animate-bounce flex-shrink-0" style={{ animationDuration: '2s' }} />
+                          <ChevronDownIcon size={14} className="text-[#1C1C1E] dark:text-[#F2F2F7] animate-bounce flex-shrink-0" style={{ animationDuration: '2s' }} />
                         </div>
                       </motion.div>
                     )}
@@ -1686,7 +1686,7 @@ export default function App() {
                     aria-label={themeConfig.texts?.closeNotification}
                     style={{ touchAction: 'manipulation' }}
                   >
-                    <X size={14} className="text-yellow-800 dark:text-yellow-200" aria-hidden="true" />
+                    <X size={14} className="text-[#1C1C1E] dark:text-[#F2F2F7]" aria-hidden="true" />
                   </button>
                 </div>
               </div>
@@ -1727,49 +1727,6 @@ export default function App() {
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Industry Standard Mobile Navigation Hint - Visual Only */}
-        {currentScene === 0 && (
-          <div className={cssClasses.mobileNavHintContainer} aria-hidden="true">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.5 }}
-              className="flex items-center justify-center"
-            >
-              {/* Industry Standard: Visual Gesture Indicator Only */}
-              <motion.div
-                className={cssClasses.mobileNavHintContent}
-                animate={{
-                  x: [0, 8, 0],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: 2
-                }}
-              >
-                {/* Left Arrow - Animated Swipe Gesture Hint */}
-                <motion.div
-                  className="flex items-center space-x-1"
-                  animate={{
-                    opacity: [0.4, 1, 0.4],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                >
-                  <div className="w-2 h-2 bg-blue-500/60 dark:bg-blue-400/60 rounded-full"></div>
-                  <div className="w-1 h-1 bg-blue-500/40 dark:bg-blue-400/40 rounded-full"></div>
-                  <div className="w-0.5 h-0.5 bg-blue-500/20 dark:bg-blue-400/20 rounded-full"></div>
-                </motion.div>
-              </motion.div>
-            </motion.div>
-          </div>
-        )}
 
         {/* Mobile Floating Scroll-to-Top Button */}
         <AnimatePresence>

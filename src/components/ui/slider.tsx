@@ -62,9 +62,9 @@ function Slider({
       };
     } else {
       return {
-        trackBg: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.08) 100%)',
-        rangeBg: 'linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(59, 130, 246, 0.15) 100%)',
-        thumbBg: 'linear-gradient(135deg, rgba(59, 130, 246, 0.95) 0%, rgba(59, 130, 246, 0.85) 25%, rgba(59, 130, 246, 0.75) 50%, rgba(59, 130, 246, 0.65) 75%, rgba(59, 130, 246, 0.55) 100%)',
+        trackBg: '',
+        rangeBg: '',
+        thumbBg: '',
         thumbBorder: 'rgba(59, 130, 246, 0.3)',
         thumbShadow: '0 4px 16px rgba(59, 130, 246, 0.2), 0 2px 8px rgba(59, 130, 246, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 -1px 0 rgba(0, 0, 0, 0.05)'
       };
@@ -79,7 +79,7 @@ function Slider({
       min={min}
       max={max}
       className={cn(
-        "relative flex w-full touch-none items-center select-none data-[disabled]:opacity-50 data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col",
+        "relative flex w-full glass-border-0 touch-none items-center select-none data-[disabled]:opacity-50 data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col",
         className,
       )}
       style={{
@@ -131,7 +131,7 @@ function Slider({
         <SliderPrimitive.Range
           data-slot="slider-range"
           className={cn(
-            "absolute data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full",
+            "absolute data-[orientation=horizontal] glass-border-0 :h-full data-[orientation=vertical]:w-full",
           )}
           style={{
             background: getSliderStyle.rangeBg,
@@ -148,7 +148,7 @@ function Slider({
         <SliderPrimitive.Thumb
           data-slot="slider-thumb"
           key={index}
-          className="block size-5 shrink-0 rounded-full border transition-[color,box-shadow] hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
+          className="block size-5 shrink-0 glass-border-0 rounded-full border transition-[color,box-shadow] hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
           style={{
             background: getSliderStyle.thumbBg,
             border: `1px solid ${getSliderStyle.thumbBorder}`,

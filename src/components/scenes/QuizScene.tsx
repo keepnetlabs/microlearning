@@ -384,102 +384,6 @@ export const QuizScene = React.memo(function QuizScene({
   const maxAttempts = useMemo(() => config?.questions?.maxAttempts || 2, [config?.questions?.maxAttempts]);
   const currentQuestion = useMemo(() => questions[currentQuestionIndex], [questions, currentQuestionIndex]);
   const currentAnswer = useMemo(() => answers.get(currentQuestion?.id), [answers, currentQuestion?.id]);
-  // Answer options style helper - Mobile-first with proper dark mode support
-  const getAnswerOptionStyle = useCallback((isSelected: boolean, isCorrect?: boolean, showResult?: boolean) => {
-    // Mobile-first color palette with proper dark mode support
-    const colorStyles = {
-      // Correct answer - Green tones (Enhanced for microlearning)
-      correct: {
-        light: {
-          background: "linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.10) 30%, rgba(34, 197, 94, 0.06) 70%, rgba(34, 197, 94, 0.03) 100%)",
-          border: "1px solid rgba(34, 197, 94, 0.4)",
-          text: "text-green-700",
-          icon: "text-green-600"
-        },
-        dark: {
-          background: "linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.10) 30%, rgba(34, 197, 94, 0.06) 70%, rgba(34, 197, 94, 0.03) 100%)",
-          border: "1px solid rgba(34, 197, 94, 0.4)",
-          text: "text-green-300",
-          icon: "text-green-400"
-        }
-      },
-      // Incorrect answer - Red tones (Enhanced for microlearning)
-      incorrect: {
-        light: {
-          background: "linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.10) 30%, rgba(239, 68, 68, 0.06) 70%, rgba(239, 68, 68, 0.03) 100%)",
-          border: "1px solid rgba(239, 68, 68, 0.4)",
-          text: "text-red-700",
-          icon: "text-red-600"
-        },
-        dark: {
-          background: "linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.10) 30%, rgba(239, 68, 68, 0.06) 70%, rgba(239, 68, 68, 0.03) 100%)",
-          border: "1px solid rgba(239, 68, 68, 0.4)",
-          text: "text-red-300",
-          icon: "text-red-400"
-        }
-      },
-      // Selected answer - Blue tones
-      selected: {
-        light: {
-          background: "linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(59, 130, 246, 0.08) 50%, rgba(59, 130, 246, 0.04) 100%)",
-          border: "1px solid rgba(59, 130, 246, 0.3)",
-          text: "text-blue-700",
-          icon: "text-blue-600"
-        },
-        dark: {
-          background: "linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.10) 50%, rgba(59, 130, 246, 0.05) 100%)",
-          border: "1px solid rgba(59, 130, 246, 0.4)",
-          text: "text-blue-300",
-          icon: "text-blue-400"
-        }
-      },
-      // Default state - Neutral tones (Mobile-optimized glass morphism)
-      default: {
-        light: {
-          background: "transparent",
-          border: "transparent",
-          text: "text-[#1C1C1E]",
-          icon: "text-[#1C1C1E]"
-        },
-        dark: {
-          background: "transparent",
-          border: "transparent",
-          text: "text-[#F2F2F7]",
-          icon: "text-[#F2F2F7]"
-        }
-      }
-    };
-
-    // Use centralized isDarkMode prop
-
-    let styleType: keyof typeof colorStyles;
-    let colorVariant: 'light' | 'dark';
-
-    if (showResult && isCorrect) {
-      styleType = 'correct';
-    } else if (showResult && !isCorrect && isSelected) {
-      styleType = 'incorrect';
-    } else if (isSelected) {
-      styleType = 'selected';
-    } else {
-      styleType = 'default';
-    }
-
-    colorVariant = isDarkMode ? 'dark' : 'light';
-
-    const currentStyle = colorStyles[styleType][colorVariant];
-
-    return {
-      className: currentStyle.text,
-      style: styleType === 'default' ? {} : {
-        background: currentStyle.background,
-        border: currentStyle.border,
-      },
-      iconClassName: currentStyle.icon
-    };
-  }, [config.styling?.answerOptions, isDarkMode]);
-
-
 
   // Answer Validation
   const validateAnswer = useCallback(
@@ -709,7 +613,6 @@ export const QuizScene = React.memo(function QuizScene({
           const isSelected = userAnswer === option.id;
           const isCorrect = option.isCorrect;
           const showCorrectness = showResult;
-          const optionStyle = getAnswerOptionStyle(isSelected, isCorrect, showResult);
 
           return (
             <motion.button
@@ -732,7 +635,6 @@ export const QuizScene = React.memo(function QuizScene({
               }
               disabled={showResult || isLoading}
               className={`group relative w-full p-3 text-left glass-border-3 transition-all duration-300 focus:outline-none disabled:cursor-not-allowed`}
-              style={optionStyle.style}
               role="radio"
               aria-checked={isSelected}
               aria-describedby={showCorrectness ? `result-${option.id}` : undefined}
@@ -740,7 +642,7 @@ export const QuizScene = React.memo(function QuizScene({
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1 pr-3">
-                  <span className="block mb-1 font-medium transition-colors duration-300">
+                  <span className="block mb-1 font-medium transition-colors duration-300 text-[#1C1C1E] dark:text-[#F2F2F7]">
                     {option.text}
                   </span>
                   {option.strength && (
@@ -793,7 +695,7 @@ export const QuizScene = React.memo(function QuizScene({
         })}
       </div>
     );
-  }, [currentQuestion, currentAnswer, showResult, isLoading, handleAnswer, getAnswerOptionStyle]);
+  }, [currentQuestion, currentAnswer, showResult, isLoading, handleAnswer]);
 
   const renderTrueFalse = useCallback(() => {
     const question = currentQuestion as TrueFalseQuestion;
@@ -836,7 +738,6 @@ export const QuizScene = React.memo(function QuizScene({
             const isCorrect =
               option.value === question.correctAnswer;
             const showCorrectness = showResult;
-            const optionStyle = getAnswerOptionStyle(isSelected, isCorrect, showResult);
 
             return (
               <motion.button
@@ -864,18 +765,11 @@ export const QuizScene = React.memo(function QuizScene({
                 }
                 disabled={showResult || isLoading}
                 className={`relative p-4 rounded-xl text-center font-medium transition-all duration-300 focus:outline-none glass-border-0`}
-                style={optionStyle.style}
               >
                 <div className="flex flex-col items-center space-y-2">
                   <div
-                    className="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300"
+                    className="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 glass-border-0"
                     style={{
-                      background: option.value
-                        ? "linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.08) 100%)"
-                        : "linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.08) 100%)",
-                      border: option.value
-                        ? "1.5px solid rgba(34, 197, 94, 0.3)"
-                        : "1.5px solid rgba(239, 68, 68, 0.3)",
                       backdropFilter: "blur(8px) saturate(150%)",
                       boxShadow: `
                         0 2px 8px rgba(0, 0, 0, 0.04),
@@ -904,7 +798,7 @@ export const QuizScene = React.memo(function QuizScene({
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="absolute -top-2 -right-2"
+                      className="absolute top-0 right-5"
                     >
                       {isCorrect ? (
                         <CheckCircle className="w-6 h-6 text-chart-4 bg-background rounded-full p-1" />
@@ -919,7 +813,7 @@ export const QuizScene = React.memo(function QuizScene({
         </div>
       </div>
     );
-  }, [currentQuestion, currentAnswer, showResult, isLoading, handleAnswer, getAnswerOptionStyle]);
+  }, [currentQuestion, currentAnswer, showResult, isLoading, handleAnswer]);
 
   const renderMultiSelect = useCallback(() => {
     const question = currentQuestion as MultiSelectQuestion;
@@ -933,7 +827,6 @@ export const QuizScene = React.memo(function QuizScene({
             );
             const isCorrect = option.isCorrect;
             const showCorrectness = showResult;
-            const optionStyle = getAnswerOptionStyle(isSelected, isCorrect, showResult);
 
             return (
               <motion.button
@@ -947,7 +840,6 @@ export const QuizScene = React.memo(function QuizScene({
                 onClick={() => handleMultiSelectToggle(option.id)}
                 disabled={showResult || isLoading}
                 className={`w-full p-3 text-left rounded-lg transition-all duration-200 glass-border-1 hover:scale-[1.02] ${isSelected ? 'bg-[#1C1C1E]/10 dark:bg-[#F2F2F7]/10' : ''}`}
-                style={optionStyle.style}
               >
                 <div className="flex items-center space-x-4">
                   <div
@@ -1015,49 +907,6 @@ export const QuizScene = React.memo(function QuizScene({
   const renderSliderScale = useCallback(() => {
     const question = currentQuestion as SliderScaleQuestion;
 
-    // Get custom styling for the slider value display
-    const getSliderValueStyle = () => {
-      // Use centralized isDarkMode prop
-
-      if (isDarkMode) {
-        return {
-          className: "text-white",
-          style: {
-            background: config.styling?.buttons?.checkAnswer?.gradientFrom && config.styling?.buttons?.checkAnswer?.gradientTo
-              ? `linear-gradient(135deg, ${config.styling?.buttons?.checkAnswer?.gradientFrom} 0%, ${config.styling?.buttons?.checkAnswer?.gradientTo} 100%)`
-              : config.styling?.buttons?.checkAnswer?.backgroundColor || "linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.08) 100%)",
-            border: config.styling?.buttons?.checkAnswer?.borderColor || "1px solid rgba(59, 130, 246, 0.3)",
-            backdropFilter: "blur(16px) saturate(160%)",
-            WebkitBackdropFilter: "blur(16px) saturate(160%)",
-            boxShadow: config.styling?.buttons?.checkAnswer?.shadow || `
-              0 4px 16px rgba(59, 130, 246, 0.2),
-              0 2px 8px rgba(59, 130, 246, 0.1),
-              inset 0 1px 0 rgba(255, 255, 255, 0.3),
-              inset 0 -1px 0 rgba(0, 0, 0, 0.05)
-            `,
-          }
-        };
-      } else {
-        return {
-          className: "text-blue-800",
-          style: {
-            background: "linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.08) 100%)",
-            border: "1px solid rgba(59, 130, 246, 0.3)",
-            backdropFilter: "blur(16px) saturate(160%)",
-            WebkitBackdropFilter: "blur(16px) saturate(160%)",
-            boxShadow: `
-              0 4px 16px rgba(59, 130, 246, 0.2),
-              0 2px 8px rgba(59, 130, 246, 0.1),
-              inset 0 1px 0 rgba(255, 255, 255, 0.3),
-              inset 0 -1px 0 rgba(0, 0, 0, 0.05)
-            `,
-          }
-        };
-      }
-    };
-
-    const sliderValueStyle = getSliderValueStyle();
-
     return (
       <div
         ref={sliderContainerRef}
@@ -1120,18 +969,17 @@ export const QuizScene = React.memo(function QuizScene({
 
           <div className="text-center">
             <div
-              className={`inline-flex items-center space-x-2 px-3 py-1.5 rounded-lg border-2 ${sliderValueStyle.className}`}
-              style={sliderValueStyle.style}
+              className={`inline-flex items-center space-x-2 px-3 py-1.5 glass-border-4 `}
               role="status"
               aria-live="polite"
               aria-label={`Current slider value: ${sliderValue}${question.unit ? ` ${question.unit}` : ''}`}
             >
               <Zap className="w-4 h-4 text-primary" aria-hidden="true" />
-              <span className="font-bold">
+              <span className="font-bold text-[#1C1C1E] dark:text-[#F2F2F7]">
                 {sliderValue}
               </span>
               {question.unit && (
-                <span className="text-sm text-muted-foreground dark:text-white">
+                <span className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7]">
                   {question.unit}
                 </span>
               )}
@@ -1144,31 +992,17 @@ export const QuizScene = React.memo(function QuizScene({
             onClick={() => handleAnswer(sliderValue)}
             disabled={showResult || isLoading}
             aria-label={isLoading ? "Processing evaluation" : "Complete evaluation"}
-            className={`transition-all duration-300 ${config.styling?.buttons?.checkAnswer?.padding || 'px-4 py-2.5'} ${config.styling?.buttons?.checkAnswer?.fontSize || 'text-sm'} ${config.styling?.buttons?.checkAnswer?.fontWeight || 'font-medium'} ${config.styling?.buttons?.checkAnswer?.borderRadius || 'rounded-lg'}`}
-            style={{
-              background: config.styling?.buttons?.checkAnswer?.gradientFrom && config.styling?.buttons?.checkAnswer?.gradientTo
-                ? `linear-gradient(135deg, ${config.styling?.buttons?.checkAnswer?.gradientFrom} 0%, ${config.styling?.buttons?.checkAnswer?.gradientTo} 100%)`
-                : config.styling?.buttons?.checkAnswer?.backgroundColor || "linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.08) 100%)",
-              border: config.styling?.buttons?.checkAnswer?.borderColor || "1px solid rgba(59, 130, 246, 0.3)",
-              backdropFilter: "blur(16px) saturate(160%)",
-              WebkitBackdropFilter: "blur(16px) saturate(160%)",
-              boxShadow: config.styling?.buttons?.checkAnswer?.shadow || `
-                0 4px 16px rgba(59, 130, 246, 0.2),
-                0 2px 8px rgba(59, 130, 246, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.05)
-              `
-            }}
+            className={`transition-all duration-300 glass-border-2`}
           >
             {isLoading ? (
               <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" aria-hidden="true" />
-                <span className={config.styling?.buttons?.checkAnswer?.textColor || 'text-white dark:text-blue-100'}>
+                <div className="w-4 h-4 animate-spin" aria-hidden="true" />
+                <span className={'text-[#1C1C1E] dark:text-[#F2F2F7]'}>
                   {config.texts?.evaluating || "Değerlendiriliyor..."}
                 </span>
               </div>
             ) : (
-              <span className={config.styling?.buttons?.checkAnswer?.textColor || 'text-blue-800 dark:text-white'}>
+              <span className={'text-[#1C1C1E] dark:text-[#F2F2F7]'}>
                 {config.texts?.completeEvaluation || "Değerlendirmeyi Tamamla"}
               </span>
             )}
@@ -1804,7 +1638,7 @@ export const QuizScene = React.memo(function QuizScene({
     const IconComponent = getIconComponent(iconName);
     return (
       <IconComponent
-        className={`w-6 h-6 ${isTrue ? 'text-green-600' : 'text-red-500'}`}
+        className={`w-6 h-6 text-[#1C1C1E] dark:text-[#F2F2F7]`}
         strokeWidth={2}
       />
     );
@@ -1954,7 +1788,7 @@ export const QuizScene = React.memo(function QuizScene({
 
                   {/* Simple Explanation */}
                   <div className="mb-3">
-                    <p className="text-sm text-muted-foreground leading-relaxed">
+                    <p className="text-sm text-muted-foreground leading-relaxed text-[#1C1C1E] dark:text-[#F2F2F7]">
                       {currentQuestion?.explanation}
                     </p>
                   </div>
@@ -1966,7 +1800,7 @@ export const QuizScene = React.memo(function QuizScene({
                         {currentQuestion?.tips.map((tip, index) => (
                           <div key={index} className="flex items-start space-x-2 text-sm">
                             <div className="w-1.5 h-1.5 bg-[#1C1C1E] dark:bg-[#F2F2F7] rounded-full mt-2 flex-shrink-0" />
-                            <span className="text-muted-foreground">{tip}</span>
+                            <span className="text-muted-foreground text-[#1C1C1E] dark:text-[#F2F2F7]">{tip}</span>
                           </div>
                         ))}
                       </div>
@@ -1977,18 +1811,11 @@ export const QuizScene = React.memo(function QuizScene({
                   <div className="flex justify-between items-center pt-3 border-t">
                     {/* Status */}
                     <div className="text-sm">
-                      {isAnswerCorrect ? (
+                      {isAnswerCorrect && (
                         <span className="text-[#1C1C1E] dark:text-[#F2F2F7] font-medium">
                           {currentQuestionIndex === questions.length - 1
                             ? (config.texts?.quizCompleted || "Tamamlandı! 🎉")
                             : (config.texts?.correctAnswer || "Doğru! 🎉")
-                          }
-                        </span>
-                      ) : (
-                        <span className="text-[#1C1C1E] dark:text-[#F2F2F7]">
-                          {attempts >= maxAttempts
-                            ? (config.texts?.noAttemptsLeft || "Deneme hakkınız bitti")
-                            : `${maxAttempts - attempts} ${config.texts?.attemptsLeft || "deneme kaldı"}`
                           }
                         </span>
                       )}
@@ -1998,10 +1825,9 @@ export const QuizScene = React.memo(function QuizScene({
                     <div className="flex gap-2">
                       {!isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked && (
                         <Button
-                          variant="outline"
                           size="sm"
                           onClick={retryQuestion}
-                          className="text-xs"
+                          className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] glass-border-2 z-50"
                         >
                           {config.texts?.retryQuestion}
                         </Button>
@@ -2012,7 +1838,7 @@ export const QuizScene = React.memo(function QuizScene({
                           <Button
                             size="sm"
                             onClick={handleNextQuestion}
-                            className="text-sm px-4 py-2 glass-border-2"
+                            className="text-sm px-4  py-2 glass-border-2 text-[#1C1C1E] dark:text-[#F2F2F7]"
                             style={{ background: "transparent" }}
                           >
                             {config.texts?.nextQuestion || "Sonraki"}
@@ -2024,20 +1850,6 @@ export const QuizScene = React.memo(function QuizScene({
               )}
             </AnimatePresence>
           </div>
-        </motion.div>
-
-        {/* Mobile Help Text */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className="md:hidden mt-4 text-center"
-          role="complementary"
-          aria-label={ariaTexts?.mobileHintLabel || "Mobile usage tip"}
-        >
-          <p className="text-xs text-muted-foreground dark:text-white">
-            <span aria-hidden="true">💡</span> {ariaTexts?.mobileHintLabel || config.texts?.mobileHint || "En iyi deneyim için soruları dikkatle okuyun"}
-          </p>
         </motion.div>
       </div>
     </FontWrapper>

@@ -58,18 +58,8 @@ export function SurveyScene({
 
   const handleSubmit = () => {
     if (rating === 0) return;
-
     setIsSubmitting(true);
-
-    // Simulate API call with delay
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSubmitted(true);
-      // Call the callback to trigger auto-advance and toast
-      if (onSurveySubmitted) {
-        onSurveySubmitted();
-      }
-    }, 1500);
+    setIsSubmitted(true);
   };
 
   if (isSubmitted) {
@@ -99,48 +89,47 @@ export function SurveyScene({
           >
             <div className="mb-6 relative">
               <div
-                className={`relative p-4 rounded-2xl backdrop-blur-xl border shadow-xl mx-auto w-fit ${config.styling?.successCard?.backgroundColor || 'bg-emerald-50/60 dark:bg-emerald-900/40'} ${config.styling?.successCard?.borderColor || 'border-emerald-200/50 dark:border-emerald-600/60'}`}
+                className={`relative p-4 rounded-2xl glass-border-4 mx-auto w-fit`}
                 role="img"
                 aria-label={config.texts?.successIconLabel || config.ariaTexts?.successIconLabel || "Success checkmark icon"}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent dark:from-gray-800/20 dark:to-transparent rounded-2xl"></div>
+                <div className="absolute inset-0 glass-border-4"></div>
                 <CheckCircle
                   size={40}
-                  className={`${config.styling?.successCard?.iconColor || 'text-emerald-500 dark:text-emerald-400'} relative z-10`}
+                  className={`text-[#1C1C1E] dark:text-[#F2F2F7] relative z-10`}
                   aria-hidden="true"
                 />
               </div>
             </div>
 
             <h1
-              className={`text-lg sm:text-xl mb-4 text-center font-semibold ${config.styling?.successCard?.textColor || 'text-emerald-700 dark:text-emerald-300'}`}
+              className={`text-lg sm:text-xl mb-4 text-center font-semibold text-[#1C1C1E] dark:text-[#F2F2F7]`}
               id="success-title"
             >
               {config.texts?.successTitle || "Geri Bildiriminiz Alındı!"}
             </h1>
 
             <div
-              className={`relative p-4 sm:p-6 rounded-2xl backdrop-blur-xl border shadow-lg max-w-sm w-full ${config.styling?.successCard?.backgroundColor || 'bg-emerald-50/60 dark:bg-emerald-900/40'} ${config.styling?.successCard?.borderColor || 'border-emerald-200/50 dark:border-emerald-600/60'}`}
+              className={`relative p-4 sm:p-6 rounded-2xl glass-border-4 max-w-sm w-full`}
               role="region"
               aria-labelledby="success-title"
               aria-describedby="success-messages"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent dark:from-gray-800/20 dark:to-transparent rounded-2xl"></div>
               <div className="relative z-10">
                 <div id="success-messages">
-                  <p className={`text-sm leading-relaxed mb-3 ${config.styling?.successCard?.textColor || 'text-emerald-800 dark:text-emerald-100'}`}>
+                  <p className={`text-sm leading-relaxed mb-3 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
                     {config.texts?.successMessage1}
                   </p>
-                  <p className={`text-sm leading-relaxed mb-3 ${config.styling?.successCard?.textColor || 'text-emerald-800 dark:text-emerald-100'}`}>
+                  <p className={`text-sm leading-relaxed mb-3 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
                     {config.texts?.successMessage2}
                   </p>
-                  <p className={`text-xs leading-relaxed ${config.styling?.successCard?.textColor || 'text-emerald-800 dark:text-emerald-100'}`}>
+                  <p className={`text-xs leading-relaxed text-[#1C1C1E] dark:text-[#F2F2F7]`}>
                     {config.texts?.successMessage3}
                   </p>
                 </div>
 
                 <div className="mt-4 pt-3 border-t border-emerald-200/40 dark:border-emerald-600/40">
-                  <p className={`text-xs font-medium ${config.styling?.successCard?.textColor || 'text-emerald-800 dark:text-emerald-100'}`}>
+                  <p className={`text-xs font-medium text-[#1C1C1E] dark:text-[#F2F2F7]`}>
                     {config.texts?.thankYouMessage}
                   </p>
                 </div>
@@ -176,11 +165,11 @@ export function SurveyScene({
           role="banner"
           aria-label={config.texts?.headerLabel || config.ariaTexts?.headerLabel || "Survey header"}
         >
-          <div className="relative p-3 rounded-2xl mx-auto w-fit">
+          <div className="relative p-1 rounded-2xl mx-auto w-fit">
             <div className="absolute inset-0 rounded-2xl"></div>
             <IconComponent
               size={config.icon?.size || 40}
-              className={`${config.icon?.color || 'text-blue-500 dark:text-blue-400'} relative z-10`}
+              className={`text-[#1C1C1E] dark:text-[#F2F2F7] relative z-10`}
               aria-hidden="true"
             />
           </div>
@@ -190,7 +179,7 @@ export function SurveyScene({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-lg sm:text-2xl mb-3 text-center text-[#1C1C1E] dark:text-white"
+          className="text-lg sm:text-2xl mb-3 text-center text-[#1C1C1E] dark:text-[#F2F2F7]"
           id="survey-title"
         >
           {config.texts?.title}
@@ -200,12 +189,11 @@ export function SurveyScene({
           initial={{ opacity: 0, y: 40, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className={`relative rounded-2xl backdrop-blur-xl border shadow-xl max-w-xs sm:max-w-md w-full space-y-2 p-4 sm:p-6 bg-white/60 dark:bg-gray-800/80 border-white/30 dark:border-gray-600/60`}
+          className={`relative glass-border-4 max-w-xs sm:max-w-md w-full space-y-2 p-4 sm:p-6 `}
           role="region"
           aria-labelledby="survey-title"
           aria-describedby="survey-form-description"
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent dark:from-gray-800/20 dark:to-transparent rounded-2xl"></div>
           <div
             id="survey-form-description"
             className="sr-only"
@@ -215,7 +203,6 @@ export function SurveyScene({
           <div className="relative z-10 space-y-4 ">
             {/* Rating Section */}
             <section
-              role="region"
               aria-labelledby="rating-question"
               aria-describedby="rating-description"
             >
@@ -243,7 +230,7 @@ export function SurveyScene({
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => setRating(star)}
-                    className={`p-2 rounded-xl transition-all backdrop-blur-sm hover:bg-white/40 dark:hover:bg-gray-700/50`}
+                    className={`p-2 transition-all glass-border-2`}
                     style={{ touchAction: 'manipulation' }}
                     role="radio"
                     aria-checked={star === rating}
@@ -271,13 +258,12 @@ export function SurveyScene({
 
             {/* Topics Section */}
             <section
-              role="region"
               aria-labelledby="topics-question"
               aria-describedby="topics-description"
             >
               <h3
                 id="topics-question"
-                className="text-sm text-[#1C1C1E] dark:text-white mb-3 font-medium"
+                className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] mb-3 font-medium"
               >
                 {config.texts?.topicsQuestion || "Hangi konuyu daha detaylı öğrenmek istersiniz?"}
               </h3>
@@ -300,7 +286,7 @@ export function SurveyScene({
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.6 + index * 0.1 }}
                     onClick={() => handleTopicToggle(index)}
-                    className={`w-full flex items-center text-sm group cursor-pointer p-1 rounded-lg transition-all hover:bg-white/30 dark:hover:bg-gray-700/40`}
+                    className={`w-full flex items-center text-sm group cursor-pointer p-1 rounded-lg transition-all`}
                     style={{ touchAction: 'manipulation' }}
                     role="checkbox"
                     aria-checked={selectedTopics.includes(index)}
@@ -315,10 +301,7 @@ export function SurveyScene({
                   >
                     <div className="relative mr-3">
                       {/* Custom Checkbox */}
-                      <div className={`w-4 h-4 rounded border-2 transition-all duration-200 flex items-center justify-center ${selectedTopics.includes(index)
-                        ? 'w-3 h-3 text-blue-600 dark:text-white dark:bg-black dark:border-0'
-                        : 'bg-white/70 dark:bg-gray-600/70 border-gray-300 dark:border-gray-500 hover:border-blue-400 dark:hover:border-blue-400'
-                        }`}
+                      <div className={`w-4 h-4 rounded border-2 transition-all duration-200 flex items-center justify-center glass-border-2`}
                         aria-hidden="true"
                       >
                         {selectedTopics.includes(index) && (
@@ -327,7 +310,7 @@ export function SurveyScene({
                             animate={{ scale: 1 }}
                             transition={{ duration: 0.2 }}
                           >
-                            <CheckCircle size={10} className="w-3 h-3 text-blue-600 dark:text-white" />
+                            <CheckCircle size={10} className="w-3 h-3 text-[#1C1C1E] dark:text-[#F2F2F7]" />
                           </motion.div>
                         )}
                       </div>
@@ -348,7 +331,7 @@ export function SurveyScene({
             >
               <h3
                 id="feedback-question"
-                className="text-sm text-[#1C1C1E] dark:text-white mb-2 font-medium"
+                className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] mb-2 font-medium"
               >
                 {config.texts?.feedbackQuestion || "Ek yorumlarınız:"}
               </h3>
@@ -363,13 +346,12 @@ export function SurveyScene({
                   value={feedback}
                   onChange={(e) => setFeedback(e.target.value)}
                   placeholder={config.texts?.feedbackPlaceholder || "İyileştirme önerilerinizi paylaşın..."}
-                  className={`w-full h-20 p-3 sm:p-4 border rounded-xl text-sm resize-none backdrop-blur-sm focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 transition-all focus:outline-none bg-white/80 dark:bg-gray-700/60 border-gray-200 dark:border-gray-600/50 text-[#1C1C1E] dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:bg-white/90 dark:focus:bg-gray-600/70 focus:border-blue-300/50 dark:focus:border-blue-400/50`}
+                  className={`w-full h-20 p-3 sm:p-4 glass-border-4 border-[0.5px] border-[#1C1C1E] dark:border-[#F2F2F7] placeholder:text-[#1C1C1E] dark:placeholder:text-[#F2F2F7] focus:outline-none text-[#1C1C1E] dark:text-[#F2F2F7] text-sm resize-none  transition-all `}
                   style={{ touchAction: 'manipulation' }}
                   aria-labelledby="feedback-question"
                   aria-describedby="feedback-description"
                   aria-label={config.texts?.feedbackLabel || config.ariaTexts?.feedbackLabel || "Additional feedback"}
                 />
-                <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-xl pointer-events-none"></div>
               </div>
             </section>
 
@@ -384,10 +366,10 @@ export function SurveyScene({
                 whileTap={{ scale: rating > 0 ? 0.98 : 1 }}
                 onClick={handleSubmit}
                 disabled={rating === 0 || isSubmitting}
-                className={`w-full transition-all font-medium text-sm flex items-center justify-center space-x-2 py-3 rounded-xl ${rating > 0 && !isSubmitting
-                  ? `bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-lg hover:shadow-xl`
-                  : `bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed`
-                  }`}
+                className={`w-full transition-all font-medium text-sm flex items-center justify-center space-x-2 py-3 rounded-xl glass-border-2 ${rating > 0 && !isSubmitting
+                  ? ``
+                  : `cursor-not-allowed`
+                  } text-[#1C1C1E] dark:text-[#F2F2F7]`}
                 style={{ touchAction: 'manipulation' }}
                 aria-label={isSubmitting ? (config.texts?.submittingLabel || config.ariaTexts?.submittingLabel || "Submitting survey") : (config.texts?.submitLabel || config.ariaTexts?.submitLabel || "Submit survey")}
                 aria-describedby={rating === 0 ? "rating-required" : undefined}
@@ -422,8 +404,8 @@ export function SurveyScene({
               role="complementary"
               aria-label={config.texts?.securityNoticeLabel || config.ariaTexts?.securityNoticeLabel || "Data security notice"}
             >
-              <div className="pt-3 border-t border-gray-200/30 dark:border-gray-600/30">
-                <p className="text-xs text-gray-500 dark:text-gray-400 text-center leading-relaxed">
+              <div className="pt-3 glass-border-2">
+                <p className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] text-center leading-relaxed">
                   {config.texts?.dataSecurityNotice}
                 </p>
               </div>

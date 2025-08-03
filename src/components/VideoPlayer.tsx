@@ -590,7 +590,7 @@ export function VideoPlayer({
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <div
-                    className="p-2 glass-border-2"
+                    className="p-2 glass-border-4"
                     aria-hidden="true"
                   >
                     <FileText className="w-4 h-4 text-[#1C1C1E] dark:text-[#F2F2F7]" />
@@ -610,7 +610,7 @@ export function VideoPlayer({
                         aria-label={`${ariaTexts?.transcriptProgressLabel || "Progress"}: ${currentRowIndex + 1} of ${parsedTranscript.length} transcript entries`}
                       >
                         <div
-                          className="w-16 h-1 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden"
+                          className="w-16 h-1 glass-border-2  rounded-full overflow-hidden"
                           role="progressbar"
                           aria-valuenow={currentRowIndex + 1}
                           aria-valuemin={1}
@@ -618,13 +618,13 @@ export function VideoPlayer({
                           aria-label={ariaTexts?.transcriptProgressLabel || "Transcript progress"}
                         >
                           <div
-                            className="h-full bg-blue-500 dark:bg-blue-400 transition-all duration-300 ease-out"
+                            className="h-full bg-[#1C1C1E] dark:bg-[#F2F2F7] transition-all duration-300 ease-out"
                             style={{
                               width: `${((currentRowIndex + 1) / parsedTranscript.length) * 100}%`
                             }}
                           />
                         </div>
-                        <span className="text-xs text-gray-500 dark:text-gray-300">
+                        <span className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7]">
                           {currentRowIndex + 1} / {parsedTranscript.length}
                         </span>
                       </div>
@@ -704,8 +704,8 @@ export function VideoPlayer({
                           className={`font-medium transition-colors duration-200 flex items-center gap-1 text-xs ${isActive
                             ? "text-blue-600 dark:text-blue-300 font-semibold"
                             : canAccess
-                              ? "text-gray-600 dark:text-slate-300"
-                              : "text-gray-400 dark:text-slate-500"
+                              ? "text-[#1C1C1E] dark:text-[#F2F2F7]"
+                              : "text-[#1C1C1E] dark:text-[#F2F2F7]"
                             }`}
                           style={{
                             fontSize: "12px",
