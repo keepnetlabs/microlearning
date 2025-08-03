@@ -149,23 +149,19 @@ export function ScenarioScene({
       if (typeof transcriptValue === 'string') {
         if (isUrl(transcriptValue)) {
           // URL olarak algılandı - fetch et
-          console.log('📡 Transcript URL olarak algılandı:', transcriptValue);
           setIsLoadingTranscript(true);
           setTranscriptError(null);
 
           try {
             const transcriptText = await fetchTranscriptFromUrl(transcriptValue);
             setTranscriptData(transcriptText);
-            console.log('✅ Transcript başarıyla yüklendi');
           } catch (error) {
             setTranscriptError(`Transcript yüklenirken hata oluştu: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`);
-            console.error('❌ Transcript loading error:', error);
           } finally {
             setIsLoadingTranscript(false);
           }
         } else {
           // String olarak algılandı - direkt kullan
-          console.log('📝 Transcript string olarak algılandı');
           setTranscriptData(transcriptValue);
         }
       } else {

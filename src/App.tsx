@@ -603,17 +603,20 @@ export default function App() {
 
   // Show quiz completion hint only once at first quiz start
   useEffect(() => {
+
     if (currentScene === 4 && !hasShownQuizHint && showQuizCompletionHint) {
       setHasShownQuizHint(true);
 
-      // Auto-hide after 5 seconds
+      // Auto-hide after 2 seconds for testing
       const timer = setTimeout(() => {
         setShowQuizCompletionHint(false);
       }, 5000);
 
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(timer);
+      };
     }
-  }, [currentScene, hasShownQuizHint, showQuizCompletionHint]);
+  }, [currentScene]);
 
   // Reset scroll position when scene changes
   const resetScrollPosition = useCallback(() => {
@@ -1050,7 +1053,7 @@ export default function App() {
 
         {/* Optimized Mobile Header - Enhanced dark mode contrast */}
         <header
-          className={`${cssClasses.headerContainer} ${isIOS && currentScene === 4 ? 'pt-2.5' : ''}`}
+          className={`${cssClasses.headerContainer} ${isIOS && currentScene >= 4 ? 'pt-2.5' : ''}`}
           role="banner"
           aria-label={appConfig.theme?.ariaTexts?.headerLabel || "Application header"}
         >
