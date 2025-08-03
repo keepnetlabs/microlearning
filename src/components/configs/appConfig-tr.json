@@ -157,7 +157,7 @@
       "sparkleEnabled": true,
       "sparkleIconName": "alert-triangle",
       "sceneIconName": "smartphone",
-      "className": "text-red-500"
+      "className": "text-[#1C1C1E] dark:text-[#F2F2F7]"
     },
     "card": {
       "backgroundColor": "bg-red-50/60 dark:bg-red-900/80",
