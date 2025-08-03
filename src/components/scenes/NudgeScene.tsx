@@ -734,7 +734,7 @@ export function NudgeScene({ config, completionData }: NudgeSceneProps) {
           className="w-full max-w-sm sm:max-w-md mb-3"
         >
           <h2 className="text-sm sm:text-base font-semibold text-gray-800 dark:text-white mb-2 flex items-center">
-            <BookOpen size={16} className="mr-2 text-purple-600 dark:text-purple-400" />
+            <BookOpen size={16} className="mr-2 text-[#1C1C1E] dark:text-[#F2F2F7]" />
             {config.texts?.resourcesTitle || ""}
           </h2>
 
@@ -756,26 +756,21 @@ export function NudgeScene({ config, completionData }: NudgeSceneProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 href={resource.url}
-                className={`relative flex items-center justify-between p-3 ${config.styling?.resourceCards?.backgroundColor || 'bg-white/50 dark:bg-gray-800/60'} backdrop-blur-xl border ${config.styling?.resourceCards?.borderColor || 'border-white/30 dark:border-gray-600/50'} rounded-lg hover:bg-white/70 dark:hover:bg-gray-700/70 hover:border-white/50 dark:hover:border-gray-600/70 transition-all group overflow-hidden`}
+                className={`relative flex items-center justify-between p-3 glass-border-2 transition-all group overflow-hidden`}
               >
-                {/* Hover effect overlay */}
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100"
-                  transition={{ duration: 0.3 }}
-                />
 
                 <div className="flex items-center space-x-3 relative z-10">
                   <motion.div
-                    className="p-1.5 rounded-lg bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/60 dark:to-purple-900/60 group-hover:from-blue-200 group-hover:to-purple-200 dark:group-hover:from-blue-800/70 dark:group-hover:to-purple-800/70 transition-all"
+                    className="p-1.5 rounded-lg glass-border-1 transition-all"
                     whileHover={{ scale: 1.1 }}
                   >
-                    <ExternalLink size={12} className={`${config.styling?.resourceCards?.iconColor || 'text-blue-600 dark:text-blue-400'}`} />
+                    <ExternalLink size={12} className={`text-[#1C1C1E] dark:text-[#F2F2F7]`} />
                   </motion.div>
                   <div>
-                    <div className={`text-xs font-medium ${config.styling?.resourceCards?.textColor || 'text-gray-800 dark:text-white'} transition-colors`}>
+                    <div className={`text-xs font-medium text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors`}>
                       {resource.title}
                     </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                    <div className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7]">
                       {resource.description}
                     </div>
                   </div>
@@ -801,11 +796,7 @@ export function NudgeScene({ config, completionData }: NudgeSceneProps) {
           >
             {/* Background pattern */}
             <div
-              className="absolute inset-0 opacity-10 mix-blend-overlay"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                backgroundSize: '128px 128px'
-              }}
+              className="absolute inset-0 opacity-10 mix-blend-overlay border-g"
             />
 
             <div className="relative z-10">

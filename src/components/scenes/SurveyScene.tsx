@@ -369,7 +369,7 @@ export function SurveyScene({
                 whileTap={{ scale: rating > 0 ? 0.98 : 1 }}
                 onClick={handleSubmit}
                 disabled={rating === 0 || isSubmitting}
-                className={`w-full transition-all font-medium text-sm flex items-center justify-center space-x-2 py-3 rounded-xl glass-border-2 ${rating > 0 && !isSubmitting
+                className={`z-50 w-full transition-all font-medium text-sm flex items-center justify-center space-x-2 py-3 rounded-xl glass-border-2 ${rating > 0 && !isSubmitting
                   ? ``
                   : `cursor-not-allowed`
                   } text-[#1C1C1E] dark:text-[#F2F2F7]`}

@@ -114,13 +114,6 @@ function Slider({
           "relative grow overflow-hidden rounded-full data-[orientation=horizontal]:h-4 data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5",
         )}
         style={{
-          background: getSliderStyle.trackBg,
-          backdropFilter: 'blur(16px) saturate(160%)',
-          WebkitBackdropFilter: 'blur(16px) saturate(160%)',
-          border: isDarkMode ? '0.5px solid rgba(0, 0, 0, 0.2)' : '1px solid rgba(59, 130, 246, 0.3)',
-          boxShadow: isDarkMode
-            ? 'inset 0 1px 0 rgba(255, 255, 255, 0.1)'
-            : '0 4px 16px rgba(59, 130, 246, 0.2), 0 2px 8px rgba(59, 130, 246, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 -1px 0 rgba(0, 0, 0, 0.05)',
           touchAction: 'pan-x',
           userSelect: 'none',
           WebkitUserSelect: 'none',
@@ -133,15 +126,6 @@ function Slider({
           className={cn(
             "absolute data-[orientation=horizontal] glass-border-0 :h-full data-[orientation=vertical]:w-full",
           )}
-          style={{
-            background: getSliderStyle.rangeBg,
-            backdropFilter: 'blur(8px) saturate(200%)',
-            WebkitBackdropFilter: 'blur(8px) saturate(200%)',
-            border: isDarkMode ? '0.5px solid hsl(var(--primary) / 0.6)' : '1px solid rgba(59, 130, 246, 0.4)',
-            boxShadow: isDarkMode
-              ? 'inset 0 1px 0 rgba(255, 255, 255, 0.2)'
-              : '0 2px 8px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
-          }}
         />
       </SliderPrimitive.Track>
       {Array.from({ length: _values.length }, (_, index) => (
@@ -153,8 +137,6 @@ function Slider({
             background: getSliderStyle.thumbBg,
             border: `1px solid ${getSliderStyle.thumbBorder}`,
             boxShadow: getSliderStyle.thumbShadow,
-            backdropFilter: 'blur(20px) saturate(220%)',
-            WebkitBackdropFilter: 'blur(20px) saturate(220%)',
             touchAction: 'pan-x',
             cursor: 'grab',
             userSelect: 'none',
