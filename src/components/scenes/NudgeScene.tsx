@@ -439,13 +439,13 @@ export function NudgeScene({ config, completionData }: NudgeSceneProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 text-[#1C1C1E] dark:text-white"
+            className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 text-[#1C1C1E] dark:text-[#F2F2F7]"
           >
             <motion.span
               initial={{ width: 0 }}
               animate={{ width: "auto" }}
               transition={{ duration: 1, delay: 0.5 }}
-              className="inline-block overflow-hidden whitespace-normal lg:whitespace-nowrap bg-gradient-to-r from-emerald-600 via-green-500 to-emerald-500 dark:from-emerald-300 dark:via-green-300 dark:to-emerald-200 bg-clip-text text-transparent drop-shadow-sm dark:drop-shadow-lg break-words"
+              className="inline-block overflow-hidden whitespace-normal text-[#1C1C1E] dark:text-[#F2F2F7] lg:whitespace-nowrap break-words"
             >
               {config.texts?.completionTitle}
             </motion.span>
@@ -455,7 +455,7 @@ export function NudgeScene({ config, completionData }: NudgeSceneProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-base sm:text-lg text-[#1C1C1E] dark:text-gray-100 mb-6 font-medium leading-relaxed dark:font-semibold"
+            className="text-base sm:text-lg text-[#1C1C1E] dark:text-[#F2F2F7] mb-6 font-medium leading-relaxed dark:font-semibold"
           >
             {config.texts?.completionSubtitle}
           </motion.p>
@@ -504,14 +504,14 @@ export function NudgeScene({ config, completionData }: NudgeSceneProps) {
                   <stat.icon size={16} className={`${stat.color} sm:w-5 sm:h-5 relative z-10`} />
                 </motion.div>
                 <motion.div
-                  className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white"
+                  className="text-lg sm:text-xl font-semibold text-[#1C1C1E] dark:text-[#F2F2F7]"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 1 + index * 0.1 }}
                 >
                   {stat.value}
                 </motion.div>
-                <div className="text-xs text-gray-500 dark:text-gray-300">{stat.label}</div>
+                <div className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7]">{stat.label}</div>
               </motion.div>
             ))}
           </motion.div>

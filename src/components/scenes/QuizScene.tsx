@@ -601,7 +601,7 @@ export const QuizScene = React.memo(function QuizScene({
     const userAnswer = currentAnswer;
 
     return (
-      <div className="space-y-2" role="radiogroup" aria-label={ariaTexts?.multipleChoiceLabel || "Multiple choice options"} aria-describedby="multiple-choice-description">
+      <div className="space-y-2 sm:space-y-3" role="radiogroup" aria-label={ariaTexts?.multipleChoiceLabel || "Multiple choice options"} aria-describedby="multiple-choice-description">
         <div
           id="multiple-choice-description"
           className="sr-only"

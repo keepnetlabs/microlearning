@@ -247,7 +247,7 @@ export function SurveyScene({
                       size={'20'}
                       className={`${star <= rating
                         ? `text-yellow-400 fill-current drop-shadow-sm`
-                        : "text-gray-300 dark:text-gray-500"
+                        : "text-[#1C1C1E] dark:text-[#F2F2F7]"
                         } transition-all duration-200`}
                       aria-hidden="true"
                     />
@@ -301,7 +301,10 @@ export function SurveyScene({
                   >
                     <div className="relative mr-3">
                       {/* Custom Checkbox */}
-                      <div className={`w-4 h-4 rounded border-2 transition-all duration-200 flex items-center justify-center glass-border-2`}
+                      <div className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all duration-300 cursor-pointer glass-border-0 ${ selectedTopics.includes(index)
+                      ? "bg-[#1C1C1E]/30 dark:bg-[#F2F2F7]/30 border-[#1C1C1E] dark:border-[#F2F2F7]"
+                      : "border-[#1C1C1E] dark:border-[#F2F2F7] hover:border-[#1C1C1E]/60 dark:hover:border-[#F2F2F7]/60"
+                      }`}
                         aria-hidden="true"
                       >
                         {selectedTopics.includes(index) && (
@@ -310,7 +313,7 @@ export function SurveyScene({
                             animate={{ scale: 1 }}
                             transition={{ duration: 0.2 }}
                           >
-                            <CheckCircle size={10} className="w-3 h-3 text-[#1C1C1E] dark:text-[#F2F2F7]" />
+                           <CheckCircle className="w-4 h-4 text-[#1C1C1E] dark:text-[#F2F2F7]" />
                           </motion.div>
                         )}
                       </div>
@@ -390,7 +393,7 @@ export function SurveyScene({
               {rating === 0 && (
                 <p
                   id="rating-required"
-                  className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center"
+                  className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] mt-2 text-center"
                   role="alert"
                   aria-live="polite"
                 >
@@ -404,7 +407,7 @@ export function SurveyScene({
               role="complementary"
               aria-label={config.texts?.securityNoticeLabel || config.ariaTexts?.securityNoticeLabel || "Data security notice"}
             >
-              <div className="pt-3 glass-border-2">
+              <div className="pt-2">
                 <p className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] text-center leading-relaxed">
                   {config.texts?.dataSecurityNotice}
                 </p>

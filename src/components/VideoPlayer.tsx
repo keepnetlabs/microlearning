@@ -93,6 +93,7 @@ function formatTime(seconds: number): string {
   const remainingSeconds = Math.floor(seconds % 60);
   return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
 }
+const isIOS = navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad') || navigator.userAgent.includes('iPod');
 
 export function VideoPlayer({
   src = "https://customer-0lll6yc8omc23rbm.cloudflarestream.com/5fdb12ff1436c991f50b698a02e2faa1/manifest/video.m3u8",
@@ -116,7 +117,6 @@ export function VideoPlayer({
   const [hasReplayed, setHasReplayed] = useState(false);
   const [watchedRows, setWatchedRows] = useState<Set<number>>(new Set());
   const transcriptContainerRef = useRef<HTMLDivElement>(null);
-
   // Dark mode detection
   useEffect(() => {
     const checkDarkMode = () => {
@@ -177,9 +177,7 @@ export function VideoPlayer({
   useEffect(() => {
     const video = videoRef.current;
     if (video) {
-      // Initialize _lastTime to 0
       video._lastTime = 0;
-
       if (Hls.isSupported()) {
         const hls = new Hls();
         hls.loadSource(src);
@@ -191,15 +189,62 @@ export function VideoPlayer({
             }
           }, 500);
         });
-        initializePlayer();
+        if(true && disableForwardSeek){
+            const handleSeek = (e: Event) => {
+              const target = e.target as VideoWithLastTime;
+              if (target.currentTime > (target._lastTime || 0)) {
+                target.currentTime = target._lastTime || 0;
+                e.preventDefault();
+                return false;
+              }
+              target._lastTime = target.currentTime;
+            };
+            
+            const handleTimeUpdate = () => {
+              const target = video as VideoWithLastTime;
+              const currentTime = target.currentTime;
+              const lastTime = target._lastTime || 0;
+              
+              // Allow small forward jumps (less than 1 second) for smooth playback
+              if (currentTime > lastTime + 1) {
+                target.currentTime = lastTime;
+              } else {
+                target._lastTime = currentTime;
+              }
+            };
+            
+            video.addEventListener('seeking', handleSeek);
+            video.addEventListener('timeupdate', handleTimeUpdate);
+            
+            // Prevent speed changes with JavaScript
+            const handleRateChange = () => {
+              const target = video as VideoWithLastTime;
+              if (target.playbackRate !== 1) {
+                target.playbackRate = 1;
+              }
+            };
+            
+            video.addEventListener('ratechange', handleRateChange);
+            
+            // Cleanup function
+            return () => {
+              video.removeEventListener('seeking', handleSeek);
+              video.removeEventListener('timeupdate', handleTimeUpdate);
+              video.removeEventListener('ratechange', handleRateChange);
+            };
+        }
+        else {
+          initializePlayer();
+        }
       }
       else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-        video.src = src;
-        initializePlayer();
+         video.src = src;
+         initializePlayer();
       }
       else {
         video.src = src;
         initializePlayer();
+    
       }
     }
   }, [src, initializePlayer]);
@@ -674,21 +719,18 @@ export function VideoPlayer({
                       ? "cursor-pointer"
                       : "cursor-not-allowed"
                       } ${isActive
-                        ? "border border-blue-500/60 dark:border-blue-400/60 bg-blue-50/80 dark:bg-blue-900/30"
+                        ? "border border-white/50 border-[1px]"
                         : "border border-transparent"
                       }`}
                     style={{
                       padding: "8px 12px",
                       backgroundColor: "transparent",
-                      opacity: canAccess ? 1 : 0.5,
-                      boxShadow: isActive
-                        ? "0 2px 8px rgba(59, 130, 246, 0.15)"
-                        : "none",
+                      opacity: canAccess ? 1 : 0.5
                     }}
                     role="listitem"
                     aria-label={`${ariaTexts?.transcriptEntryLabel || "Transcript entry"} ${index + 1} at ${formatTime(row.start)}`}
                     aria-current={isActive ? "true" : "false"}
-                    aria-disabled={!canAccess}
+                    data-disabled={!canAccess}
                     tabIndex={canAccess ? 0 : -1}
                     onKeyDown={(e) => {
                       if (canAccess && (e.key === 'Enter' || e.key === ' ')) {
@@ -702,7 +744,7 @@ export function VideoPlayer({
                       <div className="flex-shrink-0 self-center">
                         <span
                           className={`font-medium transition-colors duration-200 flex items-center gap-1 text-xs ${isActive
-                            ? "text-blue-600 dark:text-blue-300 font-semibold"
+                            ? "font-semibold text-[#1C1C1E] dark:text-[#F2F2F7]"
                             : canAccess
                               ? "text-[#1C1C1E] dark:text-[#F2F2F7]"
                               : "text-[#1C1C1E] dark:text-[#F2F2F7]"
@@ -739,8 +781,8 @@ export function VideoPlayer({
                             className={`leading-relaxed transition-colors duration-200 ${isActive
                               ? "text-[#1C1C1E] dark:text-slate-50 font-medium"
                               : canAccess
-                                ? "text-[#1C1C1E] dark:text-slate-200"
-                                : "text-gray-400 dark:text-slate-500"
+                                ? "text-[#1C1C1E] dark:text-[#F2F2F7]"
+                                : "text-[#1C1C1E] dark:text-[#F2F2F7] opacity-50"
                               }`}
                             style={{
                               fontSize: "13px",
