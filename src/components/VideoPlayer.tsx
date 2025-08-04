@@ -148,7 +148,7 @@ export function VideoPlayer({
     const video = videoRef.current;
     if (video) {
       playerRef.current = new Plyr(video, {
-        controls: ['play', 'progress', 'current-time', 'mute', 'captions', 'settings', 'fullscreen'],
+        controls: ['play', 'progress', 'current-time', 'mute', 'captions', 'fullscreen'],
         captions: {
           active: true,
           update: true,
@@ -189,62 +189,62 @@ export function VideoPlayer({
             }
           }, 500);
         });
-        if(true && disableForwardSeek){
-            const handleSeek = (e: Event) => {
-              const target = e.target as VideoWithLastTime;
-              if (target.currentTime > (target._lastTime || 0)) {
-                target.currentTime = target._lastTime || 0;
-                e.preventDefault();
-                return false;
-              }
-              target._lastTime = target.currentTime;
-            };
-            
-            const handleTimeUpdate = () => {
-              const target = video as VideoWithLastTime;
-              const currentTime = target.currentTime;
-              const lastTime = target._lastTime || 0;
-              
-              // Allow small forward jumps (less than 1 second) for smooth playback
-              if (currentTime > lastTime + 1) {
-                target.currentTime = lastTime;
-              } else {
-                target._lastTime = currentTime;
-              }
-            };
-            
-            video.addEventListener('seeking', handleSeek);
-            video.addEventListener('timeupdate', handleTimeUpdate);
-            
-            // Prevent speed changes with JavaScript
-            const handleRateChange = () => {
-              const target = video as VideoWithLastTime;
-              if (target.playbackRate !== 1) {
-                target.playbackRate = 1;
-              }
-            };
-            
-            video.addEventListener('ratechange', handleRateChange);
-            
-            // Cleanup function
-            return () => {
-              video.removeEventListener('seeking', handleSeek);
-              video.removeEventListener('timeupdate', handleTimeUpdate);
-              video.removeEventListener('ratechange', handleRateChange);
-            };
+        if (isIOS && disableForwardSeek) {
+          const handleSeek = (e: Event) => {
+            const target = e.target as VideoWithLastTime;
+            if (target.currentTime > (target._lastTime || 0)) {
+              target.currentTime = target._lastTime || 0;
+              e.preventDefault();
+              return false;
+            }
+            target._lastTime = target.currentTime;
+          };
+
+          const handleTimeUpdate = () => {
+            const target = video as VideoWithLastTime;
+            const currentTime = target.currentTime;
+            const lastTime = target._lastTime || 0;
+
+            // Allow small forward jumps (less than 1 second) for smooth playback
+            if (currentTime > lastTime + 1) {
+              target.currentTime = lastTime;
+            } else {
+              target._lastTime = currentTime;
+            }
+          };
+
+          video.addEventListener('seeking', handleSeek);
+          video.addEventListener('timeupdate', handleTimeUpdate);
+
+          // Prevent speed changes with JavaScript
+          const handleRateChange = () => {
+            const target = video as VideoWithLastTime;
+            if (target.playbackRate !== 1) {
+              target.playbackRate = 1;
+            }
+          };
+
+          video.addEventListener('ratechange', handleRateChange);
+
+          // Cleanup function
+          return () => {
+            video.removeEventListener('seeking', handleSeek);
+            video.removeEventListener('timeupdate', handleTimeUpdate);
+            video.removeEventListener('ratechange', handleRateChange);
+          };
         }
         else {
           initializePlayer();
         }
       }
       else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-         video.src = src;
-         initializePlayer();
+        video.src = src;
+        initializePlayer();
       }
       else {
         video.src = src;
         initializePlayer();
-    
+
       }
     }
   }, [src, initializePlayer]);
@@ -655,7 +655,7 @@ export function VideoPlayer({
                         aria-label={`${ariaTexts?.transcriptProgressLabel || "Progress"}: ${currentRowIndex + 1} of ${parsedTranscript.length} transcript entries`}
                       >
                         <div
-                          className="w-16 h-1 glass-border-2  rounded-full overflow-hidden"
+                          className="w-16 h-2 glass-border-2  rounded-full overflow-hidden"
                           role="progressbar"
                           aria-valuenow={currentRowIndex + 1}
                           aria-valuemin={1}
@@ -663,7 +663,7 @@ export function VideoPlayer({
                           aria-label={ariaTexts?.transcriptProgressLabel || "Transcript progress"}
                         >
                           <div
-                            className="h-full bg-[#1C1C1E] dark:bg-[#F2F2F7] transition-all duration-300 ease-out"
+                            className="h-full transition-all duration-300 ease-out glass-border-2"
                             style={{
                               width: `${((currentRowIndex + 1) / parsedTranscript.length) * 100}%`
                             }}
