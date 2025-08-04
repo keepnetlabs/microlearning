@@ -40,27 +40,24 @@ export function SummaryScene({ config }: SummarySceneProps) {
     <FontWrapper>
       <div className="flex flex-col items-center justify-center h-full px-6">
         <div className="mb-4 relative">
-          <div className="relative p-6 rounded-3xl bg-gradient-to-br from-yellow-500/20 to-orange-500/20 dark:from-yellow-900/40 dark:to-orange-900/40 backdrop-blur-xl border border-white/20 dark:border-gray-600/40 shadow-2xl">
-            <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent dark:from-gray-800/20 dark:to-transparent rounded-3xl"></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-yellow-500/10 to-transparent dark:from-yellow-900/20 dark:to-transparent rounded-3xl"></div>
+          <div className="relative p-3 glass-border-3">
             <IconComponent
-              size={config.icon?.size || 48}
-              className={`${config.icon?.color || 'text-yellow-500 dark:text-yellow-400'} relative z-10`}
+              size={config.icon?.size || 40}
+              className={`text-[#1C1C1E] dark:text-[#F2F2F7] relative z-10`}
             />
           </div>
         </div>
 
-        <h1 className="text-2xl mb-2 text-center text-[#1C1C1E] dark:text-white">
+        <h1 className="text-2xl mb-2 text-center leading-[1.5] text-[#1C1C1E] dark:text-white">
           {config.texts?.title || "Artık Daha Güvenlisiniz!"}
         </h1>
-        <p className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] mb-8 text-center">
+        <p className="text-[#1C1C1E] dark:text-[#F2F2F7] mb-4 text-center">
           {config.texts?.subtitle || "Bu bilgileri ekibinizle paylaşma ve uygulamaya başlama zamanı"}
         </p>
 
-        <div className={`relative p-6 rounded-2xl ${config.styling?.container?.backgroundColor || 'bg-white/90 dark:bg-gray-800/80'} backdrop-blur-xl border ${config.styling?.container?.borderColor || 'border-gray-200/60 dark:border-gray-600/60'} shadow-xl max-w-md w-full`}>
-          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent dark:from-gray-800/20 dark:to-transparent rounded-2xl"></div>
+        <div className={`relative p-6 glass-border-3 max-w-md w-full`}>
           <div className="relative z-10 space-y-4">
-            <h3 className="text-sm font-semibold text-[#1C1C1E] dark:text-white mb-4">
+            <h3 className="text-[#1C1C1E] dark:text-[#F2F2F7] mb-4">
               {config.texts?.achievementsTitle || "Öğrendikleriniz:"}
             </h3>
 
@@ -68,8 +65,8 @@ export function SummaryScene({ config }: SummarySceneProps) {
               {achievements.map((achievement, index) => (
                 <div key={index} className="flex items-start group">
                   <div className="flex-shrink-0 mr-3 mt-0.5">
-                    <div className={`p-1.5 rounded-full bg-gradient-to-r ${config.styling?.achievements?.iconColor || 'from-green-500 to-emerald-600'} shadow-sm border border-green-200/50 dark:border-green-500/30`}>
-                      <CheckCircle size={12} className="text-white" />
+                    <div className={`p-1.5 glass-border-0`}>
+                      <CheckCircle size={12} className="text-[#1C1C1E] dark:text-[#F2F2F7]" />
                     </div>
                   </div>
                   <span className={`text-sm ${config.styling?.achievements?.textColor || 'text-gray-800 dark:text-gray-200'} group-${config.styling?.achievements?.hoverColor || 'hover:text-[#1C1C1E] dark:hover:text-white'} transition-colors leading-relaxed font-medium`}>
@@ -79,13 +76,12 @@ export function SummaryScene({ config }: SummarySceneProps) {
               ))}
             </div>
 
-            <div className={`relative mt-6 p-4 rounded-xl bg-gradient-to-r ${config.styling?.progressCard?.backgroundColor || 'from-green-100/80 to-emerald-100/80 dark:from-green-900/40 dark:to-emerald-900/40'} backdrop-blur-sm border ${config.styling?.progressCard?.borderColor || 'border-green-300/60 dark:border-green-600/60'} shadow-lg`}>
-              <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent dark:from-gray-800/20 dark:to-transparent rounded-xl"></div>
+            <div className={`relative mt-6 p-4 glass-border-3`}>
               <div className="relative z-10 flex items-center">
-                <div className="p-2 rounded-lg bg-white/70 dark:bg-gray-700/60 backdrop-blur-sm border border-white/40 dark:border-gray-600/50 mr-3 shadow-sm">
-                  <TrendingUp size={14} className={`${config.styling?.progressCard?.iconColor || 'text-green-600 dark:text-green-400'}`} />
+                <div className="p-2 glass-border-0 mr-3">
+                  <TrendingUp size={14} className={`text-[#1C1C1E] dark:text-[#F2F2F7]`} />
                 </div>
-                <span className={`text-sm font-medium ${config.styling?.progressCard?.textColor || 'text-green-800 dark:text-green-200'}`}>
+                <span className={`text-[#1C1C 1E] dark:text-[#F2F2F7]`}>
                   {config.texts?.progressMessage || "Güvenlik seviyeniz %85 arttı!"}
                 </span>
               </div>

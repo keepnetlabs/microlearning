@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Star, CheckCircle, Send, LucideIcon } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { motion } from "framer-motion";
@@ -21,6 +21,11 @@ export function SurveyScene({
   const [selectedTopics, setSelectedTopics] = useState<number[]>([]);
   const [isSubmitted, setIsSubmitted] = useState(propIsSubmitted || false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Sync local state with prop changes
+  useEffect(() => {
+    setIsSubmitted(propIsSubmitted || false);
+  }, [propIsSubmitted]);
 
   const topics = config.topics || [];
 
@@ -57,9 +62,14 @@ export function SurveyScene({
   };
 
   const handleSubmit = () => {
-    if (rating === 0) return;
+    if (rating === 0 || isSubmitted) return;
     setIsSubmitting(true);
     setIsSubmitted(true);
+
+    // Notify parent component about submission
+    if (onSurveySubmitted) {
+      onSurveySubmitted();
+    }
   };
 
   if (isSubmitted) {
@@ -89,7 +99,7 @@ export function SurveyScene({
           >
             <div className="mb-6 relative">
               <div
-                className={`relative p-4 rounded-2xl glass-border-4 mx-auto w-fit`}
+                className={`relative p-3 glass-border-4 mx-auto w-fit`}
                 role="img"
                 aria-label={config.texts?.successIconLabel || config.ariaTexts?.successIconLabel || "Success checkmark icon"}
               >
@@ -110,7 +120,7 @@ export function SurveyScene({
             </h1>
 
             <div
-              className={`relative p-4 sm:p-6 rounded-2xl glass-border-4 max-w-sm w-full`}
+              className={`relative p-4 sm:p-6 rounded-2xl glass-border-3 max-w-sm w-full`}
               role="region"
               aria-labelledby="success-title"
               aria-describedby="success-messages"
@@ -207,7 +217,7 @@ export function SurveyScene({
             >
               <h3
                 id="rating-question"
-                className="text-sm text-[#1C1C1E] dark:text-white mb-4 font-medium"
+                className="text-[#1C1C1E] dark:text-[#F2F2F7] mb-4 font-medium"
               >
                 {config.texts?.ratingQuestion || "Bu eğitimi nasıl değerlendiriyorsunuz?"}
               </h3>
@@ -218,7 +228,7 @@ export function SurveyScene({
                 {config.texts?.ratingDescription || config.ariaTexts?.ratingDescription || "Rate the training from 1 to 5 stars"}
               </div>
               <div
-                className="flex justify-center space-x-2"
+                className="flex justify-start space-x-2"
                 role="radiogroup"
                 aria-labelledby="rating-question"
                 aria-describedby="rating-description"
@@ -364,11 +374,11 @@ export function SurveyScene({
             >
               <div id="submit-section" className="sr-only">{config.texts?.submitSectionLabel || config.ariaTexts?.submitSectionLabel || "Submit survey"}</div>
               <motion.button
-                whileHover={{ scale: rating > 0 ? 1.02 : 1 }}
-                whileTap={{ scale: rating > 0 ? 0.98 : 1 }}
+                whileHover={{ scale: rating > 0 && !isSubmitted ? 1.02 : 1 }}
+                whileTap={{ scale: rating > 0 && !isSubmitted ? 0.98 : 1 }}
                 onClick={handleSubmit}
-                disabled={rating === 0 || isSubmitting}
-                className={`z-50 w-full transition-all font-medium text-sm flex items-center justify-center space-x-2 py-3 rounded-xl glass-border-2 ${rating > 0 && !isSubmitting
+                disabled={rating === 0 || isSubmitting || isSubmitted}
+                className={`z-50 w-full transition-all font-medium text-sm flex items-center justify-center space-x-2 py-3 rounded-xl glass-border-2 ${rating > 0 && !isSubmitting && !isSubmitted
                   ? ``
                   : `cursor-not-allowed`
                   } text-[#1C1C1E] dark:text-[#F2F2F7]`}

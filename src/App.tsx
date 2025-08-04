@@ -237,7 +237,7 @@ export default function App() {
     backgroundGradient2: `absolute -bottom-60 -right-60 w-[500px] h-[500px] bg-gradient-to-tl from-${themeConfig.colors?.accent || 'purple'}-100/35 via-pink-100/25 to-transparent dark:from-${themeConfig.colors?.accent || 'purple'}-900/20 dark:via-pink-900/15 dark:to-transparent ${themeConfig.effects?.borderRadius || 'rounded-full'} blur-3xl animate-pulse transition-colors duration-500`,
 
     // Content card
-    contentCard: `absolute inset-0 w-full h-full glass-border-2 sm:glass-border-1.5 overflow-hidden transition-colors duration-300`,
+    contentCard: `absolute inset-0 w-full h-full glass-border-2 overflow-hidden transition-colors duration-300`,
 
     // Navigation button
     navButton: `relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full backdrop-blur-xl border border-${themeConfig.colors?.surface || 'white'}/60 dark:border-gray-600/60 shadow-lg transition-all duration-300 focus:outline-none`,
@@ -857,7 +857,11 @@ export default function App() {
   const handleQuizCompleted = useCallback(() => {
     setQuizCompleted(true);
     setAchievements(prev => [...prev, 'quiz-completed'].filter((a, i, arr) => arr.indexOf(a) === i));
-  }, []);
+    // Advance to next scene after quiz completion
+    setTimeout(() => {
+      nextScene();
+    }, 1000);
+  }, [nextScene]);
 
 
 
@@ -866,12 +870,8 @@ export default function App() {
   // Survey feedback submission handler
   const handleSurveySubmitted = useCallback(() => {
     setIsSurveySubmitted(true);
-
-    // Auto-advance to next scene after feedback submission
-    setTimeout(() => {
-      nextScene();
-    }, 1500); // Wait for the submission animation to complete
-  }, [nextScene]);
+    // Removed automatic navigation - user can manually navigate when ready
+  }, []);
 
   const handleSceneChange = useCallback((newScene: number) => {
     // Don't reset quizCompleted state when leaving quiz scene
@@ -1080,10 +1080,7 @@ export default function App() {
                       src={isDarkMode ? themeConfig.logo?.darkSrc : themeConfig.logo?.src}
                       alt={themeConfig.logo?.alt || "Application Logo"}
                       aria-label={appConfig.theme?.ariaTexts?.logoLabel || "Application logo"}
-                      className="relative z-10 h-10 sm:h-12 md:h-14 w-auto object-contain"
-                      style={{
-                        padding: '8px',
-                      }}
+                      className="relative z-10 h-10 sm:h-12 md:h-14 w-auto object-contain p-1.5 sm:p-2"
                     />
                   </div>
                 </motion.div>

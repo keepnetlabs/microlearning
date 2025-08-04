@@ -54,10 +54,7 @@ const IconDemo = ({ name, Icon, description }: IconDemoProps) => {
           <button
             key={stateOption}
             onClick={() => setState(stateOption as any)}
-            className={`px-3 py-1 text-xs rounded-lg transition-all duration-200 ${state === stateOption
-              ? 'bg-blue-500 text-white shadow-sm'
-              : 'bg-gray-100 dark:bg-gray-700 text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-gray-200 dark:hover:bg-gray-600'
-              }`}
+            className={`px-3 py-1 text-xs rounded-lg transition-all duration-200 text-[#1C1C1E] dark:text-[#F2F2F7] glass-border-0`}
           >
             {stateOption.charAt(0).toUpperCase() + stateOption.slice(1)}
           </button>

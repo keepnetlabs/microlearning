@@ -31,6 +31,12 @@ module.exports = {
     'glass-border-2',
     'glass-border-3',
     'glass-border-4',
+    'md:glass-border-0',
+    'md:glass-border-1',
+    'md:glass-border-1-5', 
+    'md:glass-border-2',
+    'md:glass-border-3',
+    'md:glass-border-4',
   ],
   theme: {
     extend: {

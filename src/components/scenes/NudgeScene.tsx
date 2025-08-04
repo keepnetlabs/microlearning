@@ -330,7 +330,7 @@ export function NudgeScene({ config, completionData }: NudgeSceneProps) {
           {/* Success Icon with Enhanced Effects */}
           <div className="relative mb-4">
             <motion.div
-              className="relative w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/20"
+              className="relative w-16 h-16 sm:w-20 sm:h-20 glass-border-2 flex items-center justify-center mx-auto"
               animate={{
                 scale: celebrationPhase >= 1 ? [1, 1.2, 1.05, 1] : [1, 1.05, 1],
                 boxShadow: [
@@ -391,7 +391,7 @@ export function NudgeScene({ config, completionData }: NudgeSceneProps) {
                   return (
                     <IconComponent
                       size={config.icon?.size || 28}
-                      className={`${config.icon?.color || 'text-white'} relative z-10 sm:w-8 sm:h-8`}
+                      className={`text-[#1C1C1E] dark:text-[#F2F2F7] relative z-10 sm:w-8 sm:h-8`}
                       strokeWidth={2.5}
                     />
                   );
@@ -482,7 +482,7 @@ export function NudgeScene({ config, completionData }: NudgeSceneProps) {
                 transition={{ type: "spring", stiffness: 400 }}
               >
                 <motion.div
-                  className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 ${stat.bgColor} backdrop-blur-xl border ${stat.borderColor} rounded-xl mb-2 relative overflow-hidden shadow-lg`}
+                  className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 glass-border-2 rounded-xl mb-2 relative overflow-hidden `}
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.8 + index * 0.1, type: "spring", stiffness: 200 }}
@@ -501,7 +501,7 @@ export function NudgeScene({ config, completionData }: NudgeSceneProps) {
                       delay: 1 + index * 0.3
                     }}
                   />
-                  <stat.icon size={16} className={`${stat.color} sm:w-5 sm:h-5 relative z-10`} />
+                  <stat.icon size={16} className={`text-[#1C1C1E] dark:text-[#F2F2F7] sm:w-5 sm:h-5 relative z-10`} />
                 </motion.div>
                 <motion.div
                   className="text-lg sm:text-xl font-semibold text-[#1C1C1E] dark:text-[#F2F2F7]"
@@ -529,7 +529,7 @@ export function NudgeScene({ config, completionData }: NudgeSceneProps) {
               whileTap={{ scale: 0.95 }}
               onClick={handleDownloadCertificate}
               disabled={showCertificate}
-              className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r ${config.styling?.downloadButton?.gradientFrom || 'from-blue-500'} ${config.styling?.downloadButton?.gradientTo || 'to-indigo-600'} ${config.styling?.downloadButton?.textColor || 'text-white'} rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500/30 overflow-hidden`}
+              className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 glass-border-2 ${config.styling?.downloadButton?.gradientFrom || 'from-blue-500'} ${config.styling?.downloadButton?.gradientTo || 'to-indigo-600'} ${config.styling?.downloadButton?.textColor || 'text-white'} transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden`}
             >
               {/* Button shimmer effect */}
               <motion.div
@@ -542,8 +542,8 @@ export function NudgeScene({ config, completionData }: NudgeSceneProps) {
                 }}
               />
 
-              <Download size={16} className={`sm:w-5 sm:h-5 relative z-10 ${config.styling?.downloadButton?.iconColor || 'text-white'}`} />
-              <span className={`text-sm sm:text-base font-medium relative z-10`}>
+              <Download size={16} className={`sm:w-5 sm:h-5 relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
+              <span className={`text-sm sm:text-base font-medium relative text-[#1C1C1E] dark:text-[#F2F2F7] z-10`}>
                 {showCertificate ? (config.texts?.downloadingText || "") : (config.texts?.downloadButton || "")}
               </span>
 
@@ -565,8 +565,8 @@ export function NudgeScene({ config, completionData }: NudgeSceneProps) {
           transition={{ duration: 0.8, delay: 1.0 }}
           className="w-full max-w-sm sm:max-w-md mb-3"
         >
-          <h2 className="text-sm sm:text-base font-semibold text-gray-800 dark:text-white mb-3 flex items-center">
-            <Award size={16} className="mr-2 text-yellow-600 dark:text-yellow-400" />
+          <h2 className="text-sm sm:text-base font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] mb-3 flex items-center">
+            <Award size={16} className="mr-2 text-[#1C1C1E] dark:text-[#F2F2F7]" />
             {config.texts?.achievementsTitle || ""}
           </h2>
           <div className="grid grid-cols-3 gap-2 sm:gap-3">
@@ -588,42 +588,23 @@ export function NudgeScene({ config, completionData }: NudgeSceneProps) {
                     y: -5,
                     transition: { type: "spring", stiffness: 400 }
                   }}
-                  className={`relative flex flex-col items-center p-3 ${config.styling?.achievements?.backgroundColor || 'bg-white/60 dark:bg-gray-800/80'} backdrop-blur-xl border ${config.styling?.achievements?.borderColor || 'border-white/40 dark:border-gray-600/60'} rounded-xl shadow-sm overflow-hidden group`}
+                  className={`relative flex flex-col items-center p-3 glass-border-2 overflow-hidden group`}
                 >
                   {/* Achievement glow */}
                   <motion.div
-                    className="absolute inset-0 bg-gradient-to-br from-yellow-200/30 to-orange-200/30 dark:from-yellow-700/20 dark:to-orange-700/20 opacity-0 group-hover:opacity-100"
+                    className="absolute inset-0"
                     initial={false}
                     transition={{ duration: 0.3 }}
                   />
 
-                  {/* Noise texture */}
-                  <div
-                    className="absolute inset-0 opacity-5 mix-blend-overlay"
-                    style={{
-                      backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                      backgroundSize: '64px 64px'
-                    }}
-                  />
+
 
                   <motion.div
-                    className="w-8 h-8 bg-gradient-to-r from-yellow-100 to-orange-100 dark:from-yellow-900/60 dark:to-orange-900/60 rounded-full flex items-center justify-center mb-2 relative overflow-hidden"
-                    animate={{
-                      boxShadow: celebrationPhase >= 2 ? [
-                        "0 0 0 rgba(251, 191, 36, 0)",
-                        "0 0 20px rgba(251, 191, 36, 0.5)",
-                        "0 0 0 rgba(251, 191, 36, 0)"
-                      ] : "0 0 0 rgba(251, 191, 36, 0)"
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: celebrationPhase >= 2 ? Infinity : 0,
-                      delay: index * 0.3
-                    }}
+                    className="w-8 h-8 glass-border-0 flex items-center justify-center mb-2 relative overflow-hidden"
                   >
-                    <IconComponent size={14} className={`${achievement.color} ${achievement.color.includes('yellow') ? 'dark:text-yellow-400' : achievement.color.includes('green') ? 'dark:text-green-400' : 'dark:text-blue-400'} relative z-10`} />
+                    <IconComponent size={14} className={`text-[#1C1C1E] dark:text-[#F2F2F7] relative z-10`} />
                   </motion.div>
-                  <span className={`text-xs text-center ${config.styling?.achievements?.textColor || 'text-[#1C1C1E] dark:text-gray-200'} leading-tight relative z-10 transition-colors`}>
+                  <span className={`text-xs text-center text-[#1C1C1E] dark:text-[#F2F2F7] leading-tight relative z-10 transition-colors`}>
                     {achievement.name}
                   </span>
                 </motion.div>
@@ -639,8 +620,8 @@ export function NudgeScene({ config, completionData }: NudgeSceneProps) {
           transition={{ duration: 0.8, delay: 1.4 }}
           className="w-full max-w-sm sm:max-w-md mb-3"
         >
-          <h2 className="text-sm sm:text-base font-semibold text-gray-800 dark:text-white mb-2 flex items-center">
-            <ArrowRight size={16} className="mr-2 text-blue-600 dark:text-blue-400" />
+          <h2 className="text-sm sm:text-base font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] mb-2 flex items-center">
+            <ArrowRight size={16} className="mr-2 text-[#1C1C1E] dark:text-[#F2F2F7]" />
             {config.texts?.actionPlanTitle || ""}
           </h2>
 
@@ -662,41 +643,27 @@ export function NudgeScene({ config, completionData }: NudgeSceneProps) {
                     scale: 1.02,
                     transition: { type: "spring", stiffness: 400 }
                   }}
-                  className={`relative p-3 rounded-xl ${action.bgColor} dark:bg-gray-800/80 backdrop-blur-xl border ${action.borderColor} dark:border-gray-600/60 shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer overflow-hidden`}
+                  className={`relative p-3 glass-border-2 transition-all duration-300 group cursor-pointer overflow-hidden`}
                 >
-                  {/* Noise texture overlay */}
-                  <div
-                    className="absolute inset-0 opacity-5 mix-blend-overlay"
-                    style={{
-                      backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                      backgroundSize: '128px 128px'
-                    }}
-                  />
-
-                  <div className={`absolute inset-0 bg-gradient-to-br ${action.gradient} rounded-xl opacity-50`}></div>
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-xl"></div>
-
-                  {/* Inner glow */}
-                  <div className="absolute inset-0.5 bg-gradient-to-br from-white/30 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
                   <div className="relative z-10">
                     <div className="flex items-start justify-between mb-1">
                       <div className="flex items-center">
                         <motion.div
-                          className="p-1.5 rounded-lg bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm border border-white/40 dark:border-gray-600/50 mr-2 group-hover:scale-110 transition-transform overflow-hidden"
+                          className="p-1.5 rounded-lg glass-border-0 mr-2 group-hover:scale-110 transition-transform overflow-hidden"
                           whileHover={{
                             rotate: 5,
                             transition: { type: "spring", stiffness: 400 }
                           }}
                         >
-                          <IconComponent size={14} className={`${action.iconColor} ${action.iconColor.includes('red') ? 'dark:text-red-400' : action.iconColor.includes('amber') ? 'dark:text-amber-400' : 'dark:text-blue-400'} relative z-10`} />
+                          <IconComponent size={14} className={`text-[#1C1C1E] dark:text-[#F2F2F7] relative z-10`} />
                         </motion.div>
                         <div>
                           <h3 className="text-sm font-semibold text-[#1C1C1E] dark:text-white flex items-center">
                             {action.title}
                             {action.priority === 'critical' && (
                               <motion.span
-                                className="ml-2 px-2 py-0.5 text-xs bg-red-100 dark:bg-red-900/60 text-red-700 dark:text-red-200 rounded-full"
+                                className="ml-2 px-2 py-0.5 text-xs text-[#1C1C1E] dark:text-[#F2F2F7] glass-border-0  rounded-full"
                                 animate={{
                                   scale: [1, 1.05, 1],
                                 }}
@@ -712,11 +679,11 @@ export function NudgeScene({ config, completionData }: NudgeSceneProps) {
                           </h3>
                         </div>
                       </div>
-                      <span className="text-xs text-gray-500 dark:text-gray-400 bg-white/50 dark:bg-gray-700/50 px-2 py-1 rounded-full">
+                      <span className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] px-2 py-1 rounded-full">
                         {action.timeframe}
                       </span>
                     </div>
-                    <p className="text-xs text-[#1C1C1E] dark:text-gray-200 leading-relaxed ml-8">
+                    <p className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] leading-relaxed ml-8">
                       {action.description}
                     </p>
                   </div>
@@ -733,7 +700,7 @@ export function NudgeScene({ config, completionData }: NudgeSceneProps) {
           transition={{ duration: 0.8, delay: 2.0 }}
           className="w-full max-w-sm sm:max-w-md mb-3"
         >
-          <h2 className="text-sm sm:text-base font-semibold text-gray-800 dark:text-white mb-2 flex items-center">
+          <h2 className="text-sm sm:text-base font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] mb-2 flex items-center">
             <BookOpen size={16} className="mr-2 text-[#1C1C1E] dark:text-[#F2F2F7]" />
             {config.texts?.resourcesTitle || ""}
           </h2>
@@ -775,7 +742,7 @@ export function NudgeScene({ config, completionData }: NudgeSceneProps) {
                     </div>
                   </div>
                 </div>
-                <span className="text-xs bg-gray-100 dark:bg-gray-700 text-[#1C1C1E] dark:text-[#F2F2F7] px-2 py-1 rounded-full relative z-10">
+                <span className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] glass-border-0 px-2 py-1 rounded-full relative z-10">
                   {resource.type}
                 </span>
               </motion.a>
@@ -791,7 +758,7 @@ export function NudgeScene({ config, completionData }: NudgeSceneProps) {
           className="text-center pb-4"
         >
           <motion.div
-            className={`relative p-3 bg-gradient-to-r ${config.styling?.motivationalCard?.backgroundColor || 'from-emerald-50/80 to-green-50/60 dark:from-emerald-900/40 dark:to-green-900/30'} backdrop-blur-xl border ${config.styling?.motivationalCard?.borderColor || 'border-emerald-200/60 dark:border-emerald-600/50'} rounded-xl overflow-hidden`}
+            className={`relative p-3 glass-border-2 overflow-hidden max-w-sm w-full sm:max-w-md `}
             whileHover={{ scale: 1.02 }}
           >
             {/* Background pattern */}
@@ -800,11 +767,11 @@ export function NudgeScene({ config, completionData }: NudgeSceneProps) {
             />
 
             <div className="relative z-10">
-              <h3 className={`text-sm font-semibold ${config.styling?.motivationalCard?.titleColor || 'text-emerald-800 dark:text-emerald-200'} mb-2 flex items-center justify-center`}>
-                <Shield size={16} className={`mr-2 ${config.styling?.motivationalCard?.iconColor || 'text-emerald-600 dark:text-emerald-400'}`} />
+              <h3 className={`text-sm font-semibold mb-2 flex items-center justify-center text-[#1C1C1E] dark:text-[#F2F2F7]`}>
+                <Shield size={16} className={`mr-2 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
                 {config.texts?.motivationalTitle || ""}
               </h3>
-              <p className={`text-xs ${config.styling?.motivationalCard?.textColor || 'text-emerald-700 dark:text-emerald-300'} leading-relaxed`}>
+              <p className={`text-xs text-[#1C1C1E] dark:text-[#F2F2F7] leading-relaxed`}>
                 {config.texts?.motivationalMessage || ""}
               </p>
             </div>

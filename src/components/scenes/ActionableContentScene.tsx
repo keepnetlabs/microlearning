@@ -221,7 +221,7 @@ export function ActionableContentScene({
                     <div className="flex items-start">
                       <div className="flex-shrink-0 mr-4" aria-hidden="true">
                         <div className="p-3 rounded-xl glass-border-4">
-                          <ActionIcon size={20} aria-hidden="true" />
+                          <ActionIcon size={20} aria-hidden="true" className="text-[#1C1C1E] dark:text-[#F2F2F7]" />
                         </div>
                       </div>
                       <div className="flex-1">

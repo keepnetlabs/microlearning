@@ -515,6 +515,7 @@
     "texts": {
       "question": "Question",
       "nextQuestion": "Next Question",
+      "nextSlide": "Next Slide",
       "retryQuestion": "Retry",
       "quizCompleted": "Quiz Completed! 🎉",
       "correctAnswer": "Correct! 🎉",
@@ -657,8 +658,7 @@
     ],
     "icon": {
       "name": "award",
-      "size": 48,
-      "color": "text-yellow-500 dark:text-yellow-400"
+      "size": 40
     },
     "styling": {
       "container": {
@@ -681,7 +681,7 @@
   "nudgeSceneConfig": {
     "points": 40,
     "texts": {
-      "completionTitle": "🎉 Congratulations! You’ve Completed the Training",
+      "completionTitle": "Congratulations! You’ve Completed the Training",
       "completionSubtitle": "You’ve successfully refreshed your cybersecurity knowledge",
       "achievementsTitle": "Achievements Earned",
       "actionPlanTitle": "What to Do Next?",
