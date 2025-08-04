@@ -22,6 +22,8 @@ module.exports = {
     // Custom gradients
     'bg-gradient-red',
     'bg-gradient-blue',
+    'bg-gradient-green',
+    'bg-gradient-gray',
     // Glass border classes
     'glass-border-0',
     'glass-border-1',
@@ -54,6 +56,8 @@ module.exports = {
       backgroundImage: {
         'gradient-red': 'linear-gradient(106deg, #D77676 0%, #A53131 100%)',
         'gradient-blue': 'linear-gradient(106deg, #76B2D7 0%, #3178A5 100%)',
+        'gradient-green': 'linear-gradient(106deg, #76D79D 0%, #31A561 100%)',
+        'gradient-gray':'linear-gradient(106deg, rgba(200, 200, 205, 0.30) 0%, rgba(142, 142, 147, 0.30) 100%)'
       }
     },
   },

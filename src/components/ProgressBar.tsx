@@ -180,7 +180,7 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
           {/* Progress Bar for Mobile - Using the same design as desktop but simplified */}
           <div className="flex-1">
             <div
-              className="relative w-full h-1.5 sm:h-2 glass-border-1-outline overflow-hidden transition-all duration-500 ease-out group"
+              className="relative w-full h-2 glass-border-1-outline overflow-hidden transition-all duration-500 ease-out group"
               style={{
                 // OPTIMIZED BACKGROUND - More visible but still premium
                 background: '',
@@ -310,7 +310,7 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
 
           {/* INDUSTRY STANDARD LIQUID GLASS PROGRESS CONTAINER */}
           <div
-            className="relative w-full h-1.5 sm:h-2 glass-border-1-outline overflow-hidden transition-all duration-500 ease-out group"
+            className="relative w-full h-2 glass-border-1-outline overflow-hidden transition-all duration-500 ease-out group"
             style={{
               // OPTIMIZED BACKGROUND - More visible but still premium
               background: '',

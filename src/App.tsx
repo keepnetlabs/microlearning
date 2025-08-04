@@ -53,7 +53,7 @@ const STATIC_CSS_CLASSES = {
   pointsText: "text-xs md:text-sm font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300",
 
   // Theme button
-  themeButton: "relative glass-border-3 flex items-center justify-center p-1 sm:p-1.5 md:p-2 h-[32px] sm:h-[40px] sm:max-h-[40px] rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group ",
+  themeButton: "relative glass-border-3 flex items-center justify-center p-1.5 md:p-2 h-[32px] sm:h-[40px] sm:max-h-[40px] rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group ",
   themeButtonIcon: "w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300",
 
   // Language button
@@ -1080,7 +1080,7 @@ export default function App() {
                       src={isDarkMode ? themeConfig.logo?.darkSrc : themeConfig.logo?.src}
                       alt={themeConfig.logo?.alt || "Application Logo"}
                       aria-label={appConfig.theme?.ariaTexts?.logoLabel || "Application logo"}
-                      className="relative z-10 h-8 sm:h-10 md:h-12 w-auto object-contain"
+                      className="relative z-10 h-10 sm:h-12 md:h-14 w-auto object-contain"
                       style={{
                         padding: '8px',
                       }}
@@ -1271,7 +1271,7 @@ export default function App() {
                               placeholder="..."
                               value={languageSearchTerm}
                               onChange={(e) => setLanguageSearchTerm(e.target.value)}
-                              className={`w-full pl-6 pr-3 py-1.5 bg-transparent text-xs rounded-lg placeholder-gray-[#1C1C1E] dark:placeholder-gray-[#F2F2F7] text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 focus:ring-inset`}
+                              className={`w-full pl-6 pr-3 py-1.5 bg-transparent text-xs rounded-lg placeholder-[#1C1C1E] dark:placeholder-[#F2F2F7] text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 focus:ring-inset`}
                               aria-label="..."
                               aria-describedby="language-search-description"
                               role="searchbox"

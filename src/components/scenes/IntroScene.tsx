@@ -191,7 +191,7 @@ export const IntroScene = React.memo(({
     const IconComponent = memoizedGetIconComponent(icon?.sceneIconName || 'smartphone');
     return (
       <IconComponent
-        size={icon?.size || 48}
+        size={icon?.size || 40}
         className={icon?.className}
       />
     );
@@ -275,27 +275,6 @@ export const IntroScene = React.memo(({
     stats: (animationDelays?.welcomeDelay || 1.5) + (animationDelays?.statsDelay || 2.8),
     cta: (animationDelays?.welcomeDelay || 1.5) + (animationDelays?.ctaDelay || 3.0)
   }), [animationDelays]);
-
-  // Memoize CSS-in-JS styles to prevent recalculation
-  const cardStyles = useMemo(() => ({
-    background: `linear-gradient(135deg, 
-      rgba(59, 130, 246, 0.12) 0%, 
-      rgba(99, 102, 241, 0.08) 30%,
-      rgba(139, 92, 246, 0.06) 70%,
-      rgba(168, 85, 247, 0.04) 100%
-    )`,
-    backdropFilter: 'blur(16px) saturate(150%)',
-    WebkitBackdropFilter: 'blur(16px) saturate(150%)',
-    border: '1px solid rgba(59, 130, 246, 0.20)',
-    boxShadow: `
-      0 4px 16px rgba(59, 130, 246, 0.08),
-      0 2px 8px rgba(99, 102, 241, 0.06),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15),
-      inset 0 -1px 0 rgba(59, 130, 246, 0.08)
-    `,
-    transform: 'translateZ(0)',
-    willChange: 'transform'
-  }), []);
 
   const statsStyles = useMemo(() => ({
     transform: 'translateZ(0)',
@@ -509,12 +488,12 @@ export const IntroScene = React.memo(({
             type: "spring",
             stiffness: 200
           }}
-          className="flex justify-center mb-1 sm:mb-3 relative"
+          className="flex justify-center mb-1 sm:mb-2 relative"
         >
           {/* Icon glow effect */}
           <div className="absolute inset-0 from-blue-400/30 to-transparent rounded-full animate-pulse scale-150"></div>
 
-          <div className="relative z-10">
+          <div className="relative z-10 p-3 glass-border-3">
             {icon?.component || sceneIconComponent}
           </div>
 

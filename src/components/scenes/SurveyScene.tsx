@@ -165,8 +165,7 @@ export function SurveyScene({
           role="banner"
           aria-label={config.texts?.headerLabel || config.ariaTexts?.headerLabel || "Survey header"}
         >
-          <div className="relative p-1 rounded-2xl mx-auto w-fit">
-            <div className="absolute inset-0 rounded-2xl"></div>
+          <div className="relative p-3 glass-border-3 mx-auto w-fit">
             <IconComponent
               size={config.icon?.size || 40}
               className={`text-[#1C1C1E] dark:text-[#F2F2F7] relative z-10`}
@@ -301,10 +300,10 @@ export function SurveyScene({
                   >
                     <div className="relative mr-3">
                       {/* Custom Checkbox */}
-                      <div className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all duration-300 cursor-pointer glass-border-0 ${ selectedTopics.includes(index)
-                      ? "bg-[#1C1C1E]/30 dark:bg-[#F2F2F7]/30 border-[#1C1C1E] dark:border-[#F2F2F7]"
-                      : "border-[#1C1C1E] dark:border-[#F2F2F7] hover:border-[#1C1C1E]/60 dark:hover:border-[#F2F2F7]/60"
-                      }`}
+                      <div className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all duration-300 cursor-pointer glass-border-0 ${selectedTopics.includes(index)
+                        ? "bg-[#1C1C1E]/30 dark:bg-[#F2F2F7]/30 border-[#1C1C1E] dark:border-[#F2F2F7]"
+                        : "border-[#1C1C1E] dark:border-[#F2F2F7] hover:border-[#1C1C1E]/60 dark:hover:border-[#F2F2F7]/60"
+                        }`}
                         aria-hidden="true"
                       >
                         {selectedTopics.includes(index) && (
@@ -313,7 +312,7 @@ export function SurveyScene({
                             animate={{ scale: 1 }}
                             transition={{ duration: 0.2 }}
                           >
-                           <CheckCircle className="w-4 h-4 text-[#1C1C1E] dark:text-[#F2F2F7]" />
+                            <CheckCircle className="w-4 h-4 text-[#1C1C1E] dark:text-[#F2F2F7]" />
                           </motion.div>
                         )}
                       </div>

@@ -101,25 +101,6 @@ const staticStyles = {
       inset 0 0 0 0.5px rgba(255, 255, 255, 0.3),
       inset 0 1px 0 rgba(255, 255, 255, 0.4)
     `
-  },
-  iconContainer: {
-    background: `linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.85) 0%, 
-      rgba(255, 255, 255, 0.75) 30%,
-      rgba(255, 255, 255, 0.65) 60%,
-      rgba(255, 255, 255, 0.55) 100%
-    )`,
-    backdropFilter: 'blur(28px) saturate(220%)',
-    WebkitBackdropFilter: 'blur(28px) saturate(220%)',
-    border: '0.5px solid rgba(255, 255, 255, 0.7)',
-    boxShadow: `
-      0 6px 20px rgba(0, 0, 0, 0.06),
-      0 3px 10px rgba(0, 0, 0, 0.04),
-      inset 0 1px 0 rgba(255, 255, 255, 0.6),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.04)
-    `,
-    transform: 'translateZ(0)',
-    willChange: 'transform'
   }
 };
 
@@ -132,31 +113,10 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
   // Memoize icon component
   const Icon = useMemo(() => getIconComponent(goal.iconName), [goal.iconName]);
 
-  const cardStyle = useMemo(() => ({
-    background: `linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.95) 0%, 
-      rgba(255, 255, 255, 0.88) 25%,
-      rgba(255, 255, 255, 0.80) 50%,
-      rgba(255, 255, 255, 0.72) 75%,
-      rgba(255, 255, 255, 0.65) 100%
-    )`,
-    backdropFilter: glassEffect?.blur || 'blur(32px) saturate(200%)',
-    WebkitBackdropFilter: glassEffect?.blur || 'blur(32px) saturate(200%)',
-    border: glassEffect?.border || '1px solid rgba(255, 255, 255, 0.45)',
-    boxShadow: glassEffect?.shadow || `
-      0 12px 40px rgba(0, 0, 0, 0.12),
-      0 6px 20px rgba(0, 0, 0, 0.08),
-      0 3px 10px rgba(0, 0, 0, 0.04),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.06)
-    `,
-    willChange: 'transform'
-  }), [glassEffect]);
 
   return (
     <article
-      className="relative p-4 sm:p-5 rounded-2xl overflow-hidden transition-all duration-500 ease-out group hover:scale-[1.03] hover:shadow-2xl cursor-pointer"
-      style={cardStyle}
+      className="relative p-4 sm:p-5 glass-border-2 overflow-hidden transition-all duration-500 ease-out group hover:scale-[1.03] cursor-pointer"
       aria-labelledby={`goal-title-${index}`}
       aria-describedby={`goal-description-${index}`}
       tabIndex={0}
@@ -166,98 +126,17 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
         }
       }}
     >
-      {/* APPLE-STYLE ULTRA-FINE NOISE TEXTURE - VisionOS Quality */}
-      <div
-        className="absolute inset-0 opacity-[0.008] dark:opacity-[0.004] rounded-2xl mix-blend-overlay pointer-events-none"
-        style={staticStyles.noiseTexture}
-        aria-hidden="true"
-      />
 
-      {/* APPLE MULTI-LAYERED DEPTH SYSTEM */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-white/30 to-white/20 dark:from-gray-800/40 dark:via-gray-700/25 dark:to-gray-600/20 rounded-2xl transition-colors duration-500" aria-hidden="true" />
-
-      {/* APPLE COLORED BACKGROUND - Subtle but visible */}
-      <div
-        className="absolute inset-0 rounded-2xl transition-opacity duration-500"
-        style={{
-          background: goal.strongBgGradient
-        }}
-        aria-hidden="true"
-      />
-
-      {/* APPLE DARK MODE COLORED BACKGROUND */}
-      <div
-        className="absolute inset-0 rounded-2xl opacity-0 dark:opacity-100 transition-opacity duration-500"
-        style={{
-          background: goal.darkBgGradient
-        }}
-        aria-hidden="true"
-      />
-
-      {/* APPLE TOP HIGHLIGHT LAYER */}
-      <div className="absolute inset-0 bg-gradient-to-t from-gray-100/25 via-transparent to-transparent dark:from-gray-800/20 rounded-2xl transition-colors duration-500" aria-hidden="true" />
-
-      {/* APPLE RADIAL HIGHLIGHT - Ultra-subtle inner glow */}
-      <div
-        className="absolute inset-0 rounded-2xl pointer-events-none"
-        style={staticStyles.radialHighlight}
-        aria-hidden="true"
-      />
-
-      {/* APPLE ULTRA-THIN BORDER SYSTEM - 0.5px precision */}
-      <div
-        className="absolute inset-0 rounded-2xl pointer-events-none"
-        style={staticStyles.ultraThinBorder}
-        aria-hidden="true"
-      />
-
-      {/* APPLE HOVER GLOW EFFECT - Subtle interaction */}
-      <div
-        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-700"
-        style={staticStyles.hoverGlow}
-        aria-hidden="true"
-      />
-
-      {/* APPLE DARK MODE ADAPTATION - Subtle depth */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-800/20 via-gray-900/12 to-gray-900/8 dark:from-gray-700/30 dark:via-gray-800/20 dark:to-gray-900/15 rounded-2xl opacity-0 dark:opacity-100 transition-opacity duration-500" aria-hidden="true" />
-
-      {/* APPLE CONTENT LAYER */}
       <div className="relative z-10">
         <header className="flex items-center mb-3">
-          {/* APPLE ICON CONTAINER - Ultra-refined liquid glass */}
           <div
-            className="p-2 sm:p-2.5 rounded-xl mr-3 overflow-hidden transition-all duration-300 ease-out group-hover:scale-105"
-            style={{
-              ...staticStyles.iconContainer,
-              backdropFilter: 'blur(28px) saturate(220%)',
-              WebkitBackdropFilter: 'blur(28px) saturate(220%)',
-              border: '1px solid rgba(255, 255, 255, 0.8)',
-              boxShadow: `
-                0 8px 25px rgba(0, 0, 0, 0.10),
-                0 4px 12px rgba(0, 0, 0, 0.06),
-                inset 0 1px 0 rgba(255, 255, 255, 0.8),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.06)
-              `
-            }}
+            className="p-2 sm:p-2.5 glass-border-4 rounded-xl mr-3 overflow-hidden transition-all duration-300 ease-out group-hover:scale-105"
             aria-hidden="true"
           >
-            {/* Apple-style icon noise texture */}
-            <div
-              className="absolute inset-0 opacity-[0.006] dark:opacity-[0.003] rounded-xl mix-blend-overlay pointer-events-none"
-              style={staticStyles.iconNoiseTexture}
-              aria-hidden="true"
-            />
-
-            {/* Apple-style icon highlight */}
-            <div
-              className="absolute inset-0 rounded-xl pointer-events-none"
-              style={staticStyles.iconHighlight}
-              aria-hidden="true"
-            />
 
             <Icon
               size={16}
-              className={`${goal.iconColor} dark:opacity-90 relative z-10 transition-all duration-300 ease-out group-hover:scale-105`}
+              className={'relative z-10 transition-all duration-300 ease-out group-hover:scale-105 text-[#1C1C1E] dark:text-[#F2F2F7]'}
               aria-hidden="true"
             />
           </div>
@@ -266,12 +145,12 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
           <div className="flex flex-col items-start">
             <h3
               id={`goal-title-${index}`}
-              className="text-sm font-medium text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 ease-out group-hover:text-gray-800 dark:group-hover:text-gray-100"
+              className="text-sm font-medium text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 ease-out"
             >
               {goal.title}
             </h3>
             {goal.subtitle && (
-              <p className="text-xs font-semibold text-[#1C1C1E] dark:text-gray-300 transition-colors duration-300 ease-out group-hover:text-gray-600 dark:group-hover:text-gray-200 mt-0.5">
+              <p className="text-xs font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 ease-out mt-0.5">
                 {goal.subtitle}
               </p>
             )}
@@ -281,14 +160,12 @@ const GoalCard = memo(({ goal, index, glassEffect }: {
         {/* APPLE DESCRIPTION TEXT - Perfect readability */}
         <p
           id={`goal-description-${index}`}
-          className="text-xs text-left text-gray-800 dark:text-gray-200 leading-relaxed transition-colors duration-300 ease-out group-hover:text-[#1C1C1E] dark:group-hover:text-gray-100 font-medium"
+          className="text-xs text-left text-[#1C1C1E] dark:text-[#F2F2F7] leading-relaxed transition-colors duration-300 ease-out font-medium"
         >
           {goal.description}
         </p>
       </div>
 
-      {/* APPLE INNER DEPTH EFFECT - Ultra-subtle */}
-      <div className="absolute inset-1 bg-gradient-to-br from-white/15 via-transparent to-transparent dark:from-white/8 rounded-xl pointer-events-none" aria-hidden="true" />
     </article>
   );
 });
@@ -329,7 +206,7 @@ export const GoalScene = memo(({
     const SceneIcon = getIconComponent(icon?.sceneIconName || 'target');
     return (
       <SceneIcon
-        size={icon?.size || 48}
+        size={icon?.size || 40}
         className={`text-[#1C1C1E] dark:text-[#F2F2F7]`}
         aria-hidden="true"
       />
@@ -352,7 +229,7 @@ export const GoalScene = memo(({
         role="main"
         aria-labelledby="goal-scene-title"
       >
-        <div className="mb-2 sm:mb-3 relative">
+        <div className="mb-1 sm:mb-2 p-3 glass-border-3 relative">
           {iconComponent}
         </div>
 
@@ -365,7 +242,6 @@ export const GoalScene = memo(({
 
         <section
           className={containerClass}
-          role="region"
           aria-label="Training Goals"
         >
           {memoizedGoals.map((goal, index) => (

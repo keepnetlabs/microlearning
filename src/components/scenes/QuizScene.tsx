@@ -877,22 +877,20 @@ export const QuizScene = React.memo(function QuizScene({
 
         <div className="text-center pt-2.5">
           <Button
+            size="xl"
             onClick={() => handleAnswer(multiSelectAnswers)}
             disabled={
               showResult ||
               isLoading ||
               multiSelectAnswers.length < question.minCorrect
             }
-            className="text-sm px-4 py-2 glass-border-2"
+            className="px-4 py-2 glass-border-2"
             style={{ background: "transparent" }}
           >
             {isLoading ? (
-              <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                <span className="text-[#1C1C1E] dark:text-[#F2F2F7]">
-                  {config.texts?.checkAnswer || "Kontrol ediliyor..."}
-                </span>
-              </div>
+              <span className="text-[#1C1C1E] dark:text-[#F2F2F7]">
+                {config.texts?.checkAnswer || "Kontrol ediliyor..."}
+              </span>
             ) : (
               <span className="text-[#1C1C1E] dark:text-[#F2F2F7]">
                 {`${config.texts?.checkAnswer || "Cevabı Kontrol Et"} (${multiSelectAnswers.length}/${question.minCorrect})`}
@@ -990,9 +988,10 @@ export const QuizScene = React.memo(function QuizScene({
         <div className="text-center">
           <Button
             onClick={() => handleAnswer(sliderValue)}
+            size="xl"
             disabled={showResult || isLoading}
             aria-label={isLoading ? "Processing evaluation" : "Complete evaluation"}
-            className={`transition-all duration-300 glass-border-2`}
+            className={`transition-all duration-300 glass-border-2 `}
           >
             {isLoading ? (
               <div className="flex items-center space-x-2">
@@ -1654,14 +1653,18 @@ export const QuizScene = React.memo(function QuizScene({
   } else if (iconConfig.sceneIconName) {
     const LucideIconComponent = getIconComponent(iconConfig.sceneIconName);
     iconNode = (
-      <LucideIconComponent
-        size={iconConfig.size ?? 48}
-        className={`text-[#1C1C1E] dark:text-[#F2F2F7]`}
-        strokeWidth={2}
-      />
+      <div className="mb-1 sm:mb-2 p-3 glass-border-3">
+        <LucideIconComponent
+          size={iconConfig.size ?? 40}
+          className={`text-[#1C1C1E] dark:text-[#F2F2F7]`}
+          strokeWidth={2}
+        />
+      </div>
     );
   } else {
-    iconNode = <LucideIcons.HelpCircle size={48} />;
+    iconNode = <div className="mb-1 sm:mb-2 p-3 glass-border-3">
+      <LucideIcons.HelpCircle size={40} />
+    </div>;
   }
 
   // Safety check for currentQuestion
@@ -1825,9 +1828,9 @@ export const QuizScene = React.memo(function QuizScene({
                     <div className="flex gap-2">
                       {!isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked && (
                         <Button
-                          size="sm"
+                          size="xl"
                           onClick={retryQuestion}
-                          className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] glass-border-2 z-50"
+                          className=" text-[#1C1C1E] dark:text-[#F2F2F7] glass-border-4 z-50"
                         >
                           {config.texts?.retryQuestion}
                         </Button>
@@ -1836,9 +1839,9 @@ export const QuizScene = React.memo(function QuizScene({
                       {(isAnswerCorrect || (!isAnswerCorrect && attempts >= maxAttempts) || isAnswerLocked) &&
                         currentQuestionIndex < questions.length - 1 && (
                           <Button
-                            size="sm"
+                            size="xl"
                             onClick={handleNextQuestion}
-                            className="text-sm px-4  py-2 glass-border-2 text-[#1C1C1E] dark:text-[#F2F2F7]"
+                            className="px-4 py-2 glass-border-4 text-[#1C1C1E] dark:text-[#F2F2F7]"
                             style={{ background: "transparent" }}
                           >
                             {config.texts?.nextQuestion || "Sonraki"}

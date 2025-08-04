@@ -123,20 +123,24 @@ export function ActionableContentScene({
     if (icon.component) {
       const SceneIcon = icon.component;
       return (
-        <SceneIcon
-          size={icon.size || 40}
-          className={`text-[#1C1C1E] dark:text-[#F2F2F7]`}
-          aria-hidden="true"
-        />
+        <div className="mb-1 sm:mb-2 p-3 glass-border-3">
+          <SceneIcon
+            size={icon.size || 40}
+            className={`text-[#1C1C1E] dark:text-[#F2F2F7] `}
+            aria-hidden="true"
+          />
+        </div>
       );
     } else if (icon.sceneIconName) {
       const SceneIcon = getIconComponent(icon.sceneIconName);
       return (
-        <SceneIcon
-          size={icon.size || 40}
-          className={`text-[#1C1C1E] dark:text-[#F2F2F7]`}
-          aria-hidden="true"
-        />
+        <div className="mb-1 sm:mb-2 p-3 glass-border-3">
+          <SceneIcon
+            size={icon.size || 40}
+            className={`text-[#1C1C1E] dark:text-[#F2F2F7]`}
+            aria-hidden="true"
+          />
+        </div>
       );
     }
     return null;
@@ -167,7 +171,7 @@ export function ActionableContentScene({
         </div>
 
         <header role="banner" aria-label={ariaTexts?.headerLabel || "Scene header"}>
-          <div className="mb-2 sm:mb-3 flex items-center justify-center" aria-hidden="true">
+          <div className="flex items-center justify-center" aria-hidden="true">
             {sceneIconComponent}
           </div>
           <h1
@@ -200,7 +204,7 @@ export function ActionableContentScene({
                   role="listitem"
                   aria-labelledby={`${cardId}-title`}
                   aria-describedby={`${cardId}-description ${tipId}`}
-                  className={`relative p-5 rounded-2xl ${finalGlassEffect.cardBackground} ${finalGlassEffect.backdropBlur} border ${finalGlassEffect.cardBorder} ${finalGlassEffect.shadow} transition-all duration-300 hover:scale-105`}
+                  className={`relative p-5 glass-border-2 transition-all duration-300 hover:scale-105`}
                   tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -213,18 +217,11 @@ export function ActionableContentScene({
                     }
                   }}
                 >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${action.bgGradientClass} dark:opacity-50 rounded-2xl`} aria-hidden="true"></div>
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent dark:from-gray-800/20 dark:to-transparent rounded-2xl" aria-hidden="true"></div>
-
-                  {/* Apple Dark Mode Depth Layers */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-gray-800/20 via-gray-900/12 to-gray-900/8 dark:from-gray-700/30 dark:via-gray-800/20 dark:to-gray-900/15 rounded-2xl opacity-0 dark:opacity-100 transition-opacity duration-500" aria-hidden="true" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-gray-100/25 via-transparent to-transparent dark:from-gray-800/20 rounded-2xl transition-colors duration-500" aria-hidden="true" />
-
                   <div className="relative z-10">
                     <div className="flex items-start">
                       <div className="flex-shrink-0 mr-4" aria-hidden="true">
-                        <div className="p-3 rounded-xl bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm border border-white/30 dark:border-gray-600/50 shadow-sm">
-                          <ActionIcon size={20} className={action.iconColorClass} aria-hidden="true" />
+                        <div className="p-3 rounded-xl glass-border-4">
+                          <ActionIcon size={20} aria-hidden="true" />
                         </div>
                       </div>
                       <div className="flex-1">
@@ -242,19 +239,15 @@ export function ActionableContentScene({
                         </p>
                         <div
                           id={tipId}
-                          className={`relative p-3 rounded-xl bg-gradient-to-r ${action.tipColorClass} backdrop-blur-sm border`}
+                          className={`relative p-3 glass-border-0`}
                           role="note"
                           aria-label={ariaTexts?.tipLabel || "Tip"}
                         >
-                          <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent dark:from-gray-800/10 dark:to-transparent rounded-xl" aria-hidden="true"></div>
-
-                          {/* Apple Dark Mode Tip Depth */}
-                          <div className="absolute inset-0 bg-gradient-to-br from-gray-800/15 via-gray-900/8 to-gray-900/5 dark:from-gray-700/25 dark:via-gray-800/15 dark:to-gray-900/10 rounded-xl opacity-0 dark:opacity-100 transition-opacity duration-500" aria-hidden="true" />
                           <div className="relative z-10 flex items-start">
-                            <div className={`${action.tipIconColorClass} mr-2 mt-0.5 flex-shrink-0`} aria-hidden="true">
+                            <div className={`text-[#1C1C1E] dark:text-[#F2F2F7] mr-2 mt-0.5 flex-shrink-0`} aria-hidden="true">
                               {tipIconComponent}
                             </div>
-                            <span className={`text-xs ${action.tipTextColorClass}`}>
+                            <span className={`text-xs text-[#1C1C1E] dark:text-[#F2F2F7]`}>
                               {action.tip}
                             </span>
                           </div>
