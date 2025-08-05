@@ -50,23 +50,21 @@ function Slider({
     };
   }, []);
 
-  // Get slider styling based on theme
+  // Get slider styling based on theme - Apple Liquid Glass standards
   const getSliderStyle = React.useMemo(() => {
     if (isDarkMode) {
       return {
-        trackBg: 'rgba(0, 0, 0, 0.1)',
-        rangeBg: 'linear-gradient(90deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%)',
+        trackBg: 'rgba(255, 255, 255, 0.08)',
         thumbBg: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 25%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.65) 75%, rgba(255, 255, 255, 0.55) 100%)',
-        thumbBorder: 'hsl(var(--primary))',
-        thumbShadow: '0 6px 20px rgba(0, 0, 0, 0.15), 0 3px 10px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+        thumbBorder: 'rgba(255, 255, 255, 0.2)',
+        thumbShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 rgba(0, 0, 0, 0.05)',
+        thumbSize: '32px'
       };
     } else {
       return {
-        trackBg: '',
-        rangeBg: '',
-        thumbBg: '',
-        thumbBorder: 'rgba(59, 130, 246, 0.3)',
-        thumbShadow: '0 4px 16px rgba(59, 130, 246, 0.2), 0 2px 8px rgba(59, 130, 246, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 -1px 0 rgba(0, 0, 0, 0.05)'
+        trackBg: 'rgba(0, 0, 0, 0.06)', thumbBorder: 'rgba(0, 0, 0, 0.08)',
+        thumbShadow: '0 8px 32px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 rgba(0, 0, 0, 0.02)',
+        thumbSize: '32px'
       };
     }
   }, [isDarkMode]);
@@ -85,6 +83,7 @@ function Slider({
       style={{
         ...props.style,
         touchAction: 'pan-x',
+        overflow: "visible",
         userSelect: 'none',
         WebkitUserSelect: 'none',
         WebkitTouchCallout: 'none',
@@ -111,9 +110,10 @@ function Slider({
       <SliderPrimitive.Track
         data-slot="slider-track"
         className={cn(
-          "relative grow overflow-hidden rounded-full data-[orientation=horizontal]:h-4 data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5",
+          "relative grow rounded-full data-[orientation=horizontal]:h-7 data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-2.5",
         )}
         style={{
+          background: getSliderStyle.trackBg,
           touchAction: 'pan-x',
           userSelect: 'none',
           WebkitUserSelect: 'none',
@@ -124,7 +124,7 @@ function Slider({
         <SliderPrimitive.Range
           data-slot="slider-range"
           className={cn(
-            "absolute data-[orientation=horizontal] glass-border-0 :h-full data-[orientation=vertical]:w-full",
+            "absolute data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full rounded-full",
           )}
         />
       </SliderPrimitive.Track>
@@ -132,17 +132,18 @@ function Slider({
         <SliderPrimitive.Thumb
           data-slot="slider-thumb"
           key={index}
-          className="block size-5 shrink-0 glass-border-0 rounded-full border transition-[color,box-shadow] hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
+          className="block shrink-0 glass-border-0 transition-all duration-200 disabled:pointer-events-none disabled:opacity-50"
           style={{
-            background: getSliderStyle.thumbBg,
-            border: `1px solid ${getSliderStyle.thumbBorder}`,
-            boxShadow: getSliderStyle.thumbShadow,
+            width: getSliderStyle.thumbSize,
+            height: getSliderStyle.thumbSize,
             touchAction: 'pan-x',
             cursor: 'grab',
             userSelect: 'none',
             WebkitUserSelect: 'none',
             WebkitTouchCallout: 'none',
             WebkitTapHighlightColor: 'transparent',
+            transform: 'translateZ(0)',
+            background: "rgba(255, 255, 255, 0.1)"
           }}
         />
       ))}

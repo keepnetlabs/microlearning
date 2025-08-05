@@ -954,14 +954,14 @@ export const QuizScene = React.memo(function QuizScene({
             {question.statement}
           </p>
           {question.description && (
-            <p className="text-center text-sm text-muted-foreground dark:text-white">
+            <p className="text-center text-sm text-[#1C1C1E] dark:text-[#F2F2F7]">
               {question.description}
             </p>
           )}
         </div>
 
         <div className="space-y-3">
-          <div className="flex justify-between text-sm text-muted-foreground dark:text-white">
+          <div className="flex justify-between text-sm text-[#1C1C1E] dark:text-[#F2F2F7]">
             <span>{question.labels.min}</span>
             <span>{question.labels.max}</span>
           </div>
@@ -981,14 +981,6 @@ export const QuizScene = React.memo(function QuizScene({
                 aria-valuemax={question.max}
                 aria-valuenow={sliderValue}
                 aria-valuetext={`${sliderValue}${question.unit ? ` ${question.unit}` : ''}`}
-                style={{
-                  // Dynamic Apple liquid glass styling for slider based on theme
-                  '--slider-track-bg': 'rgba(0, 0, 0, 0.1)',
-                  '--slider-range-bg': 'linear-gradient(90deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%)',
-                  '--slider-thumb-bg': 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 25%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.65) 75%, rgba(255, 255, 255, 0.55) 100%)',
-                  '--slider-thumb-border': 'hsl(var(--primary))',
-                  '--slider-thumb-shadow': '0 6px 20px rgba(0, 0, 0, 0.15), 0 3px 10px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
-                } as React.CSSProperties}
               />
             </div>
           </div>
@@ -1186,10 +1178,10 @@ export const QuizScene = React.memo(function QuizScene({
           <p className="text-sm font-medium text-foreground mb-1">
             {config.texts?.mobileInstructions || "📱 Mobil: Önce öğeyi seçin, sonra kategoriye dokunun"}
           </p>
-          <p className="text-xs text-muted-foreground dark:text-white">
+          <p className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7]">
             {config.texts?.desktopInstructions || "🖥️ Masaüstü: Öğeleri sürükleyip kategorilere bırakın"}
           </p>
-          <p className="text-xs text-muted-foreground dark:text-white mt-1">
+          <p className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] mt-1">
             💡 <strong>İpucu:</strong> Öğeleri kaldırmak için üzerine gelin ve X butonuna tıklayın
           </p>
         </div>
@@ -1198,7 +1190,7 @@ export const QuizScene = React.memo(function QuizScene({
         {availableItems.length > 0 && (
           <div>
             <h4 className="font-medium mb-3 text-foreground flex items-center">
-              <Move className="w-4 h-4 mr-2 text-muted-foreground dark:text-white" />
+              <Move className="w-4 h-4 mr-2 text-[#1C1C1E] dark:text-[#F2F2F7]" />
               {config.texts?.options || "Seçenekler"}
             </h4>
 
@@ -1333,7 +1325,7 @@ export const QuizScene = React.memo(function QuizScene({
                           {category.name}
                         </h5>
                         {category.description && (
-                          <p className="text-xs text-muted-foreground dark:text-white mt-0.5">
+                          <p className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] mt-0.5">
                             {category.description}
                           </p>
                         )}
@@ -1385,7 +1377,7 @@ export const QuizScene = React.memo(function QuizScene({
                         background: "rgba(255, 255, 255, 0.05)"
                       }}
                     >
-                      <span className="text-xs text-muted-foreground dark:text-white">
+                      <span className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7]">
                         {config.texts?.tapHere || "Buraya dokunun"}
                       </span>
                     </div>
@@ -1718,7 +1710,7 @@ export const QuizScene = React.memo(function QuizScene({
         aria-label={`Loading question ${currentQuestionIndex + 1}`}
       >
         <div className="text-center">
-          <p className="text-muted-foreground dark:text-white">
+          <p className="text-[#1C1C1E] dark:text-[#F2F2F7]">
             {questionLoadingText}
           </p>
         </div>
@@ -1760,7 +1752,7 @@ export const QuizScene = React.memo(function QuizScene({
             {config.title}
           </h1>
 
-          <div className="flex items-center justify-center space-x-4 text-sm text-muted-foreground dark:text-white">
+          <div className="flex items-center justify-center space-x-4 text-sm text-[#1C1C1E] dark:text-[#F2F2F7]">
             <span aria-label={`Question ${currentQuestionIndex + 1} of ${questions.length}`}>
               {config.texts?.question} {currentQuestionIndex + 1}/{questions.length}
             </span>
@@ -1799,7 +1791,7 @@ export const QuizScene = React.memo(function QuizScene({
                 {currentQuestion?.title}
               </h2>
               {currentQuestion?.description && (
-                <p className="text-muted-foreground dark:text-white">
+                <p className="text-[#1C1C1E] dark:text-[#F2F2F7]">
                   {currentQuestion?.description}
                 </p>
               )}
