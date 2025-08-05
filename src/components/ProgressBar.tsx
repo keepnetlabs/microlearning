@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { useIsMobile } from "../utils/languageUtils";
 
 // Yüzde formatı için localization fonksiyonu
 export const formatPercent = (value: number, locale = navigator.language) =>
@@ -155,9 +156,9 @@ const defaultConfig: ProgressBarConfig = {
 export function ProgressBar({ currentScene, totalScenes, language = 'en', config = {} }: ProgressBarProps) {
   const progress = (currentScene / totalScenes) * 100;
   const finalConfig = { ...defaultConfig, ...config };
-
+  const isMobile = useIsMobile();
   return (
-    <div className="w-full" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label={`${finalConfig.ariaLabel}: %${Math.round(progress)} ${finalConfig.progressLabel}`}>
+    <div className={`w-full ${isMobile && progress === 100 ? 'mr-8' : 'mr-0'}`} role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label={`${finalConfig.ariaLabel}: %${Math.round(progress)} ${finalConfig.progressLabel}`}>
       {/* Mobile Progress Bar - Header Bottom Row */}
       <div className="md:hidden mt-4">
         {/* Responsive Container with Margins */}
