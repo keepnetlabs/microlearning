@@ -1368,7 +1368,7 @@ export default function App() {
                                       {getCountryCode(language.code)}
                                     </span>
                                     {selectedLanguage === language.code && (
-                                      <div className="w-1 h-1 text-[#1C1C1E] dark:text-[#F2F2F7] rounded-full flex-shrink-0"></div>
+                                      <div className="w-1 h-1 bg-[#1C1C1E] dark:bg-[#F2F2F7] rounded-full flex-shrink-0"></div>
                                     )}
                                   </motion.button>
                                 ))
