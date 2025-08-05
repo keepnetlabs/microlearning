@@ -291,6 +291,7 @@ interface QuizSceneConfig {
 interface QuizSceneProps {
   config: QuizSceneConfig;
   onQuizCompleted: () => void;
+  onNextSlide: () => void;
 
   // Quiz state props
   currentQuestionIndex: number;
@@ -320,6 +321,7 @@ interface QuizSceneProps {
 export const QuizScene = React.memo(function QuizScene({
   config,
   onQuizCompleted,
+  onNextSlide,
 
   // Quiz state props
   currentQuestionIndex,
@@ -473,6 +475,11 @@ export const QuizScene = React.memo(function QuizScene({
       const isCorrect = validateAnswer(answer);
       if (isCorrect) {
         setIsAnswerLocked(true);
+
+        // For any question type on the last question, trigger quiz completion
+        if (currentQuestionIndex === questions.length - 1) {
+          onQuizCompleted();
+        }
       }
 
       // Auto-scroll to result panel after a short delay
@@ -494,6 +501,9 @@ export const QuizScene = React.memo(function QuizScene({
       setAttempts,
       setIsAnswerLocked,
       setIsLoading,
+      currentQuestionIndex,
+      questions.length,
+      onQuizCompleted,
     ],
   );
 
@@ -909,7 +919,7 @@ export const QuizScene = React.memo(function QuizScene({
             />
 
             <Zap size={16} className={`sm:w-5 sm:h-5 relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
-            <span className={`text-sm sm:text-center  font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
+            <span className={`text-sm sm:text-base text-center  font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
               {isLoading ? (
                 config.texts?.checkAnswer || "Kontrol ediliyor..."
               ) : (
@@ -1034,14 +1044,14 @@ export const QuizScene = React.memo(function QuizScene({
             {isLoading ? (
               <>
                 <div className="w-4 h-4 animate-spin relative z-10" aria-hidden="true" />
-                <span className={'text-sm sm:text-center font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]'}>
+                <span className={'text-sm sm:text-base text-center font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]'}>
                   {config.texts?.evaluating || "Değerlendiriliyor..."}
                 </span>
               </>
             ) : (
               <>
                 <Zap size={16} className={`sm:w-5 sm:h-5 relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
-                <span className={'text-sm sm:text-center font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]'}>
+                <span className={'text-sm sm:text-base text-center font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]'}>
                   {config.texts?.completeEvaluation || "Değerlendirmeyi Tamamla"}
                 </span>
               </>
@@ -1470,14 +1480,14 @@ export const QuizScene = React.memo(function QuizScene({
               {isLoading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-background/30 border-t-background rounded-full animate-spin relative z-10" aria-hidden="true" />
-                  <span className={`text-sm sm:text-center font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
+                  <span className={`text-sm sm:text-base text-center font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
                     {config.texts?.checkAnswer || "Kontrol ediliyor..."}
                   </span>
                 </>
               ) : (
                 <>
                   <Zap size={16} className={`sm:w-5 sm:h-5 relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
-                  <span className={`text-sm sm:text-center font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
+                  <span className={`text-sm sm:text-base text-center font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
                     {config.texts?.checkAnswerButton || "Cevabı Kontrol Et"}
                   </span>
                 </>
@@ -1937,7 +1947,7 @@ export const QuizScene = React.memo(function QuizScene({
                               }}
                               whileTap={{ scale: 0.95 }}
                               onClick={() => {
-                                onQuizCompleted();
+                                onNextSlide();
                               }}
                               className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
                             >

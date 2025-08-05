@@ -857,11 +857,7 @@ export default function App() {
   const handleQuizCompleted = useCallback(() => {
     setQuizCompleted(true);
     setAchievements(prev => [...prev, 'quiz-completed'].filter((a, i, arr) => arr.indexOf(a) === i));
-    // Advance to next scene after quiz completion
-    setTimeout(() => {
-      nextScene();
-    }, 1000);
-  }, [nextScene]);
+  }, []);
 
 
 
@@ -1500,6 +1496,7 @@ export default function App() {
                           <MemoizedQuizScene
                             config={(appConfig as any).quizSceneConfig}
                             onQuizCompleted={handleQuizCompleted}
+                            onNextSlide={nextScene}
                             currentQuestionIndex={quizCurrentQuestionIndex}
                             setCurrentQuestionIndex={setQuizCurrentQuestionIndex}
                             answers={quizAnswers}
