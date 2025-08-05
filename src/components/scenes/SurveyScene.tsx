@@ -191,7 +191,7 @@ export function SurveyScene({
           className="text-lg sm:text-2xl mb-3 text-center text-[#1C1C1E] dark:text-[#F2F2F7]"
           id="survey-title"
         >
-          {config.texts?.title}
+          {config?.title}
         </motion.h1>
 
         <motion.div

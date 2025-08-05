@@ -1,0 +1,122 @@
+{
+  "microlearning_id": "phishing-001",
+  "microlearning_metadata": {
+    "title": "Recognizing and Reporting Phishing Emails",
+    "category": "Phishing",
+    "subcategory": "Email Phishing",
+    "industry_relevance": ["All industries"],
+    "department_relevance": ["All departments"],
+    "role_relevance": ["All roles"],
+    "regulation_compliance": ["ISO 27001", "NIS2", "GDPR", "HIPAA"],
+    "risk_area": "Phishing",
+    "content_provider": "Keepnet",
+    "level": "Beginner",
+    "language_availability": ["en", "tr"]
+  },
+  "theme": {
+    "fontFamily": {
+      "primary": "SF Pro Display, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+      "secondary": "SF Pro Text, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+      "monospace": "SF Mono, ui-monospace, SFMono-Regular, 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace"
+    },
+    "colors": {
+      "background": "bg-gradient-blue"
+    },
+    "logo": {
+      "src": "https://keepnetlabs.com/keepnet-logo.svg",
+      "darkSrc": "https://imagedelivery.net/KxWh-mxPGDbsqJB3c5_fmA/74b2b289-fe69-4e14-ef7d-f15e2ad3bb00/public",
+      "alt": "Keepnet Labs"
+    }
+  },
+  "scenes": [
+    {
+      "scene_id": "1",
+      "metadata": {
+        "scene_type": "intro",
+        "points": 10,
+        "duration_seconds": 100,
+        "behavioral_science_principle": [
+          "Salience",
+          "Emotionally Triggered Memory"
+        ],
+        "icon": {
+          "sparkleIconName": "alert-triangle",
+          "sceneIconName": "smartphone"
+        }
+      }
+    },
+    {
+      "scene_id": "2",
+      "metadata": {
+        "scene_type": "goal",
+        "points": 15,
+        "duration_seconds": 100,
+        "behavioral_science_principle": [
+          "Implementation Intention",
+          "Goal Priming"
+        ]
+      }
+    },
+    {
+      "scene_id": "3",
+      "metadata": {
+        "scene_type": "scenario",
+        "points": 20,
+        "duration_seconds": 100,
+        "behavioral_science_principle": ["Social Proof", "Scarcity"]
+      }
+    },
+    {
+      "scene_id": "4",
+      "metadata": {
+        "scene_type": "actionable_content",
+        "points": 25,
+        "duration_seconds": 100,
+        "behavioral_science_principle": ["Social Proof", "Scarcity"]
+      }
+    },
+    {
+      "scene_id": "5",
+      "metadata": {
+        "scene_type": "quiz",
+        "points": 50,
+        "duration_seconds": 100,
+        "behavioral_science_principle": ["Social Proof", "Scarcity"]
+      }
+    },
+    {
+      "scene_id": "6",
+      "metadata": {
+        "scene_type": "survey",
+        "points": 20,
+        "duration_seconds": 100,
+        "behavioral_science_principle": ["Social Proof", "Scarcity"],
+        "icon": {
+          "name": "clipboard-list"
+        }
+      }
+    },
+    {
+      "scene_id": "7",
+      "metadata": {
+        "scene_type": "nudge",
+        "points": 30,
+        "behavioral_science_principle": ["Social Proof", "Scarcity"],
+        "icon": {
+          "name": "award"
+        }
+      }
+    },
+    {
+      "scene_id": "8",
+      "metadata": {
+        "scene_type": "summary",
+        "points": 40,
+        "behavioral_science_principle": ["Social Proof", "Scarcity"],
+        "icon": {
+          "name": "check-circle"
+        }
+      }
+    }
+  ]
+}

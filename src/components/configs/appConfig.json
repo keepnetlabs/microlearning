@@ -469,8 +469,8 @@
         "scene_type": "survey",
         "points": 20,
         "behavioral_science_principle": ["Social Proof", "Scarcity"],
+        "title": "Training Evaluation",
         "texts": {
-          "title": "Training Evaluation",
           "ratingQuestion": "How would you rate this training?",
           "topicsQuestion": "Which topics would you like to learn in more detail?",
           "feedbackQuestion": "Additional feedback:",

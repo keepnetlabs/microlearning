@@ -469,8 +469,8 @@
         "scene_type": "survey",
         "points": 20,
         "behavioral_science_principle": ["Social Proof", "Scarcity"],
+        "title": "Eğitim Değerlendirmesi",
         "texts": {
-          "title": "Eğitim Değerlendirmesi",
           "ratingQuestion": "Bu eğitimi nasıl değerlendirirsiniz?",
           "topicsQuestion": "Hangi konuları daha detaylı öğrenmek istersiniz?",
           "feedbackQuestion": "Ek geri bildirimleriniz:",

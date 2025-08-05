@@ -88,8 +88,8 @@ export const ColorClasses = {
 
 
 export interface SurveySceneConfig {
+    title?: string;
     texts?: {
-        title?: string;
         ratingQuestion?: string;
         topicsQuestion?: string;
         feedbackQuestion?: string;
