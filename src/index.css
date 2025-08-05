@@ -453,15 +453,20 @@
   border-radius: 0 100px 8px 0;
   backdrop-filter: blur(5px);
 }
-.plyr__control:hover{
-  padding:8px !important;
+.plyr__controls__item.plyr__control {
+  padding: 8px !important;
+}
+.plyr__control:hover {
   border-radius: 8px !important;
-  background: #1C1C1E !important;
-  color: #F2F2F7 !important;
+  background: #1c1c1e !important;
+  color: #f2f2f7 !important;
 }
 
 :root {
-  --plyr-color-main: #F2F2F7 !important;
+  --plyr-color-main: #f2f2f7 !important;
+  --plyr-range-track-height: 8px !important;
+  --plyr-range-thumb-height: 16px;
+  --plyr-range-thumb-width: 16px;
 }
 /* Orijinal fullscreen ikonunu gizle */
 .plyr__controls button[data-plyr="fullscreen"] svg {
@@ -480,14 +485,35 @@
   background-size: 18px !important;
   background-repeat: no-repeat !important;
   background-position: center !important;
-  color: #F2F2F7 !important;
+  color: #f2f2f7 !important;
   padding: 13.5px !important;
-  border-radius: 8px !important;
-  margin-top:-1px;
-  margin-left:8px;
-  transform:scale(1.2) !important;
+  border-radius: 6px !important;
+  margin-top: -1px;
+  margin-left: 8px;
+  transform: scale(1.2) !important;
 }
-.plyr__controls button[data-plyr="fullscreen"]:hover{
-  background-color: #1C1C1E !important;
-  color: #F2F2F7 !important;
+.plyr__controls button[data-plyr="fullscreen"]:hover {
+  background-color: #1c1c1e !important;
+  color: #f2f2f7 !important;
+}
+.plyr__controls button[data-plyr="captions"] svg {
+  display: none;
+}
+
+.plyr__controls button[data-plyr="captions"] {
+  background-image: url("data:image/svg+xml,%3Csvg%20width%3D%2218%22%20height%3D%2218%22%20viewBox%3D%220%200%2018%2018%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%20%3Cpath%20d%3D%22M1.7998%205.39961C1.7998%204.4068%202.60699%203.59961%203.5998%203.59961H14.3998C15.3926%203.59961%2016.1998%204.4068%2016.1998%205.39961V12.5996C16.1998%2013.5924%2015.3926%2014.3996%2014.3998%2014.3996H3.5998C2.60699%2014.3996%201.7998%2013.5924%201.7998%2012.5996V5.39961ZM6.0748%207.64961H6.9748C7.09855%207.64961%207.1998%207.75086%207.1998%207.87461C7.1998%208.24867%207.50074%208.54961%207.8748%208.54961C8.24887%208.54961%208.5498%208.24867%208.5498%207.87461C8.5498%207.00555%207.84387%206.29961%206.9748%206.29961H6.0748C5.20574%206.29961%204.4998%207.00555%204.4998%207.87461V10.1246C4.4998%2010.9937%205.20574%2011.6996%206.0748%2011.6996H6.9748C7.84387%2011.6996%208.5498%2010.9937%208.5498%2010.1246C8.5498%209.75055%208.24887%209.44961%207.8748%209.44961C7.50074%209.44961%207.1998%209.75055%207.1998%2010.1246C7.1998%2010.2484%207.09855%2010.3496%206.9748%2010.3496H6.0748C5.95105%2010.3496%205.8498%2010.2484%205.8498%2010.1246V7.87461C5.8498%207.75086%205.95105%207.64961%206.0748%207.64961ZM10.7998%207.87461C10.7998%207.75086%2010.9011%207.64961%2011.0248%207.64961H11.9248C12.0486%207.64961%2012.1498%207.75086%2012.1498%207.87461C12.1498%208.24867%2012.4507%208.54961%2012.8248%208.54961C13.1989%208.54961%2013.4998%208.24867%2013.4998%207.87461C13.4998%207.00555%2012.7939%206.29961%2011.9248%206.29961H11.0248C10.1557%206.29961%209.4498%207.00555%209.4498%207.87461V10.1246C9.4498%2010.9937%2010.1557%2011.6996%2011.0248%2011.6996H11.9248C12.7939%2011.6996%2013.4998%2010.9937%2013.4998%2010.1246C13.4998%209.75055%2013.1989%209.44961%2012.8248%209.44961C12.4507%209.44961%2012.1498%209.75055%2012.1498%2010.1246C12.1498%2010.2484%2012.0486%2010.3496%2011.9248%2010.3496H11.0248C10.9011%2010.3496%2010.7998%2010.2484%2010.7998%2010.1246V7.87461Z%22%20fill%3D%22%23F2F2F7%22/%3E%20%3C/svg%3E") !important;
+  background-size: 18px !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  color: #f2f2f7 !important;
+  padding: 13.5px !important;
+  border-radius: 6px !important;
+  margin-top: -1px;
+  margin-left: 8px;
+  transform: scale(1.2) !important;
+}
+
+.plyr__controls button[data-plyr="captions"]:hover {
+  background-color: #1c1c1e !important;
+  color: #f2f2f7 !important;
 }
