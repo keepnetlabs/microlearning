@@ -2,8 +2,6 @@ import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import {
   CheckCircle,
   XCircle,
-  Lightbulb,
-  RotateCcw,
   Move,
   Zap,
   X,
@@ -13,7 +11,6 @@ import {
   ArrowUpRight
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "../ui/button";
 import { Slider } from "../ui/slider";
 import * as LucideIcons from "lucide-react";
 import { LucideIcon } from "lucide-react";
@@ -680,11 +677,39 @@ export const QuizScene = React.memo(function QuizScene({
                   >
                     {isCorrect ? (
                       <div className="flex items-center justify-center w-6 h-6  text-[#1C1C1E] dark:text-[#F2F2F7]" aria-label={ariaTexts?.correctAnswerLabel || "Correct answer"}>
-                        <CheckCircle className={`w-4 h-4`} aria-hidden="true" />
+                        <motion.div
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{
+                            scale: 1,
+                            opacity: 1,
+                            rotate: [0, -10, 10, -10, 10, 0]
+                          }}
+                          transition={{
+                            duration: 0.6,
+                            ease: "easeInOut",
+                            delay: 0.1
+                          }}
+                        >
+                          <CheckCircle className={`w-4 h-4`} aria-hidden="true" />
+                        </motion.div>
                       </div>
                     ) : isSelected ? (
                       <div className="flex items-center justify-center w-6 h-6 text-[#1C1C1E] dark:text-[#F2F2F7]" aria-label={ariaTexts?.incorrectAnswerLabel || "Incorrect answer"}>
-                        <XCircle className={`w-4 h-4`} aria-hidden="true" />
+                        <motion.div
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{
+                            scale: 1,
+                            opacity: 1,
+                            rotate: [0, -10, 10, -10, 10, 0]
+                          }}
+                          transition={{
+                            duration: 0.6,
+                            ease: "easeInOut",
+                            delay: 0.1
+                          }}
+                        >
+                          <XCircle className={`w-4 h-4`} aria-hidden="true" />
+                        </motion.div>
                       </div>
                     ) : null}
                   </motion.div>
@@ -779,8 +804,8 @@ export const QuizScene = React.memo(function QuizScene({
                 className={`relative p-4 rounded-xl text-center font-medium transition-all duration-300 focus:outline-none glass-border-0 text-[#1C1C1E] dark:text-[#F2F2F7]`}
               >
                 <div className="flex flex-col items-center space-y-2">
-                  <div
-                    className="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 glass-border-0"
+                  <motion.div
+                    className="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 glass-border-0 relative overflow-hidden"
                     style={{
                       backdropFilter: "blur(8px) saturate(150%)",
                       boxShadow: `
@@ -788,9 +813,44 @@ export const QuizScene = React.memo(function QuizScene({
                         inset 0 1px 0 rgba(255, 255, 255, 0.1)
                       `
                     }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                   >
-                    {renderTrueFalseIcon(option.icon, option.value)}
-                  </div>
+                    {/* Subtle particle effect for selection feedback */}
+                    {isSelected && (
+                      <motion.div
+                        className="absolute inset-0 rounded-full pointer-events-none"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                      >
+                        <motion.div
+                          className="absolute inset-0 rounded-full border-glass-0"
+                          animate={{
+                            scale: [1, 1.2, 1],
+                            opacity: [0.3, 0.1, 0.3]
+                          }}
+                          transition={{
+                            duration: 1.5,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                          }}
+                        />
+                      </motion.div>
+                    )}
+
+                    {/* Icon with enhanced animation */}
+                    <motion.div
+                      className="relative z-10"
+                      animate={isSelected ? {
+                        scale: [1, 1.1, 1],
+                        rotate: [0, 5, -5, 0],
+                        transition: { duration: 0.4 }
+                      } : {}}
+                    >
+                      {renderTrueFalseIcon(option.icon, option.value)}
+                    </motion.div>
+                  </motion.div>
 
                   <div
                     className="px-4 py-1.5 rounded-lg text-center transition-all duration-300"
@@ -813,9 +873,37 @@ export const QuizScene = React.memo(function QuizScene({
                       className="absolute top-0 right-4 text-[#1C1C1E] dark:text-[#F2F2F7]"
                     >
                       {isCorrect ? (
-                        <CheckCircle className="w-6 h-6 text-chart-4 bg-background rounded-full p-1" />
+                        <motion.div
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{
+                            scale: 1,
+                            opacity: 1,
+                            rotate: [0, -10, 10, -10, 10, 0]
+                          }}
+                          transition={{
+                            duration: 0.6,
+                            ease: "easeInOut",
+                            delay: 0.1
+                          }}
+                        >
+                          <CheckCircle className="w-6 h-6 text-chart-4 bg-background rounded-full p-1" />
+                        </motion.div>
                       ) : (
-                        <XCircle className="w-6 h-6 text-destructive bg-background rounded-full p-1" />
+                        <motion.div
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{
+                            scale: 1,
+                            opacity: 1,
+                            rotate: [0, -10, 10, -10, 10, 0]
+                          }}
+                          transition={{
+                            duration: 0.6,
+                            ease: "easeInOut",
+                            delay: 0.1
+                          }}
+                        >
+                          <XCircle className="w-6 h-6 text-destructive bg-background rounded-full p-1" />
+                        </motion.div>
                       )}
                     </motion.div>
                   )}
@@ -875,9 +963,37 @@ export const QuizScene = React.memo(function QuizScene({
                   {showCorrectness && (
                     <div>
                       {isCorrect ? (
-                        <CheckCircle className="w-4 h-4 text-chart-4" />
+                        <motion.div
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{
+                            scale: 1,
+                            opacity: 1,
+                            rotate: [0, -10, 10, -10, 10, 0]
+                          }}
+                          transition={{
+                            duration: 0.6,
+                            ease: "easeInOut",
+                            delay: 0.1
+                          }}
+                        >
+                          <CheckCircle className="w-4 h-4 text-chart-4" />
+                        </motion.div>
                       ) : isSelected ? (
-                        <XCircle className="w-4 h-4 text-destructive" />
+                        <motion.div
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{
+                            scale: 1,
+                            opacity: 1,
+                            rotate: [0, -10, 10, -10, 10, 0]
+                          }}
+                          transition={{
+                            duration: 0.6,
+                            ease: "easeInOut",
+                            delay: 0.1
+                          }}
+                        >
+                          <XCircle className="w-4 h-4 text-destructive" />
+                        </motion.div>
                       ) : null}
                     </div>
                   )}
