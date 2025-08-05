@@ -1368,7 +1368,7 @@ export default function App() {
                                       {getCountryCode(language.code)}
                                     </span>
                                     {selectedLanguage === language.code && (
-                                      <div className="w-1 h-1 bg-blue-500 dark:bg-gray-400 rounded-full flex-shrink-0"></div>
+                                      <div className="w-1 h-1 text-[#1C1C1E] dark:text-[#F2F2F7] rounded-full flex-shrink-0"></div>
                                     )}
                                   </motion.button>
                                 ))
@@ -1589,7 +1589,8 @@ export default function App() {
           <div
             className="absolute inset-0 pointer-events-none md:hidden z-10"
             style={{
-              pointerEvents: 'none'
+              pointerEvents: 'none',
+              zIndex: "-1"
             }}
           >
             {/* Optimized Left Gesture Area */}
@@ -1598,7 +1599,8 @@ export default function App() {
               style={{
                 touchAction: 'pan-x',
                 background: 'transparent',
-                pointerEvents: currentScene === sceneIndices.goal ? 'none' : 'auto'
+                pointerEvents: currentScene === sceneIndices.goal ? 'none' : 'auto',
+                zIndex: "-1"
               }}
               onTouchStart={(e) => {
                 const startX = e.touches[0].clientX;
@@ -1636,7 +1638,8 @@ export default function App() {
               style={{
                 touchAction: 'pan-x',
                 background: 'transparent',
-                pointerEvents: currentScene === sceneIndices.goal ? 'none' : 'auto'
+                pointerEvents: currentScene === sceneIndices.goal ? 'none' : 'auto',
+                zIndex: "-1"
               }}
               onTouchStart={(e) => {
                 const startX = e.touches[0].clientX;

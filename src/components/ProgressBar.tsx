@@ -296,7 +296,7 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
                   transform: 'translateZ(0)',
                   minWidth: '38px',
                   height: '24px',
-                  top: "-9px"
+                  top: "-7.5px"
                 }}
               >
 

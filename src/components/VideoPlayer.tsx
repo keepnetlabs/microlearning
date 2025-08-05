@@ -480,6 +480,7 @@ export function VideoPlayer({
     color: "white",
     transform: "translateZ(0)",
     willChange: "transform",
+    zIndex: "99999"
   }), []);
   const videoContainerStyle = useMemo((): React.CSSProperties => ({
     width: "100%",
@@ -577,7 +578,7 @@ export function VideoPlayer({
         )}
 
         {/* Replay Button - Only show when video has ended */}
-        {isVideoEnded && (
+        {isVideoEnded && !isIOS && (
           <motion.button
             onClick={handleReplay}
             whileHover={{ scale: 1.05 }}
