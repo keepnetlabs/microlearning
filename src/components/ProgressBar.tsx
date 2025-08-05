@@ -159,105 +159,129 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
   return (
     <div className="w-full" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label={`${finalConfig.ariaLabel}: %${Math.round(progress)} ${finalConfig.progressLabel}`}>
       {/* Mobile Progress Bar - Header Bottom Row */}
-      <div className="md:hidden mt-2">
-        <div className="flex items-center space-x-3">
-          {/* Mobile Tooltip - Light design on the left */}
-          <div className="flex-shrink-0">
+      <div className="md:hidden mt-4">
+        {/* Responsive Container with Margins */}
+        <div className="relative sm:mx-8">
+          {/* Progress Tooltip - Pill-shaped thumb on progress bar */}
+          <div className="relative w-full">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              className="glass-border-1 max-w-[40px] h-[27px] rounded-lg flex justify-center items-center p-1 px-3 py-1.5"
+              animate={{
+                opacity: 1,
+                scale: 1,
+                left: `calc(${progress}% - 8px)`
+              }}
+              transition={{
+                duration: 0.8,
+                ease: "easeOut",
+                type: "spring",
+                stiffness: 100,
+                damping: 15
+              }}
+              className="absolute z-20"
+              style={{
+                top: '50%',
+                transform: 'translate(-50%, -50%)',
+                marginTop: '-1px'
+              }}
             >
-              <div className="corner-top-left"></div>
-              <div className="corner-bottom-right"></div>
-              <span className="text-sm font-medium text-[#1C1C1E] dark:text-[#F2F2F7]">
-                {formatPercent(progress, language)}
-              </span>
+              {/* Pill-shaped thumb indicator */}
+              <div
+                className="flex items-center glass-border-1 justify-center px-1.5 py-1 rounded-full shadow-lg relative"
+                style={{
+                  transform: 'translateZ(0)',
+                  minWidth: '38px',
+                  height: '24px',
+                  top: "-7.5px"
+                }}
+              >
+                {/* Percentage text */}
+                <span className="relative z-10 text-xs font-semibold text-[#1C1C1E] dark:text-[#F2F2F7]">
+                  {formatPercent(progress, language)}
+                </span>
+              </div>
             </motion.div>
           </div>
 
-          {/* Progress Bar for Mobile - Using the same design as desktop but simplified */}
-          <div className="flex-1">
-            <div
-              className="relative w-full h-2 glass-border-1-outline overflow-hidden transition-all duration-500 ease-out group"
+          {/* INDUSTRY STANDARD LIQUID GLASS PROGRESS CONTAINER */}
+          <div
+            className="relative w-full h-2 glass-border-1-outline overflow-hidden transition-all duration-500 ease-out group"
+            style={{
+              // OPTIMIZED BACKGROUND - More visible but still premium
+              background: '',
+              border: finalConfig.containerBorder,
+              boxShadow: '',
+              transform: 'translateZ(0)',
+              willChange: 'transform',
+              borderRadius: '4px'
+            }}
+          >
+            <div className="corner-top-left"></div>
+            <div className="corner-bottom-right"></div>
+
+            {/* INDUSTRY STANDARD LIQUID GLASS PROGRESS FILL */}
+            <motion.div
+              className="relative h-full overflow-hidden"
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 1.2, ease: "easeOut", type: "spring", stiffness: 80 }}
               style={{
-                // OPTIMIZED BACKGROUND - More visible but still premium
-                background: '',
-                border: finalConfig.containerBorder,
-                boxShadow: '',
-                transform: 'translateZ(0)',
-                willChange: 'transform',
+                // CLEAN INDUSTRY STANDARD PROGRESS FILL - Apple/Google style
+                background: "rgba(242, 242, 247, 0.10)",
                 borderRadius: '4px'
               }}
             >
-              <div className="corner-top-left"></div>
-              <div className="corner-bottom-right"></div>
-
-              {/* INDUSTRY STANDARD LIQUID GLASS PROGRESS FILL */}
+              {/* Enhanced flowing animation with liquid glass effect */}
               <motion.div
-                className="relative h-full overflow-hidden"
-                initial={{ width: 0 }}
-                animate={{ width: `${progress}%` }}
-                transition={{ duration: 1.2, ease: "easeOut", type: "spring", stiffness: 80 }}
+                className="absolute inset-0"
+                animate={{
+                  x: ['-100%', '200%'],
+                  opacity: [0, 0.6, 0]
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  repeatDelay: 1
+                }}
                 style={{
-                  // CLEAN INDUSTRY STANDARD PROGRESS FILL - Apple/Google style
-                  background: "rgba(242, 242, 247, 0.10)",
+                  width: '150%',
+                  background: `linear-gradient(90deg, 
+                    transparent 0%, 
+                    rgba(255, 255, 255, 0.40) 30%, 
+                    rgba(255, 255, 255, 0.60) 50%, 
+                    rgba(255, 255, 255, 0.40) 70%, 
+                    transparent 100%
+                  )`,
+                  mixBlendMode: 'overlay',
                   borderRadius: '4px'
                 }}
-              >
-                {/* Enhanced flowing animation with liquid glass effect */}
-                <motion.div
-                  className="absolute inset-0"
-                  animate={{
-                    x: ['-100%', '200%'],
-                    opacity: [0, 0.6, 0]
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    repeatDelay: 1
-                  }}
-                  style={{
-                    width: '150%',
-                    background: `linear-gradient(90deg, 
-                      transparent 0%, 
-                      rgba(255, 255, 255, 0.40) 30%, 
-                      rgba(255, 255, 255, 0.60) 50%, 
-                      rgba(255, 255, 255, 0.40) 70%, 
-                      transparent 100%
-                    )`,
-                    mixBlendMode: 'overlay',
-                    borderRadius: '4px'
-                  }}
-                />
+              />
 
-                {/* Enhanced Apple-style top highlight */}
-                <div
-                  className="absolute top-0 left-0 right-0 h-1/2 pointer-events-none"
-                  style={{
-                    background: `linear-gradient(180deg, 
-                      rgba(255, 255, 255, 0.50) 0%, 
-                      rgba(255, 255, 255, 0.25) 30%, 
-                      transparent 70%
-                    )`,
-                    mixBlendMode: 'soft-light',
-                    borderRadius: '4px'
-                  }}
-                />
+              {/* Enhanced Apple-style top highlight */}
+              <div
+                className="absolute top-0 left-0 right-0 h-1/2 pointer-events-none"
+                style={{
+                  background: `linear-gradient(180deg, 
+                    rgba(255, 255, 255, 0.50) 0%, 
+                    rgba(255, 255, 255, 0.25) 30%, 
+                    transparent 70%
+                  )`,
+                  mixBlendMode: 'soft-light',
+                  borderRadius: '4px'
+                }}
+              />
 
-                {/* Clean inner glow - Single color approach */}
-                <div
-                  className="absolute inset-0 pointer-events-none"
-                  style={{
-                    background: `radial-gradient(ellipse 120% 50% at 50% 0%, rgba(59, 130, 246, 0.25) 0%, rgba(59, 130, 246, 0.15) 25%, transparent 60%)`,
-                    mixBlendMode: 'overlay',
-                    borderRadius: '4px'
-                  }}
-                />
-              </motion.div>
-            </div>
+              {/* Clean inner glow - Single color approach */}
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background: `radial-gradient(ellipse 120% 50% at 50% 0%, rgba(59, 130, 246, 0.25) 0%, rgba(59, 130, 246, 0.15) 25%, transparent 60%)`,
+                  mixBlendMode: 'overlay',
+                  borderRadius: '4px'
+                }}
+              />
+            </motion.div>
           </div>
         </div>
       </div>

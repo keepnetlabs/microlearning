@@ -30,7 +30,7 @@ const STATIC_CSS_CLASSES = {
 
   // Header
   headerContainer: "relative shrink-0",
-  headerContent: "relative z-10 px-4 pt-5 pb-3 lg:px-16 xl:px-20 2xl:px-24 min-h-[106px] md:min-h-[72px]",
+  headerContent: "relative z-10 px-4 pt-4 pb-3 lg:px-16 xl:px-20 2xl:px-24 min-h-[106px] md:min-h-[72px]",
 
   // Controls
   controlsContainer: "flex items-center space-x-1.5 md:space-x-3 flex-shrink-0 z-20",
@@ -1078,7 +1078,7 @@ export default function App() {
                 >
                   {/* Cam Panel */}
                   <div
-                    className="relative bg-transparent glass-border-2"
+                    className={`relative bg-transparent glass-border-${isMobile ? 4 : 2}`}
                     style={{
                       filter: "drop-shadow(-8px - 10px 46px #000)"
                     }}
@@ -1089,7 +1089,7 @@ export default function App() {
                       src={isDarkMode ? themeConfig.logo?.darkSrc : themeConfig.logo?.src}
                       alt={themeConfig.logo?.alt || "Application Logo"}
                       aria-label={appConfig.theme?.ariaTexts?.logoLabel || "Application logo"}
-                      className="relative z-10 h-10 sm:h-12 md:h-14 w-auto object-contain p-1.5 sm:p-2"
+                      className="relative z-10 h-8 sm:h-12 md:h-14 w-auto object-contain p-1.5 sm:p-2"
                     />
                   </div>
                 </motion.div>
