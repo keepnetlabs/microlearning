@@ -11,7 +11,7 @@ import { QuizScene } from "./components/scenes/QuizScene";
 import { SurveyScene } from "./components/scenes/SurveyScene";
 import { SummaryScene } from "./components/scenes/SummaryScene";
 import { NudgeScene } from "./components/scenes/NudgeScene";
-import { ChevronDown, Search, Loader2, ChevronDown as ChevronDownIcon, Star, X, Moon, Sun, Award, ChevronUp } from "lucide-react";
+import { ChevronDown, Search, Loader2, X, Moon, Sun, Award, ChevronUp } from "lucide-react";
 import ReactCountryFlag from "react-country-flag";
 import { getCountryCode, detectBrowserLanguage, useIsMobile, languages } from "./utils/languageUtils";
 import { loadAppConfig, createConfigChangeEvent } from "./components/configs/appConfigLoader";
@@ -31,18 +31,6 @@ const STATIC_CSS_CLASSES = {
   // Header
   headerContainer: "relative shrink-0",
   headerContent: "relative z-10 px-4 pt-5 pb-3 lg:px-16 xl:px-20 2xl:px-24 min-h-[106px] md:min-h-[72px]",
-
-  // Logo
-  logoContainer: "flex-shrink-0 z-20",
-  logoGlass: "relative p-1 sm:p-1.5 md:p-2 rounded-lg sm:rounded-xl md:rounded-2xl overflow-hidden transition-all duration-500 ease-out group",
-  logoNoise: "absolute inset-0 opacity-[0.015] dark:opacity-[0.008] rounded-lg sm:rounded-xl md:rounded-2xl mix-blend-overlay pointer-events-none",
-  logoGradient: "absolute inset-0 bg-gradient-to-br from-slate-50/20 via-slate-100/10 to-slate-200/5 dark:from-slate-800/15 dark:via-slate-700/8 dark:to-slate-600/4 rounded-lg sm:rounded-xl md:rounded-2xl transition-colors duration-500",
-  logoHighlight: "absolute inset-0 rounded-lg sm:rounded-xl md:rounded-2xl pointer-events-none",
-  logoImage: "h-3.5 w-auto sm:h-4 md:h-6 lg:h-7 transition-opacity duration-300",
-
-  // Title
-  titleContainer: "absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 max-w-[120px] sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg px-1 sm:px-2",
-  titleText: "text-[10px] sm:text-xs md:text-base lg:text-lg font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] tracking-tight transition-colors duration-300 text-center truncate",
 
   // Controls
   controlsContainer: "flex items-center space-x-1.5 md:space-x-3 flex-shrink-0 z-20",
@@ -80,15 +68,10 @@ const STATIC_CSS_CLASSES = {
   navContainer: "fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30",
   navButtonIcon: "w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300",
 
-  // Quiz timer
-  timerContainer: "fixed top-4 right-4 z-30",
-
   // Quiz completion notification
   quizNotificationContainer: "fixed z-30 bottom-4 right-4 sm:bottom-6 sm:right-6",
   quizNotificationClose: "ml-1 p-1 rounded-full hover:bg-amber-200/50 dark:hover:bg-amber-900/40 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400/30 dark:focus:ring-amber-600/30 opacity-60",
 
-  // Mobile navigation hint
-  mobileNavHintContainer: "md:hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 z-30"
 } as const;
 
 // Memoized constants for better performance
@@ -118,8 +101,8 @@ const MemoizedScenarioScene = React.memo(ScenarioScene);
 const MemoizedActionableContentScene = React.memo(ActionableContentScene);
 const MemoizedQuizScene = React.memo(QuizScene);
 const MemoizedSurveyScene = React.memo(SurveyScene);
-const MemoizedSummaryScene = React.memo(SummaryScene);
 const MemoizedNudgeScene = React.memo(NudgeScene);
+const MemoizedSummaryScene = React.memo(SummaryScene);
 
 
 
@@ -147,49 +130,100 @@ export default function App() {
     return appConfig.theme;
   });
 
-  // Simplified scenes array - Single memoization
-  const scenes = useMemo(() => [
-    {
-      component: MemoizedIntroScene,
-      points: appConfig.introSceneConfig.points || 10,
-      config: appConfig.introSceneConfig
-    },
-    {
-      component: MemoizedGoalScene,
-      points: appConfig.goalSceneConfig.points || 15,
-      config: appConfig.goalSceneConfig
-    },
-    {
-      component: MemoizedScenarioScene,
-      points: appConfig.scenarioSceneConfig.points || 20,
-      config: appConfig.scenarioSceneConfig
-    },
-    {
-      component: MemoizedActionableContentScene,
-      points: appConfig.actionableContentSceneConfig.points || 25,
-      config: appConfig.actionableContentSceneConfig
-    },
-    {
-      component: MemoizedQuizScene,
-      points: appConfig.quizSceneConfig.points || 50,
-      config: appConfig.quizSceneConfig
-    },
-    {
-      component: MemoizedSurveyScene,
-      points: appConfig.surveySceneConfig.points || 20,
-      config: appConfig.surveySceneConfig
-    },
-    {
-      component: MemoizedSummaryScene,
-      points: appConfig.summarySceneConfig.points || 30,
-      config: appConfig.summarySceneConfig
-    },
-    {
-      component: MemoizedNudgeScene,
-      points: appConfig.nudgeSceneConfig.points || 40,
-      config: appConfig.nudgeSceneConfig
+  // Dynamic scene mapping based on appConfig.scenes
+  const sceneComponentMap = useMemo(() => ({
+    intro: MemoizedIntroScene,
+    goal: MemoizedGoalScene,
+    scenario: MemoizedScenarioScene,
+    actionable_content: MemoizedActionableContentScene,
+    quiz: MemoizedQuizScene,
+    survey: MemoizedSurveyScene,
+    summary: MemoizedSummaryScene,
+    nudge: MemoizedNudgeScene
+  }), []);
+
+  // Dynamic scenes array from appConfig.scenes
+  const scenes = useMemo(() => {
+    if (!appConfig.scenes || !Array.isArray(appConfig.scenes)) {
+      // Fallback to original hardcoded scenes if appConfig.scenes is not available
+      return [
+        {
+          component: MemoizedIntroScene,
+          points: appConfig.introSceneConfig?.points || 10,
+          config: appConfig.introSceneConfig
+        },
+        {
+          component: MemoizedGoalScene,
+          points: appConfig.goalSceneConfig?.points || 15,
+          config: appConfig.goalSceneConfig
+        },
+        {
+          component: MemoizedScenarioScene,
+          points: appConfig.scenarioSceneConfig?.points || 20,
+          config: appConfig.scenarioSceneConfig
+        },
+        {
+          component: MemoizedActionableContentScene,
+          points: appConfig.actionableContentSceneConfig?.points || 25,
+          config: appConfig.actionableContentSceneConfig
+        },
+        {
+          component: MemoizedQuizScene,
+          points: appConfig.quizSceneConfig?.points || 50,
+          config: appConfig.quizSceneConfig
+        },
+        {
+          component: MemoizedSurveyScene,
+          points: appConfig.surveySceneConfig?.points || 20,
+          config: appConfig.surveySceneConfig
+        },
+        {
+          component: MemoizedSummaryScene,
+          points: appConfig.summarySceneConfig?.points || 30,
+          config: appConfig.summarySceneConfig
+        },
+        {
+          component: MemoizedNudgeScene,
+          points: appConfig.nudgeSceneConfig?.points || 40,
+          config: appConfig.nudgeSceneConfig
+        }
+      ];
     }
-  ], [appConfig]);
+
+    return appConfig.scenes.map((scene: any) => {
+      const sceneType = scene.metadata?.scene_type;
+      const component = sceneComponentMap[sceneType as keyof typeof sceneComponentMap];
+
+      if (!component) {
+        console.warn(`Unknown scene type: ${sceneType} for scene ${scene.scene_id}`);
+        return null;
+      }
+
+      return {
+        component,
+        points: scene.metadata?.points || 10,
+        config: scene.metadata,
+        sceneId: scene.scene_id
+      };
+    }).filter(Boolean); // Remove null entries
+  }, [appConfig.scenes, sceneComponentMap]);
+
+  // Helper function to get scene index by type
+  const getSceneIndexByType = useCallback((sceneType: string): number => {
+    return scenes.findIndex((scene: any) => {
+      const sceneConfig = scene.config as any;
+      return sceneConfig?.scene_type === sceneType;
+    });
+  }, [scenes]);
+
+  // Dynamic scene indices
+  const sceneIndices = useMemo(() => ({
+    quiz: getSceneIndexByType('quiz'),
+    survey: getSceneIndexByType('survey'),
+    summary: getSceneIndexByType('summary'),
+    scenario: getSceneIndexByType('scenario'),
+    goal: getSceneIndexByType('goal')
+  }), [getSceneIndexByType]);
 
   // Backend'den tema config'ini güncelleme fonksiyonu
   const updateThemeConfig = useCallback((newConfig: any) => {
@@ -563,7 +597,7 @@ export default function App() {
   // Optimized achievement notification - only show for NEW achievements in key scenes
   useEffect(() => {
     // Only show notifications on Quiz (scene 4), Summary (scene 6), or Nudge (scene 7)
-    const isKeyScene = currentScene === 4 || currentScene === 6 || currentScene === 7;
+    const isKeyScene = currentScene === sceneIndices.quiz || currentScene === sceneIndices.survey || currentScene === sceneIndices.summary;
 
     // Check if we have new achievements that haven't been shown yet
     const newAchievements = achievements.filter(achievement => !shownAchievements.includes(achievement));
@@ -593,7 +627,7 @@ export default function App() {
   // Show quiz completion hint only once at first quiz start
   useEffect(() => {
 
-    if (currentScene === 4 && !hasShownQuizHint && showQuizCompletionHint) {
+    if (currentScene === sceneIndices.quiz && !hasShownQuizHint && showQuizCompletionHint) {
       setHasShownQuizHint(true);
 
       // Auto-hide after 2 seconds for testing
@@ -637,7 +671,7 @@ export default function App() {
       isAtTop: scrollTop <= threshold,
       isAtBottom: scrollTop + clientHeight >= scrollHeight - threshold,
       showIndicator: !isMobile && scrollHeight > clientHeight + threshold, // Disable on mobile
-      showScrollToTop: scrollTop > MEMOIZED_CONSTANTS.MOBILE_SCROLL_THRESHOLD && isMobile && currentScene === 2
+      showScrollToTop: scrollTop > MEMOIZED_CONSTANTS.MOBILE_SCROLL_THRESHOLD && isMobile && currentScene === sceneIndices.goal
     };
 
     setScrollPosition({ top: updates.isAtTop, bottom: updates.isAtBottom });
@@ -674,7 +708,7 @@ export default function App() {
   }, [languageSearchTerm]);
 
   const canProceedNext = useCallback(() => {
-    if (currentScene === 4) {
+    if (currentScene === sceneIndices.quiz) {
       return quizCompleted;
     }
     return currentScene < scenes.length - 1;
@@ -708,7 +742,7 @@ export default function App() {
     setPointsAwardedScenes(prev => new Set([...prev, sceneIndex]));
 
     const newAchievements: string[] = [];
-    if (sceneIndex === 4 && quizCompleted) {
+    if (sceneIndex === sceneIndices.quiz && quizCompleted) {
       newAchievements.push('quiz-master');
     }
     if (visitedScenes.size === scenes.length) {
@@ -723,7 +757,7 @@ export default function App() {
 
   // Ultra-optimized completion data calculation
   const completionData = useMemo(() => {
-    if (currentScene !== 7) return null; // Only calculate when needed
+    if (currentScene !== sceneIndices.summary) return null; // Only calculate when needed
 
     const totalTimeSpent = Array.from(sceneTimeSpent.values()).reduce((total, time) => total + time, 0);
     const minutes = Math.floor(totalTimeSpent / 60000);
@@ -745,7 +779,7 @@ export default function App() {
   // ULTRA FAST MOBILE TRANSITIONS - NO LOADING DELAY
   const nextScene = useCallback(() => {
     // Allow progression if quiz is completed or we're not on quiz scene
-    if (currentScene === 4 && !quizCompleted) {
+    if (currentScene === sceneIndices.quiz && !quizCompleted) {
       return;
     }
 
@@ -858,12 +892,6 @@ export default function App() {
     // Removed automatic navigation - user can manually navigate when ready
   }, []);
 
-  const handleSceneChange = useCallback((newScene: number) => {
-    // Don't reset quizCompleted state when leaving quiz scene
-    // Once quiz is completed, it should stay completed
-    // Only reset quiz state when leaving quiz scene - preserve progress
-  }, []);
-
   // Mobile swipe gesture handlers - ONLY FOR MOBILE
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if (!isMobile) return;
@@ -923,11 +951,7 @@ export default function App() {
   const handleAnimationComplete = useCallback(() => {
     // Only trigger if this is an actual scene change, not just animation completion
     if (previousScene !== currentScene) {
-      handleSceneChange(currentScene);
       setPreviousScene(currentScene);
-
-
-
       // Immediate scroll reset on mobile for better performance
       if (isMobile) {
         resetScrollPosition();
@@ -937,7 +961,7 @@ export default function App() {
         }, 50);
       }
     }
-  }, [currentScene, previousScene, handleSceneChange, resetScrollPosition, isMobile]);
+  }, [currentScene, previousScene, resetScrollPosition, isMobile]);
 
   const CurrentSceneComponent = scenes[currentScene].component as React.ComponentType<any>;
   const currentLanguage = useMemo(() => languages.find(lang => lang.code === selectedLanguage), [selectedLanguage]);
@@ -1481,9 +1505,9 @@ export default function App() {
                         className="w-full"
                       >
                         {/* Quiz Scene - Always mounted to preserve state */}
-                        <div style={{ display: currentScene === 4 ? 'block' : 'none' }}>
+                        <div style={{ display: currentScene === sceneIndices.quiz ? 'block' : 'none' }}>
                           <MemoizedQuizScene
-                            config={(appConfig as any).quizSceneConfig}
+                            config={currentSceneConfig}
                             onQuizCompleted={handleQuizCompleted}
                             onNextSlide={nextScene}
                             currentQuestionIndex={quizCurrentQuestionIndex}
@@ -1512,11 +1536,11 @@ export default function App() {
                         </div>
 
                         {/* Other scenes */}
-                        {currentScene !== 4 && (
+                        {currentScene !== sceneIndices.quiz && (
                           <CurrentSceneComponent config={currentSceneConfig}
                             onSurveySubmitted={handleSurveySubmitted}
                             isSubmitted={isSurveySubmitted}
-                            completionData={currentScene === 7 ? completionData : undefined}
+                            completionData={currentScene === sceneIndices.summary ? completionData : undefined}
                           />
                         )}
                       </motion.div>
@@ -1538,7 +1562,7 @@ export default function App() {
                           <span className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] font-medium transition-colors duration-300 whitespace-nowrap">
                             {themeConfig.texts?.scrollHint}
                           </span>
-                          <ChevronDownIcon size={14} className="text-[#1C1C1E] dark:text-[#F2F2F7] animate-bounce flex-shrink-0" style={{ animationDuration: '2s' }} />
+                          <ChevronDown size={14} className="text-[#1C1C1E] dark:text-[#F2F2F7] animate-bounce flex-shrink-0" style={{ animationDuration: '2s' }} />
                         </div>
                       </motion.div>
                     )}
@@ -1574,7 +1598,7 @@ export default function App() {
               style={{
                 touchAction: 'pan-x',
                 background: 'transparent',
-                pointerEvents: currentScene === 2 ? 'none' : 'auto'
+                pointerEvents: currentScene === sceneIndices.goal ? 'none' : 'auto'
               }}
               onTouchStart={(e) => {
                 const startX = e.touches[0].clientX;
@@ -1612,7 +1636,7 @@ export default function App() {
               style={{
                 touchAction: 'pan-x',
                 background: 'transparent',
-                pointerEvents: currentScene === 2 ? 'none' : 'auto'
+                pointerEvents: currentScene === sceneIndices.goal ? 'none' : 'auto'
               }}
               onTouchStart={(e) => {
                 const startX = e.touches[0].clientX;
@@ -1682,7 +1706,7 @@ export default function App() {
 
         {/* Enhanced Quiz Completion Notification - Industry Standard Position */}
         <AnimatePresence>
-          {currentScene === 4 && !quizCompleted && showQuizCompletionHint && (
+          {currentScene === sceneIndices.quiz && !quizCompleted && showQuizCompletionHint && (
             <motion.div
               initial={{ opacity: 0, y: 20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -1695,7 +1719,7 @@ export default function App() {
               <div className={cssClasses.quizNotificationContent}>
                 <div className="flex items-center space-x-2.5 relative z-10">
                   <p className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] font-medium transition-colors duration-300">
-                    {(appConfig as any).quizSceneConfig?.texts?.quizCompletionHint}
+                    {currentSceneConfig?.texts?.quizCompletionHint}
                   </p>
                   {/* Industry Standard: Close Button */}
                   <button

@@ -346,7 +346,7 @@ export const QuizScene = React.memo(function QuizScene({
   isDarkMode,
 }: QuizSceneProps) {
   // Destructure ariaTexts from config for accessibility
-  const { ariaTexts } = config;
+  const { ariaTexts } = config || {};
   // Theme state for forcing re-renders when theme changes
   const [themeState, setThemeState] = React.useState(0);
 

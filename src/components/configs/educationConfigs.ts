@@ -189,7 +189,7 @@ export interface SurveySceneConfig {
     };
 }
 
-export interface SummarySceneConfig {
+export interface NudgeSceneConfig {
     texts?: {
         title?: string;
         subtitle?: string;
@@ -1002,7 +1002,7 @@ export const passwordSecurityConfig = passwordSecurityIntroConfig;
 export const socialEngineeringConfig = socialEngineeringIntroConfig;
 
 
-export interface NudgeSceneConfig {
+export interface SummarySceneConfig {
     texts?: {
         completionTitle?: string;
         completionSubtitle?: string;

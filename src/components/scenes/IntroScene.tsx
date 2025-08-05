@@ -274,18 +274,6 @@ export const IntroScene = React.memo(({
     willChange: 'transform'
   }), []);
 
-  const ctaStyles = useMemo(() => ({
-    backdropFilter: 'blur(20px) saturate(180%)',
-    WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-    border: '1px solid rgba(71, 85, 105, 0.20)',
-    boxShadow: `
-      0 4px 16px rgba(71, 85, 105, 0.08),
-      0 2px 8px rgba(71, 85, 105, 0.06),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15)
-    `,
-    transform: 'translateZ(0)',
-    willChange: 'transform'
-  }), []);
 
   return (
     <FontWrapper variant="primary" className={containerClassName}>
@@ -707,7 +695,6 @@ export const IntroScene = React.memo(({
             scale: 1.05,
             y: -2
           }}
-          style={ctaStyles}
         >
           <div className="corner-top-left"></div>
           <div className="corner-bottom-right"></div>
