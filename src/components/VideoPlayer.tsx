@@ -189,34 +189,36 @@ export function VideoPlayer({
             }
           }, 500);
         });
-        if (isIOS && disableForwardSeek) {
-          const handleSeek = (e: Event) => {
-            const target = e.target as VideoWithLastTime;
-            if (target.currentTime > (target._lastTime || 0)) {
-              target.currentTime = target._lastTime || 0;
-              e.preventDefault();
-              return false;
-            }
-            target._lastTime = target.currentTime;
-          };
+        if (isIOS) {
+          let handleSeek: (e: Event) => void;
+          let handleTimeUpdate: () => void;
+          if (disableForwardSeek) {
+            handleSeek = (e: Event) => {
+              const target = e.target as VideoWithLastTime;
+              if (target.currentTime > (target._lastTime || 0)) {
+                target.currentTime = target._lastTime || 0;
+                e.preventDefault();
+                return false;
+              }
+              target._lastTime = target.currentTime;
+            };
 
-          const handleTimeUpdate = () => {
-            const target = video as VideoWithLastTime;
-            const currentTime = target.currentTime;
-            const lastTime = target._lastTime || 0;
+            handleTimeUpdate = () => {
+              const target = video as VideoWithLastTime;
+              const currentTime = target.currentTime;
+              const lastTime = target._lastTime || 0;
 
-            // Allow small forward jumps (less than 1 second) for smooth playback
-            if (currentTime > lastTime + 1) {
-              target.currentTime = lastTime;
-            } else {
-              target._lastTime = currentTime;
-            }
-          };
+              if (currentTime > lastTime + 1) {
+                target.currentTime = lastTime;
+              } else {
+                target._lastTime = currentTime;
+              }
+            };
 
-          video.addEventListener('seeking', handleSeek);
-          video.addEventListener('timeupdate', handleTimeUpdate);
+            video.addEventListener('seeking', handleSeek);
+            video.addEventListener('timeupdate', handleTimeUpdate);
+          }
 
-          // Prevent speed changes with JavaScript
           const handleRateChange = () => {
             const target = video as VideoWithLastTime;
             if (target.playbackRate !== 1) {
@@ -228,8 +230,10 @@ export function VideoPlayer({
 
           // Cleanup function
           return () => {
-            video.removeEventListener('seeking', handleSeek);
-            video.removeEventListener('timeupdate', handleTimeUpdate);
+            if (disableForwardSeek) {
+              video.removeEventListener('seeking', handleSeek);
+              video.removeEventListener('timeupdate', handleTimeUpdate);
+            }
             video.removeEventListener('ratechange', handleRateChange);
           };
         }

@@ -265,7 +265,7 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
       {/* Desktop Progress Bar - Original Position */}
       <div className="hidden md:block">
         {/* Responsive Container with Margins */}
-        <div className="relative mx-4 mt-3 md:mt-2 sm:mx-8 md:mx-16 lg:mx-20 xl:mx-24 2xl:mx-32">
+        <div className="relative mx-4 sm:mx-8 md:mx-16 lg:mx-20 xl:mx-24 2xl:mx-32">
           {/* Progress Tooltip - Pill-shaped thumb on progress bar */}
           <div className="relative w-full">
             <motion.div
