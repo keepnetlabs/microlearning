@@ -453,3 +453,41 @@
   border-radius: 0 100px 8px 0;
   backdrop-filter: blur(5px);
 }
+.plyr__control:hover{
+  padding:8px !important;
+  border-radius: 8px !important;
+  background: #1C1C1E !important;
+  color: #F2F2F7 !important;
+}
+
+:root {
+  --plyr-color-main: #F2F2F7 !important;
+}
+/* Orijinal fullscreen ikonunu gizle */
+.plyr__controls button[data-plyr="fullscreen"] svg {
+  display: none;
+}
+
+/* Kendi ikonunu ekle (Maximize) */
+/* Orijinal Plyr fullscreen ikonunu gizle */
+.plyr__controls button[data-plyr="fullscreen"] svg {
+  display: none;
+}
+
+/* Fullscreen ikonu (expand) */
+.plyr__controls button[data-plyr="fullscreen"] {
+  background-image: url("data:image/svg+xml,%3Csvg%20width%3D%2218%22%20height%3D%2218%22%20viewBox%3D%220%200%2018%2018%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%20%3Cpath%20d%3D%22M3.6002%202.69922C3.10238%202.69922%202.7002%203.10141%202.7002%203.59922V6.29922C2.7002%206.79703%203.10238%207.19922%203.6002%207.19922C4.09801%207.19922%204.5002%206.79703%204.5002%206.29922V4.49922H6.3002C6.79801%204.49922%207.2002%204.09703%207.2002%203.59922C7.2002%203.10141%206.79801%202.69922%206.3002%202.69922H3.6002ZM4.5002%2011.6992C4.5002%2011.2014%204.09801%2010.7992%203.6002%2010.7992C3.10238%2010.7992%202.7002%2011.2014%202.7002%2011.6992V14.3992C2.7002%2014.897%203.10238%2015.2992%203.6002%2015.2992H6.3002C6.79801%2015.2992%207.2002%2014.897%207.2002%2014.3992C7.2002%2013.9014%206.79801%2013.4992%206.3002%2013.4992H4.5002V11.6992ZM11.7002%202.69922C11.2024%202.69922%2010.8002%203.10141%2010.8002%203.59922C10.8002%204.09703%2011.2024%204.49922%2011.7002%204.49922H13.5002V6.29922C13.5002%206.79703%2013.9024%207.19922%2014.4002%207.19922C14.898%207.19922%2015.3002%206.79703%2015.3002%206.29922V3.59922C15.3002%203.10141%2014.898%202.69922%2014.4002%202.69922H11.7002ZM15.3002%2011.6992C15.3002%2011.2014%2014.898%2010.7992%2014.4002%2010.7992C13.9024%2010.7992%2013.5002%2011.2014%2013.5002%2011.6992V13.4992H11.7002C11.2024%2013.4992%2010.8002%2013.9014%2010.8002%2014.3992C10.8002%2014.897%2011.2024%2015.2992%2011.7002%2015.2992H14.4002C14.898%2015.2992%2015.3002%2014.897%2015.3002%2014.3992V11.6992Z%22%20fill%3D%22%23F2F2F7%22/%3E%20%3C/svg%3E") !important;
+  background-size: 18px !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  color: #F2F2F7 !important;
+  padding: 13.5px !important;
+  border-radius: 8px !important;
+  margin-top:-1px;
+  margin-left:8px;
+  transform:scale(1.2) !important;
+}
+.plyr__controls button[data-plyr="fullscreen"]:hover{
+  background-color: #1C1C1E !important;
+  color: #F2F2F7 !important;
+}

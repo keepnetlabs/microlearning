@@ -627,8 +627,16 @@ export const QuizScene = React.memo(function QuizScene({
             <motion.button
               key={option.id}
               initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4, delay: index * 0.1 }}
+              animate={{ 
+                opacity: 1, 
+                x: 0,
+                scale: showCorrectness && (isCorrect || isSelected) ? [1, 1.05, 1] : 1
+              }}
+              transition={{ 
+                duration: 0.4, 
+                delay: index * 0.1,
+                scale: showCorrectness ? { duration: 0.6, ease: "easeInOut" } : {}
+              }}
               whileHover={
                 !showResult && !isLoading
                   ? { scale: 1.01, y: -1 }
@@ -651,15 +659,25 @@ export const QuizScene = React.memo(function QuizScene({
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1 pr-3">
-                  <span className="block mb-1 font-medium transition-colors duration-300 text-[#1C1C1E] dark:text-[#F2F2F7]">
+                  <motion.span 
+                    className="block mb-1 font-medium transition-colors duration-300 text-[#1C1C1E] dark:text-[#F2F2F7]"
+                    animate={showCorrectness && (isCorrect || isSelected) ? {
+                      y: [0, -2, 0],
+                      transition: { duration: 0.4, ease: "easeInOut" }
+                    } : {}}
+                  >
                     {option.text}
-                  </span>
+                  </motion.span>
                   {option.strength && (
-                    <span
+                    <motion.span
                       className={`text-base font-medium text-[#1C1C1E] dark:text-[#F2F2F7]`}
+                      animate={showCorrectness && (isCorrect || isSelected) ? {
+                        y: [0, -1, 0],
+                        transition: { duration: 0.4, delay: 0.1, ease: "easeInOut" }
+                      } : {}}
                     >
                       {option.strength}
-                    </span>
+                    </motion.span>
                   )}
                 </div>
 

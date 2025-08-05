@@ -698,7 +698,6 @@ export function VideoPlayer({
             >
               {parsedTranscript.map((row, index) => {
                 const isActive = index === currentRowIndex;
-                const video = videoRef.current;
                 const canAccess =
                   hasReplayed ||
                   !disableForwardSeek ||

@@ -381,20 +381,31 @@ export function SurveyScene({
                 className={`z-50 w-full transition-all font-medium text-sm flex items-center justify-center space-x-2 py-3 rounded-xl glass-border-2 ${rating > 0 && !isSubmitting && !isSubmitted
                   ? ``
                   : `cursor-not-allowed`
-                  } text-[#1C1C1E] dark:text-[#F2F2F7]`}
+                  } text-[#1C1C1E] dark:text-[#F2F2F7] overflow-hidden`}
                 style={{ touchAction: 'manipulation' }}
                 aria-label={isSubmitting ? (config.texts?.submittingLabel || config.ariaTexts?.submittingLabel || "Submitting survey") : (config.texts?.submitLabel || config.ariaTexts?.submitLabel || "Submit survey")}
                 aria-describedby={rating === 0 ? "rating-required" : undefined}
               >
+                {/* Button shimmer effect */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                  animate={{ x: ['-100%', '200%'] }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "linear"
+                  }}
+                />
+
                 {isSubmitting ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" aria-hidden="true"></div>
-                    <span>{config.texts?.submittingText}</span>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin relative z-10" aria-hidden="true"></div>
+                    <span className="relative z-10">{config.texts?.submittingText}</span>
                   </>
                 ) : (
                   <>
-                    <Send size={16} aria-hidden="true" />
-                    <span>{config.texts?.submitButton}</span>
+                    <Send size={16} className="relative z-10" aria-hidden="true" />
+                    <span className="relative z-10">{config.texts?.submitButton}</span>
                   </>
                 )}
               </motion.button>
