@@ -89,10 +89,6 @@ interface ScenarioSceneConfig {
   };
   containerClassName?: string;
   videoContainerClassName?: string;
-  mobileHint?: {
-    text: string;
-    className: string;
-  };
   texts?: {
     transcriptLoading?: string;
   };
@@ -102,7 +98,6 @@ interface ScenarioSceneConfig {
     loadingLabel?: string;
     errorLabel?: string;
     videoPlayerLabel?: string;
-    mobileHintLabel?: string;
   };
 }
 interface ScenarioSceneProps {

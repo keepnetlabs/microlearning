@@ -240,7 +240,6 @@ interface QuizSceneConfig {
     checkAnswerButton?: string;
     explanation?: string;
     tips?: string;
-    mobileHint?: string;
     clearCategory?: string;
     removeItem?: string;
     previousQuestion?: string;
@@ -279,7 +278,6 @@ interface QuizSceneConfig {
     attemptsLeftLabel?: string;
     noAttemptsLeftLabel?: string;
     quizCompletedLabel?: string;
-    mobileHintLabel?: string;
     mobileInstructionsLabel?: string;
     desktopInstructionsLabel?: string;
     tapHereLabel?: string;

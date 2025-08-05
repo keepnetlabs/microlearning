@@ -66,12 +66,6 @@ interface IconConfig {
   className?: string;
 }
 
-interface TitleConfig {
-  words: string[];
-  highlightLastWord?: boolean;
-  gradientClasses?: string;
-}
-
 interface SparklesConfig {
   enabled?: boolean;
   ambient?: {
@@ -130,7 +124,7 @@ interface AnimationDelays {
 
 interface IntroSceneConfig {
   // Content
-  title?: TitleConfig;
+  title?: string;
   subtitle?: string;
   sectionTitle?: string;
   highlights?: HighlightItem[];
@@ -172,8 +166,7 @@ export const IntroScene = React.memo(({
     duration,
     level,
     callToActionText,
-    icon,
-    card
+    icon
   } = config;
 
   // Use default values for removed properties - artık component dışından geliyor
@@ -539,19 +532,13 @@ export const IntroScene = React.memo(({
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: delays.titleWords }}
           >
-            {title?.words.map((word, index) => (
-              <React.Fragment key={index}>
-                {index > 0 && " "}
-                <motion.span
-                  initial={{ display: "inline-block", opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: delays.titleWordStagger + index * 0.2 }}
-                  className={title?.highlightLastWord && index === title.words.length - 1 ? title.gradientClasses : ''}
-                >
-                  {word}
-                </motion.span>
-              </React.Fragment>
-            ))}
+            <motion.span
+              initial={{ display: "inline-block", opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: delays.titleWordStagger }}
+            >
+              {title}
+            </motion.span>
           </motion.h1>
 
           <motion.p

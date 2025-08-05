@@ -230,11 +230,7 @@ export default function App() {
 
     // Loading container
     loadingContainer: `flex items-center space-x-3 px-6 py-4 bg-${themeConfig.colors?.surface || 'white'}/90 dark:bg-gray-900/90 ${themeConfig.effects?.backdropBlur || 'backdrop-blur-xl'} ${themeConfig.effects?.borderRadius || 'rounded-2xl'} border border-${themeConfig.colors?.surface || 'white'}/${themeConfig.effects?.borderOpacity || '60'} dark:border-gray-600/60 ${themeConfig.effects?.shadow || 'shadow-xl'} transition-colors duration-300`,
-    loadingSpinner: `animate-spin text-${themeConfig.colors?.primary || 'blue'}-600 dark:text-${themeConfig.colors?.primary || 'blue'}-400`,
-
-    // Background gradients
-    backgroundGradient1: `absolute -top-60 -left-60 w-96 h-96 bg-gradient-to-br from-${themeConfig.colors?.primary || 'blue'}-200/40 via-${themeConfig.colors?.secondary || 'indigo'}-100/30 to-transparent dark:from-${themeConfig.colors?.primary || 'blue'}-900/25 dark:via-${themeConfig.colors?.secondary || 'indigo'}-800/18 dark:to-transparent ${themeConfig.effects?.borderRadius || 'rounded-full'} blur-3xl animate-pulse transition-colors duration-500`,
-    backgroundGradient2: `absolute -bottom-60 -right-60 w-[500px] h-[500px] bg-gradient-to-tl from-${themeConfig.colors?.accent || 'purple'}-100/35 via-pink-100/25 to-transparent dark:from-${themeConfig.colors?.accent || 'purple'}-900/20 dark:via-pink-900/15 dark:to-transparent ${themeConfig.effects?.borderRadius || 'rounded-full'} blur-3xl animate-pulse transition-colors duration-500`,
+    loadingSpinner: `animate-spin`,
 
     // Content card
     contentCard: `absolute inset-0 w-full h-full glass-border-2 overflow-hidden transition-colors duration-300`,
@@ -245,16 +241,9 @@ export default function App() {
     // Language dropdown
     languageDropdown: `absolute top-full right-0 mt-1 w-64 bg-${themeConfig.colors?.surface || 'white'}/95 dark:bg-gray-900/95 backdrop-blur-xl border border-${themeConfig.colors?.surface || 'white'}/60 dark:border-gray-600/60 rounded-xl shadow-xl shadow-black/10 dark:shadow-black/30 transition-all duration-300 z-50`,
 
-    // Timer badge
-    timerBadge: `flex items-center space-x-1.5 px-2.5 py-1.5 bg-${themeConfig.colors?.badge?.timer?.background || 'red'}-50/90 dark:bg-${themeConfig.colors?.badge?.timer?.background || 'red'}-900/90 ${themeConfig.effects?.backdropBlur || 'backdrop-blur-xl'} border border-${themeConfig.colors?.badge?.timer?.background || 'red'}-200/60 dark:border-${themeConfig.colors?.badge?.timer?.background || 'red'}-600/60 ${themeConfig.effects?.borderRadius || 'rounded-lg'} ${themeConfig.effects?.shadow || 'shadow-lg'} transition-colors duration-300`,
-    timerIcon: `w-4 h-4 text-${themeConfig.colors?.badge?.timer?.icon || 'red-600'} dark:text-${themeConfig.colors?.badge?.timer?.iconDark || 'red-400'}`,
-    timerText: `text-sm font-semibold text-${themeConfig.colors?.badge?.timer?.text || 'red-700'} dark:text-${themeConfig.colors?.badge?.timer?.textDark || 'red-300'}`,
 
     // Quiz notification
     quizNotificationContent: `relative px-4 py-2 glass-border-1 text-sm text-[#1C1C1E] dark:text-[#F2F2F7] group`,
-
-    // Mobile nav hint
-    mobileNavHintContent: `flex items-center px-3 py-2 bg-white/85 dark:bg-gray-900/85 ${themeConfig.effects?.borderRadius || 'rounded-full'} border border-white/40 dark:border-gray-600/40 ${themeConfig.effects?.shadow || 'shadow-lg'} transition-colors duration-300 backdrop-blur-xl`
   }), [themeConfig]);
 
   // Combined CSS classes - Static ve dynamic sınıfları birleştir

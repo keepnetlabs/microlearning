@@ -1,11 +1,4 @@
 {
-  "header": {
-    "title": {
-      "desktop": "Cybersecurity Training",
-      "mobile": "Security Training"
-    }
-  },
-
   "theme": {
     "fontFamily": {
       "primary": "SF Pro Display, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
@@ -13,12 +6,7 @@
       "monospace": "SF Mono, ui-monospace, SFMono-Regular, 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace"
     },
     "colors": {
-      "primary": "blue",
-      "secondary": "indigo",
-      "accent": "purple",
-      "background": "bg-gradient-blue",
-      "surface": "white",
-      "border": "gray"
+      "background": "bg-gradient-blue"
     },
     "logo": {
       "src": "https://keepnetlabs.com/keepnet-logo.svg",
@@ -66,77 +54,34 @@
   },
   "introSceneConfig": {
     "points": 10,
-    "title": {
-      "words": ["SMS", "Phishing", "Protection"],
-      "highlightLastWord": false,
-      "gradientClasses": "bg-gradient-to-r from-blue-500 to-blue-500 dark:from-blue-500 dark:to-blue-300 bg-clip-text text-transparent"
-    },
+    "title": "SMS Phishing Protection",
     "subtitle": "Recognize SMS-based phishing attacks and protection methods",
     "sectionTitle": "What You'll Learn in This Training:",
     "icon": {
-      "component": null,
-      "size": 40,
-      "sparkleCount": 8,
-      "sparkleEnabled": false,
       "sparkleIconName": "alert-triangle",
-      "sceneIconName": "smartphone",
-      "className": "text-[#1C1C1E] dark:text-[#F2F2F7]"
+      "sceneIconName": "smartphone"
     },
     "highlights": [
       {
         "iconName": "smartphone",
-        "text": "Recognize SMS phishing attacks",
-        "textColor": "text-red-500",
-        "liquidGlassBackground": "linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(220, 38, 38, 0.08) 50%, rgba(185, 28, 28, 0.06) 100%)",
-        "liquidGlassBorder": "1px solid rgba(239, 68, 68, 0.25)",
-        "liquidGlassBoxShadow": "0 4px 16px rgba(239, 68, 68, 0.12), 0 2px 8px rgba(220, 38, 38, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 -1px 0 rgba(239, 68, 68, 0.1)",
-        "multiLayerGradient": "linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(220, 38, 38, 0.05) 50%, rgba(185, 28, 28, 0.03) 100%)",
-        "radialHighlight": "radial-gradient(circle at 30% 20%, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.08) 40%, transparent 70%)",
-        "innerDepthGradient": "linear-gradient(135deg, rgba(239, 68, 68, 0.06) 0%, rgba(220, 38, 38, 0.04) 30%, rgba(185, 28, 28, 0.02) 60%, transparent 100%)"
+        "text": "Recognize SMS phishing attacks"
       },
       {
         "iconName": "shield",
-        "text": "Protection strategies",
-        "textColor": "text-green-500",
-        "liquidGlassBackground": "linear-gradient(135deg, rgba(34, 197, 94, 0.12) 0%, rgba(22, 163, 74, 0.08) 50%, rgba(21, 128, 61, 0.06) 100%)",
-        "liquidGlassBorder": "1px solid rgba(34, 197, 94, 0.25)",
-        "liquidGlassBoxShadow": "0 4px 16px rgba(34, 197, 94, 0.12), 0 2px 8px rgba(22, 163, 74, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 -1px 0 rgba(34, 197, 94, 0.1)",
-        "multiLayerGradient": "linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(22, 163, 74, 0.05) 50%, rgba(21, 128, 61, 0.03) 100%)",
-        "radialHighlight": "radial-gradient(circle at 30% 20%, rgba(34, 197, 94, 0.15) 0%, rgba(22, 163, 74, 0.08) 40%, transparent 70%)",
-        "innerDepthGradient": "linear-gradient(135deg, rgba(34, 197, 94, 0.06) 0%, rgba(22, 163, 74, 0.04) 30%, rgba(21, 128, 61, 0.02) 60%, transparent 100%)"
+        "text": "Protection strategies"
       },
       {
         "iconName": "alert-triangle",
-        "text": "Detect suspicious messages",
-        "textColor": "text-orange-500",
-        "liquidGlassBackground": "linear-gradient(135deg, rgba(249, 115, 22, 0.12) 0%, rgba(245, 101, 101, 0.08) 50%, rgba(194, 65, 12, 0.06) 100%)",
-        "liquidGlassBorder": "1px solid rgba(249, 115, 22, 0.25)",
-        "liquidGlassBoxShadow": "0 4px 16px rgba(249, 115, 22, 0.12), 0 2px 8px rgba(245, 101, 101, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 -1px 0 rgba(249, 115, 22, 0.1)",
-        "multiLayerGradient": "linear-gradient(135deg, rgba(249, 115, 22, 0.08) 0%, rgba(245, 101, 101, 0.05) 50%, rgba(194, 65, 12, 0.03) 100%)",
-        "radialHighlight": "radial-gradient(circle at 30% 20%, rgba(249, 115, 22, 0.15) 0%, rgba(245, 101, 101, 0.08) 40%, transparent 70%)",
-        "innerDepthGradient": "linear-gradient(135deg, rgba(249, 115, 22, 0.06) 0%, rgba(245, 101, 101, 0.04) 30%, rgba(194, 65, 12, 0.02) 60%, transparent 100%)"
+        "text": "Detect suspicious messages"
       },
       {
         "iconName": "users",
-        "text": "Build team awareness",
-        "textColor": "text-blue-500",
-        "liquidGlassBackground": "linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(37, 99, 235, 0.08) 50%, rgba(29, 78, 216, 0.06) 100%)",
-        "liquidGlassBorder": "1px solid rgba(59, 130, 246, 0.25)",
-        "liquidGlassBoxShadow": "0 4px 16px rgba(59, 130, 246, 0.12), 0 2px 8px rgba(37, 99, 235, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 -1px 0 rgba(59, 130, 246, 0.1)",
-        "multiLayerGradient": "linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(37, 99, 235, 0.05) 50%, rgba(29, 78, 216, 0.03) 100%)",
-        "radialHighlight": "radial-gradient(circle at 30% 20%, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.08) 40%, transparent 70%)",
-        "innerDepthGradient": "linear-gradient(135deg, rgba(59, 130, 246, 0.06) 0%, rgba(37, 99, 235, 0.04) 30%, rgba(29, 78, 216, 0.02) 60%, transparent 100%)"
+        "text": "Build team awareness"
       }
     ],
     "duration": "~10 minutes",
     "level": "All Levels",
     "callToActionText": "Swipe to learn SMS security",
-    "card": {
-      "backgroundColor": "bg-blue-50/10 dark:bg-slate-900/70",
-      "borderColor": "border-blue-100/10 dark:border-slate-700/50",
-      "gradientFrom": "from-blue-50/10 dark:from-slate-900/60",
-      "gradientTo": "to-blue-50/3 dark:to-slate-800/40"
-    },
     "texts": {
       "sceneLabel": "Introduction Scene",
       "sceneDescription": "Welcome to the SMS phishing protection training module",
@@ -161,35 +106,23 @@
         "iconName": "smartphone",
         "title": "Recognize SMS Threats",
         "subtitle": "Awareness",
-        "description": "Quickly recognize and identify SMS-based phishing attacks",
-        "iconColor": "text-red-500",
-        "strongBgGradient": "linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(220, 38, 38, 0.18) 50%, rgba(185, 28, 28, 0.12) 100%)",
-        "darkBgGradient": "linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(220, 38, 38, 0.18) 50%, rgba(185, 28, 28, 0.12) 100%)"
+        "description": "Quickly recognize and identify SMS-based phishing attacks"
       },
       {
         "iconName": "shield",
         "title": "Protection Strategies",
         "subtitle": "Defense",
-        "description": "Develop effective methods to protect against SMS attacks",
-        "iconColor": "text-green-500",
-        "strongBgGradient": "linear-gradient(135deg, rgba(34, 197, 94, 0.25) 0%, rgba(22, 163, 74, 0.18) 50%, rgba(21, 128, 61, 0.12) 100%)",
-        "darkBgGradient": "linear-gradient(135deg, rgba(34, 197, 94, 0.25) 0%, rgba(22, 163, 74, 0.18) 50%, rgba(21, 128, 61, 0.12) 100%)"
+        "description": "Develop effective methods to protect against SMS attacks"
       },
       {
         "iconName": "alert-triangle",
         "title": "Detect Suspicious Messages",
         "subtitle": "Vigilance",
-        "description": "Analyze and verify suspicious SMS messages",
-        "iconColor": "text-orange-500",
-        "strongBgGradient": "linear-gradient(135deg, rgba(249, 115, 22, 0.25) 0%, rgba(234, 88, 12, 0.18) 50%, rgba(194, 65, 12, 0.12) 100%)",
-        "darkBgGradient": "linear-gradient(135deg, rgba(249, 115, 22, 0.25) 0%, rgba(234, 88, 12, 0.18) 50%, rgba(194, 65, 12, 0.12) 100%)"
+        "description": "Analyze and verify suspicious SMS messages"
       }
     ],
     "icon": {
-      "component": null,
-      "size": 40,
-      "sceneIconName": "target",
-      "className": "text-red-500"
+      "sceneIconName": "target"
     }
   },
   "scenarioSceneConfig": {
@@ -207,14 +140,7 @@
       "transcript": "00:00:04.400 security is always a top priority but an\n00:00:07.919 experience I had last month made me\n00:00:10.400 change my behavior one day during my\n00:00:13.120 lunch break I received an email that\n00:00:15.639 looked like it was from the finance\n00:00:17.439 department it asked me to approve an\n00:00:20.039 invoice something felt off the invoice\n00:00:23.320 number was strange and there were a few\n00:00:25.519 grammar mistakes thanks to my cyber\n00:00:28.279 security training I quickly realized it\n00:00:30.679 was a phishing attempt I thought someone\n00:00:33.879 might fall for this but instead of\n00:00:36.239 reporting it I moved on with my work\n00:00:38.760 assuming it will catch it anyway a week\n00:00:42.079 later our company announced a phishing\n00:00:44.840 attack has led to a data breach exposing\n00:00:47.680 customer information the email I had ignored was\n00:00:51.559 part of that attack if I had reported it\n00:00:54.719 the whole crisis might have been avoided\n00:00:57.600 after the breach the company held a\n00:00:59.600 meeting the IT team explained how the attack\n00:01:03.199 happened and the damage it caused not\n00:01:05.880 just reputational harm but also\n00:01:08.320 financial loss I was shocked and felt\n00:01:11.280 guilty a simple secure reporting\n00:01:14.119 behavior could have made all the\n00:01:16.439 difference here's what I learned from\n00:01:18.439 this experience don't assume someone\n00:01:21.320 else will report it just do it if\n00:01:24.119 everyone thinks the same way nothing\n00:01:26.439 gets done we all share the\n00:01:28.560 responsibility know your company's\n00:01:30.960 reporting process if you're unsure ask it there are always tools to make\n00:01:37.439 reporting easier never underestimate\n00:01:40.399 phishing attacks even one fake email can\n00:01:43.439 put the entire company at risk after\n00:01:46.560 this incident I realized that combating\n00:01:49.079 cyber attacks is only possible when\n00:01:51.439 everyone practices secure\n00:01:53.640 behaviors identifying a phishing email\n00:01:56.520 isn't enough you have to take action\n00:02:00.000 but"
     },
     "icon": {
-      "component": null,
-      "size": 40,
-      "sceneIconName": "play-circle",
-      "className": "text-blue-500"
-    },
-    "mobileHint": {
-      "text": "💡 Watch the video and review the transcript",
-      "className": "sm:hidden mt-2"
+      "sceneIconName": "play-circle"
     },
     "texts": {
       "transcriptLoading": "Loading transcript..."
@@ -236,48 +162,26 @@
         "iconName": "key",
         "title": "Create Strong Password",
         "description": "At least 12 characters, uppercase and lowercase letters, numbers, and symbols",
-        "tip": "Example: 'Coffee!very7Good#2024'",
-        "iconColorClass": "text-blue-500 dark:text-blue-300",
-        "bgGradientClass": "from-blue-500/20 to-indigo-500/20",
-        "tipColorClass": "from-blue-50/50 to-indigo-50/50 dark:from-blue-900/40 dark:to-indigo-900/40 border-blue-200/30 dark:border-blue-600/60",
-        "tipTextColorClass": "text-blue-800 dark:text-blue-100",
-        "tipIconColorClass": "text-blue-600 dark:text-blue-200"
+        "tip": "Example: 'Coffee!very7Good#2024'"
       },
       {
         "iconName": "smartphone",
         "title": "Enable 2FA",
         "description": "Enable multi-factor authentication on all critical accounts",
-        "tip": "Use Google Authenticator or Authy",
-        "iconColorClass": "text-green-500 dark:text-green-300",
-        "bgGradientClass": "from-green-500/20 to-emerald-500/20",
-        "tipColorClass": "from-green-50/50 to-emerald-50/50 dark:from-green-900/40 dark:to-emerald-900/40 border-green-200/30 dark:border-green-600/60",
-        "tipTextColorClass": "text-green-800 dark:text-green-100",
-        "tipIconColorClass": "text-green-600 dark:text-green-200"
+        "tip": "Use Google Authenticator or Authy"
       },
       {
         "iconName": "database",
         "title": "Password Manager",
         "description": "Use unique and complex passwords for each account",
-        "tip": "1Password, Bitwarden, or LastPass",
-        "iconColorClass": "text-purple-500 dark:text-purple-300",
-        "bgGradientClass": "from-purple-500/20 to-violet-500/20",
-        "tipColorClass": "from-purple-50/50 to-violet-50/50 dark:from-purple-900/40 dark:to-violet-900/40 border-purple-200/30 dark:border-purple-600/60",
-        "tipTextColorClass": "text-purple-800 dark:text-purple-100",
-        "tipIconColorClass": "text-purple-600 dark:text-purple-200"
+        "tip": "1Password, Bitwarden, or LastPass"
       }
     ],
     "icon": {
-      "component": null,
-      "size": 40,
-      "sceneIconName": "shield-check",
-      "className": "text-blue-500"
+      "sceneIconName": "shield-check"
     },
     "tipConfig": {
-      "iconName": "check-circle",
-      "iconSize": 12,
-      "tipColorClass": "from-blue-50/50 to-indigo-50/50 dark:from-blue-900/40 dark:to-indigo-900/40 border-blue-200/30 dark:border-blue-600/60",
-      "tipTextColorClass": "text-blue-800 dark:text-blue-100",
-      "tipIconColorClass": "text-blue-600 dark:text-blue-200"
+      "iconName": "check-circle"
     },
     "ariaTexts": {
       "mainLabel": "Actionable Content",
@@ -293,18 +197,11 @@
     "points": 50,
     "title": "Cyber Security Quiz",
     "subtitle": "Test your knowledge",
-    "difficulty": {
-      "easy": "Easy",
-      "medium": "Medium",
-      "hard": "Hard"
-    },
     "icon": {
-      "sceneIconName": "brain-circuit",
-      "size": 40,
-      "className": "text-blue-500"
+      "sceneIconName": "brain-circuit"
     },
     "questions": {
-      "totalCount": 5,
+      "totalCount": 4,
       "maxAttempts": 2,
       "list": [
         {
@@ -312,29 +209,25 @@
           "type": "multiple_choice",
           "title": "Password Strength Assessment",
           "description": "Which of the following passwords is the most secure?",
-          "difficulty": "easy",
           "category": "Password Security",
           "options": [
             {
               "id": "weak-1",
               "text": "password123",
               "isCorrect": false,
-              "explanation": "Too simple and predictable",
-              "color": "red"
+              "explanation": "Too simple and predictable"
             },
             {
               "id": "medium-1",
               "text": "P@ssw0rd!",
               "isCorrect": false,
-              "explanation": "A common pattern",
-              "color": "yellow"
+              "explanation": "A common pattern"
             },
             {
               "id": "strong-1",
               "text": "Coffee!very7Good#2024",
               "isCorrect": true,
-              "explanation": "Long, complex, and memorable",
-              "color": "green"
+              "explanation": "Long, complex, and memorable"
             },
             {
               "id": "weak-2",
@@ -358,18 +251,15 @@
           "title": "Phishing Attack Detection",
           "statement": "Attackers always use unknown email addresses in phishing attacks.",
           "correctAnswer": false,
-          "difficulty": "medium",
           "category": "Email Security",
           "options": {
             "true": {
               "label": "Yes",
-              "icon": "check",
-              "color": "green"
+              "icon": "check"
             },
             "false": {
               "label": "No",
-              "icon": "x",
-              "color": "red"
+              "icon": "x"
             }
           },
           "explanation": "Phishers often spoof familiar-looking addresses.",
@@ -385,7 +275,6 @@
           "type": "multi_select",
           "title": "Password Best Practices",
           "description": "Which rules should you follow to create a secure password?",
-          "difficulty": "easy",
           "category": "Password Security",
           "minCorrect": 3,
           "options": [
@@ -444,7 +333,6 @@
           "max": 10,
           "correctRange": { "min": 8, "max": 10 },
           "labels": { "min": "Safe", "max": "Very Risky" },
-          "difficulty": "medium",
           "category": "Email Security",
           "explanation": "High risk: urgent language, unknown sender, shortened link.",
           "tips": [
@@ -455,62 +343,6 @@
           ]
         }
       ]
-    },
-    "styling": {
-      "card": {
-        "backgroundColor": "bg-white/60 dark:bg-gray-800/80",
-        "borderColor": "border-white/60 dark:border-gray-600/60",
-        "gradientFrom": "from-white/50",
-        "gradientTo": "to-white/20"
-      },
-      "resultPanel": {
-        "backgroundColor": "bg-green-50/90 dark:bg-green-900/20",
-        "borderColor": "border-green-200 dark:border-green-700",
-        "gradientFrom": "from-green-50",
-        "gradientTo": "to-green-100"
-      },
-      "answerOptions": {
-        "backgroundColor": "bg-white/80 dark:bg-gray-700/80",
-        "borderColor": "border-gray-200 dark:border-gray-600",
-        "selectedColor": "bg-blue-100 dark:bg-blue-900/30",
-        "correctColor": "bg-green-100 dark:bg-green-900/30",
-        "incorrectColor": "bg-red-100 dark:bg-red-900/30",
-        "hoverColor": "hover:bg-gray-50 dark:hover:bg-gray-600/50"
-      },
-      "cardStyle": {
-        "background": "linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card) / 0.95) 25%, hsl(var(--card) / 0.85) 50%, hsl(var(--card) / 0.75) 75%, hsl(var(--card) / 0.65) 100%)",
-        "border": "0.5px solid rgba(255, 255, 255, 0.4)"
-      },
-      "resultPanelStyle": {
-        "background": "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 25%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.65) 75%, rgba(255, 255, 255, 0.55) 100%)",
-        "borderColor": "border-border/60"
-      },
-      "buttons": {
-        "nextQuestion": {
-          "backgroundColor": "rgba(59, 130, 246, 0.15)",
-          "borderColor": "rgba(59, 130, 246, 0.3)",
-          "textColor": "text-blue-800 dark:text-white",
-          "iconColor": "text-blue-600 dark:text-blue-200",
-          "gradientFrom": "rgba(59, 130, 246, 0.15)",
-          "gradientTo": "rgba(59, 130, 246, 0.08)"
-        },
-        "retryQuestion": {
-          "backgroundColor": "rgba(255, 255, 255, 0.8)",
-          "borderColor": "rgba(0, 0, 0, 0.1)",
-          "textColor": "text-gray-800 dark:text-gray-200",
-          "iconColor": "text-[#1C1C1E] dark:text-[#F2F2F7]",
-          "gradientFrom": "rgba(255, 255, 255, 0.8)",
-          "gradientTo": "rgba(255, 255, 255, 0.6)"
-        },
-        "checkAnswer": {
-          "backgroundColor": "rgba(59, 130, 246, 0.15)",
-          "borderColor": "rgba(59, 130, 246, 0.3)",
-          "textColor": "text-blue-800 dark:text-white",
-          "iconColor": "text-blue-600 dark:text-blue-200",
-          "gradientFrom": "rgba(59, 130, 246, 0.15)",
-          "gradientTo": "rgba(59, 130, 246, 0.08)"
-        }
-      }
     },
     "texts": {
       "question": "Question",
@@ -629,17 +461,7 @@
       "Two-Factor Authentication"
     ],
     "icon": {
-      "name": "clipboard-list",
-      "size": 48,
-      "color": "text-blue-500 dark:text-blue-400"
-    },
-    "styling": {
-      "successCard": {
-        "backgroundColor": "bg-green-50 dark:bg-green-900/20",
-        "borderColor": "border-green-200 dark:border-green-600",
-        "iconColor": "text-green-600 dark:text-green-400",
-        "textColor": "text-green-800 dark:text-green-200"
-      }
+      "name": "clipboard-list"
     }
   },
   "summarySceneConfig": {
@@ -657,25 +479,7 @@
       "Recognizing phishing attacks"
     ],
     "icon": {
-      "name": "award",
-      "size": 40
-    },
-    "styling": {
-      "container": {
-        "backgroundColor": "bg-white/90 dark:bg-gray-800/80",
-        "borderColor": "border-gray-200/60 dark:border-gray-600/60"
-      },
-      "achievements": {
-        "iconColor": "from-green-500 to-emerald-600",
-        "textColor": "text-gray-800 dark:text-gray-200",
-        "hoverColor": "hover:text-gray-900 dark:hover:text-white"
-      },
-      "progressCard": {
-        "backgroundColor": "from-green-100/80 to-emerald-100/80 dark:from-green-900/40 dark:to-emerald-900/40",
-        "borderColor": "border-green-300/60 dark:border-green-600/60",
-        "iconColor": "text-green-600 dark:text-green-400",
-        "textColor": "text-green-800 dark:text-green-200"
-      }
+      "name": "award"
     }
   },
   "nudgeSceneConfig": {
@@ -701,33 +505,21 @@
         "title": "Do Now",
         "description": "Download a password manager and add your primary accounts",
         "priority": "critical",
-        "timeframe": "5 minutes",
-        "gradient": "from-red-500/20 to-pink-500/20",
-        "iconColor": "text-red-600",
-        "bgColor": "bg-red-50/80",
-        "borderColor": "border-red-200/60"
+        "timeframe": "5 minutes"
       },
       {
         "iconName": "users",
         "title": "This Week",
         "description": "Share security policies at your team meeting",
         "priority": "high",
-        "timeframe": "This week",
-        "gradient": "from-amber-500/20 to-orange-500/20",
-        "iconColor": "text-amber-600",
-        "bgColor": "bg-amber-50/80",
-        "borderColor": "border-amber-200/60"
+        "timeframe": "This week"
       },
       {
         "iconName": "calendar",
         "title": "This Month",
         "description": "Plan and launch team security trainings",
         "priority": "medium",
-        "timeframe": "Within 30 days",
-        "gradient": "from-blue-500/20 to-indigo-500/20",
-        "iconColor": "text-blue-600",
-        "bgColor": "bg-blue-50/80",
-        "borderColor": "border-blue-200/60"
+        "timeframe": "Within 30 days"
       }
     ],
     "resources": [
@@ -751,70 +543,24 @@
       }
     ],
     "icon": {
-      "name": "check-circle",
-      "size": 28,
-      "color": "text-white"
+      "name": "check-circle"
     },
     "achievements": [
       {
         "id": "quiz-master",
         "name": "Quiz Master",
-        "iconName": "award",
-        "color": "text-yellow-600"
+        "iconName": "award"
       },
       {
         "id": "fast-learner",
         "name": "Fast Learner",
-        "iconName": "trending-up",
-        "color": "text-green-600"
+        "iconName": "trending-up"
       },
       {
         "id": "security-champion",
         "name": "Security Champion",
-        "iconName": "shield",
-        "color": "text-blue-600"
+        "iconName": "shield"
       }
-    ],
-    "styling": {
-      "stats": {
-        "backgroundColor": "bg-gradient-to-r from-blue-100 to-indigo-100",
-        "borderColor": "border-blue-200/60",
-        "iconColor": "text-blue-600 dark:text-blue-400",
-        "textColor": "text-gray-800 dark:text-white"
-      },
-      "downloadButton": {
-        "backgroundColor": "from-blue-500 to-indigo-600",
-        "borderColor": "border-blue-500/30",
-        "textColor": "text-white",
-        "iconColor": "text-white",
-        "gradientFrom": "from-blue-500",
-        "gradientTo": "to-indigo-600"
-      },
-      "achievements": {
-        "backgroundColor": "bg-white/60 dark:bg-gray-800/80",
-        "borderColor": "border-white/40 dark:border-gray-600/60",
-        "iconColor": "text-yellow-600 dark:text-yellow-400",
-        "textColor": "text-[#1C1C1E] dark:text-gray-200"
-      },
-      "actionCards": {
-        "backgroundColor": "bg-white/50 dark:bg-gray-800/60",
-        "borderColor": "border-white/30 dark:border-gray-600/50",
-        "iconColor": "text-[#1C1C1E] dark:text-[#F2F2F7]",
-        "textColor": "text-[#1C1C1E] dark:text-gray-200"
-      },
-      "resourceCards": {
-        "backgroundColor": "bg-white/50 dark:bg-gray-800/60",
-        "borderColor": "border-white/30 dark:border-gray-600/50",
-        "iconColor": "text-blue-600 dark:text-blue-400",
-        "textColor": "text-gray-800 dark:text-white"
-      },
-      "motivationalCard": {
-        "backgroundColor": "from-emerald-50/80 to-green-50/60 dark:from-emerald-900/40 dark:to-green-900/30",
-        "borderColor": "border-emerald-200/60 dark:border-emerald-600/50",
-        "iconColor": "text-emerald-600 dark:text-emerald-400",
-        "textColor": "text-emerald-700 dark:text-emerald-300",
-        "titleColor": "text-emerald-800 dark:text-emerald-200"
-      }
-    }
+    ]
   }
 }
