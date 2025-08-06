@@ -164,16 +164,6 @@ interface QuizSceneConfig {
       incorrectColor?: string;
       hoverColor?: string;
     };
-    cardStyle?: {
-      background?: string;
-      border?: string;
-      shadow?: string;
-    };
-    resultPanelStyle?: {
-      background?: string;
-      border?: string;
-      shadow?: string;
-    };
     buttons?: {
       nextQuestion?: {
         backgroundColor?: string;
@@ -317,8 +307,6 @@ export const QuizScene = React.memo(function QuizScene({
   config,
   onQuizCompleted,
   onNextSlide,
-
-  // Quiz state props
   currentQuestionIndex,
   setCurrentQuestionIndex,
   answers,
@@ -1164,7 +1152,6 @@ export const QuizScene = React.memo(function QuizScene({
                 ease: "linear"
               }}
             />
-
             {isLoading ? (
               <>
                 <div className="w-4 h-4 animate-spin relative z-10" aria-hidden="true" />
@@ -1649,9 +1636,6 @@ export const QuizScene = React.memo(function QuizScene({
     [currentAnswer, validateAnswer]
   );
 
-  // Removed auto-completion effect - user can manually click "Next Slide" button
-
-  // Prevent page scrolling when slider is active
   useEffect(() => {
     if (currentQuestion?.type === QuestionType.SLIDER_SCALE && !showResult && sliderContainerRef.current) {
       const container = sliderContainerRef.current;
@@ -1734,59 +1718,6 @@ export const QuizScene = React.memo(function QuizScene({
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [handleKeyDown]);
-
-  // Lightweight card style objects
-  const cardStyle = useMemo(() => {
-    const card = config.styling?.card;
-    const cardStyle = config.styling?.cardStyle; // Backward compatibility
-
-    return {
-      // Yeni lightweight props'ları kullan, yoksa eski cardStyle'ı kullan
-      background: card?.backgroundColor || cardStyle?.background || "linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.88) 20%, rgba(255, 255, 255, 0.84) 40%, rgba(255, 255, 255, 0.80) 60%, rgba(255, 255, 255, 0.76) 80%, rgba(255, 255, 255, 0.72) 100%)",
-      backdropFilter: "blur(28px) saturate(200%)",
-      WebkitBackdropFilter: "blur(28px) saturate(200%)",
-      border: cardStyle?.border || "1px solid rgba(255, 255, 255, 0.25)", // Eski border kullan
-      boxShadow: `
-        0 12px 40px rgba(0, 0, 0, 0.1),
-        0 6px 20px rgba(0, 0, 0, 0.06),
-        0 3px 12px rgba(0, 0, 0, 0.04),
-        inset 0 1px 0 rgba(255, 255, 255, 0.85),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.08)
-      `,
-      borderRadius: "rounded-2xl",
-      gradientFrom: card?.gradientFrom,
-      gradientTo: card?.gradientTo,
-      backgroundColor: card?.backgroundColor,
-      borderColor: card?.borderColor,
-      shadow: 'shadow-xl',
-    };
-  }, [config.styling?.card, config.styling?.cardStyle]);
-
-  const resultPanelStyle = useMemo(() => {
-    const resultPanel = config.styling?.resultPanel;
-    const resultPanelStyle = config.styling?.resultPanelStyle; // Backward compatibility
-
-    return {
-      background: resultPanelStyle?.background || "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.90) 20%, rgba(255, 255, 255, 0.85) 40%, rgba(255, 255, 255, 0.80) 60%, rgba(255, 255, 255, 0.75) 80%, rgba(255, 255, 255, 0.70) 100%)",
-      backdropFilter: "blur(24px) saturate(180%)",
-      WebkitBackdropFilter: "blur(24px) saturate(180%)",
-      border: resultPanelStyle?.border || "1px solid rgba(255, 255, 255, 0.3)",
-      boxShadow: `
-        0 8px 32px rgba(0, 0, 0, 0.12),
-        0 4px 16px rgba(0, 0, 0, 0.08),
-        0 2px 8px rgba(0, 0, 0, 0.04),
-        inset 0 1px 0 rgba(255, 255, 255, 0.8),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.05)
-      `,
-      borderRadius: "rounded-2xl",
-      gradientFrom: resultPanel?.gradientFrom,
-      gradientTo: resultPanel?.gradientTo,
-      // Yeni lightweight props'ları ayrı tut
-      backgroundColor: resultPanel?.backgroundColor,
-      borderColor: resultPanel?.borderColor,
-      shadow: 'shadow-lg',
-    };
-  }, [config.styling?.resultPanel, config.styling?.resultPanelStyle]);
 
   const getIconComponent = (iconName?: string): LucideIcon => {
     if (!iconName) return LucideIcons.HelpCircle;

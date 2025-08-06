@@ -72,6 +72,7 @@
       "metadata": {
         "scene_type": "intro",
         "points": 10,
+        "hasAchievementNotification": false,
         "behavioral_science_principle": [
           "Salience",
           "Emotionally Triggered Memory"
@@ -126,6 +127,7 @@
       "metadata": {
         "scene_type": "goal",
         "points": 15,
+        "hasAchievementNotification": false,
         "behavioral_science_principle": [
           "Implementation Intention",
           "Goal Priming"
@@ -161,6 +163,7 @@
       "metadata": {
         "scene_type": "scenario",
         "points": 20,
+        "hasAchievementNotification": false,
         "behavioral_science_principle": ["Social Proof", "Scarcity"],
         "title": "Real‑Life Scenario",
         "subtitle": "DevOps Manager's Phishing Experience",
@@ -195,6 +198,7 @@
       "metadata": {
         "scene_type": "actionable_content",
         "points": 25,
+        "hasAchievementNotification": false,
         "title": "Actionable Steps",
         "behavioral_science_principle": ["Social Proof", "Scarcity"],
         "actions": [
@@ -239,6 +243,7 @@
       "metadata": {
         "scene_type": "quiz",
         "points": 50,
+        "hasAchievementNotification": true,
         "behavioral_science_principle": ["Social Proof", "Scarcity"],
         "title": "Cyber Security Quiz",
         "subtitle": "Test your knowledge",
@@ -468,6 +473,7 @@
       "metadata": {
         "scene_type": "survey",
         "points": 20,
+        "hasAchievementNotification": true,
         "behavioral_science_principle": ["Social Proof", "Scarcity"],
         "title": "Training Evaluation",
         "texts": {
@@ -520,6 +526,7 @@
       "metadata": {
         "scene_type": "nudge",
         "points": 30,
+        "hasAchievementNotification": false,
         "behavioral_science_principle": ["Social Proof", "Scarcity"],
         "texts": {
           "title": "You're More Secure Now!",
@@ -543,6 +550,7 @@
       "metadata": {
         "scene_type": "summary",
         "points": 40,
+        "hasAchievementNotification": true,
         "behavioral_science_principle": ["Social Proof", "Scarcity"],
         "texts": {
           "completionTitle": "Congratulations! You've Completed the Training",

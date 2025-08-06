@@ -23,55 +23,42 @@ const STATIC_CSS_CLASSES = {
   // Loading overlay
   loadingOverlay: "fixed inset-0 bg-white/50 dark:bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center transition-colors duration-300",
   loadingText: "text-sm font-medium text-[#1C1C1E] dark:text-[#F2F2F7]",
-
-
   // Background
   backgroundContainer: "fixed inset-0 pointer-events-none overflow-hidden",
-
   // Header
   headerContainer: "relative shrink-0",
   headerContent: "relative z-10 px-4 pt-4 pb-3 lg:px-16 xl:px-20 2xl:px-24 min-h-[106px] md:min-h-[72px]",
-
   // Controls
   controlsContainer: "flex items-center space-x-1.5 md:space-x-3 flex-shrink-0 z-20",
-
   // Points badge
   pointsBadge: "relative flex items-center justify-center min-w-[54px] sm:min-w-[70px] space-x-1 sm:space-x-1.5 md:space-x-1.5 px-1.5 sm:px-2 md:px-3 h-8 sm:h-10 rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 glass-border-3 ease-out group",
   pointsBadgeNoise: "absolute inset-0 opacity-[0.020] dark:opacity-[0.012] rounded-lg sm:rounded-xl mix-blend-overlay pointer-events-none",
   pointsText: "text-xs md:text-sm font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300",
-
   // Theme button
   themeButton: "relative glass-border-3 flex items-center justify-center p-1.5 md:p-2 h-[32px] sm:h-[40px] sm:max-h-[40px] rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group ",
   themeButtonIcon: "w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300",
-
   // Language button
   languageButton: "relative flex items-center justify-center space-x-0.5 glass-border-3 sm:space-x-1 md:space-x-2 px-1 sm:px-1.5 md:px-3 h-8 sm:h-10 w-[64px] sm:w-[100px] rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group",
   languageFlag: "w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 rounded-sm transition-opacity duration-300",
   languageChevron: "w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4 text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300",
-
   // Language dropdown
   languageSearch: "w-full px-3 py-2 text-sm bg-transparent border-0 focus:outline-none focus:ring-0 text-[#1C1C1E] dark:text-[#F2F2F7] placeholder-gray-500 dark:placeholder-gray-400",
   languageList: "max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent",
   languageItem: "flex items-center space-x-2 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 cursor-pointer",
   languageItemText: "text-sm text-[#1C1C1E] dark:text-[#F2F2F7]",
   languageItemFlag: "w-4 h-4 rounded-sm",
-
   // Content area
   contentContainer: "flex-1 relative z-10 overflow-hidden",
-
   // Achievement notification
   achievementContainer: "fixed top-24 right-4 z-40",
   achievementContent: "relative px-4 py-2 glass-border-1 text-sm text-[#1C1C1E] dark:text-[#F2F2F7] group",
   achievementClose: "ml-2 p-1 rounded-full text-[#1C1C1E] dark:text-[#F2F2F7]",
-
   // Navigation
   navContainer: "fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30",
   navButtonIcon: "w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300",
-
   // Quiz completion notification
   quizNotificationContainer: "fixed z-30 bottom-4 right-4 sm:bottom-6 sm:right-6",
   quizNotificationClose: "ml-1 p-1 rounded-full hover:bg-amber-200/50 dark:hover:bg-amber-900/40 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400/30 dark:focus:ring-amber-600/30 opacity-60",
-
 } as const;
 
 // Memoized constants for better performance
@@ -103,8 +90,6 @@ const MemoizedQuizScene = React.memo(QuizScene);
 const MemoizedSurveyScene = React.memo(SurveyScene);
 const MemoizedNudgeScene = React.memo(NudgeScene);
 const MemoizedSummaryScene = React.memo(SummaryScene);
-
-
 
 export default function App() {
   // Dinamik appConfig state'i - ileride API'den gelecek
@@ -149,42 +134,42 @@ export default function App() {
       return [
         {
           component: MemoizedIntroScene,
-          points: appConfig.introSceneConfig?.points || 10,
+          points: appConfig.introSceneConfig?.points,
           config: appConfig.introSceneConfig
         },
         {
           component: MemoizedGoalScene,
-          points: appConfig.goalSceneConfig?.points || 15,
+          points: appConfig.goalSceneConfig?.points,
           config: appConfig.goalSceneConfig
         },
         {
           component: MemoizedScenarioScene,
-          points: appConfig.scenarioSceneConfig?.points || 20,
+          points: appConfig.scenarioSceneConfig?.points,
           config: appConfig.scenarioSceneConfig
         },
         {
           component: MemoizedActionableContentScene,
-          points: appConfig.actionableContentSceneConfig?.points || 25,
+          points: appConfig.actionableContentSceneConfig?.points,
           config: appConfig.actionableContentSceneConfig
         },
         {
           component: MemoizedQuizScene,
-          points: appConfig.quizSceneConfig?.points || 50,
+          points: appConfig.quizSceneConfig?.points,
           config: appConfig.quizSceneConfig
         },
         {
           component: MemoizedSurveyScene,
-          points: appConfig.surveySceneConfig?.points || 20,
+          points: appConfig.surveySceneConfig?.points,
           config: appConfig.surveySceneConfig
         },
         {
           component: MemoizedSummaryScene,
-          points: appConfig.summarySceneConfig?.points || 30,
+          points: appConfig.summarySceneConfig?.points,
           config: appConfig.summarySceneConfig
         },
         {
           component: MemoizedNudgeScene,
-          points: appConfig.nudgeSceneConfig?.points || 40,
+          points: appConfig.nudgeSceneConfig?.points,
           config: appConfig.nudgeSceneConfig
         }
       ];
@@ -255,8 +240,6 @@ export default function App() {
   // Font family configuration
   const fontStyles = useFontFamily(themeConfig.fontFamily);
 
-
-
   // Dynamic CSS classes - Sadece themeConfig değiştiğinde yeniden hesaplanır
   const dynamicCssClasses = useMemo(() => ({
     // Ana container
@@ -278,7 +261,7 @@ export default function App() {
 
     // Quiz notification
     quizNotificationContent: `relative px-4 py-2 glass-border-1 text-sm text-[#1C1C1E] dark:text-[#F2F2F7] group`,
-  }), [themeConfig]);
+  }), [themeConfig.colors?.background, themeConfig.colors?.surface, themeConfig.effects?.backdropBlur, themeConfig.effects?.borderRadius, themeConfig.effects?.borderOpacity, themeConfig.effects?.shadow]);
 
   // Combined CSS classes - Static ve dynamic sınıfları birleştir
   const cssClasses = useMemo(() => ({
@@ -540,7 +523,7 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyboardShortcut);
   }, [toggleTheme]);
 
-  // Auto-save functionality - Optimized with useCallback
+  // Auto-save functionality - Optimized with requestIdleCallback
   const saveDataToStorage = useCallback(() => {
     const saveData = {
       currentScene,
@@ -553,7 +536,17 @@ export default function App() {
       shownAchievements,
       isSurveySubmitted
     };
-    localStorage.setItem('cyber-training-progress', JSON.stringify(saveData));
+    
+    // Use requestIdleCallback for better performance
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(() => {
+        localStorage.setItem('cyber-training-progress', JSON.stringify(saveData));
+      });
+    } else {
+      setTimeout(() => {
+        localStorage.setItem('cyber-training-progress', JSON.stringify(saveData));
+      }, 0);
+    }
   }, [currentScene, totalPoints, achievements, visitedScenes, pointsAwardedScenes, quizCompleted, selectedLanguage, shownAchievements, isSurveySubmitted]);
 
   useEffect(() => {
@@ -583,21 +576,12 @@ export default function App() {
     }
   }, []);
 
-  // Track scene time for analytics
-  useEffect(() => {
-    const startTime = Date.now();
-
-    return () => {
-      // Analytics tracking could be implemented here
-      const timeSpent = Date.now() - startTime;
-      // console.log(`Time spent on scene ${currentScene}: ${timeSpent}ms`);
-    };
-  }, [currentScene]);
 
   // Optimized achievement notification - only show for NEW achievements in key scenes
   useEffect(() => {
-    // Only show notifications on Quiz (scene 4), Summary (scene 6), or Nudge (scene 7)
-    const isKeyScene = currentScene === sceneIndices.quiz || currentScene === sceneIndices.survey || currentScene === sceneIndices.summary;
+    // Check if current scene has achievement notifications enabled
+    const currentSceneConfig = scenes[currentScene];
+    const isKeyScene = currentSceneConfig?.config?.hasAchievementNotification;
 
     // Check if we have new achievements that haven't been shown yet
     const newAchievements = achievements.filter(achievement => !shownAchievements.includes(achievement));
@@ -613,33 +597,30 @@ export default function App() {
 
       return () => clearTimeout(timer);
     }
-  }, [achievements, currentScene, shownAchievements]);
+  }, [achievements, currentScene, shownAchievements, scenes]);
 
   // Auto-close achievement notification when scene changes
   useEffect(() => {
     if (showAchievementNotification) {
       setShowAchievementNotification(false);
     }
-  }, [currentScene]);
+  }, [currentScene, showAchievementNotification]);
 
 
 
   // Show quiz completion hint only once at first quiz start
   useEffect(() => {
-
     if (currentScene === sceneIndices.quiz && !hasShownQuizHint && showQuizCompletionHint) {
       setHasShownQuizHint(true);
 
-      // Auto-hide after 2 seconds for testing
+      // Auto-hide after 5 seconds
       const timer = setTimeout(() => {
         setShowQuizCompletionHint(false);
       }, 5000);
 
-      return () => {
-        clearTimeout(timer);
-      };
+      return () => clearTimeout(timer);
     }
-  }, [currentScene]);
+  }, [currentScene, sceneIndices.quiz, hasShownQuizHint, showQuizCompletionHint]);
 
   // Reset scroll position when scene changes
   const resetScrollPosition = useCallback(() => {
@@ -674,9 +655,12 @@ export default function App() {
       showScrollToTop: scrollTop > MEMOIZED_CONSTANTS.MOBILE_SCROLL_THRESHOLD && isMobile && currentScene === sceneIndices.goal
     };
 
-    setScrollPosition({ top: updates.isAtTop, bottom: updates.isAtBottom });
-    setShowScrollIndicator(updates.showIndicator);
-    setShowScrollToTop(updates.showScrollToTop);
+    // Use React.startTransition for non-urgent updates
+    React.startTransition(() => {
+      setScrollPosition({ top: updates.isAtTop, bottom: updates.isAtBottom });
+      setShowScrollIndicator(updates.showIndicator);
+      setShowScrollToTop(updates.showScrollToTop);
+    });
 
     // Only update parallax on desktop for better performance
     if (!isMobile) {
@@ -712,7 +696,7 @@ export default function App() {
       return quizCompleted;
     }
     return currentScene < scenes.length - 1;
-  }, [currentScene, quizCompleted]);
+  }, [currentScene, quizCompleted, sceneIndices.quiz, scenes.length]);
 
   // Optimized scene timing tracking
   const trackSceneTime = useCallback((sceneIndex: number) => {
@@ -769,7 +753,7 @@ export default function App() {
       timeSpent: timeSpentString,
       completionDate: new Date().toISOString().split('T')[0]
     };
-  }, [totalPoints, sceneTimeSpent, currentScene]);
+  }, [totalPoints, sceneTimeSpent, currentScene, sceneIndices.summary]);
 
   // Initialize first scene timing
   useEffect(() => {
@@ -807,7 +791,7 @@ export default function App() {
         }, 100); // Reduced from 250ms to 100ms
       }
     }
-  }, [currentScene, quizCompleted, awardPoints, isMobile, trackSceneTime]);
+  }, [currentScene, quizCompleted, isMobile]);
 
   const prevScene = useCallback(() => {
     if (currentScene > 0) {
@@ -842,7 +826,7 @@ export default function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentScene, canProceedNext, nextScene, prevScene, isLanguageDropdownOpen]);
+  }, [canProceedNext, nextScene, prevScene, isLanguageDropdownOpen]);
 
   // Click outside handling for dropdown
   useEffect(() => {
@@ -882,10 +866,6 @@ export default function App() {
     setAchievements(prev => [...prev, 'quiz-completed'].filter((a, i, arr) => arr.indexOf(a) === i));
   }, []);
 
-
-
-
-
   // Survey feedback submission handler
   const handleSurveySubmitted = useCallback(() => {
     setIsSurveySubmitted(true);
@@ -895,7 +875,6 @@ export default function App() {
   // Mobile swipe gesture handlers - ONLY FOR MOBILE
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if (!isMobile) return;
-
     const touch = e.touches[0];
     touchStartX.current = touch.clientX;
     touchStartY.current = touch.clientY;
@@ -904,11 +883,9 @@ export default function App() {
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     if (!isMobile) return;
-
     const touch = e.touches[0];
     touchEndX.current = touch.clientX;
     touchEndY.current = touch.clientY;
-
     const deltaX = Math.abs(touchEndX.current - touchStartX.current);
     const deltaY = Math.abs(touchEndY.current - touchStartY.current);
 
@@ -945,8 +922,6 @@ export default function App() {
   // Track previous scene to detect actual scene changes
   const [previousScene, setPreviousScene] = useState(currentScene);
 
-
-
   // Enhanced scene change handler with scroll reset
   const handleAnimationComplete = useCallback(() => {
     // Only trigger if this is an actual scene change, not just animation completion
@@ -967,12 +942,12 @@ export default function App() {
   const currentLanguage = useMemo(() => languages.find(lang => lang.code === selectedLanguage), [selectedLanguage]);
   const currentSceneConfig = scenes[currentScene].config;
 
-  // Ultra-optimized slide variants for mobile performance
-  const slideVariants = useMemo(() => ({
+  // Ultra-optimized slide variants for mobile performance - Static for better performance
+  const slideVariants = {
     enter: (direction: number) => ({
       x: direction > 0 ? '100%' : '-100%',
-      opacity: isMobile ? 1 : 0,
-      scale: 1 // Remove scale animation for better performance
+      opacity: 1,
+      scale: 1
     }),
     center: {
       zIndex: 1,
@@ -983,10 +958,10 @@ export default function App() {
     exit: (direction: number) => ({
       zIndex: 0,
       x: direction < 0 ? '100%' : '-100%',
-      opacity: isMobile ? 1 : 0,
-      scale: 1 // Remove scale animation for better performance
+      opacity: 1,
+      scale: 1
     })
-  }), [isMobile]);
+  };
 
   return (
     <FontFamilyProvider fontFamilyConfig={themeConfig.fontFamily}>
@@ -1095,8 +1070,6 @@ export default function App() {
                 </motion.div>
               </div>
 
-
-
               {/* Center - Progress Bar */}
               <div className="flex-1 hidden md:block" role="progressbar" aria-label={appConfig.theme?.ariaTexts?.progressLabel || "Training progress"}>
                 <div className="relative">
@@ -1146,8 +1119,6 @@ export default function App() {
                   role="switch"
                   aria-describedby="theme-toggle-description"
                 >
-
-
                   {/* Hover glow effect */}
                   <motion.div
                     className="absolute inset-0 rounded-lg sm:rounded-xl opacity-0 pointer-events-none"
@@ -1380,8 +1351,6 @@ export default function App() {
                     )}
                   </AnimatePresence>
                 </div>
-
-
               </div>
             </div>
             {isMobile && (
@@ -1394,11 +1363,8 @@ export default function App() {
                 />
               </div>
             )}
-
-
           </div>
         </header>
-
         {/* Navigation Area - Optimized spacing */}
         <main className="flex-1 relative sm:flex sm:items-center" role="main" aria-label={appConfig.theme?.ariaTexts?.contentLabel || "Training content area"}>
           {/* Left Navigation - Hidden on mobile and only show when active */}
@@ -1413,7 +1379,6 @@ export default function App() {
               />
             </div>
           )}
-
           {/* APPLE VISIONOS FLOATING GLASS CARD - Enhanced prominence with darker background */}
           <div className="flex-1 mx-2 sm:mx-4 md:mx-16 lg:mx-20 xl:mx-24 sm:my-3 md:my-6 sm:flex sm:items-center sm:justify-center">
             <div className="w-full sm:h-[calc(100vh-140px)] relative mb-2 sm:mb-0">
@@ -1469,7 +1434,6 @@ export default function App() {
                     })
                   }}
                 >
-
                   {/* Content Scroll Container - ANCHORED (doesn't move with parallax) */}
                   <div
                     ref={scrollContainerRef}
@@ -1546,7 +1510,6 @@ export default function App() {
                       </motion.div>
                     </div>
                   </div>
-
                   {/* Enhanced Scroll Indicator - Hidden on mobile for better UX */}
                   <AnimatePresence>
                     {showScrollIndicator && !scrollPosition.bottom && currentScene !== 2 && !isMobile && (
@@ -1584,7 +1547,6 @@ export default function App() {
               />
             </div>
           )}
-
           {/* ULTRA RESPONSIVE Mobile Touch Gesture Layer */}
           <div
             className="absolute inset-0 pointer-events-none md:hidden z-10"
@@ -1740,7 +1702,6 @@ export default function App() {
             </motion.div>
           )}
         </AnimatePresence>
-
         {/* Mobile Floating Scroll-to-Top Button */}
         <AnimatePresence>
           {showScrollToTop && (

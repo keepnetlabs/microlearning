@@ -526,6 +526,7 @@ export function VideoPlayer({
           id="player"
           controls
           playsInline
+          poster={poster}
           crossOrigin="anonymous"
           style={videoStyle}
           aria-label={ariaTexts?.videoDescription || "Video content"}

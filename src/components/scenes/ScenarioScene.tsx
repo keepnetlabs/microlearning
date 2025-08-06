@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useEffect, useMemo } from "react";
+import { motion } from "framer-motion";
 import * as LucideIcons from "lucide-react";
 import { LucideIcon } from "lucide-react";
 import { VideoPlayer } from "../VideoPlayer";
@@ -187,7 +187,7 @@ export function ScenarioScene({
         aria-hidden="true"
       />
     );
-  }, [config.icon?.component, config.icon?.sceneIconName, config.icon?.size, config.icon?.className]);
+  }, [config.icon?.component, config.icon?.sceneIconName, config.icon?.size]);
 
   return (
     <FontWrapper>

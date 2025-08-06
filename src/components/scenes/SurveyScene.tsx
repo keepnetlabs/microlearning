@@ -327,7 +327,7 @@ export function SurveyScene({
                         )}
                       </div>
                     </div>
-                    <span className={`group-hover:text-[#1C1C1E] dark:group-hover:text-white transition-colors text-left flex-1 text-[#1C1C1E] dark:text-gray-200`}>
+                    <span className={`group-hover:text-[#1C1C1E] dark:group-hover:text-white transition-colors text-left flex-1 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
                       {topic}
                     </span>
                   </motion.button>
@@ -337,7 +337,6 @@ export function SurveyScene({
 
             {/* Feedback Section */}
             <section
-              role="region"
               aria-labelledby="feedback-question"
               aria-describedby="feedback-description"
             >
@@ -369,7 +368,6 @@ export function SurveyScene({
 
             {/* Submit Button */}
             <section
-              role="region"
               aria-labelledby="submit-section"
             >
               <div id="submit-section" className="sr-only">{config.texts?.submitSectionLabel || config.ariaTexts?.submitSectionLabel || "Submit survey"}</div>

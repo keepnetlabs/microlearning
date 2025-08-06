@@ -35,6 +35,7 @@
         "scene_type": "intro",
         "points": 10,
         "duration_seconds": 100,
+        "hasAchievementNotification": false,
         "behavioral_science_principle": [
           "Salience",
           "Emotionally Triggered Memory"
@@ -48,9 +49,13 @@
     {
       "scene_id": "2",
       "metadata": {
+        "icon": {
+          "sceneIconName": "target"
+        },
         "scene_type": "goal",
         "points": 15,
         "duration_seconds": 100,
+        "hasAchievementNotification": false,
         "behavioral_science_principle": [
           "Implementation Intention",
           "Goal Priming"
@@ -60,7 +65,11 @@
     {
       "scene_id": "3",
       "metadata": {
+        "icon": {
+          "sceneIconName": "play-circle"
+        },
         "scene_type": "scenario",
+        "hasAchievementNotification": false,
         "points": 20,
         "duration_seconds": 100,
         "behavioral_science_principle": ["Social Proof", "Scarcity"]
@@ -71,17 +80,25 @@
       "metadata": {
         "scene_type": "actionable_content",
         "points": 25,
+        "hasAchievementNotification": false,
         "duration_seconds": 100,
-        "behavioral_science_principle": ["Social Proof", "Scarcity"]
+        "behavioral_science_principle": ["Social Proof", "Scarcity"],
+        "icon": {
+          "sceneIconName": "shield-check"
+        }
       }
     },
     {
       "scene_id": "5",
       "metadata": {
         "scene_type": "quiz",
+        "hasAchievementNotification": true,
         "points": 50,
         "duration_seconds": 100,
-        "behavioral_science_principle": ["Social Proof", "Scarcity"]
+        "behavioral_science_principle": ["Social Proof", "Scarcity"],
+        "icon": {
+          "sceneIconName": "brain-circuit"
+        }
       }
     },
     {
@@ -89,6 +106,7 @@
       "metadata": {
         "scene_type": "survey",
         "points": 20,
+        "hasAchievementNotification": true,
         "duration_seconds": 100,
         "behavioral_science_principle": ["Social Proof", "Scarcity"],
         "icon": {
@@ -101,6 +119,7 @@
       "metadata": {
         "scene_type": "nudge",
         "points": 30,
+        "hasAchievementNotification": false,
         "behavioral_science_principle": ["Social Proof", "Scarcity"],
         "icon": {
           "name": "award"
@@ -112,6 +131,7 @@
       "metadata": {
         "scene_type": "summary",
         "points": 40,
+        "hasAchievementNotification": true,
         "behavioral_science_principle": ["Social Proof", "Scarcity"],
         "icon": {
           "name": "check-circle"

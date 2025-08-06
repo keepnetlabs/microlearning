@@ -4,7 +4,7 @@ import React, { ReactNode, useMemo, useCallback } from "react";
 import { LucideIcon, ClockIcon, ChartBarIcon } from "lucide-react"
 import { FontWrapper } from "../common/FontWrapper";
 
-// İkon mapping fonksiyonu
+// İkon mapping fonksiyonu - useCallback ile optimize edildi
 const getIconComponent = (iconName: string): LucideIcon => {
   // İkon adını camelCase'e çevir (örn: "book-open" -> "BookOpen")
   const camelCaseName = iconName
@@ -37,7 +37,7 @@ const DEFAULT_CONTAINER_CLASSNAME = "flex flex-col items-center justify-center h
 const DEFAULT_ANIMATION_DELAYS = { welcomeDelay: 1.0, iconDelay: 0.2, titleDelay: 0.3, subtitleDelay: 1.0, cardDelay: 0.5, statsDelay: 0.8, ctaDelay: 1.0 };
 
 // Props interfaces
-interface HighlightItem {
+interface HighlightItemData {
   iconName: string;
   text: string;
   textColor: string;
@@ -127,7 +127,7 @@ interface IntroSceneConfig {
   title?: string;
   subtitle?: string;
   sectionTitle?: string;
-  highlights?: HighlightItem[];
+  highlights?: HighlightItemData[];
   duration?: string;
   level?: string;
   callToActionText?: string;
@@ -137,10 +137,10 @@ interface IntroSceneConfig {
   icon?: IconConfig;
   sparkles?: SparklesConfig;
   card?: {
-    backgroundColor?: string; // "bg-red-50", "bg-blue-50" vb.
-    borderColor?: string;     // "border-red-200", "border-blue-200" vb.
-    gradientFrom?: string;    // "from-red-50", "from-blue-50" vb.
-    gradientTo?: string;      // "to-red-100", "to-blue-100" vb.
+    backgroundColor?: string;
+    borderColor?: string;
+    gradientFrom?: string;
+    gradientTo?: string;
   };
 
   // Layout
@@ -150,14 +150,222 @@ interface IntroSceneConfig {
   animationDelays?: AnimationDelays;
 }
 
+// Type for sparkle config
+type SparkleConfigType = {
+  size?: number;
+  opacity?: number;
+  duration?: number;
+  delay?: number;
+};
+
+// Memoized sparkle component to prevent re-renders
+const Sparkle = React.memo(({ 
+  type, 
+  config
+}: { 
+  type: string;
+  config: SparkleConfigType; 
+}) => {
+  const randomValues = useMemo(() => ({
+    left: Math.random() * 100,
+    top: Math.random() * 100,
+    duration: (config.duration || 8) + Math.random() * 4,
+    delay: Math.random() * (config.delay || 2),
+    x: Math.random() * 12 - 6,
+    y: Math.random() * 12 - 6,
+    scale: Math.random() * 0.5 + 0.3
+  }), [config.duration, config.delay]);
+
+  return (
+    <motion.div
+      className={`absolute w-${config.size || 0.5} h-${config.size || 0.5} bg-white/${config.opacity || 25} rounded-full`}
+      style={{
+        left: `${randomValues.left}%`,
+        top: `${randomValues.top}%`,
+      }}
+      initial={{ opacity: 0, scale: 0 }}
+      animate={{
+        opacity: [0, (config.opacity || 25) / 100, 0],
+        scale: [0, randomValues.scale, 0],
+        ...(type === 'floating' && { y: [0, -8, 0] }),
+        ...(type === 'drifting' && { x: [0, randomValues.x, 0], y: [0, randomValues.y, 0] })
+      }}
+      transition={{
+        duration: randomValues.duration,
+        delay: randomValues.delay,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }}
+    />
+  );
+});
+
+// Memoized gradient sparkle component
+const GradientSparkle = React.memo(({ 
+  config 
+}: { 
+  config: SparkleConfigType; 
+}) => {
+  const randomValues = useMemo(() => ({
+    left: Math.random() * 100,
+    top: Math.random() * 100,
+    duration: (config.duration || 12) + Math.random() * 6,
+    delay: Math.random() * (config.delay || 5)
+  }), [config.duration, config.delay]);
+
+  return (
+    <motion.div
+      className={`absolute w-${config.size || 1} h-${config.size || 1} rounded-full`}
+      style={{
+        left: `${randomValues.left}%`,
+        top: `${randomValues.top}%`,
+        background: `radial-gradient(circle, rgba(255, 255, 255, ${(config.opacity || 15) / 100}) 0%, rgba(255, 255, 255, ${(config.opacity || 15) / 200}) 50%, transparent 100%)`,
+      }}
+      initial={{ opacity: 0, scale: 0 }}
+      animate={{
+        opacity: [0, (config.opacity || 15) / 100, 0],
+        scale: [0, 1, 0],
+      }}
+      transition={{
+        duration: randomValues.duration,
+        delay: randomValues.delay,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }}
+    />
+  );
+});
+
+// Memoized particle component
+const Particle = React.memo(({ 
+  config 
+}: { 
+  config: ParticlesConfig; 
+}) => {
+  const randomValues = useMemo(() => ({
+    x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
+    duration: (config.baseDuration || 4) + Math.random() * 3,
+    delay: Math.random() * 2
+  }), [config.baseDuration]);
+
+  return (
+    <motion.div
+      className={`absolute w-1 h-1 ${config.color || "bg-blue-400/60"} rounded-full`}
+      initial={{
+        x: randomValues.x,
+        y: (typeof window !== 'undefined' ? window.innerHeight : 800) + 20,
+        opacity: 0
+      }}
+      animate={{
+        y: -20,
+        opacity: [0, 1, 0],
+        scale: [0.5, 1, 0.5]
+      }}
+      transition={{
+        duration: randomValues.duration,
+        delay: randomValues.delay,
+        repeat: Infinity,
+        ease: "easeOut"
+      }}
+    />
+  );
+});
+
+// Memoized highlight item component
+const HighlightItemComponent = React.memo(({ 
+  item, 
+  index, 
+  delays 
+}: { 
+  item: HighlightItemData & { Icon: LucideIcon; index: number }; 
+  index: number; 
+  delays: Record<string, number>; 
+}) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{
+        duration: 0.6,
+        delay: delays.cardItems + index * 0.15,
+        type: "spring",
+        stiffness: 200
+      }}
+      whileHover={{
+        x: 5,
+        transition: { type: "spring", stiffness: 400 }
+      }}
+      className="flex items-center group hover:transform hover:scale-102 transition-all duration-300"
+    >
+      <div className="flex-shrink-0 mr-3 sm:mr-4">
+        <motion.div
+          className="relative p-2 sm:p-3 rounded-[10px] overflow-hidden transition-all duration-500 ease-out group-item glass-border-4"
+          whileHover={{
+            scale: 1.1,
+            rotate: 5,
+            transition: { type: "spring", stiffness: 400 }
+          }}
+          style={{
+            transform: 'translateZ(0)',
+            willChange: 'transform'
+          }}
+        >
+          <item.Icon size={14} className={`text-[#1C1C1E] dark:text-[#F2F2F7] relative z-10 sm:w-4 sm:h-4`} strokeWidth={2} />
+        </motion.div>
+      </div>
+      <span className="text-xs sm:text-[12px] max-h-[24px] text-[#1C1C1E] dark:text-[#F2F2F7] font-medium leading-relaxed group-hover:text-[#1C1C1E] dark:group-hover:text-white transition-colors">
+        {item.text}
+      </span>
+    </motion.div>
+  );
+});
+
+// Memoized stats item component
+const StatsItem = React.memo(({ 
+  icon: Icon, 
+  text, 
+  statsStyles 
+}: { 
+  icon: LucideIcon; 
+  text: string; 
+  statsStyles: React.CSSProperties; 
+}) => {
+  return (
+    <motion.div
+      className="relative flex items-center space-x-2 max-h-[24px] px-2 py-1 rounded-lg overflow-hidden transition-all duration-500 ease-out group glass-border-4"
+      whileHover={{ scale: 1.05 }}
+      style={statsStyles}
+    >
+      {/* Ultra-fine noise texture */}
+      <div
+        className="absolute inset-0 opacity-[0.010] dark:opacity-[0.005] rounded-lg mix-blend-overlay pointer-events-none"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='statsNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23statsNoise)'/%3E%3C/svg%3E")`,
+          backgroundSize: '64px 64px'
+        }}
+      />
+
+      {/* Apple-style highlight */}
+      <div
+        className="absolute inset-0 rounded-lg pointer-events-none dark:border-white dark:border-1"
+        style={{
+          background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 30%, transparent 70%)`,
+          mixBlendMode: 'overlay'
+        }}
+      />
+
+      <span className="relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7] text-[12px] max-h-[24px] flex items-center gap-1 font-medium">
+        <Icon size={14} className="text-[#1C1C1E] dark:text-[#F2F2F7] relative z-10 sm:w-4 sm:h-4" strokeWidth={2} /> 
+        {text}
+      </span>
+    </motion.div>
+  );
+});
 
 export const IntroScene = React.memo(({
   config
 }: { config: IntroSceneConfig }) => {
-
-  // Debug: Render sayısını takip et
-  // console.log('IntroScene rendered', new Date().toISOString());
-
+  
   const {
     title,
     subtitle,
@@ -274,6 +482,15 @@ export const IntroScene = React.memo(({
     willChange: 'transform'
   }), []);
 
+  // Memoize sparkle configurations to prevent object recreation
+  const sparkleConfigs = useMemo(() => ({
+    ambient: sparkles?.ambient || {},
+    floating: sparkles?.floating || {},
+    twinkling: sparkles?.twinkling || {},
+    gradient: sparkles?.gradient || {},
+    drifting: sparkles?.drifting || {},
+    breathing: sparkles?.breathing || {}
+  }), [sparkles]);
 
   return (
     <FontWrapper variant="primary" className={containerClassName}>
@@ -282,144 +499,32 @@ export const IntroScene = React.memo(({
         <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
           {/* Subtle ambient sparkles */}
           {ambientSparkles.map((_, i) => (
-            <motion.div
-              key={`ambient-${i}`}
-              className={`absolute w-${sparkles.ambient?.size || 0.5} h-${sparkles.ambient?.size || 0.5} bg-white/${sparkles.ambient?.opacity || 25} rounded-full`}
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{
-                opacity: [0, (sparkles.ambient?.opacity || 25) / 100, 0],
-                scale: [0, 0.8, 0],
-              }}
-              transition={{
-                duration: (sparkles.ambient?.duration || 8) + Math.random() * 4,
-                delay: Math.random() * (sparkles.ambient?.delay || 2),
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            />
+            <Sparkle key={`ambient-${i}`} type="ambient" config={sparkleConfigs.ambient} />
           ))}
 
           {/* Gentle floating sparkles */}
           {floatingSparkles.map((_, i) => (
-            <motion.div
-              key={`floating-${i}`}
-              className={`absolute w-${sparkles.floating?.size || 0.5} h-${sparkles.floating?.size || 0.5} bg-white/${sparkles.floating?.opacity || 20} rounded-full`}
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{
-                opacity: [0, (sparkles.floating?.opacity || 20) / 100, 0],
-                scale: [0, 0.6, 0],
-                y: [0, -8, 0],
-              }}
-              transition={{
-                duration: (sparkles.floating?.duration || 10) + Math.random() * 5,
-                delay: Math.random() * (sparkles.floating?.delay || 3),
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            />
+            <Sparkle key={`floating-${i}`} type="floating" config={sparkleConfigs.floating} />
           ))}
 
           {/* Soft twinkling sparkles */}
           {twinklingSparkles.map((_, i) => (
-            <motion.div
-              key={`twinkle-${i}`}
-              className={`absolute w-${sparkles.twinkling?.size || 0.5} h-${sparkles.twinkling?.size || 0.5} bg-white/${sparkles.twinkling?.opacity || 18} rounded-full`}
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{
-                opacity: [0, (sparkles.twinkling?.opacity || 18) / 100, 0],
-                scale: [0, 0.5, 0],
-              }}
-              transition={{
-                duration: (sparkles.twinkling?.duration || 6) + Math.random() * 3,
-                delay: Math.random() * (sparkles.twinkling?.delay || 4),
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            />
+            <Sparkle key={`twinkle-${i}`} type="twinkling"config={sparkleConfigs.twinkling} />
           ))}
 
           {/* Delicate gradient sparkles */}
           {gradientSparkles.map((_, i) => (
-            <motion.div
-              key={`gradient-${i}`}
-              className={`absolute w-${sparkles.gradient?.size || 1} h-${sparkles.gradient?.size || 1} rounded-full`}
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                background: `radial-gradient(circle, rgba(255, 255, 255, ${(sparkles.gradient?.opacity || 15) / 100}) 0%, rgba(255, 255, 255, ${(sparkles.gradient?.opacity || 15) / 200}) 50%, transparent 100%)`,
-              }}
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{
-                opacity: [0, (sparkles.gradient?.opacity || 15) / 100, 0],
-                scale: [0, 1, 0],
-              }}
-              transition={{
-                duration: (sparkles.gradient?.duration || 12) + Math.random() * 6,
-                delay: Math.random() * (sparkles.gradient?.delay || 5),
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            />
+            <GradientSparkle key={`gradient-${i}`} config={sparkleConfigs.gradient} />
           ))}
 
           {/* Gentle drifting sparkles */}
           {driftingSparkles.map((_, i) => (
-            <motion.div
-              key={`drift-${i}`}
-              className={`absolute w-${sparkles.drifting?.size || 0.5} h-${sparkles.drifting?.size || 0.5} bg-white/${sparkles.drifting?.opacity || 15} rounded-full`}
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{
-                opacity: [0, (sparkles.drifting?.opacity || 15) / 100, 0],
-                scale: [0, 0.4, 0],
-                x: [0, Math.random() * 12 - 6],
-                y: [0, Math.random() * 12 - 6],
-              }}
-              transition={{
-                duration: (sparkles.drifting?.duration || 15) + Math.random() * 8,
-                delay: Math.random() * (sparkles.drifting?.delay || 6),
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            />
+            <Sparkle key={`drift-${i}`} type="drifting" config={sparkleConfigs.drifting} />
           ))}
 
           {/* Subtle breathing sparkles */}
           {breathingSparkles.map((_, i) => (
-            <motion.div
-              key={`breathing-${i}`}
-              className={`absolute w-${sparkles.breathing?.size || 0.5} h-${sparkles.breathing?.size || 0.5} bg-white/${sparkles.breathing?.opacity || 12} rounded-full`}
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{
-                opacity: [0, (sparkles.breathing?.opacity || 12) / 100, 0],
-                scale: [0, 0.7, 0],
-              }}
-              transition={{
-                duration: (sparkles.breathing?.duration || 9) + Math.random() * 4,
-                delay: Math.random() * (sparkles.breathing?.delay || 7),
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            />
+            <Sparkle key={`breathing-${i}`} type="breathing" config={sparkleConfigs.breathing} />
           ))}
         </div>
       )}
@@ -428,26 +533,7 @@ export const IntroScene = React.memo(({
       {particles?.enabled && (
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           {particlesArray.map((_, i) => (
-            <motion.div
-              key={i}
-              className={`absolute w-1 h-1 ${particles.color || "bg-blue-400/60"} rounded-full`}
-              initial={{
-                x: Math.random() * window.innerWidth,
-                y: window.innerHeight + 20,
-                opacity: 0
-              }}
-              animate={{
-                y: -20,
-                opacity: [0, 1, 0],
-                scale: [0.5, 1, 0.5]
-              }}
-              transition={{
-                duration: (particles.baseDuration || 4) + Math.random() * 3,
-                delay: Math.random() * 2,
-                repeat: Infinity,
-                ease: "easeOut"
-              }}
-            />
+            <Particle key={i} config={particles} />
           ))}
         </div>
       )}
@@ -572,44 +658,7 @@ export const IntroScene = React.memo(({
 
           <div className="space-y-3 sm:space-y-4">
             {memoizedHighlights.map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{
-                  duration: 0.6,
-                  delay: delays.cardItems + index * 0.15,
-                  type: "spring",
-                  stiffness: 200
-                }}
-                whileHover={{
-                  x: 5,
-                  transition: { type: "spring", stiffness: 400 }
-                }}
-                className="flex items-center group hover:transform hover:scale-102 transition-all duration-300"
-              >
-                <div className="flex-shrink-0 mr-3 sm:mr-4">
-                  <motion.div
-                    className="relative p-2 sm:p-3 rounded-[10px] overflow-hidden transition-all duration-500 ease-out group-item glass-border-4"
-                    whileHover={{
-                      scale: 1.1,
-                      rotate: 5,
-                      transition: { type: "spring", stiffness: 400 }
-                    }}
-                    style={{
-                      transform: 'translateZ(0)',
-                      willChange: 'transform'
-                    }}
-                  >
-
-
-                    <item.Icon size={14} className={`text-[#1C1C1E] dark:text-[#F2F2F7] relative z-10 sm:w-4 sm:h-4`} strokeWidth={2} />
-                  </motion.div>
-                </div>
-                <span className="text-xs sm:text-[12px] max-h-[24px] text-[#1C1C1E] dark:text-[#F2F2F7] font-medium leading-relaxed group-hover:text-[#1C1C1E] dark:group-hover:text-white transition-colors">
-                  {item.text}
-                </span>
-              </motion.div>
+              <HighlightItemComponent key={index} item={item} index={index} delays={delays} />
             ))}
           </div>
 
@@ -621,57 +670,8 @@ export const IntroScene = React.memo(({
             className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200/50 dark:border-gray-600/50"
           >
             <div className="flex justify-between items-center">
-              <motion.div
-                className="relative flex items-center space-x-2 max-h-[24px] px-2 py-1 rounded-lg overflow-hidden transition-all duration-500 ease-out group glass-border-4"
-                whileHover={{ scale: 1.05 }}
-                style={statsStyles}
-              >
-                {/* Ultra-fine noise texture */}
-                <div
-                  className="absolute inset-0 opacity-[0.010] dark:opacity-[0.005] rounded-lg mix-blend-overlay pointer-events-none"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='statsNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23statsNoise)'/%3E%3C/svg%3E")`,
-                    backgroundSize: '64px 64px'
-                  }}
-                />
-
-                {/* Apple-style highlight */}
-                <div
-                  className="absolute inset-0 rounded-lg pointer-events-none dark:border-white dark:border-1"
-                  style={{
-                    background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 30%, transparent 70%)`,
-                    mixBlendMode: 'overlay'
-                  }}
-                />
-
-                <span className="relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7] text-[12px] max-h-[24px] flex items-center gap-1 font-medium"><ClockIcon size={14} className="text-[#1C1C1E] dark:text-[#F2F2F7] relative z-10 sm:w-4 sm:h-4" strokeWidth={2} /> {duration}</span>
-              </motion.div>
-
-              <motion.div
-                className="relative flex items-center space-x-2 px-2 py-1 rounded-lg overflow-hidden transition-all duration-500 ease-out group glass-border-4 max-h-[24px]"
-                whileHover={{ scale: 1.05 }}
-                style={statsStyles}
-              >
-                {/* Ultra-fine noise texture */}
-                <div
-                  className="absolute inset-0 opacity-[0.010] dark:opacity-[0.005] rounded-lg mix-blend-overlay pointer-events-none"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='statsNoise2'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23statsNoise2)'/%3E%3C/svg%3E")`,
-                    backgroundSize: '64px 64px'
-                  }}
-                />
-
-                {/* Apple-style highlight */}
-                <div
-                  className="absolute inset-0 rounded-lg pointer-events-none dark:border-white dark:border-1"
-                  style={{
-                    background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 30%, transparent 70%)`,
-                    mixBlendMode: 'overlay'
-                  }}
-                />
-
-                <span className="relative z-10 text-xs text-[#1C1C1E] dark:text-[#F2F2F7] font-medium flex items-center gap-1"><ChartBarIcon size={14} className="text-[#1C1C1E] dark:text-[#F2F2F7] relative z-10 sm:w-4 sm:h-4 transform rotate-270" strokeWidth={2} /> {level}</span>
-              </motion.div>
+              <StatsItem icon={ClockIcon} text={duration || ''} statsStyles={statsStyles} />
+              <StatsItem icon={ChartBarIcon} text={level || ''} statsStyles={statsStyles} />
             </div>
           </motion.div>
         </div>

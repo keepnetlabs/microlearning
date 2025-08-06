@@ -39,13 +39,6 @@ interface IconConfig {
   className?: string;
 }
 
-interface GlassEffectConfig {
-  blur?: string;
-  saturation?: string;
-  border?: string;
-  shadow?: string;
-}
-
 interface GoalSceneConfig {
   // Content props
   title?: string;
@@ -59,61 +52,15 @@ interface GoalSceneConfig {
   cardSpacing?: string;
   maxWidth?: string;
 
-  // Glass effect configuration
-  glassEffect?: GlassEffectConfig;
 }
 
-
-// Memoized static styles
-const staticStyles = {
-  noiseTexture: {
-    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 1024 1024' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='appleNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='8' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23appleNoise)'/%3E%3C/svg%3E")`,
-    backgroundSize: '512px 512px'
-  },
-  iconNoiseTexture: {
-    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='appleIconNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.0' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23appleIconNoise)'/%3E%3C/svg%3E")`,
-    backgroundSize: '128px 128px'
-  },
-  radialHighlight: {
-    background: `radial-gradient(ellipse 120% 70% at 50% 0%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.20) 25%, rgba(255, 255, 255, 0.08) 50%, transparent 75%)`,
-    mixBlendMode: 'soft-light' as const
-  },
-  iconHighlight: {
-    background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.2) 30%, transparent 70%)`,
-    mixBlendMode: 'soft-light' as const
-  },
-  hoverGlow: {
-    background: `linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.25) 0%, 
-      rgba(255, 255, 255, 0.18) 30%, 
-      rgba(255, 255, 255, 0.12) 60%, 
-      rgba(255, 255, 255, 0.08) 100%
-    )`,
-    boxShadow: `
-      0 0 50px rgba(255, 255, 255, 0.12),
-      0 0 25px rgba(255, 255, 255, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3)
-    `
-  },
-  ultraThinBorder: {
-    border: '0.5px solid rgba(255, 255, 255, 0.7)',
-    boxShadow: `
-      inset 0 0 0 0.5px rgba(255, 255, 255, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.4)
-    `
-  }
-};
-
 // Memoized GoalCard component for better performance
-const GoalCard = memo(({ goal, index, glassEffect }: {
+const GoalCard = memo(({ goal, index }: {
   goal: GoalItem;
   index: number;
-  glassEffect?: GlassEffectConfig;
 }) => {
   // Memoize icon component
   const Icon = useMemo(() => getIconComponent(goal.iconName), [goal.iconName]);
-
-
   return (
     <article
       className="relative p-4 sm:p-5 glass-border-2 overflow-hidden transition-all duration-500 ease-out group hover:scale-[1.03] cursor-pointer"
@@ -180,12 +127,6 @@ export const GoalScene = memo(({
   const defaultContainerClassName = "flex flex-col items-center justify-center h-full text-center px-6";
   const defaultCardSpacing = "space-y-6";
   const defaultMaxWidth = "max-w-md w-full";
-  const defaultGlassEffect = {
-    blur: "blur(24px)",
-    saturation: "saturate(180%)",
-    border: "1px solid rgba(255, 255, 255, 0.30)",
-    shadow: "0 8px 32px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.20)"
-  };
 
   const {
     title,
@@ -197,7 +138,6 @@ export const GoalScene = memo(({
   const containerClassName = defaultContainerClassName;
   const cardSpacing = defaultCardSpacing;
   const maxWidth = defaultMaxWidth;
-  const glassEffect = defaultGlassEffect;
 
   // Memoize the icon component
   const iconComponent = useMemo(() => {
@@ -249,7 +189,6 @@ export const GoalScene = memo(({
               key={`${goal.title}-${index}`}
               goal={goal}
               index={index}
-              glassEffect={glassEffect}
             />
           ))}
         </section>

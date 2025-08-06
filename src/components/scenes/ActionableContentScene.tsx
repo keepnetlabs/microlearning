@@ -90,14 +90,6 @@ export function ActionableContentScene({
   // Default values for container classes
   const defaultContainerClassName = "flex flex-col items-center justify-start min-h-full px-2 sm:px-6 overflow-y-auto";
 
-  // Default glass effect configuration
-  const defaultGlassEffect = {
-    cardBackground: "bg-white/60 dark:bg-gray-800/80",
-    cardBorder: "border-white/30 dark:border-gray-600/60",
-    shadow: "shadow-lg hover:shadow-xl",
-    backdropBlur: "backdrop-blur-xl"
-  };
-
   // Default layout configuration
   const defaultCardSpacing = "space-y-4";
   const defaultMaxWidth = "max-w-md w-full";
@@ -109,12 +101,10 @@ export function ActionableContentScene({
     tipConfig,
     cardSpacing,
     maxWidth,
-    glassEffect,
     ariaTexts
   } = config;
 
-  // Use provided values or defaults
-  const finalGlassEffect = glassEffect || defaultGlassEffect;
+
   const finalCardSpacing = cardSpacing || defaultCardSpacing;
   const finalMaxWidth = maxWidth || defaultMaxWidth;
 
@@ -144,7 +134,7 @@ export function ActionableContentScene({
       );
     }
     return null;
-  }, [icon.component, icon.sceneIconName, icon.size, icon.className]);
+  }, [icon.component, icon.sceneIconName, icon.size]);
 
   const tipIconComponent = useMemo(() => {
     if (tipConfig.iconName) {
@@ -209,7 +199,6 @@ export function ActionableContentScene({
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      // Focus management for keyboard navigation
                       const nextCard = e.currentTarget.nextElementSibling as HTMLElement;
                       if (nextCard) {
                         nextCard.focus();
