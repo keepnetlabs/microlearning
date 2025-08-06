@@ -3,6 +3,7 @@ import { CheckCircle, TrendingUp, LucideIcon } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { NudgeSceneConfig } from "../configs/educationConfigs";
 import { FontWrapper } from "../common/FontWrapper";
+import { useIsMobile } from "../ui/use-mobile";
 
 interface NudgeSceneProps {
   config: NudgeSceneConfig;
@@ -10,7 +11,7 @@ interface NudgeSceneProps {
 
 export function NudgeScene({ config }: NudgeSceneProps) {
   const achievements = config.achievements || [];
-
+  const isMobile = useIsMobile();
   // Dinamik icon mapping function (diğer componentlerle aynı)
   const getIconComponent = (iconName?: string): LucideIcon => {
     if (!iconName) {
@@ -38,16 +39,16 @@ export function NudgeScene({ config }: NudgeSceneProps) {
   return (
     <FontWrapper>
       <div className="flex flex-col items-center justify-center h-full px-6">
-        <div className="mb-4 relative">
+        {!isMobile && <div className="mb-4 relative">
           <div className="relative p-3 glass-border-3">
             <IconComponent
               size={config.icon?.size || 40}
               className={`text-[#1C1C1E] dark:text-[#F2F2F7] relative z-10`}
             />
           </div>
-        </div>
+        </div>}
 
-        <h1 className="text-2xl mb-2 text-center leading-[1.5] text-[#1C1C1E] dark:text-white">
+        <h1 className="text-2xl font-semibold mb-2 text-center leading-[1.5] text-[#1C1C1E] dark:text-white">
           {config.texts?.title || "Artık Daha Güvenlisiniz!"}
         </h1>
         <p className="text-[#1C1C1E] dark:text-[#F2F2F7] mb-4 text-center">

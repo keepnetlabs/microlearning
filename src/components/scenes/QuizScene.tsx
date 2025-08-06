@@ -15,6 +15,7 @@ import { Slider } from "../ui/slider";
 import * as LucideIcons from "lucide-react";
 import { LucideIcon } from "lucide-react";
 import { FontWrapper } from "../common/FontWrapper";
+import { useIsMobile } from "../ui/use-mobile";
 
 // Question Types
 enum QuestionType {
@@ -363,9 +364,7 @@ export const QuizScene = React.memo(function QuizScene({
   const sliderContainerRef = useRef<HTMLDivElement>(null);
 
   // Check if device is mobile
-  const isMobile = useMemo(() => {
-    return typeof window !== 'undefined' && window.innerWidth < 768;
-  }, []);
+  const isMobile = useIsMobile();
 
   // Get questions from config
   const questions = useMemo(() => config?.questions?.list || [], [config?.questions?.list]);
@@ -615,13 +614,13 @@ export const QuizScene = React.memo(function QuizScene({
             <motion.button
               key={option.id}
               initial={{ opacity: 0, x: -20 }}
-              animate={{ 
-                opacity: 1, 
+              animate={{
+                opacity: 1,
                 x: 0,
                 scale: showCorrectness && (isCorrect || isSelected) ? [1, 1.05, 1] : 1
               }}
-              transition={{ 
-                duration: 0.4, 
+              transition={{
+                duration: 0.4,
                 delay: index * 0.1,
                 scale: showCorrectness ? { duration: 0.6, ease: "easeInOut" } : {}
               }}
@@ -647,7 +646,7 @@ export const QuizScene = React.memo(function QuizScene({
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1 pr-3">
-                  <motion.span 
+                  <motion.span
                     className="block mb-1 font-medium transition-colors duration-300 text-[#1C1C1E] dark:text-[#F2F2F7]"
                     animate={showCorrectness && (isCorrect || isSelected) ? {
                       y: [0, -2, 0],
@@ -722,17 +721,7 @@ export const QuizScene = React.memo(function QuizScene({
                 )}
               </div>
 
-              {/* Loading indicator */}
-              {isLoading && isSelected && (
-                <div
-                  className="absolute inset-0 bg-card/80 backdrop-blur-sm rounded-xl flex items-center justify-center"
-                  aria-label={ariaTexts?.checkAnswerLabel || "Processing answer"}
-                  role="status"
-                  aria-live="polite"
-                >
-                  <div className="w-5 h-5 border-2 border-ring/30 border-t-ring rounded-full animate-spin" aria-hidden="true" />
-                </div>
-              )}
+
             </motion.button>
           );
         })}
@@ -759,7 +748,7 @@ export const QuizScene = React.memo(function QuizScene({
 
 
     return (
-      <div className="space-y-2.5" role="radiogroup" aria-label={ariaTexts?.trueFalseLabel || "True or false options"} aria-describedby="true-false-description">
+      <div className="space-y-1 sm:space-y-2.5" role="radiogroup" aria-label={ariaTexts?.trueFalseLabel || "True or false options"} aria-describedby="true-false-description">
         <div
           id="true-false-description"
           className="sr-only"
@@ -770,7 +759,7 @@ export const QuizScene = React.memo(function QuizScene({
         <div
           className="p-3 rounded-lg "
         >
-          <p className="text-center font-medium text-[#1C1C1E] dark:text-[#F2F2F7]">
+          <p className="text-center text-[#1C1C1E] dark:text-[#F2F2F7]">
             {question.statement}
           </p>
         </div>
@@ -1154,16 +1143,15 @@ export const QuizScene = React.memo(function QuizScene({
             />
             {isLoading ? (
               <>
-                <div className="w-4 h-4 animate-spin relative z-10" aria-hidden="true" />
                 <span className={'text-sm sm:text-base text-center font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]'}>
-                  {config.texts?.evaluating || "Değerlendiriliyor..."}
+                  {config.texts?.evaluating}
                 </span>
               </>
             ) : (
               <>
                 <Zap size={16} className={`sm:w-5 sm:h-5 relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
                 <span className={'text-sm sm:text-base text-center font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]'}>
-                  {config.texts?.completeEvaluation || "Değerlendirmeyi Tamamla"}
+                  {config.texts?.completeEvaluation}
                 </span>
               </>
             )}
@@ -1574,7 +1562,7 @@ export const QuizScene = React.memo(function QuizScene({
               whileTap={{ scale: 0.95 }}
               onClick={() => handleAnswer(draggedItems)}
               disabled={isLoading}
-              aria-label={isLoading ? "Processing answer" : "Check answer"}
+              aria-label={isLoading ? config.texts?.evaluating : config.texts?.checkAnswer}
               className={`relative flex items-center space-x-2 w-full px-4 py-2 sm:px-6 sm:py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
             >
               {/* Button shimmer effect */}
@@ -1590,7 +1578,6 @@ export const QuizScene = React.memo(function QuizScene({
 
               {isLoading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-background/30 border-t-background rounded-full animate-spin relative z-10" aria-hidden="true" />
                   <span className={`text-sm sm:text-base text-center font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
                     {config.texts?.checkAnswer || "Kontrol ediliyor..."}
                   </span>
@@ -1782,7 +1769,6 @@ export const QuizScene = React.memo(function QuizScene({
       </div>
     );
   }
-
   return (
     <FontWrapper>
       <div
@@ -1805,15 +1791,15 @@ export const QuizScene = React.memo(function QuizScene({
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-4"
+          className="text-center mb-2 sm:mb-4"
           role="banner"
           aria-label={ariaTexts?.headerLabel || "Quiz header"}
         >
-          <div className="flex items-center justify-center mb-3" aria-hidden="true">
+          {!isMobile && <div className="flex items-center justify-center mb-3" aria-hidden="true">
             {iconNode}
-          </div>
+          </div>}
 
-          <h1 className="text-2xl mb-2 sm:mb-2 text-center text-[#1C1C1E] dark:text-white">
+          <h1 className="text-2xl mb-2 sm:mb-2 font-semibold text-center text-[#1C1C1E] dark:text-white">
             {config.title}
           </h1>
 
@@ -1842,7 +1828,7 @@ export const QuizScene = React.memo(function QuizScene({
             {ariaTexts?.questionDescription || "Current question with answer options"}
           </div>
           <div
-            className={`!isMobile && p-4 glass-border-1`}
+            className={`${!isMobile && "p-4 glass-border-1"}`}
 
             role="article"
             aria-labelledby="question-title"

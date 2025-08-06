@@ -4,6 +4,7 @@ import * as LucideIcons from "lucide-react";
 import { motion } from "framer-motion";
 import { SurveySceneConfig } from "../configs/educationConfigs";
 import { FontWrapper } from "../common/FontWrapper";
+import { useIsMobile } from "../ui/use-mobile";
 
 interface SurveySceneProps {
   config: SurveySceneConfig;
@@ -21,7 +22,7 @@ export function SurveyScene({
   const [selectedTopics, setSelectedTopics] = useState<number[]>([]);
   const [isSubmitted, setIsSubmitted] = useState(propIsSubmitted || false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const isMobile = useIsMobile();
   // Sync local state with prop changes
   useEffect(() => {
     setIsSubmitted(propIsSubmitted || false);
@@ -151,6 +152,7 @@ export function SurveyScene({
     );
   }
 
+
   return (
     <FontWrapper>
       <main
@@ -167,7 +169,7 @@ export function SurveyScene({
           {config.texts?.formDescription || config.ariaTexts?.formDescription || "Survey form with rating, topic selection, and feedback sections"}
         </div>
 
-        <motion.div
+        {!isMobile && <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
@@ -182,13 +184,13 @@ export function SurveyScene({
               aria-hidden="true"
             />
           </div>
-        </motion.div>
+        </motion.div>}
 
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-lg sm:text-2xl mb-3 text-center text-[#1C1C1E] dark:text-[#F2F2F7]"
+          className="text-2xl font-semibold mb-3 text-center text-[#1C1C1E] dark:text-[#F2F2F7]"
           id="survey-title"
         >
           {config?.title}

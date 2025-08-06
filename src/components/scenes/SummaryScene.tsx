@@ -17,7 +17,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { SummarySceneConfig } from "../configs/educationConfigs";
 import { FontWrapper } from "../common/FontWrapper";
-
+import { useIsMobile } from "../ui/use-mobile";
 interface SummarySceneProps {
   config: SummarySceneConfig;
   completionData?: {
@@ -31,7 +31,7 @@ export function SummaryScene({ config, completionData }: SummarySceneProps) {
   const [showCertificate, setShowCertificate] = useState(false);
   const [showConfetti, setShowConfetti] = useState(true);
   const [celebrationPhase, setCelebrationPhase] = useState(0);
-
+  const isMobile = useIsMobile();
   // Start celebration sequence
   useEffect(() => {
     const celebrations = [
@@ -306,7 +306,7 @@ export function SummaryScene({ config, completionData }: SummarySceneProps) {
         </AnimatePresence>
 
         {/* Background celebration glow */}
-        <motion.div
+        {!isMobile && <motion.div
           className="fixed inset-0 pointer-events-none z-30"
           initial={{ opacity: 0 }}
           animate={{
@@ -318,17 +318,18 @@ export function SummaryScene({ config, completionData }: SummarySceneProps) {
           }}
         >
           <div className="absolute inset-0 bg-gradient-radial from-emerald-400/20 via-green-400/10 to-transparent"></div>
-        </motion.div>
+        </motion.div>}
 
         {/* Completion Celebration */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.8, y: -20 }}
+          initial={{ opacity: isMobile ? 1 : 0, scale: isMobile ? 1 : 0.8, y: isMobile ? 0 : -20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          transition={!isMobile ? { duration: 0.8, ease: "easeOut" } : {}}
           className="text-center mb-3 sm:mb-4 relative z-50"
         >
           {/* Success Icon with Enhanced Effects */}
-          <div className="relative mb-4">
+          {!isMobile && <div className="relative mb-4">
+
             <motion.div
               className="relative w-16 h-16 sm:w-20 sm:h-20 glass-border-2 flex items-center justify-center mx-auto"
               animate={{
@@ -381,7 +382,7 @@ export function SummaryScene({ config, completionData }: SummarySceneProps) {
                 transition={{ duration: 1, repeat: Infinity }}
               />
 
-              <motion.div
+              {!isMobile && <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
@@ -396,7 +397,7 @@ export function SummaryScene({ config, completionData }: SummarySceneProps) {
                     />
                   );
                 })()}
-              </motion.div>
+              </motion.div>}
 
               {/* Success burst effect */}
               {celebrationPhase >= 1 && (
@@ -408,6 +409,7 @@ export function SummaryScene({ config, completionData }: SummarySceneProps) {
                 />
               )}
             </motion.div>
+
 
             {/* Orbital stars */}
             {[...Array(4)].map((_, i) => (
@@ -432,20 +434,19 @@ export function SummaryScene({ config, completionData }: SummarySceneProps) {
                 <Star size={8} className="text-yellow-400 fill-current" />
               </motion.div>
             ))}
-          </div>
+          </div>}
 
-          {/* Completion Message with Typewriter Effect */}
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 text-[#1C1C1E] dark:text-[#F2F2F7]"
+            initial={!isMobile ? { opacity: 0, y: 20 } : {}}
+            animate={!isMobile ? { opacity: 1, y: 0 } : {}}
+            transition={!isMobile ? { duration: 0.8, delay: 0.2 } : {}}
+            className="text-2xl font-semibold mb-3 text-[#1C1C1E] dark:text-[#F2F2F7]"
           >
             <motion.span
-              initial={{ width: 0 }}
-              animate={{ width: "auto" }}
-              transition={{ duration: 1, delay: 0.5 }}
-              className="inline-block overflow-hidden whitespace-normal text-[#1C1C1E] dark:text-[#F2F2F7] lg:whitespace-nowrap break-words"
+              initial={!isMobile ? { width: 0 } : {}}
+              animate={!isMobile ? { width: "auto" } : {}}
+              transition={!isMobile ? { duration: 1, delay: 0.5 } : {}}
+              className="inline-block overflow-hidden whitespace-normal text-[#1C1C1E] dark:text-[#F2F2F7] lg:whitespace-nowrap break-words min-w-[280px]"
             >
               {config.texts?.completionTitle}
             </motion.span>
