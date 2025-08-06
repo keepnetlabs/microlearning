@@ -2,6 +2,7 @@ import * as LucideIcons from "lucide-react";
 import { ReactNode, useMemo, memo } from "react";
 import { LucideIcon } from "lucide-react";
 import { FontWrapper } from "../common/FontWrapper";
+import { useIsMobile } from "../ui/use-mobile";
 
 // İkon mapping fonksiyonu
 const getIconComponent = (iconName: string): LucideIcon => {
@@ -162,6 +163,8 @@ export const GoalScene = memo(({
     [cardSpacing, maxWidth]
   );
 
+  const isMobile = useIsMobile();
+
   return (
     <FontWrapper>
       <main
@@ -169,13 +172,15 @@ export const GoalScene = memo(({
         role="main"
         aria-labelledby="goal-scene-title"
       >
-        <div className="mb-1 sm:mb-2 p-3 glass-border-3 relative">
-          {iconComponent}
-        </div>
+        {!isMobile && (
+          <div className="mb-1 sm:mb-2 p-3 glass-border-3 relative">
+            {iconComponent}
+          </div>
+        )}
 
         <h1
           id="goal-scene-title"
-          className="text-2xl mb-3 sm:mb-5 text-[#1C1C1E] dark:text-[#F2F2F7]"
+          className="text-2xl mb-3 sm:mb-5 text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold"
         >
           {title}
         </h1>

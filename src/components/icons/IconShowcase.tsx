@@ -118,7 +118,7 @@ export const IconShowcase = () => {
         <p className="text-lg text-[#1C1C1E] dark:text-[#F2F2F7] mb-4">
           Apple Vision Pro aesthetics with 3D gradients, glow effects and micro-animations
         </p>
-        <div className="flex justify-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+        <div className="flex justify-center space-x-4 text-sm text-[#1C1C1E] dark:text-[#F2F2F7]">
           <span>🔵 Passive</span>
           <span>🟦 Active</span>
           <span>🟢 Completed</span>

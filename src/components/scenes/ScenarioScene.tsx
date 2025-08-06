@@ -4,6 +4,7 @@ import * as LucideIcons from "lucide-react";
 import { LucideIcon } from "lucide-react";
 import { VideoPlayer } from "../VideoPlayer";
 import { FontWrapper } from "../common/FontWrapper";
+import { useIsMobile } from "../ui/use-mobile";
 
 export interface TranscriptRow {
   start: number;
@@ -189,6 +190,8 @@ export function ScenarioScene({
     );
   }, [config.icon?.component, config.icon?.sceneIconName, config.icon?.size]);
 
+  const isMobile = useIsMobile();
+
   return (
     <FontWrapper>
       <main
@@ -199,7 +202,7 @@ export function ScenarioScene({
         aria-label={config.ariaTexts?.mainLabel || "Scenario Scene"}
       >
         {/* Header Icon */}
-        <motion.div
+        {!isMobile && (<motion.div
           initial={{ opacity: 0, scale: 0.8, y: -20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
@@ -207,7 +210,7 @@ export function ScenarioScene({
           aria-hidden="true"
         >
           {iconComponent}
-        </motion.div>
+        </motion.div>)}
 
         {/* Title */}
         <motion.h1
@@ -215,7 +218,7 @@ export function ScenarioScene({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-2xl mb-1 sm:mb-3 text-[#1C1C1E] dark:text-white text-center"
+          className="text-2xl mb-1 sm:mb-3 text-[#1C1C1E] dark:text-[#F2F2F7] text-center font-semibold"
         >
           {config.title}
         </motion.h1>

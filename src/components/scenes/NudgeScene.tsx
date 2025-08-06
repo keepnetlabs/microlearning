@@ -68,7 +68,7 @@ export function NudgeScene({ config }: NudgeSceneProps) {
                       <CheckCircle size={12} className="text-[#1C1C1E] dark:text-[#F2F2F7]" />
                     </div>
                   </div>
-                  <span className={`text-sm ${config.styling?.achievements?.textColor || 'text-gray-800 dark:text-gray-200'} group-${config.styling?.achievements?.hoverColor || 'hover:text-[#1C1C1E] dark:hover:text-white'} transition-colors leading-relaxed font-medium`}>
+                  <span className={`text-sm text-[#1C1C1E] dark:text-[#F2F2F7] group-${'hover:text-[#1C1C1E] dark:hover:text-white'} transition-colors leading-relaxed font-medium`}>
                     {achievement}
                   </span>
                 </div>

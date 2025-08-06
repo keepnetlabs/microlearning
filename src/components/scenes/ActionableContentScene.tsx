@@ -2,6 +2,7 @@ import { LucideIcon } from "lucide-react";
 import { useMemo } from "react";
 import * as LucideIcons from "lucide-react";
 import { FontWrapper } from "../common/FontWrapper";
+import { useIsMobile } from "../ui/use-mobile";
 
 // Props interfaces
 interface ActionItem {
@@ -104,7 +105,7 @@ export function ActionableContentScene({
     ariaTexts
   } = config;
 
-
+  const isMobile = useIsMobile();
   const finalCardSpacing = cardSpacing || defaultCardSpacing;
   const finalMaxWidth = maxWidth || defaultMaxWidth;
 
@@ -161,11 +162,13 @@ export function ActionableContentScene({
         </div>
 
         <header role="banner" aria-label={ariaTexts?.headerLabel || "Scene header"}>
-          <div className="flex items-center justify-center" aria-hidden="true">
-            {sceneIconComponent}
-          </div>
+          {!isMobile && (
+            <div className="flex items-center justify-center" aria-hidden="true">
+              {sceneIconComponent}
+            </div>
+          )}
           <h1
-            className="text-2xl mb-2 sm:mb-3 text-center text-[#1C1C1E] dark:text-[#F2F2F7]"
+            className="text-2xl mb-3 sm:mb-5 text-center text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold"
             id="actionable-content-title"
           >
             {title}
@@ -222,7 +225,7 @@ export function ActionableContentScene({
                         </h3>
                         <p
                           id={`${cardId}-description`}
-                          className="text-xs text-[#1C1C1E] dark:text-gray-200 mb-3 leading-relaxed"
+                          className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] mb-3 leading-relaxed"
                         >
                           {action.description}
                         </p>

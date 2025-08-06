@@ -1,9 +1,9 @@
 import * as LucideIcons from "lucide-react";
 import { motion } from "framer-motion";
-import React, { ReactNode, useMemo, useCallback } from "react";
+import React, { ReactNode, useMemo, useCallback, useState, useEffect } from "react";
 import { LucideIcon, ClockIcon, ChartBarIcon } from "lucide-react"
 import { FontWrapper } from "../common/FontWrapper";
-
+import { useIsMobile } from "../ui/use-mobile";
 // İkon mapping fonksiyonu - useCallback ile optimize edildi
 const getIconComponent = (iconName: string): LucideIcon => {
   // İkon adını camelCase'e çevir (örn: "book-open" -> "BookOpen")
@@ -34,7 +34,7 @@ const DEFAULT_SPARKLES = {
   breathing: { count: 7, opacity: 12, size: 0.5, duration: 11, delay: 6 }
 };
 const DEFAULT_CONTAINER_CLASSNAME = "flex flex-col items-center justify-center h-full text-center relative overflow-hidden px-2 sm:px-4";
-const DEFAULT_ANIMATION_DELAYS = { welcomeDelay: 1.0, iconDelay: 0.2, titleDelay: 0.3, subtitleDelay: 1.0, cardDelay: 0.5, statsDelay: 0.8, ctaDelay: 1.0 };
+const DEFAULT_ANIMATION_DELAYS = { welcomeDelay: 0.3, iconDelay: 0.1, titleDelay: 0.2, subtitleDelay: 0.4, cardDelay: 0.3, statsDelay: 0.5, ctaDelay: 0.6 };
 
 // Props interfaces
 interface HighlightItemData {
@@ -159,12 +159,12 @@ type SparkleConfigType = {
 };
 
 // Memoized sparkle component to prevent re-renders
-const Sparkle = React.memo(({ 
-  type, 
+const Sparkle = React.memo(({
+  type,
   config
-}: { 
+}: {
   type: string;
-  config: SparkleConfigType; 
+  config: SparkleConfigType;
 }) => {
   const randomValues = useMemo(() => ({
     left: Math.random() * 100,
@@ -201,10 +201,10 @@ const Sparkle = React.memo(({
 });
 
 // Memoized gradient sparkle component
-const GradientSparkle = React.memo(({ 
-  config 
-}: { 
-  config: SparkleConfigType; 
+const GradientSparkle = React.memo(({
+  config
+}: {
+  config: SparkleConfigType;
 }) => {
   const randomValues = useMemo(() => ({
     left: Math.random() * 100,
@@ -237,10 +237,10 @@ const GradientSparkle = React.memo(({
 });
 
 // Memoized particle component
-const Particle = React.memo(({ 
-  config 
-}: { 
-  config: ParticlesConfig; 
+const Particle = React.memo(({
+  config
+}: {
+  config: ParticlesConfig;
 }) => {
   const randomValues = useMemo(() => ({
     x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
@@ -272,14 +272,14 @@ const Particle = React.memo(({
 });
 
 // Memoized highlight item component
-const HighlightItemComponent = React.memo(({ 
-  item, 
-  index, 
-  delays 
-}: { 
-  item: HighlightItemData & { Icon: LucideIcon; index: number }; 
-  index: number; 
-  delays: Record<string, number>; 
+const HighlightItemComponent = React.memo(({
+  item,
+  index,
+  delays
+}: {
+  item: HighlightItemData & { Icon: LucideIcon; index: number };
+  index: number;
+  delays: Record<string, number>;
 }) => {
   return (
     <motion.div
@@ -321,14 +321,14 @@ const HighlightItemComponent = React.memo(({
 });
 
 // Memoized stats item component
-const StatsItem = React.memo(({ 
-  icon: Icon, 
-  text, 
-  statsStyles 
-}: { 
-  icon: LucideIcon; 
-  text: string; 
-  statsStyles: React.CSSProperties; 
+const StatsItem = React.memo(({
+  icon: Icon,
+  text,
+  statsStyles
+}: {
+  icon: LucideIcon;
+  text: string;
+  statsStyles: React.CSSProperties;
 }) => {
   return (
     <motion.div
@@ -355,7 +355,7 @@ const StatsItem = React.memo(({
       />
 
       <span className="relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7] text-[12px] max-h-[24px] flex items-center gap-1 font-medium">
-        <Icon size={14} className="text-[#1C1C1E] dark:text-[#F2F2F7] relative z-10 sm:w-4 sm:h-4" strokeWidth={2} /> 
+        <Icon size={14} className="text-[#1C1C1E] dark:text-[#F2F2F7] relative z-10 sm:w-4 sm:h-4" strokeWidth={2} />
         {text}
       </span>
     </motion.div>
@@ -365,7 +365,18 @@ const StatsItem = React.memo(({
 export const IntroScene = React.memo(({
   config
 }: { config: IntroSceneConfig }) => {
-  
+
+  // 🎯 OPTİMİZE EDİLDİ - Daha erken animasyon başlangıcı
+  const [isVisible, setIsVisible] = useState(false);
+  const isMobile = useIsMobile();
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 10); // 10ms delay ile animasyonlar daha erken başlar
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const {
     title,
     subtitle,
@@ -462,19 +473,19 @@ export const IntroScene = React.memo(({
     [...Array(particles?.count || 12)], [particles?.count]
   );
 
-  // Memoize animation delays to prevent recalculation
+  // Memoize animation delays to prevent recalculation - OPTİMİZE EDİLDİ
   const delays = useMemo(() => ({
-    welcome: animationDelays?.welcomeDelay || 1.5,
-    icon: (animationDelays?.welcomeDelay || 1.5) + (animationDelays?.iconDelay || 0.2),
-    title: (animationDelays?.welcomeDelay || 1.5) + (animationDelays?.titleDelay || 0.7),
-    titleWords: (animationDelays?.welcomeDelay || 1.5) + (animationDelays?.titleDelay || 0.9),
-    titleWordStagger: (animationDelays?.welcomeDelay || 1.5) + (animationDelays?.titleDelay || 1.1),
-    subtitle: (animationDelays?.welcomeDelay || 1.5) + (animationDelays?.subtitleDelay || 1.7),
-    card: (animationDelays?.welcomeDelay || 1.5) + (animationDelays?.cardDelay || 1.9),
-    cardTitle: (animationDelays?.welcomeDelay || 1.5) + (animationDelays?.cardDelay || 2.1),
-    cardItems: (animationDelays?.welcomeDelay || 1.5) + (animationDelays?.cardDelay || 2.3),
-    stats: (animationDelays?.welcomeDelay || 1.5) + (animationDelays?.statsDelay || 2.8),
-    cta: (animationDelays?.welcomeDelay || 1.5) + (animationDelays?.ctaDelay || 3.0)
+    welcome: animationDelays?.welcomeDelay || 0.3,
+    icon: (animationDelays?.welcomeDelay || 0.3) + (animationDelays?.iconDelay || 0.1),
+    title: (animationDelays?.welcomeDelay || 0.3) + (animationDelays?.titleDelay || 0.2),
+    titleWords: (animationDelays?.welcomeDelay || 0.3) + (animationDelays?.titleDelay || 0.3),
+    titleWordStagger: (animationDelays?.welcomeDelay || 0.3) + (animationDelays?.titleDelay || 0.4),
+    subtitle: (animationDelays?.welcomeDelay || 0.3) + (animationDelays?.subtitleDelay || 0.4),
+    card: (animationDelays?.welcomeDelay || 0.3) + (animationDelays?.cardDelay || 0.3),
+    cardTitle: (animationDelays?.welcomeDelay || 0.3) + (animationDelays?.cardDelay || 0.4),
+    cardItems: (animationDelays?.welcomeDelay || 0.3) + (animationDelays?.cardDelay || 0.5),
+    stats: (animationDelays?.welcomeDelay || 0.3) + (animationDelays?.statsDelay || 0.5),
+    cta: (animationDelays?.welcomeDelay || 0.3) + (animationDelays?.ctaDelay || 0.6)
   }), [animationDelays]);
 
   const statsStyles = useMemo(() => ({
@@ -509,7 +520,7 @@ export const IntroScene = React.memo(({
 
           {/* Soft twinkling sparkles */}
           {twinklingSparkles.map((_, i) => (
-            <Sparkle key={`twinkle-${i}`} type="twinkling"config={sparkleConfigs.twinkling} />
+            <Sparkle key={`twinkle-${i}`} type="twinkling" config={sparkleConfigs.twinkling} />
           ))}
 
           {/* Delicate gradient sparkles */}
@@ -541,16 +552,20 @@ export const IntroScene = React.memo(({
       {/* Welcome Animation with Scene Icon */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut", delay: delays.welcome }}
+        animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 30 }}
+        transition={{ duration: 0.6, ease: "easeOut", delay: delays.welcome }}
         className="mb-3 sm:mb-5 relative"
       >
         {/* Scene Icon with Enhanced Effects */}
         <motion.div
           initial={{ opacity: 0, scale: 0.5, rotateY: 180 }}
-          animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+          animate={{
+            opacity: isVisible ? 1 : 0,
+            scale: isVisible ? 1 : 0.5,
+            rotateY: isVisible ? 0 : 180
+          }}
           transition={{
-            duration: 1.2,
+            duration: 0.8,
             delay: delays.icon,
             type: "spring",
             stiffness: 200
@@ -560,9 +575,11 @@ export const IntroScene = React.memo(({
           {/* Icon glow effect */}
           <div className="absolute inset-0 from-blue-400/30 to-transparent rounded-full animate-pulse scale-150"></div>
 
-          <div className="relative z-10 p-3 glass-border-3">
-            {icon?.component || sceneIconComponent}
-          </div>
+          {!isMobile && (
+            <div className="relative z-10 p-3 glass-border-3">
+              {icon?.component || sceneIconComponent}
+            </div>
+          )}
 
           {/* Sparkle effects */}
           {icon?.sparkleEnabled && [...Array(icon.sparkleCount || 6)].map((_, i) => (
@@ -597,18 +614,18 @@ export const IntroScene = React.memo(({
         {/* Title and Subtitle with Stagger Animation */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: delays.title }}
+          animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
+          transition={{ duration: 0.6, delay: delays.title }}
         >
           <motion.h1
             className="text-2xl sm:text-3xl md:text-4xl font-semibold text-[#1C1C1E] dark:text-[#F2F2F7]"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: delays.titleWords }}
+            animate={{ opacity: isVisible ? 1 : 0 }}
+            transition={{ duration: 0.7, delay: delays.titleWords }}
           >
             <motion.span
               initial={{ display: "inline-block", opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
               transition={{ delay: delays.titleWordStagger }}
             >
               {title}
@@ -618,8 +635,8 @@ export const IntroScene = React.memo(({
           <motion.p
             className="text-base sm:text-lg md:text-xl text-[#1C1C1E] dark:text-[#F2F2F7] max-w-sm sm:max-w-md mt-2 sm:mt-3 font-medium leading-relaxed px-2"
             initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: delays.subtitle }}
+            animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
+            transition={{ duration: 0.6, delay: delays.subtitle }}
           >
             {subtitle}
           </motion.p>
@@ -629,9 +646,13 @@ export const IntroScene = React.memo(({
       {/* Enhanced Learning Points Card with Parallax Effect */}
       <motion.div
         initial={{ opacity: 0, y: 40, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
+        animate={{
+          opacity: isVisible ? 1 : 0,
+          y: isVisible ? 0 : 40,
+          scale: isVisible ? 1 : 0.95
+        }}
         transition={{
-          duration: 0.8,
+          duration: 0.6,
           delay: delays.card,
           type: "spring",
           stiffness: 120
@@ -649,7 +670,7 @@ export const IntroScene = React.memo(({
         <div className="relative z-10">
           <motion.h3
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            animate={{ opacity: isVisible ? 1 : 0 }}
             transition={{ delay: delays.cardTitle }}
             className="mb-3 sm:mb-4 text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold text-center text-sm sm:text-base"
           >
@@ -665,7 +686,7 @@ export const IntroScene = React.memo(({
           {/* Enhanced Stats */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
             transition={{ delay: delays.stats }}
             className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200/50 dark:border-gray-600/50"
           >
@@ -681,7 +702,10 @@ export const IntroScene = React.memo(({
       {/* Enhanced Call to Action */}
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
+        animate={{
+          opacity: isVisible ? 1 : 0,
+          scale: isVisible ? 1 : 0.8
+        }}
         transition={{
           delay: delays.cta,
           type: "spring",

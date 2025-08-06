@@ -536,7 +536,8 @@ export default function App() {
       shownAchievements,
       isSurveySubmitted
     };
-    
+    //test için şimdilik boş dönüyor
+    return ''
     // Use requestIdleCallback for better performance
     if ('requestIdleCallback' in window) {
       requestIdleCallback(() => {
