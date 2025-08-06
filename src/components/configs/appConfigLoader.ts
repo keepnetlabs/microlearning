@@ -2,11 +2,15 @@
 import microlearningConfig from './microlearning.json';
 import enConfig from './en.json';
 import trConfig from './tr.json';
+import frConfig from './fr.json';
+import grConfig from './gr.json';
 
 // Desteklenen diller ve içerik dosyaları
 const contentMap: Record<string, any> = {
   'tr': trConfig,
   'en': enConfig,
+  'fr': frConfig,
+  'de': grConfig,
   'default': enConfig
 };
 

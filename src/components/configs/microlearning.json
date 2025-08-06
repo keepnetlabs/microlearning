@@ -11,7 +11,7 @@
     "risk_area": "Phishing",
     "content_provider": "Keepnet",
     "level": "Beginner",
-    "language_availability": ["en", "tr"]
+    "language_availability": ["en", "tr", "fr", "gr"]
   },
   "theme": {
     "fontFamily": {

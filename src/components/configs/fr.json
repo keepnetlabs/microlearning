@@ -1,0 +1,520 @@
+{
+  "app": {
+    "texts": {
+      "loading": "Chargement...",
+      "languageNotFound": "Langue non trouvée",
+      "scrollHint": "Faites défiler vers le bas",
+      "nextSection": "Section suivante",
+      "achievementNotification": "Succès débloqué ! 🎉",
+      "closeNotification": "Fermer la notification",
+      "startLabel": "Commencer",
+      "completedLabel": "Terminé",
+      "progressLabel": "terminé",
+      "points": "points",
+      "popularLanguages": "Langues Populaires",
+      "toggleButtonLightMode": "Passer au thème clair",
+      "toggleButtonDarkMode": "Passer au thème sombre",
+      "hintTitle": "Thème Sombre/Clair",
+      "hintDescription": "Cliquez sur l'icône lune/soleil en haut à droite pour changer votre thème"
+    },
+    "ariaTexts": {
+      "appLabel": "Application de Formation à la Cybersécurité",
+      "appDescription": "Application interactive de formation à la cybersécurité avec plusieurs modules d'apprentissage et suivi des progrès",
+      "loadingLabel": "Chargement du contenu",
+      "headerLabel": "En-tête de l'application",
+      "logoLabel": "Logo de l'application",
+      "progressLabel": "Progrès de la formation",
+      "pointsLabel": "Total des points gagnés",
+      "pointsDescription": "points gagnés",
+      "themeToggleDescription": "Basculer entre le thème clair et sombre",
+      "languageSelectorLabel": "Sélecteur de langue",
+      "languageSelectorDescription": "Sélectionnez votre langue préférée pour l'application",
+      "languageListLabel": "Langues disponibles",
+      "languageListDescription": "Liste des langues disponibles pour l'application",
+      "languageSearchDescription": "Rechercher des langues par nom ou code pays",
+      "contentLabel": "Contenu de formation",
+      "contentDescription": "Zone de contenu de formation défilable avec modules d'apprentissage interactifs",
+      "achievementLabel": "Notification de succès",
+      "quizCompletionLabel": "Indice de completion du quiz",
+      "scrollToTopLabel": "Faire défiler vers le haut de la page"
+    }
+  },
+  "1": {
+    "title": "Protection contre le Phishing SMS",
+    "subtitle": "Reconnaître les attaques de phishing basées sur SMS et les méthodes de protection",
+    "sectionTitle": "Ce que vous apprendrez dans cette formation :",
+    "highlights": [
+      {
+        "iconName": "smartphone",
+        "text": "Reconnaître les attaques de phishing SMS"
+      },
+      {
+        "iconName": "shield",
+        "text": "Stratégies de protection"
+      },
+      {
+        "iconName": "alert-triangle",
+        "text": "Détecter les messages suspects"
+      },
+      {
+        "iconName": "users",
+        "text": "Construire la sensibilisation de l'équipe"
+      }
+    ],
+    "duration": "~10 minutes",
+    "level": "Tous Niveaux",
+    "callToActionText": "Glissez pour apprendre la sécurité SMS",
+    "texts": {
+      "sceneLabel": "Scène d'Introduction",
+      "sceneDescription": "Bienvenue au module de formation à la protection contre le phishing SMS",
+      "iconLabel": "Icône smartphone représentant la sécurité SMS",
+      "titleLabel": "Titre de la formation",
+      "subtitleLabel": "Description de la formation",
+      "cardLabel": "Carte des objectifs d'apprentissage",
+      "cardDescription": "Liste des compétences que vous apprendrez dans cette formation",
+      "highlightItemLabel": "Objectif d'apprentissage",
+      "statsLabel": "Statistiques de formation",
+      "durationLabel": "Durée de la formation",
+      "levelLabel": "Niveau de difficulté de la formation",
+      "ctaLabel": "Appel à l'action",
+      "sparkleLabel": "Effet étincelant décoratif"
+    }
+  },
+  "2": {
+    "title": "Objectifs de Sécurité SMS",
+    "goals": [
+      {
+        "iconName": "smartphone",
+        "title": "Reconnaître les Menaces SMS",
+        "subtitle": "Sensibilisation",
+        "description": "Reconnaître et identifier rapidement les attaques de phishing basées sur SMS"
+      },
+      {
+        "iconName": "shield",
+        "title": "Stratégies de Protection",
+        "subtitle": "Défense",
+        "description": "Développer des méthodes efficaces pour se protéger contre les attaques SMS"
+      },
+      {
+        "iconName": "alert-triangle",
+        "title": "Détecter les Messages Suspects",
+        "subtitle": "Vigilance",
+        "description": "Analyser et vérifier les messages SMS suspects"
+      }
+    ]
+  },
+  "3": {
+    "title": "Scénario Réel",
+    "subtitle": "Expérience de Phishing d'un Manager DevOps",
+    "description": "Examiner et apprendre d'un scénario d'attaque de phishing réel",
+    "video": {
+      "src": "https://customer-0lll6yc8omc23rbm.cloudflarestream.com/5fdb12ff1436c991f50b698a02e2faa1/manifest/video.m3u8",
+      "poster": null,
+      "disableForwardSeek": false,
+      "showTranscript": true,
+      "transcriptTitle": "Transcription du Scénario",
+      "transcriptLanguage": "Français",
+      "transcript": "00:00:04.400 la sécurité est toujours une priorité mais une\n00:00:07.919 expérience que j'ai eue le mois dernier m'a\n00:00:10.400 fait changer de comportement un jour pendant ma\n00:00:13.120 pause déjeuner j'ai reçu un email qui\n00:00:15.639 semblait venir du département financier\n00:00:17.439 il me demandait d'approuver une\n00:00:20.039 facture quelque chose semblait bizarre le numéro\n00:00:23.320 de facture était étrange et il y avait quelques\n00:00:25.519 erreurs de grammaire grâce à ma formation en\n00:00:28.279 cybersécurité j'ai rapidement réalisé que\n00:00:30.679 c'était une tentative de phishing j'ai pensé que\n00:00:33.879 quelqu'un pourrait tomber dans le piège mais au lieu\n00:00:36.239 de le signaler j'ai continué mon travail\n00:00:38.760 en supposant qu'ils l'attraperaient de toute façon une semaine\n00:00:42.079 plus tard notre entreprise a annoncé qu'une attaque\n00:00:44.840 de phishing avait conduit à une violation de données exposant\n00:00:47.680 les informations des clients l'email que j'avais ignoré était\n00:00:51.559 partie de cette attaque si je l'avais signalé\n00:00:54.719 toute la crise aurait pu être évitée\n00:00:57.600 après la violation l'entreprise a tenu une\n00:00:59.600 réunion l'équipe IT a expliqué comment l'attaque\n00:01:03.199 s'était produite et les dégâts causés pas\n00:01:05.880 seulement des dommages réputationnels mais aussi\n00:01:08.320 des pertes financières j'étais choqué et me sentais\n00:01:11.280 coupable un simple comportement de signalement sécurisé\n00:01:14.119 aurait pu faire toute la\n00:01:16.439 différence voici ce que j'ai appris de\n00:01:18.439 cette expérience ne supposez pas que quelqu'un\n00:01:21.320 d'autre le signalera faites-le simplement si\n00:01:24.119 tout le monde pense de la même manière rien\n00:01:26.439 ne se fait nous partageons tous la\n00:01:28.560 responsabilité connaissez le processus de\n00:01:30.960 signalement de votre entreprise si vous n'êtes pas sûr demandez à l'IT il y a toujours des outils pour rendre\n00:01:37.439 le signalement plus facile ne sous-estimez jamais\n00:01:40.399 les attaques de phishing même un seul faux email peut\n00:01:43.439 mettre toute l'entreprise en danger après\n00:01:46.560 cet incident j'ai réalisé que combattre\n00:01:49.079 les cyberattaques n'est possible que lorsque\n00:01:51.439 tout le monde pratique des comportements\n00:01:53.640 sécurisés identifier un email de phishing\n00:01:56.520 ne suffit pas vous devez agir\n00:02:00.000 mais"
+    },
+    "texts": {
+      "transcriptLoading": "Chargement de la transcription..."
+    },
+    "ariaTexts": {
+      "mainLabel": "Scène de Scénario",
+      "mainDescription": "Vidéo de scénario réel avec transcription",
+      "loadingLabel": "Chargement de la transcription",
+      "errorLabel": "Erreur de chargement de la transcription",
+      "videoPlayerLabel": "Lecteur Vidéo",
+      "mobileHintLabel": "Indice utilisateur mobile"
+    }
+  },
+  "4": {
+    "title": "Étapes Actionnables",
+    "actions": [
+      {
+        "iconName": "key",
+        "title": "Créer un Mot de Passe Fort",
+        "description": "Au moins 12 caractères, lettres majuscules et minuscules, chiffres et symboles",
+        "tip": "Exemple : 'Café!très7Bon#2024'"
+      },
+      {
+        "iconName": "smartphone",
+        "title": "Activer la 2FA",
+        "description": "Activer l'authentification multi-facteurs sur tous les comptes critiques",
+        "tip": "Utilisez Google Authenticator ou Authy"
+      },
+      {
+        "iconName": "database",
+        "title": "Gestionnaire de Mots de Passe",
+        "description": "Utilisez des mots de passe uniques et complexes pour chaque compte",
+        "tip": "1Password, Bitwarden ou LastPass"
+      }
+    ],
+    "tipConfig": {
+      "iconName": "check-circle"
+    },
+    "ariaTexts": {
+      "mainLabel": "Contenu Actionnable",
+      "mainDescription": "Section de contenu actionnable avec cartes interactives contenant des conseils et des orientations",
+      "headerLabel": "En-tête de scène",
+      "actionCardsLabel": "Cartes d'action",
+      "actionCardsDescription": "Cartes de contenu actionnable",
+      "actionCardLabel": "Carte d'action",
+      "tipLabel": "Conseil"
+    }
+  },
+  "5": {
+    "title": "Quiz de Cybersécurité",
+    "subtitle": "Testez vos connaissances",
+    "questions": {
+      "totalCount": 4,
+      "maxAttempts": 2,
+      "list": [
+        {
+          "id": "pwd-strength",
+          "type": "multiple_choice",
+          "title": "Évaluation de la Force du Mot de Passe",
+          "description": "Lequel des mots de passe suivants est le plus sécurisé ?",
+          "category": "Sécurité des Mots de Passe",
+          "options": [
+            {
+              "id": "weak-1",
+              "text": "password123",
+              "isCorrect": false,
+              "explanation": "Trop simple et prévisible"
+            },
+            {
+              "id": "medium-1",
+              "text": "P@ssw0rd!",
+              "isCorrect": false,
+              "explanation": "Un modèle courant"
+            },
+            {
+              "id": "strong-1",
+              "text": "Café!très7Bon#2024",
+              "isCorrect": true,
+              "explanation": "Long, complexe et mémorable"
+            },
+            {
+              "id": "weak-2",
+              "text": "123456789",
+              "isCorrect": false,
+              "explanation": "Seulement des chiffres",
+              "color": "red"
+            }
+          ],
+          "explanation": "Les mots de passe sécurisés sont longs, complexes et évitent les informations personnelles.",
+          "tips": [
+            "Utilisez au moins 12 caractères",
+            "Mélangez majuscules, minuscules, chiffres et symboles",
+            "Évitez les infos personnelles",
+            "Utilisez un mot de passe unique pour chaque compte"
+          ]
+        },
+        {
+          "id": "phishing-detection",
+          "type": "true_false",
+          "title": "Détection d'Attaque de Phishing",
+          "statement": "Les attaquants utilisent toujours des adresses email inconnues dans les attaques de phishing.",
+          "correctAnswer": false,
+          "category": "Sécurité Email",
+          "options": {
+            "true": {
+              "label": "Oui",
+              "icon": "check"
+            },
+            "false": {
+              "label": "Non",
+              "icon": "x"
+            }
+          },
+          "explanation": "Les phishers usurpent souvent des adresses familières.",
+          "tips": [
+            "Vérifiez attentivement l'adresse de l'expéditeur",
+            "Ne cliquez pas sur des liens suspects",
+            "Allez directement sur le site officiel",
+            "Signalez à l'IT"
+          ]
+        },
+        {
+          "id": "password-best-practices",
+          "type": "multi_select",
+          "title": "Meilleures Pratiques pour les Mots de Passe",
+          "description": "Quelles règles devez-vous suivre pour créer un mot de passe sécurisé ?",
+          "category": "Sécurité des Mots de Passe",
+          "minCorrect": 3,
+          "options": [
+            {
+              "id": "length",
+              "text": "Utilisez au moins 12 caractères",
+              "isCorrect": true,
+              "explanation": "Les mots de passe plus longs sont plus sécurisés"
+            },
+            {
+              "id": "personal-info",
+              "text": "Incluez votre date de naissance",
+              "isCorrect": false,
+              "explanation": "Les infos personnelles sont prévisibles"
+            },
+            {
+              "id": "mixed-case",
+              "text": "Mélangez majuscules et minuscules",
+              "isCorrect": true,
+              "explanation": "Augmente la complexité"
+            },
+            {
+              "id": "reuse",
+              "text": "Réutilisez le même mot de passe partout",
+              "isCorrect": false,
+              "explanation": "Crée un risque"
+            },
+            {
+              "id": "special-chars",
+              "text": "Ajoutez des caractères spéciaux",
+              "isCorrect": true,
+              "explanation": "Renforce le mot de passe"
+            },
+            {
+              "id": "avoid-personal",
+              "text": "Évitez les informations personnelles",
+              "isCorrect": true,
+              "explanation": "Rend plus difficile à deviner"
+            }
+          ],
+          "explanation": "Un mot de passe sécurisé fait au moins 12 caractères, est complexe et évite les infos personnelles.",
+          "tips": [
+            "Utilisez un mot de passe unique pour chaque compte",
+            "Utilisez un gestionnaire de mots de passe",
+            "Mettez à jour régulièrement",
+            "Activez l'authentification à deux facteurs"
+          ]
+        },
+        {
+          "id": "email-risk-assessment",
+          "type": "slider_scale",
+          "title": "Évaluation des Risques Email",
+          "statement": "\"URGENT ! Votre compte est suspendu, mettez à jour votre mot de passe maintenant : bit.ly/mise-a-jour-pass\"",
+          "description": "Évaluez le niveau de risque de cet email",
+          "min": 1,
+          "max": 10,
+          "correctRange": { "min": 8, "max": 10 },
+          "labels": { "min": "Sûr", "max": "Très Risqué" },
+          "category": "Sécurité Email",
+          "explanation": "Risque élevé : langage urgent, expéditeur inconnu, lien raccourci.",
+          "tips": [
+            "Attention au langage urgent",
+            "Évitez les liens raccourcis",
+            "Allez directement sur le site officiel",
+            "Signalez à l'IT"
+          ]
+        }
+      ]
+    },
+    "texts": {
+      "question": "Question",
+      "nextQuestion": "Question Suivante",
+      "nextSlide": "Diapositive Suivante",
+      "retryQuestion": "Réessayer",
+      "quizCompleted": "Quiz Terminé ! 🎉",
+      "correctAnswer": "Correct ! 🎉",
+      "wrongAnswer": "Incorrect",
+      "attemptsLeft": "tentatives restantes",
+      "noAttemptsLeft": "aucune tentative restante",
+      "checkAnswer": "Vérifier la Réponse",
+      "evaluating": "Évaluation...",
+      "completeEvaluation": "Terminer l'Évaluation",
+      "mobileInstructions": "📱 Mobile : sélectionnez l'élément, puis tapez une catégorie",
+      "desktopInstructions": "🖥️ Bureau : glissez les éléments dans les catégories",
+      "options": "Options",
+      "categories": "Catégories",
+      "tapHere": "Tapez ici",
+      "checkAnswerButton": "Vérifier la Réponse",
+      "explanation": "Explication",
+      "tips": "💡 Conseils",
+      "mobileHint": "💡 Lisez attentivement les questions pour une meilleure expérience",
+      "previousQuestion": "Question Précédente",
+      "quizCompletionHint": "Terminez le quiz pour continuer",
+      "achievementNotification": "Succès Débloqué ! 🎉",
+      "scrollHint": "Faites défiler vers le bas",
+      "nextSection": "Section Suivante",
+      "loading": "Chargement...",
+      "questionLoading": "Chargement de la question...",
+      "transcriptLoading": "Chargement de la transcription...",
+      "closeNotification": "Fermer la notification",
+      "languageNotFound": "Langue non trouvée"
+    },
+    "ariaTexts": {
+      "mainLabel": "Interface de Quiz",
+      "mainDescription": "Quiz interactif avec plusieurs types de questions et feedback en temps réel",
+      "headerLabel": "En-tête du quiz",
+      "questionLabel": "Contenu de la question",
+      "questionDescription": "Question actuelle avec options de réponse",
+      "multipleChoiceLabel": "Options à choix multiples",
+      "multipleChoiceDescription": "Sélectionnez une réponse parmi les options disponibles",
+      "trueFalseLabel": "Options vrai ou faux",
+      "trueFalseDescription": "Sélectionnez vrai ou faux pour l'énoncé donné",
+      "multiSelectLabel": "Options de sélection multiple",
+      "multiSelectDescription": "Sélectionnez plusieurs réponses qui s'appliquent",
+      "sliderLabel": "Question d'échelle avec curseur",
+      "sliderDescription": "Évaluez votre réponse en utilisant le curseur",
+      "dragDropLabel": "Catégories glisser-déposer",
+      "dragDropDescription": "Glissez les éléments vers les catégories appropriées ou tapez pour sélectionner",
+      "optionsLabel": "Options disponibles",
+      "categoriesLabel": "Catégories",
+      "resultPanelLabel": "Résultat et explication",
+      "resultPanelDescription": "Feedback sur votre réponse avec explication et conseils",
+      "explanationLabel": "Section explication",
+      "tipsLabel": "Conseils utiles",
+      "navigationLabel": "Navigation des questions",
+      "previousQuestionLabel": "Aller à la question précédente",
+      "nextQuestionLabel": "Aller à la question suivante",
+      "retryQuestionLabel": "Essayer cette question à nouveau",
+      "checkAnswerLabel": "Vérifier votre réponse",
+      "correctAnswerLabel": "Réponse correcte",
+      "incorrectAnswerLabel": "Réponse incorrecte",
+      "attemptsLeftLabel": "Tentatives restantes",
+      "noAttemptsLeftLabel": "Aucune tentative restante",
+      "quizCompletedLabel": "Quiz terminé avec succès",
+      "mobileHintLabel": "Conseil d'utilisation mobile",
+      "mobileInstructionsLabel": "Instructions mobiles",
+      "desktopInstructionsLabel": "Instructions bureau",
+      "tapHereLabel": "Tapez ici pour placer l'élément",
+      "clearCategoryLabel": "Effacer la catégorie",
+      "removeItemLabel": "Supprimer l'élément"
+    }
+  },
+  "6": {
+    "title": "Évaluation de la Formation",
+    "texts": {
+      "ratingQuestion": "Comment évaluez-vous cette formation ?",
+      "topicsQuestion": "Quels sujets aimeriez-vous apprendre plus en détail ?",
+      "feedbackQuestion": "Retour supplémentaire :",
+      "feedbackPlaceholder": "Partagez votre expérience...",
+      "submitButton": "Soumettre",
+      "submittingText": "Soumission...",
+      "ratingRequiredText": "Veuillez fournir une évaluation",
+      "dataSecurityNotice": "Vos données sont protégées de manière sécurisée",
+      "successTitle": "Merci !",
+      "successMessage1": "Merci pour votre retour.",
+      "successMessage2": "Votre évaluation nous aidera à améliorer nos formations.",
+      "successMessage3": "Continuez à améliorer votre sensibilisation à la sécurité !",
+      "thankYouMessage": "Restez en sécurité !"
+    },
+    "ariaTexts": {
+      "mainLabel": "Completion de l'enquête",
+      "successDescription": "Enquête terminée avec succès. Merci pour votre retour.",
+      "successRegionLabel": "Message de succès",
+      "successIconLabel": "Icône de coche de succès",
+      "formDescription": "Formulaire d'enquête avec étoiles d'évaluation, cases à cocher de sujets et zone de texte de retour",
+      "headerLabel": "En-tête de l'enquête",
+      "formContentDescription": "Formulaire d'enquête contenant des étoiles d'évaluation, des cases à cocher de sujets et une zone de texte de retour",
+      "ratingDescription": "Évaluez la formation de 1 à 5 étoiles",
+      "starLabel": "étoile",
+      "topicsDescription": "Sélectionnez les sujets que vous aimeriez apprendre plus en détail",
+      "topicLabel": "Sélectionner",
+      "feedbackDescription": "Zone de texte de retour optionnelle pour commentaires supplémentaires",
+      "feedbackLabel": "Retour supplémentaire",
+      "submitSectionLabel": "Soumettre l'enquête",
+      "submittingLabel": "Soumission de l'enquête",
+      "submitLabel": "Soumettre l'enquête",
+      "securityNoticeLabel": "Avis de sécurité des données"
+    },
+    "topics": [
+      "Sécurité SMS",
+      "Sécurité Email",
+      "Gestion des Mots de Passe",
+      "Authentification à Deux Facteurs"
+    ]
+  },
+  "7": {
+    "texts": {
+      "title": "Vous êtes Plus Sécurisé Maintenant !",
+      "subtitle": "Il est temps de partager ces connaissances avec votre équipe et de commencer à les appliquer",
+      "achievementsTitle": "Ce que vous avez Appris :",
+      "progressMessage": "Votre niveau de sécurité a augmenté de 85% !"
+    },
+    "achievements": [
+      "Techniques de création de mots de passe forts",
+      "Configuration et importance de la 2FA",
+      "Utilisation d'un gestionnaire de mots de passe",
+      "Reconnaissance des attaques de phishing"
+    ]
+  },
+  "8": {
+    "texts": {
+      "completionTitle": "Félicitations ! Vous avez Terminé la Formation",
+      "completionSubtitle": "Vous avez réussi à rafraîchir vos connaissances en cybersécurité",
+      "achievementsTitle": "Succès Obtenus",
+      "actionPlanTitle": "Que Faire Ensuite ?",
+      "resourcesTitle": "Ressources Supplémentaires",
+      "motivationalTitle": "Votre Voyage en Cybersécurité Continue",
+      "motivationalMessage": "En terminant cette formation, vous avez apporté une contribution significative à la sécurité de votre organisation. Continuez à appliquer ce que vous avez appris et encouragez votre équipe à faire de même.",
+      "downloadButton": "Télécharger le Certificat",
+      "downloadingText": "Téléchargement...",
+      "urgentLabel": "Urgent",
+      "pointsLabel": "Points",
+      "timeLabel": "Temps",
+      "completionLabel": "Completion"
+    },
+    "immediateActions": [
+      {
+        "iconName": "smartphone",
+        "title": "Faites Maintenant",
+        "description": "Téléchargez un gestionnaire de mots de passe et ajoutez vos comptes principaux",
+        "priority": "critical",
+        "timeframe": "5 minutes"
+      },
+      {
+        "iconName": "users",
+        "title": "Cette Semaine",
+        "description": "Partagez les politiques de sécurité lors de votre réunion d'équipe",
+        "priority": "high",
+        "timeframe": "Cette semaine"
+      },
+      {
+        "iconName": "calendar",
+        "title": "Ce Mois",
+        "description": "Planifiez et lancez les formations de sécurité d'équipe",
+        "priority": "medium",
+        "timeframe": "Dans les 30 jours"
+      }
+    ],
+    "resources": [
+      {
+        "title": "Guide des Mots de Passe NIST",
+        "type": "PDF",
+        "url": "https://www.nist.gov/cybersecurity/nist-password-guidelines",
+        "description": "Guide complet sur la sécurité des mots de passe"
+      },
+      {
+        "title": "Vidéos de Configuration 2FA",
+        "type": "Video",
+        "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        "description": "Authentification à deux facteurs étape par étape"
+      },
+      {
+        "title": "Outils de Test de Phishing",
+        "type": "Tool",
+        "url": "https://www.google.com",
+        "description": "Outils pour tester votre équipe"
+      }
+    ],
+    "achievements": [
+      {
+        "id": "quiz-master",
+        "name": "Maître du Quiz",
+        "iconName": "award"
+      },
+      {
+        "id": "fast-learner",
+        "name": "Apprenant Rapide",
+        "iconName": "trending-up"
+      },
+      {
+        "id": "security-champion",
+        "name": "Champion de la Sécurité",
+        "iconName": "shield"
+      }
+    ]
+  }
+}
