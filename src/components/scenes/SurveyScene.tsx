@@ -200,7 +200,7 @@ export function SurveyScene({
           initial={{ opacity: 0, y: 40, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className={`relative glass-border-4 max-w-xs sm:max-w-md w-full space-y-2 p-4 sm:p-6 `}
+          className={`relative ${!isMobile ?'glass-border-4':''} max-w-xs sm:max-w-md w-full space-y-2 sm:p-6 `}
           role="region"
           aria-labelledby="survey-title"
           aria-describedby="survey-form-description"

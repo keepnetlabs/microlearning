@@ -21,17 +21,18 @@ export function BottomSheetComponent({
         <BottomSheet
             open={open}
             onDismiss={onDismiss}
-            snapPoints={({ minHeight }) => [Math.max(384, minHeight), 0]}
-            defaultSnap={({ maxHeight }) => Math.max(384, maxHeight)}
+            className="bottom-sheet-glass"
+            snapPoints={({ minHeight }) => [Math.max(380, minHeight), 0]}
+            defaultSnap={({ maxHeight }) => Math.max(380, maxHeight)}
         >
             {title && (
-                <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                <div className="pt-10">
+                    <h3 className="text-[24px] font-semibold text-center text-[#1C1C1E] dark:text-[#F2F2F7]">
                         {title}
                     </h3>
                 </div>
             )}
-            <div className="px-4 py-2">
+            <div className="mx-4 mt-4 mb-10">
                 {children}
             </div>
         </BottomSheet>

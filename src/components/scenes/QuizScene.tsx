@@ -18,6 +18,7 @@ import { FontWrapper } from "../common/FontWrapper";
 import { useIsMobile } from "../ui/use-mobile";
 import { BottomSheetComponent } from "../ui/bottom-sheet";
 import { useBottomSheet } from "../../hooks/useBottomSheet";
+import { Button } from "../ui/button";
 
 // Question Types
 enum QuestionType {
@@ -2028,7 +2029,13 @@ export const QuizScene = React.memo(function QuizScene({
             {isMobile && (
               <BottomSheetComponent
                 open={showResult}
-                onDismiss={() => setShowResult(false)}
+                onDismiss={() => {
+                  setShowResult(false)
+                  // Eğer soru doğru cevaplandıysa ve son soru değilse, bir sonraki soruya geç
+                  if (isAnswerCorrect && currentQuestionIndex < questions.length - 1) {
+                    handleNextQuestion()
+                  }
+                }}
                 title={isAnswerCorrect
                   ? (currentQuestionIndex === questions.length - 1
                     ? (config.texts?.quizCompleted || "Tamamlandı! 🎉")
@@ -2036,7 +2043,7 @@ export const QuizScene = React.memo(function QuizScene({
                   : (config.texts?.wrongAnswer || "Yanlış Cevap")
                 }
               >
-                <div className="space-y-4">
+                <div className="space-y-4 glass-border-2 p-4">
                   {/* Simple Explanation */}
                   <div>
                     <p className="text-sm text-muted-foreground leading-relaxed text-[#1C1C1E] dark:text-[#F2F2F7]">
@@ -2058,8 +2065,9 @@ export const QuizScene = React.memo(function QuizScene({
                     </div>
                   )}
 
-                  {/* Action Buttons */}
-                  <div className="flex flex-col gap-3 pt-3 border-t">
+                </div>
+                {/* Action Buttons */}
+                <div className="flex flex-col gap-3 pt-3">
                     {!isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked && (
                       <motion.button
                         initial={{ opacity: 0 }}
@@ -2072,7 +2080,7 @@ export const QuizScene = React.memo(function QuizScene({
                         whileTap={{ scale: 0.95 }}
                         onClick={retryQuestion}
                         disabled={isAnswerLocked}
-                        className={`relative flex items-center justify-center space-x-2 px-4 py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
+                        className={`relative flex items-center justify-center space-x-2 px-4 py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full`}
                       >
                         {/* Button shimmer effect */}
                         <motion.div
@@ -2106,7 +2114,7 @@ export const QuizScene = React.memo(function QuizScene({
                             }}
                             whileTap={{ scale: 0.95 }}
                             onClick={handleNextQuestion}
-                            className={`relative flex items-center justify-center space-x-2 px-4 py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
+                            className={`relative flex items-center justify-center space-x-2 px-4 py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full`}
                           >
                             {/* Button shimmer effect */}
                             <motion.div
@@ -2140,7 +2148,7 @@ export const QuizScene = React.memo(function QuizScene({
                             onClick={() => {
                               onNextSlide();
                             }}
-                            className={`relative flex items-center justify-center space-x-2 px-4 py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
+                            className={`relative flex items-center justify-center space-x-2 px-4 py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full`}
                           >
                             {/* Button shimmer effect */}
                             <motion.div
@@ -2162,7 +2170,6 @@ export const QuizScene = React.memo(function QuizScene({
                       </>
                     )}
                   </div>
-                </div>
               </BottomSheetComponent>
             )}
           </div>

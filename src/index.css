@@ -170,7 +170,8 @@
 .glass-border-1-5::after,
 .glass-border-2::after,
 .glass-border-3::after,
-.glass-border-4::after {
+.glass-border-4::after,
+.bottom-sheet-glass div[role="dialog"]::after {
   content: "";
   position: absolute;
   top: -2px;
@@ -466,7 +467,10 @@
   --plyr-color-main: #f2f2f7 !important;
   --plyr-range-track-height: 8px !important;
   --plyr-range-thumb-height: 16px;
+  --rsbs-backdrop-bg: transparent !important;
+  --rsbs-bg: transparent !important;
   --plyr-range-thumb-width: 16px;
+  --rsbs-overlay-rounded: 8px;
 }
 /* Orijinal fullscreen ikonunu gizle */
 .plyr__controls button[data-plyr="fullscreen"] svg {
@@ -516,4 +520,38 @@
 .plyr__controls button[data-plyr="captions"]:hover {
   background-color: #1c1c1e !important;
   color: #f2f2f7 !important;
+}
+.bottom-sheet-glass div[role="dialog"] {
+  box-shadow: 4px 0 4px 0 rgba(255, 255, 255, 0.15) inset,
+  0 4px 4px 0 rgba(255, 255, 255, 0.15) inset;
+  background: rgba(242, 242, 247, 0.06);
+  backdrop-filter: blur(15px);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+.bottom-sheet-glass div[data-rsbs-header]{
+  display: none;
+}
+.bottom-sheet-glass div[role="dialog"]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 8px;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 1) 0%,
+    /* Sol üst - belirgin beyaz */ rgba(255, 255, 255, 0) 25%,
+    /* Sağ üst geçiş - saydam */ rgba(255, 255, 255, 0.15) 50%,
+    /* Sağ üst - çok saydam */ rgba(255, 255, 255, 0.05) 75%,
+    /* Sol alt - çok saydam */ rgba(255, 255, 255, 1) 100%
+  );
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: xor;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
 }
