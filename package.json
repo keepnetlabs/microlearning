@@ -43,6 +43,7 @@
     "input-otp": "^1.4.2",
     "lucide-react": "^0.487.0",
     "next-themes": "^0.4.6",
+    "pipwerks-scorm-api-wrapper": "^0.1.2",
     "plyr": "^3.7.8",
     "react": "^18.2.0",
     "react-country-flag": "^3.1.0",
@@ -51,6 +52,7 @@
     "react-hook-form": "^7.55.0",
     "react-resizable-panels": "^2.1.7",
     "react-scripts": "5.0.1",
+    "react-spring-bottom-sheet": "^3.4.1",
     "recharts": "^2.15.2",
     "sonner": "^2.0.3",
     "tailwind-merge": "^2.0.0",
@@ -61,13 +63,14 @@
   "devDependencies": {
     "@types/jest": "^29.5.0",
     "autoprefixer": "^10.4.16",
+    "cross-env": "^10.0.0",
     "postcss": "^8.4.31",
     "tailwindcss": "^3.3.5"
   },
   "scripts": {
-    "start": "GENERATE_SOURCEMAP=false react-scripts start",
-    "build": "GENERATE_SOURCEMAP=false react-scripts build",
-    "build:analyze": "GENERATE_SOURCEMAP=false npm run build && npx serve -s build",
+    "start": "set \"GENERATE_SOURCEMAP=false\" && react-scripts start",
+    "build": "set \"GENERATE_SOURCEMAP=false\" && react-scripts build",
+    "build:analyze": "set \"GENERATE_SOURCEMAP=false\" && npm run build && npx serve -s build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

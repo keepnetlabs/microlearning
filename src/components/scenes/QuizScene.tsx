@@ -16,6 +16,8 @@ import * as LucideIcons from "lucide-react";
 import { LucideIcon } from "lucide-react";
 import { FontWrapper } from "../common/FontWrapper";
 import { useIsMobile } from "../ui/use-mobile";
+import { BottomSheetComponent } from "../ui/bottom-sheet";
+import { useBottomSheet } from "../../hooks/useBottomSheet";
 
 // Question Types
 enum QuestionType {
@@ -365,6 +367,9 @@ export const QuizScene = React.memo(function QuizScene({
 
   // Check if device is mobile
   const isMobile = useIsMobile();
+
+  // BottomSheet hook for mobile result panel
+  const { isOpen: isBottomSheetOpen, open: openBottomSheet, close: closeBottomSheet } = useBottomSheet();
 
   // Get questions from config
   const questions = useMemo(() => config?.questions?.list || [], [config?.questions?.list]);
@@ -1851,30 +1856,189 @@ export const QuizScene = React.memo(function QuizScene({
             {/* Question Content */}
             <div className="mb-5" role="group" aria-label="Answer options">{renderQuestion()}</div>
 
-            {/* Result Panel */}
-            <AnimatePresence>
-              {showResult && (
-                <motion.div
-                  ref={resultPanelRef}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="mt-4 p-4 glass-border-2"
-                  role="region"
-                  aria-label={ariaTexts?.resultPanelLabel || "Result and explanation"}
-                  aria-describedby="result-panel-description"
-                  aria-live="polite"
-                >
-                  <div
-                    id="result-panel-description"
-                    className="sr-only"
+            {/* Result Panel - Desktop */}
+            {!isMobile && (
+              <AnimatePresence>
+                {showResult && (
+                  <motion.div
+                    ref={resultPanelRef}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className="mt-4 p-4 glass-border-2"
+                    role="region"
+                    aria-label={ariaTexts?.resultPanelLabel || "Result and explanation"}
+                    aria-describedby="result-panel-description"
                     aria-live="polite"
                   >
-                    {ariaTexts?.resultPanelDescription || "Feedback on your answer with explanation and tips"}
-                  </div>
+                    <div
+                      id="result-panel-description"
+                      className="sr-only"
+                      aria-live="polite"
+                    >
+                      {ariaTexts?.resultPanelDescription || "Feedback on your answer with explanation and tips"}
+                    </div>
 
+                    {/* Simple Explanation */}
+                    <div className="mb-3">
+                      <p className="text-sm text-muted-foreground leading-relaxed text-[#1C1C1E] dark:text-[#F2F2F7]">
+                        {currentQuestion?.explanation}
+                      </p>
+                    </div>
+
+                    {/* Simple Tips */}
+                    {currentQuestion?.tips && (
+                      <div className="mb-3">
+                        <div className="grid gap-1">
+                          {currentQuestion?.tips.map((tip, index) => (
+                            <div key={index} className="flex items-start space-x-2 text-sm">
+                              <div className="w-1.5 h-1.5 bg-[#1C1C1E] dark:bg-[#F2F2F7] rounded-full mt-2 flex-shrink-0" />
+                              <span className="text-muted-foreground text-[#1C1C1E] dark:text-[#F2F2F7]">{tip}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Simple Action Buttons */}
+                    <div className="flex justify-between items-center pt-3 border-t">
+                      {/* Status */}
+                      <div className="text-sm">
+                        {isAnswerCorrect && (
+                          <span className="text-[#1C1C1E] dark:text-[#F2F2F7] font-medium">
+                            {currentQuestionIndex === questions.length - 1
+                              ? (config.texts?.quizCompleted || "Tamamlandı! 🎉")
+                              : (config.texts?.correctAnswer || "Doğru! 🎉")
+                            }
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Buttons */}
+                      <div className="flex gap-2">
+                        {!isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked && (
+                          <motion.button
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.8, delay: 0.2 }}
+                            whileHover={{
+                              scale: 1.05,
+                              boxShadow: "0 20px 40px rgba(239, 68, 68, 0.3)"
+                            }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={retryQuestion}
+                            disabled={isAnswerLocked}
+                            className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
+                          >
+                            {/* Button shimmer effect */}
+                            <motion.div
+                              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                              animate={{ x: ['-100%', '200%'] }}
+                              transition={{
+                                duration: 2,
+                                repeat: Infinity,
+                                ease: "linear"
+                              }}
+                            />
+
+                            <RefreshCw size={16} className={`sm:w-5 sm:h-5 relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
+                            <span className={`text-sm sm:text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
+                              {config.texts?.retryQuestion || "Tekrar Dene"}
+                            </span>
+                          </motion.button>
+                        )}
+
+                        {(isAnswerCorrect || (!isAnswerCorrect && attempts >= maxAttempts) || isAnswerLocked) && (
+                          <>
+                            {/* Next Question button - shown when not on last question */}
+                            {currentQuestionIndex < questions.length - 1 && (
+                              <motion.button
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.8, delay: 0.4 }}
+                                whileHover={{
+                                  scale: 1.05,
+                                  boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
+                                }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={handleNextQuestion}
+                                className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
+                              >
+                                {/* Button shimmer effect */}
+                                <motion.div
+                                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                                  animate={{ x: ['-100%', '200%'] }}
+                                  transition={{
+                                    duration: 2,
+                                    repeat: Infinity,
+                                    ease: "linear"
+                                  }}
+                                />
+
+                                <ArrowRight size={16} className={`sm:w-5 sm:h-5 relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
+                                <span className={`text-sm sm:text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
+                                  {config.texts?.nextQuestion || "Sonraki Soru"}
+                                </span>
+                              </motion.button>
+                            )}
+
+                            {/* Next Slide button - shown when quiz is completed (last question answered correctly) */}
+                            {currentQuestionIndex === questions.length - 1 && isAnswerCorrect && (
+                              <motion.button
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.8, delay: 0.4 }}
+                                whileHover={{
+                                  scale: 1.05,
+                                  boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
+                                }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => {
+                                  onNextSlide();
+                                }}
+                                className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
+                              >
+                                {/* Button shimmer effect */}
+                                <motion.div
+                                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                                  animate={{ x: ['-100%', '200%'] }}
+                                  transition={{
+                                    duration: 2,
+                                    repeat: Infinity,
+                                    ease: "linear"
+                                  }}
+                                />
+
+                                <ArrowUpRight size={16} className={`sm:w-5 sm:h-5 relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
+                                <span className={`text-sm sm:text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
+                                  {config.texts?.nextSlide || "Sonraki Slayt"}
+                                </span>
+                              </motion.button>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            )}
+
+            {/* Mobile BottomSheet for Result Panel */}
+            {isMobile && (
+              <BottomSheetComponent
+                open={showResult}
+                onDismiss={() => setShowResult(false)}
+                title={isAnswerCorrect
+                  ? (currentQuestionIndex === questions.length - 1
+                    ? (config.texts?.quizCompleted || "Tamamlandı! 🎉")
+                    : (config.texts?.correctAnswer || "Doğru! 🎉"))
+                  : (config.texts?.wrongAnswer || "Yanlış Cevap")
+                }
+              >
+                <div className="space-y-4">
                   {/* Simple Explanation */}
-                  <div className="mb-3">
+                  <div>
                     <p className="text-sm text-muted-foreground leading-relaxed text-[#1C1C1E] dark:text-[#F2F2F7]">
                       {currentQuestion?.explanation}
                     </p>
@@ -1882,8 +2046,8 @@ export const QuizScene = React.memo(function QuizScene({
 
                   {/* Simple Tips */}
                   {currentQuestion?.tips && (
-                    <div className="mb-3">
-                      <div className="grid gap-1">
+                    <div>
+                      <div className="grid gap-2">
                         {currentQuestion?.tips.map((tip, index) => (
                           <div key={index} className="flex items-start space-x-2 text-sm">
                             <div className="w-1.5 h-1.5 bg-[#1C1C1E] dark:bg-[#F2F2F7] rounded-full mt-2 flex-shrink-0" />
@@ -1894,128 +2058,113 @@ export const QuizScene = React.memo(function QuizScene({
                     </div>
                   )}
 
-                  {/* Simple Action Buttons */}
-                  <div className="flex justify-between items-center pt-3 border-t">
-                    {/* Status */}
-                    <div className="text-sm">
-                      {isAnswerCorrect && (
-                        <span className="text-[#1C1C1E] dark:text-[#F2F2F7] font-medium">
-                          {currentQuestionIndex === questions.length - 1
-                            ? (config.texts?.quizCompleted || "Tamamlandı! 🎉")
-                            : (config.texts?.correctAnswer || "Doğru! 🎉")
-                          }
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Buttons */}
-                    <div className="flex gap-2">
-                      {!isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked && (
-                        <motion.button
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ duration: 0.8, delay: 0.2 }}
-                          whileHover={{
-                            scale: 1.05,
-                            boxShadow: "0 20px 40px rgba(239, 68, 68, 0.3)"
+                  {/* Action Buttons */}
+                  <div className="flex flex-col gap-3 pt-3 border-t">
+                    {!isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked && (
+                      <motion.button
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.8, delay: 0.2 }}
+                        whileHover={{
+                          scale: 1.05,
+                          boxShadow: "0 20px 40px rgba(239, 68, 68, 0.3)"
+                        }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={retryQuestion}
+                        disabled={isAnswerLocked}
+                        className={`relative flex items-center justify-center space-x-2 px-4 py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
+                      >
+                        {/* Button shimmer effect */}
+                        <motion.div
+                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                          animate={{ x: ['-100%', '200%'] }}
+                          transition={{
+                            duration: 2,
+                            repeat: Infinity,
+                            ease: "linear"
                           }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={retryQuestion}
-                          disabled={isAnswerLocked}
-                          className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
-                        >
-                          {/* Button shimmer effect */}
-                          <motion.div
-                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                            animate={{ x: ['-100%', '200%'] }}
-                            transition={{
-                              duration: 2,
-                              repeat: Infinity,
-                              ease: "linear"
+                        />
+
+                        <RefreshCw size={18} className={`relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
+                        <span className={`text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
+                          {config.texts?.retryQuestion || "Tekrar Dene"}
+                        </span>
+                      </motion.button>
+                    )}
+
+                    {(isAnswerCorrect || (!isAnswerCorrect && attempts >= maxAttempts) || isAnswerLocked) && (
+                      <>
+                        {/* Next Question button - shown when not on last question */}
+                        {currentQuestionIndex < questions.length - 1 && (
+                          <motion.button
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.8, delay: 0.4 }}
+                            whileHover={{
+                              scale: 1.05,
+                              boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
                             }}
-                          />
-
-                          <RefreshCw size={16} className={`sm:w-5 sm:h-5 relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
-                          <span className={`text-sm sm:text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
-                            {config.texts?.retryQuestion || "Tekrar Dene"}
-                          </span>
-                        </motion.button>
-                      )}
-
-                      {(isAnswerCorrect || (!isAnswerCorrect && attempts >= maxAttempts) || isAnswerLocked) && (
-                        <>
-                          {/* Next Question button - shown when not on last question */}
-                          {currentQuestionIndex < questions.length - 1 && (
-                            <motion.button
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              transition={{ duration: 0.8, delay: 0.4 }}
-                              whileHover={{
-                                scale: 1.05,
-                                boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
+                            whileTap={{ scale: 0.95 }}
+                            onClick={handleNextQuestion}
+                            className={`relative flex items-center justify-center space-x-2 px-4 py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
+                          >
+                            {/* Button shimmer effect */}
+                            <motion.div
+                              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                              animate={{ x: ['-100%', '200%'] }}
+                              transition={{
+                                duration: 2,
+                                repeat: Infinity,
+                                ease: "linear"
                               }}
-                              whileTap={{ scale: 0.95 }}
-                              onClick={handleNextQuestion}
-                              className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
-                            >
-                              {/* Button shimmer effect */}
-                              <motion.div
-                                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                                animate={{ x: ['-100%', '200%'] }}
-                                transition={{
-                                  duration: 2,
-                                  repeat: Infinity,
-                                  ease: "linear"
-                                }}
-                              />
+                            />
 
-                              <ArrowRight size={16} className={`sm:w-5 sm:h-5 relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
-                              <span className={`text-sm sm:text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
-                                {config.texts?.nextQuestion || "Sonraki Soru"}
-                              </span>
-                            </motion.button>
-                          )}
+                            <ArrowRight size={18} className={`relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
+                            <span className={`text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
+                              {config.texts?.nextQuestion || "Sonraki Soru"}
+                            </span>
+                          </motion.button>
+                        )}
 
-                          {/* Next Slide button - shown when quiz is completed (last question answered correctly) */}
-                          {currentQuestionIndex === questions.length - 1 && isAnswerCorrect && (
-                            <motion.button
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              transition={{ duration: 0.8, delay: 0.4 }}
-                              whileHover={{
-                                scale: 1.05,
-                                boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
+                        {/* Next Slide button - shown when quiz is completed (last question answered correctly) */}
+                        {currentQuestionIndex === questions.length - 1 && isAnswerCorrect && (
+                          <motion.button
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.8, delay: 0.4 }}
+                            whileHover={{
+                              scale: 1.05,
+                              boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
+                            }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => {
+                              onNextSlide();
+                            }}
+                            className={`relative flex items-center justify-center space-x-2 px-4 py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
+                          >
+                            {/* Button shimmer effect */}
+                            <motion.div
+                              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                              animate={{ x: ['-100%', '200%'] }}
+                              transition={{
+                                duration: 2,
+                                repeat: Infinity,
+                                ease: "linear"
                               }}
-                              whileTap={{ scale: 0.95 }}
-                              onClick={() => {
-                                onNextSlide();
-                              }}
-                              className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
-                            >
-                              {/* Button shimmer effect */}
-                              <motion.div
-                                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                                animate={{ x: ['-100%', '200%'] }}
-                                transition={{
-                                  duration: 2,
-                                  repeat: Infinity,
-                                  ease: "linear"
-                                }}
-                              />
+                            />
 
-                              <ArrowUpRight size={16} className={`sm:w-5 sm:h-5 relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
-                              <span className={`text-sm sm:text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
-                                {config.texts?.nextSlide || "Sonraki Slayt"}
-                              </span>
-                            </motion.button>
-                          )}
-                        </>
-                      )}
-                    </div>
+                            <ArrowUpRight size={18} className={`relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
+                            <span className={`text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
+                              {config.texts?.nextSlide || "Sonraki Slayt"}
+                            </span>
+                          </motion.button>
+                        )}
+                      </>
+                    )}
                   </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                </div>
+              </BottomSheetComponent>
+            )}
           </div>
         </motion.div>
       </div>

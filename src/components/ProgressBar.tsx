@@ -160,9 +160,9 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
   return (
     <div className={`w-full ${isMobile && progress === 100 ? 'mr-8' : 'mr-0'}`} role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label={`${finalConfig.ariaLabel}: %${Math.round(progress)} ${finalConfig.progressLabel}`}>
       {/* Mobile Progress Bar - Header Bottom Row */}
-      <div className="md:hidden mt-4">
+      <div className="md:hidden md:mt-4">
         {/* Responsive Container with Margins */}
-        <div className="relative sm:mx-8">
+        <div className={`relative ${progress === 100 ? 'sm:mx-6 ml-4 mr-12' : 'mx-6'}`}>
           {/* Progress Tooltip - Pill-shaped thumb on progress bar */}
           <div className="relative w-full">
             <motion.div

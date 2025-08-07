@@ -17,6 +17,7 @@ import { getCountryCode, detectBrowserLanguage, useIsMobile, languages } from ".
 import { loadAppConfig, createConfigChangeEvent } from "./components/configs/appConfigLoader";
 import { useFontFamily } from "./hooks/useFontFamily";
 import { FontFamilyProvider } from "./contexts/FontFamilyContext";
+import { scormService, destroySCORMService } from "./utils/scormService";
 
 // Static CSS classes - Component dışında tanımlandı çünkü hiç değişmiyor
 const STATIC_CSS_CLASSES = {
@@ -27,9 +28,9 @@ const STATIC_CSS_CLASSES = {
   backgroundContainer: "fixed inset-0 pointer-events-none overflow-hidden",
   // Header
   headerContainer: "relative shrink-0",
-  headerContent: "relative z-10 px-4 pt-4 pb-3 lg:px-16 xl:px-20 2xl:px-24 min-h-[106px] md:min-h-[72px]",
+  headerContent: "relative z-10 px-4 pt-4 pb-3 lg:px-16 xl:px-20 2xl:px-24 min-h-[72px]",
   // Controls
-  controlsContainer: "flex items-center space-x-1.5 md:space-x-3 flex-shrink-0 z-20",
+  controlsContainer: "flex items-center sm:space-x-1.5 md:space-x-3 flex-shrink-0 z-20",
   // Points badge
   pointsBadge: "relative flex items-center justify-center min-w-[54px] sm:min-w-[70px] space-x-1 sm:space-x-1.5 md:space-x-1.5 px-1.5 sm:px-2 md:px-3 h-8 sm:h-10 rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 glass-border-3 ease-out group",
   pointsBadgeNoise: "absolute inset-0 opacity-[0.020] dark:opacity-[0.012] rounded-lg sm:rounded-xl mix-blend-overlay pointer-events-none",
@@ -38,7 +39,7 @@ const STATIC_CSS_CLASSES = {
   themeButton: "relative glass-border-3 flex items-center justify-center p-1.5 md:p-2 h-[32px] sm:h-[40px] sm:max-h-[40px] rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group ",
   themeButtonIcon: "w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300",
   // Language button
-  languageButton: "relative flex items-center justify-center space-x-0.5 glass-border-3 sm:space-x-1 md:space-x-2 px-1 sm:px-1.5 md:px-3 h-8 sm:h-10 w-[64px] sm:w-[100px] rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group",
+  languageButton: "relative flex items-center justify-center space-x-0.5 sm:rounded-xl sm:space-x-1 md:space-x-2 px-1 sm:px-1.5 md:px-3 h-8 sm:h-10 w-[56px] sm:w-[100px] sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group",
   languageFlag: "w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 rounded-sm transition-opacity duration-300",
   languageChevron: "w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4 text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300",
   // Language dropdown
@@ -525,6 +526,7 @@ export default function App() {
 
   // Auto-save functionality - Optimized with requestIdleCallback
   const saveDataToStorage = useCallback(() => {
+    /*
     const saveData = {
       currentScene,
       totalPoints,
@@ -536,8 +538,12 @@ export default function App() {
       shownAchievements,
       isSurveySubmitted
     };
-    //test için şimdilik boş dönüyor
-    return ''
+
+    // SCORM'a veri gönder
+    if (scormService && scormService.isAvailable()) {
+      scormService.updateProgress(totalPoints, currentScene, scenes.length);
+      scormService.saveSuspendData(saveData);
+    }
     // Use requestIdleCallback for better performance
     if ('requestIdleCallback' in window) {
       requestIdleCallback(() => {
@@ -548,7 +554,8 @@ export default function App() {
         localStorage.setItem('cyber-training-progress', JSON.stringify(saveData));
       }, 0);
     }
-  }, [currentScene, totalPoints, achievements, visitedScenes, pointsAwardedScenes, quizCompleted, selectedLanguage, shownAchievements, isSurveySubmitted]);
+    */
+  }, [currentScene, totalPoints, achievements, visitedScenes, pointsAwardedScenes, quizCompleted, selectedLanguage, shownAchievements, isSurveySubmitted, scenes.length]);
 
   useEffect(() => {
     saveDataToStorage();
@@ -556,6 +563,7 @@ export default function App() {
 
   // Load saved data on mount
   useEffect(() => {
+    /*
     const savedData = localStorage.getItem('cyber-training-progress');
     if (savedData) {
       try {
@@ -575,6 +583,7 @@ export default function App() {
         console.error('Error loading saved data:', error);
       }
     }
+    */
   }, []);
 
 
@@ -749,6 +758,11 @@ export default function App() {
     const seconds = Math.floor((totalTimeSpent % 60000) / 1000);
     const timeSpentString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
+    // SCORM'a completion data gönder
+    if (scormService.isAvailable()) {
+      scormService.updateQuizResult(true, totalPoints);
+    }
+
     return {
       totalPoints,
       timeSpent: timeSpentString,
@@ -756,9 +770,13 @@ export default function App() {
     };
   }, [totalPoints, sceneTimeSpent, currentScene, sceneIndices.summary]);
 
-  // Initialize first scene timing
+  // Component unmount olduğunda SCORM'u temizle
   useEffect(() => {
+    scormService.initializeMicrolearning();
     trackSceneTime(0);
+    return () => {
+      destroySCORMService();
+    };
   }, []);
 
   // ULTRA FAST MOBILE TRANSITIONS - NO LOADING DELAY
@@ -791,6 +809,8 @@ export default function App() {
           setIsLoading(false);
         }, 100); // Reduced from 250ms to 100ms
       }
+      scormService.saveMicrolearningProgress(currentScene + 1, { quizCompleted }, totalPoints || 0);
+
     }
   }, [currentScene, quizCompleted, isMobile]);
 
@@ -1062,7 +1082,11 @@ export default function App() {
                     <div className="corner-top-left"></div>
                     <div className="corner-bottom-right"></div>
                     <img
-                      src={isDarkMode ? themeConfig.logo?.darkSrc : themeConfig.logo?.src}
+                      src={
+                        isMobile
+                          ? (isDarkMode ? themeConfig.logo?.minimizedDarkSrc : themeConfig.logo?.minimizedSrc)
+                          : (isDarkMode ? themeConfig.logo?.darkSrc : themeConfig.logo?.src)
+                      }
                       alt={themeConfig.logo?.alt || "Application Logo"}
                       aria-label={appConfig.theme?.ariaTexts?.logoLabel || "Application logo"}
                       className="relative z-10 h-8 sm:h-12 md:h-14 w-auto object-contain p-1.5 sm:p-2"
@@ -1072,7 +1096,7 @@ export default function App() {
               </div>
 
               {/* Center - Progress Bar */}
-              <div className="flex-1 hidden md:block" role="progressbar" aria-label={appConfig.theme?.ariaTexts?.progressLabel || "Training progress"}>
+              <div className="flex-1" role="progressbar" aria-label={appConfig.theme?.ariaTexts?.progressLabel || "Training progress"}>
                 <div className="relative">
                   <MemoizedProgressBar
                     currentScene={currentScene + 1}
@@ -1087,7 +1111,7 @@ export default function App() {
               <div className={cssClasses.controlsContainer}>
                 {/* ENHANCED LIQUID GLASS POINTS BADGE - Mobile Optimized */}
                 <motion.div
-                  className={cssClasses.pointsBadge}
+                  className={`${cssClasses.pointsBadge} hidden sm:block`}
                   whileHover={{
                     scale: 1.02,
                     y: -1
@@ -1097,7 +1121,7 @@ export default function App() {
                   aria-live="polite"
                 >
                   {/* Badge Content */}
-                  <div className="relative z-10 flex items-center space-x-1 sm:space-x-1.5 md:space-x-1.5">
+                  <div className="relative z-10 flex justify-center h-full items-center space-x-1 sm:space-x-1.5 md:space-x-1.5">
                     <Award size={isMobile ? 16 : 20} className="text-[#1C1C1E] dark:text-[#F2F2F7] sm:w-4 sm:h-4 md:w-5 md:h-5 transition-colors duration-300" aria-hidden="true" />
                     <span className={cssClasses.pointsText} aria-label={`${totalPoints} ${appConfig.theme?.ariaTexts?.pointsDescription || "points earned"}`}>
                       {totalPoints}
@@ -1108,7 +1132,7 @@ export default function App() {
                 {/* ENHANCED LIQUID GLASS THEME TOGGLE BUTTON - Mobile Optimized */}
                 <motion.button
                   onClick={toggleTheme}
-                  className={cssClasses.themeButton}
+                  className={`${cssClasses.themeButton} hidden sm:block`}
                   whileHover={{
                     scale: 1.05,
                     y: -2
@@ -1177,7 +1201,7 @@ export default function App() {
                 <div className="relative" ref={dropdownRef} role="combobox" aria-haspopup="listbox" aria-expanded={isLanguageDropdownOpen} aria-controls="language-dropdown-list">
                   <motion.button
                     onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
-                    className={cssClasses.languageButton}
+                    className={`${cssClasses.languageButton} ${!isMobile ? 'glass-border-3' : 'glass-border-4'}`}
                     whileHover={{
                       scale: 1.02,
                       y: -1
@@ -1354,16 +1378,6 @@ export default function App() {
                 </div>
               </div>
             </div>
-            {isMobile && (
-              <div className="flex-1 relative flex items-center">
-                <MemoizedProgressBar
-                  currentScene={currentScene + 1}
-                  totalScenes={scenes.length}
-                  language={selectedLanguage}
-                  config={progressBarConfig}
-                />
-              </div>
-            )}
           </div>
         </header>
         {/* Navigation Area - Optimized spacing */}

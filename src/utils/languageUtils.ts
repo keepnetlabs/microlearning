@@ -126,7 +126,13 @@ export const detectBrowserLanguage = () => {
 
 // Custom hook for mobile detection
 export const useIsMobile = () => {
-    const [isMobile, setIsMobile] = React.useState(false);
+    const [isMobile, setIsMobile] = React.useState(() => {
+        // Provide immediate initial value to prevent flickering
+        if (typeof window !== 'undefined') {
+            return window.innerWidth < 768;
+        }
+        return false;
+    });
 
     React.useEffect(() => {
         const checkIsMobile = () => {
