@@ -40,73 +40,72 @@
     }
   },
   "1": {
-    "title": "Protection contre le Phishing SMS",
-    "subtitle": "Reconnaître les attaques de phishing basées sur SMS et les méthodes de protection",
-    "sectionTitle": "Ce que vous apprendrez dans cette formation :",
+    "title": "Sensibilisation au Phishing",
+    "subtitle": "Reconnaissez les e-mails suspects, protégez votre équipe",
+    "sectionTitle": "Dans cette formation, vous apprendrez :",
     "highlights": [
       {
-        "iconName": "smartphone",
-        "text": "Reconnaître les attaques de phishing SMS"
-      },
-      {
-        "iconName": "shield",
-        "text": "Stratégies de protection"
-      },
-      {
         "iconName": "alert-triangle",
-        "text": "Détecter les messages suspects"
+        "text": "Reconnaître les e-mails de phishing"
+      },
+      {
+        "iconName": "shield-check",
+        "text": "Comprendre les risques"
+      },
+      {
+        "iconName": "smartphone",
+        "text": "Signaler en toute sécurité"
       },
       {
         "iconName": "users",
-        "text": "Construire la sensibilisation de l'équipe"
+        "text": "Créer une culture axée sur la sécurité"
       }
     ],
-    "duration": "~10 minutes",
-    "level": "Tous Niveaux",
-    "callToActionText": "Glissez pour apprendre la sécurité SMS",
+    "duration": "~5 minutes",
+    "level": "Débutant",
+    "callToActionText": "Glissez pour commencer votre parcours de sensibilisation",
     "texts": {
       "sceneLabel": "Scène d'Introduction",
-      "sceneDescription": "Bienvenue au module de formation à la protection contre le phishing SMS",
-      "iconLabel": "Icône smartphone représentant la sécurité SMS",
+      "sceneDescription": "Bienvenue à la formation de sensibilisation au phishing",
+      "iconLabel": "Icône d'alerte représentant la détection de phishing",
       "titleLabel": "Titre de la formation",
-      "subtitleLabel": "Description de la formation",
-      "cardLabel": "Carte des objectifs d'apprentissage",
-      "cardDescription": "Liste des compétences que vous apprendrez dans cette formation",
+      "subtitleLabel": "Introduction à la formation",
+      "cardLabel": "Carte d'aperçu de l'apprentissage",
+      "cardDescription": "Compétences à acquérir dans cette formation",
       "highlightItemLabel": "Objectif d'apprentissage",
-      "statsLabel": "Statistiques de formation",
-      "durationLabel": "Durée de la formation",
-      "levelLabel": "Niveau de difficulté de la formation",
-      "ctaLabel": "Appel à l'action",
-      "sparkleLabel": "Effet étincelant décoratif"
+      "statsLabel": "Détails de la formation",
+      "durationLabel": "Temps de completion",
+      "levelLabel": "Niveau de difficulté",
+      "ctaLabel": "Commencer la formation",
+      "sparkleLabel": "Animation décorative"
     }
   },
   "2": {
-    "title": "Objectifs de Sécurité SMS",
+    "title": "Objectifs de Formation",
     "goals": [
       {
-        "iconName": "smartphone",
-        "title": "Reconnaître les Menaces SMS",
-        "subtitle": "Sensibilisation",
-        "description": "Reconnaître et identifier rapidement les attaques de phishing basées sur SMS"
-      },
-      {
-        "iconName": "shield",
-        "title": "Stratégies de Protection",
-        "subtitle": "Défense",
-        "description": "Développer des méthodes efficaces pour se protéger contre les attaques SMS"
-      },
-      {
         "iconName": "alert-triangle",
-        "title": "Détecter les Messages Suspects",
-        "subtitle": "Vigilance",
-        "description": "Analyser et vérifier les messages SMS suspects"
+        "title": "Détecter le Phishing",
+        "subtitle": "Identification",
+        "description": "Apprenez à identifier rapidement les tentatives de phishing"
+      },
+      {
+        "iconName": "shield-check",
+        "title": "Signaler Correctement",
+        "subtitle": "Action",
+        "description": "Comprenez quand et comment signaler les e-mails de phishing"
+      },
+      {
+        "iconName": "users",
+        "title": "Promouvoir la Culture de Sécurité",
+        "subtitle": "Comportement d'Équipe",
+        "description": "Développez une habitude de communication sécurisée"
       }
     ]
   },
   "3": {
-    "title": "Scénario Réel",
-    "subtitle": "Expérience de Phishing d'un Manager DevOps",
-    "description": "Examiner et apprendre d'un scénario d'attaque de phishing réel",
+    "title": "Scénario de la Vie Réelle",
+    "subtitle": "L'histoire d'un collègue",
     "video": {
       "src": "https://customer-0lll6yc8omc23rbm.cloudflarestream.com/5fdb12ff1436c991f50b698a02e2faa1/manifest/video.m3u8",
       "poster": null,
@@ -114,198 +113,84 @@
       "showTranscript": true,
       "transcriptTitle": "Transcription du Scénario",
       "transcriptLanguage": "Français",
-      "transcript": "00:00:04.400 la sécurité est toujours une priorité mais une\n00:00:07.919 expérience que j'ai eue le mois dernier m'a\n00:00:10.400 fait changer de comportement un jour pendant ma\n00:00:13.120 pause déjeuner j'ai reçu un email qui\n00:00:15.639 semblait venir du département financier\n00:00:17.439 il me demandait d'approuver une\n00:00:20.039 facture quelque chose semblait bizarre le numéro\n00:00:23.320 de facture était étrange et il y avait quelques\n00:00:25.519 erreurs de grammaire grâce à ma formation en\n00:00:28.279 cybersécurité j'ai rapidement réalisé que\n00:00:30.679 c'était une tentative de phishing j'ai pensé que\n00:00:33.879 quelqu'un pourrait tomber dans le piège mais au lieu\n00:00:36.239 de le signaler j'ai continué mon travail\n00:00:38.760 en supposant qu'ils l'attraperaient de toute façon une semaine\n00:00:42.079 plus tard notre entreprise a annoncé qu'une attaque\n00:00:44.840 de phishing avait conduit à une violation de données exposant\n00:00:47.680 les informations des clients l'email que j'avais ignoré était\n00:00:51.559 partie de cette attaque si je l'avais signalé\n00:00:54.719 toute la crise aurait pu être évitée\n00:00:57.600 après la violation l'entreprise a tenu une\n00:00:59.600 réunion l'équipe IT a expliqué comment l'attaque\n00:01:03.199 s'était produite et les dégâts causés pas\n00:01:05.880 seulement des dommages réputationnels mais aussi\n00:01:08.320 des pertes financières j'étais choqué et me sentais\n00:01:11.280 coupable un simple comportement de signalement sécurisé\n00:01:14.119 aurait pu faire toute la\n00:01:16.439 différence voici ce que j'ai appris de\n00:01:18.439 cette expérience ne supposez pas que quelqu'un\n00:01:21.320 d'autre le signalera faites-le simplement si\n00:01:24.119 tout le monde pense de la même manière rien\n00:01:26.439 ne se fait nous partageons tous la\n00:01:28.560 responsabilité connaissez le processus de\n00:01:30.960 signalement de votre entreprise si vous n'êtes pas sûr demandez à l'IT il y a toujours des outils pour rendre\n00:01:37.439 le signalement plus facile ne sous-estimez jamais\n00:01:40.399 les attaques de phishing même un seul faux email peut\n00:01:43.439 mettre toute l'entreprise en danger après\n00:01:46.560 cet incident j'ai réalisé que combattre\n00:01:49.079 les cyberattaques n'est possible que lorsque\n00:01:51.439 tout le monde pratique des comportements\n00:01:53.640 sécurisés identifier un email de phishing\n00:01:56.520 ne suffit pas vous devez agir\n00:02:00.000 mais"
+      "transcript": "00:00:04.400 la sécurité est toujours une priorité mais une\n00:00:07.919 expérience que j'ai vécue le mois dernier m'a\n00:00:10.400 fait changer de comportement un jour pendant ma\n00:00:13.120 pause déjeuner j'ai reçu un e-mail qui\n00:00:15.639 semblait venir du département financier\n00:00:17.439 il me demandait d'approuver une\n00:00:20.039 facture quelque chose semblait bizarre le numéro\n00:00:23.320 de facture était étrange et il y avait quelques\n00:00:25.519 erreurs de grammaire grâce à ma formation en\n00:00:28.279 cybersécurité j'ai rapidement réalisé que\n00:00:30.679 c'était une tentative de phishing j'ai pensé que\n00:00:33.879 quelqu'un pourrait tomber dans le piège mais\n00:00:36.239 au lieu de le signaler j'ai continué mon travail\n00:00:38.760 en supposant qu'ils l'attraperaient de toute façon\n00:00:42.079 une semaine plus tard notre entreprise a\n00:00:44.840 annoncé qu'une attaque de phishing avait\n00:00:47.680 conduit à une violation de données exposant\n00:00:51.559 les informations clients l'e-mail que j'avais\n00:00:54.719 ignoré faisait partie de cette attaque si je\n00:00:57.600 l'avais signalé toute la crise aurait pu être\n00:00:59.600 évitée après la violation l'entreprise a\n00:01:03.199 organisé une réunion l'équipe IT a expliqué\n00:01:05.880 comment l'attaque s'était produite et les\n00:01:08.320 dégâts qu'elle avait causés pas seulement\n00:01:11.280 des dommages à la réputation mais aussi\n00:01:14.119 des pertes financières j'étais choqué et me\n00:01:16.439 sentais coupable un simple comportement de\n00:01:18.439 signalement sécurisé aurait pu faire toute la\n00:01:21.320 différence voici ce que j'ai appris de cette\n00:01:24.119 expérience ne supposez pas que quelqu'un\n00:01:26.439 d'autre le signalera faites-le simplement si\n00:01:28.560 tout le monde pense de la même façon rien\n00:01:30.960 ne se fait nous partageons tous la\n00:01:37.439 responsabilité connaissez le processus de\n00:01:40.399 signalement de votre entreprise si vous n'êtes\n00:01:43.439 pas sûr demandez à l'IT il y a toujours des\n00:01:46.560 outils pour faciliter le signalement ne\n00:01:49.079 sous-estimez jamais les attaques de phishing\n00:01:51.439 même un seul faux e-mail peut mettre\n00:01:53.640 toute l'entreprise en danger après cet\n00:01:56.520 incident j'ai réalisé que combattre les\n00:02:00.000 cyberattaques n'est possible que lorsque"
     },
     "texts": {
       "transcriptLoading": "Chargement de la transcription..."
     },
     "ariaTexts": {
-      "mainLabel": "Scène de Scénario",
-      "mainDescription": "Vidéo de scénario réel avec transcription",
+      "mainLabel": "Vidéo de Scénario",
+      "mainDescription": "Reconstitution animée d'un vrai cas de phishing",
       "loadingLabel": "Chargement de la transcription",
-      "errorLabel": "Erreur de chargement de la transcription",
-      "videoPlayerLabel": "Lecteur Vidéo",
-      "mobileHintLabel": "Indice utilisateur mobile"
+      "errorLabel": "Échec du chargement de la transcription",
+      "videoPlayerLabel": "Lecteur de scénario",
+      "mobileHintLabel": "Meilleure expérience avec le son"
     }
   },
   "4": {
-    "title": "Étapes Actionnables",
+    "title": "Agissez en Toute Sécurité",
     "actions": [
       {
-        "iconName": "key",
-        "title": "Créer un Mot de Passe Fort",
-        "description": "Au moins 12 caractères, lettres majuscules et minuscules, chiffres et symboles",
-        "tip": "Exemple : 'Café!très7Bon#2024'"
+        "iconName": "mail",
+        "title": "Identifier l'E-mail Suspect",
+        "description": "Examinez l'en-tête, l'expéditeur et le formatage de l'e-mail pour détecter les signes de phishing.",
+        "tip": "Recherchez des URL incohérentes ou des demandes urgentes."
       },
       {
-        "iconName": "smartphone",
-        "title": "Activer la 2FA",
-        "description": "Activer l'authentification multi-facteurs sur tous les comptes critiques",
-        "tip": "Utilisez Google Authenticator ou Authy"
+        "iconName": "alert-triangle",
+        "title": "Éviter de Cliquer sur les Liens",
+        "description": "Ne cliquez sur aucun lien dans un e-mail suspect.",
+        "tip": "Survolez pour prévisualiser la destination avant de cliquer."
       },
       {
-        "iconName": "database",
-        "title": "Gestionnaire de Mots de Passe",
-        "description": "Utilisez des mots de passe uniques et complexes pour chaque compte",
-        "tip": "1Password, Bitwarden ou LastPass"
+        "iconName": "flag",
+        "title": "Utiliser le Bouton de Signalement",
+        "description": "Utilisez le bouton de signalement de phishing dans votre client e-mail.",
+        "tip": "Dans Outlook ou Gmail, recherchez l'icône 'Signaler le phishing'."
       }
     ],
     "tipConfig": {
-      "iconName": "check-circle"
+      "iconName": "info"
     },
     "ariaTexts": {
       "mainLabel": "Contenu Actionnable",
-      "mainDescription": "Section de contenu actionnable avec cartes interactives contenant des conseils et des orientations",
+      "mainDescription": "Étapes de réponse actionnables au phishing pour les utilisateurs d'e-mail",
       "headerLabel": "En-tête de scène",
       "actionCardsLabel": "Cartes d'action",
-      "actionCardsDescription": "Cartes de contenu actionnable",
+      "actionCardsDescription": "Étapes d'action pour répondre au phishing",
       "actionCardLabel": "Carte d'action",
       "tipLabel": "Conseil"
     }
   },
   "5": {
-    "title": "Quiz de Cybersécurité",
-    "subtitle": "Testez vos connaissances",
+    "title": "Vérification Rapide des Connaissances",
+    "subtitle": "Testez votre sensibilisation au phishing",
     "questions": {
-      "totalCount": 4,
+      "totalCount": 1,
       "maxAttempts": 2,
       "list": [
         {
-          "id": "pwd-strength",
-          "type": "multiple_choice",
-          "title": "Évaluation de la Force du Mot de Passe",
-          "description": "Lequel des mots de passe suivants est le plus sécurisé ?",
-          "category": "Sécurité des Mots de Passe",
-          "options": [
-            {
-              "id": "weak-1",
-              "text": "password123",
-              "isCorrect": false,
-              "explanation": "Trop simple et prévisible"
-            },
-            {
-              "id": "medium-1",
-              "text": "P@ssw0rd!",
-              "isCorrect": false,
-              "explanation": "Un modèle courant"
-            },
-            {
-              "id": "strong-1",
-              "text": "Café!très7Bon#2024",
-              "isCorrect": true,
-              "explanation": "Long, complexe et mémorable"
-            },
-            {
-              "id": "weak-2",
-              "text": "123456789",
-              "isCorrect": false,
-              "explanation": "Seulement des chiffres",
-              "color": "red"
-            }
-          ],
-          "explanation": "Les mots de passe sécurisés sont longs, complexes et évitent les informations personnelles.",
-          "tips": [
-            "Utilisez au moins 12 caractères",
-            "Mélangez majuscules, minuscules, chiffres et symboles",
-            "Évitez les infos personnelles",
-            "Utilisez un mot de passe unique pour chaque compte"
-          ]
-        },
-        {
-          "id": "phishing-detection",
+          "id": "phishing-identification",
           "type": "true_false",
-          "title": "Détection d'Attaque de Phishing",
-          "statement": "Les attaquants utilisent toujours des adresses email inconnues dans les attaques de phishing.",
-          "correctAnswer": false,
-          "category": "Sécurité Email",
+          "title": "Drapeaux Rouges du Phishing",
+          "statement": "Les e-mails de phishing créent souvent un sentiment d'urgence pour vous faire agir rapidement.",
+          "correctAnswer": true,
+          "category": "Sécurité E-mail",
           "options": {
             "true": {
-              "label": "Oui",
+              "label": "Vrai",
               "icon": "check"
             },
             "false": {
-              "label": "Non",
+              "label": "Faux",
               "icon": "x"
             }
           },
-          "explanation": "Les phishers usurpent souvent des adresses familières.",
+          "explanation": "Les attaquants de phishing utilisent souvent un langage urgent ou menaçant pour créer la panique.",
           "tips": [
-            "Vérifiez attentivement l'adresse de l'expéditeur",
-            "Ne cliquez pas sur des liens suspects",
-            "Allez directement sur le site officiel",
-            "Signalez à l'IT"
-          ]
-        },
-        {
-          "id": "password-best-practices",
-          "type": "multi_select",
-          "title": "Meilleures Pratiques pour les Mots de Passe",
-          "description": "Quelles règles devez-vous suivre pour créer un mot de passe sécurisé ?",
-          "category": "Sécurité des Mots de Passe",
-          "minCorrect": 3,
-          "options": [
-            {
-              "id": "length",
-              "text": "Utilisez au moins 12 caractères",
-              "isCorrect": true,
-              "explanation": "Les mots de passe plus longs sont plus sécurisés"
-            },
-            {
-              "id": "personal-info",
-              "text": "Incluez votre date de naissance",
-              "isCorrect": false,
-              "explanation": "Les infos personnelles sont prévisibles"
-            },
-            {
-              "id": "mixed-case",
-              "text": "Mélangez majuscules et minuscules",
-              "isCorrect": true,
-              "explanation": "Augmente la complexité"
-            },
-            {
-              "id": "reuse",
-              "text": "Réutilisez le même mot de passe partout",
-              "isCorrect": false,
-              "explanation": "Crée un risque"
-            },
-            {
-              "id": "special-chars",
-              "text": "Ajoutez des caractères spéciaux",
-              "isCorrect": true,
-              "explanation": "Renforce le mot de passe"
-            },
-            {
-              "id": "avoid-personal",
-              "text": "Évitez les informations personnelles",
-              "isCorrect": true,
-              "explanation": "Rend plus difficile à deviner"
-            }
-          ],
-          "explanation": "Un mot de passe sécurisé fait au moins 12 caractères, est complexe et évite les infos personnelles.",
-          "tips": [
-            "Utilisez un mot de passe unique pour chaque compte",
-            "Utilisez un gestionnaire de mots de passe",
-            "Mettez à jour régulièrement",
-            "Activez l'authentification à deux facteurs"
-          ]
-        },
-        {
-          "id": "email-risk-assessment",
-          "type": "slider_scale",
-          "title": "Évaluation des Risques Email",
-          "statement": "\"URGENT ! Votre compte est suspendu, mettez à jour votre mot de passe maintenant : bit.ly/mise-a-jour-pass\"",
-          "description": "Évaluez le niveau de risque de cet email",
-          "min": 1,
-          "max": 10,
-          "correctRange": { "min": 8, "max": 10 },
-          "labels": { "min": "Sûr", "max": "Très Risqué" },
-          "category": "Sécurité Email",
-          "explanation": "Risque élevé : langage urgent, expéditeur inconnu, lien raccourci.",
-          "tips": [
-            "Attention au langage urgent",
-            "Évitez les liens raccourcis",
-            "Allez directement sur le site officiel",
-            "Signalez à l'IT"
+            "Pausez avant de cliquer.",
+            "Vérifiez avec votre équipe IT/sécurité.",
+            "Ne répondez pas directement."
           ]
         }
       ]
@@ -322,7 +207,7 @@
       "noAttemptsLeft": "aucune tentative restante",
       "checkAnswer": "Vérifier la Réponse",
       "evaluating": "Évaluation...",
-      "completeEvaluation": "Terminer l'Évaluation",
+      "completeEvaluation": "Évaluation Complète",
       "mobileInstructions": "📱 Mobile : sélectionnez l'élément, puis tapez une catégorie",
       "desktopInstructions": "🖥️ Bureau : glissez les éléments dans les catégories",
       "options": "Options",
@@ -345,7 +230,7 @@
     },
     "ariaTexts": {
       "mainLabel": "Interface de Quiz",
-      "mainDescription": "Quiz interactif avec plusieurs types de questions et feedback en temps réel",
+      "mainDescription": "Quiz interactif avec plusieurs types de questions et retour en temps réel",
       "headerLabel": "En-tête du quiz",
       "questionLabel": "Contenu de la question",
       "questionDescription": "Question actuelle avec options de réponse",
@@ -362,13 +247,13 @@
       "optionsLabel": "Options disponibles",
       "categoriesLabel": "Catégories",
       "resultPanelLabel": "Résultat et explication",
-      "resultPanelDescription": "Feedback sur votre réponse avec explication et conseils",
+      "resultPanelDescription": "Retour sur votre réponse avec explication et conseils",
       "explanationLabel": "Section explication",
       "tipsLabel": "Conseils utiles",
       "navigationLabel": "Navigation des questions",
       "previousQuestionLabel": "Aller à la question précédente",
       "nextQuestionLabel": "Aller à la question suivante",
-      "retryQuestionLabel": "Essayer cette question à nouveau",
+      "retryQuestionLabel": "Réessayer cette question",
       "checkAnswerLabel": "Vérifier votre réponse",
       "correctAnswerLabel": "Réponse correcte",
       "incorrectAnswerLabel": "Réponse incorrecte",
@@ -384,71 +269,71 @@
     }
   },
   "6": {
-    "title": "Évaluation de la Formation",
+    "title": "Votre Avis Compte",
     "texts": {
-      "ratingQuestion": "Comment évaluez-vous cette formation ?",
-      "topicsQuestion": "Quels sujets aimeriez-vous apprendre plus en détail ?",
-      "feedbackQuestion": "Retour supplémentaire :",
-      "feedbackPlaceholder": "Partagez votre expérience...",
-      "submitButton": "Soumettre",
+      "ratingQuestion": "Comment évalueriez-vous cette formation de microapprentissage ?",
+      "topicsQuestion": "Quels sujets aimeriez-vous explorer davantage ?",
+      "feedbackQuestion": "Avez-vous des commentaires supplémentaires ?",
+      "feedbackPlaceholder": "Écrivez vos réflexions ici...",
+      "submitButton": "Soumettre l'Avis",
       "submittingText": "Soumission...",
-      "ratingRequiredText": "Veuillez fournir une évaluation",
-      "dataSecurityNotice": "Vos données sont protégées de manière sécurisée",
-      "successTitle": "Merci !",
-      "successMessage1": "Merci pour votre retour.",
-      "successMessage2": "Votre évaluation nous aidera à améliorer nos formations.",
-      "successMessage3": "Continuez à améliorer votre sensibilisation à la sécurité !",
-      "thankYouMessage": "Restez en sécurité !"
+      "ratingRequiredText": "Veuillez évaluer avant de soumettre.",
+      "dataSecurityNotice": "Vos réponses sont anonymes et protégées.",
+      "successTitle": "Merci pour votre avis !",
+      "successMessage1": "Votre contribution nous aide à améliorer les formations futures.",
+      "successMessage2": "Restez vigilant. Restez en sécurité.",
+      "successMessage3": "La connaissance est votre meilleure défense.",
+      "thankYouMessage": "Vous faites une différence !"
     },
     "ariaTexts": {
-      "mainLabel": "Completion de l'enquête",
-      "successDescription": "Enquête terminée avec succès. Merci pour votre retour.",
-      "successRegionLabel": "Message de succès",
-      "successIconLabel": "Icône de coche de succès",
-      "formDescription": "Formulaire d'enquête avec étoiles d'évaluation, cases à cocher de sujets et zone de texte de retour",
+      "mainLabel": "Formulaire d'Avis de Formation",
+      "successDescription": "Enquête terminée. Merci pour votre contribution précieuse.",
+      "successRegionLabel": "Message de Succès",
+      "successIconLabel": "Icône de coche",
+      "formDescription": "Formulaire d'avis pour l'évaluation de formation avec notation, sélection de sujets et commentaires libres.",
       "headerLabel": "En-tête de l'enquête",
-      "formContentDescription": "Formulaire d'enquête contenant des étoiles d'évaluation, des cases à cocher de sujets et une zone de texte de retour",
-      "ratingDescription": "Évaluez la formation de 1 à 5 étoiles",
+      "formContentDescription": "Contenu de l'enquête : notation par étoiles, cases à cocher et saisie de texte",
+      "ratingDescription": "Évaluez votre expérience de formation",
       "starLabel": "étoile",
-      "topicsDescription": "Sélectionnez les sujets que vous aimeriez apprendre plus en détail",
-      "topicLabel": "Sélectionner",
-      "feedbackDescription": "Zone de texte de retour optionnelle pour commentaires supplémentaires",
-      "feedbackLabel": "Retour supplémentaire",
-      "submitSectionLabel": "Soumettre l'enquête",
-      "submittingLabel": "Soumission de l'enquête",
-      "submitLabel": "Soumettre l'enquête",
-      "securityNoticeLabel": "Avis de sécurité des données"
+      "topicsDescription": "Sujets que vous aimeriez explorer davantage",
+      "topicLabel": "Case à cocher de sujet",
+      "feedbackDescription": "Zone de texte pour les commentaires",
+      "feedbackLabel": "Champ d'avis",
+      "submitSectionLabel": "Section de soumission",
+      "submittingLabel": "État de soumission",
+      "submitLabel": "Bouton de soumission",
+      "securityNoticeLabel": "Note de confidentialité des données"
     },
     "topics": [
-      "Sécurité SMS",
-      "Sécurité Email",
-      "Gestion des Mots de Passe",
-      "Authentification à Deux Facteurs"
+      "Reconnaissance des E-mails de Phishing",
+      "Comportement de Signalement Sécurisé",
+      "Menaces Cybernétiques du Monde Réel",
+      "Conseils de Sécurité de Microapprentissage"
     ]
   },
   "7": {
     "texts": {
-      "title": "Vous êtes Plus Sécurisé Maintenant !",
-      "subtitle": "Il est temps de partager ces connaissances avec votre équipe et de commencer à les appliquer",
-      "achievementsTitle": "Ce que vous avez Appris :",
-      "progressMessage": "Votre niveau de sécurité a augmenté de 85% !"
+      "title": "Faites le Premier Pas Aujourd'hui",
+      "subtitle": "Votre comportement sécurisé peut protéger toute votre organisation.",
+      "achievementsTitle": "Vous Avez Déjà Fait des Progrès :",
+      "progressMessage": "Vous avez amélioré votre posture de sécurité de 85% !"
     },
     "achievements": [
-      "Techniques de création de mots de passe forts",
-      "Configuration et importance de la 2FA",
-      "Utilisation d'un gestionnaire de mots de passe",
-      "Reconnaissance des attaques de phishing"
+      "Appris à repérer les e-mails suspects",
+      "Compris l'importance du signalement sécurisé",
+      "Reconnu les tentatives de phishing du monde réel",
+      "Acquis des conseils pratiques pour agir avec confiance"
     ]
   },
   "8": {
     "texts": {
-      "completionTitle": "Félicitations ! Vous avez Terminé la Formation",
-      "completionSubtitle": "Vous avez réussi à rafraîchir vos connaissances en cybersécurité",
-      "achievementsTitle": "Succès Obtenus",
-      "actionPlanTitle": "Que Faire Ensuite ?",
+      "completionTitle": "Félicitations ! 🎉 Vous Avez Terminé la Formation",
+      "completionSubtitle": "Vous avez renforcé votre capacité à détecter et signaler les e-mails de phishing.",
+      "achievementsTitle": "Ce que Vous Avez Gagné",
+      "actionPlanTitle": "Prochaines Étapes",
       "resourcesTitle": "Ressources Supplémentaires",
-      "motivationalTitle": "Votre Voyage en Cybersécurité Continue",
-      "motivationalMessage": "En terminant cette formation, vous avez apporté une contribution significative à la sécurité de votre organisation. Continuez à appliquer ce que vous avez appris et encouragez votre équipe à faire de même.",
+      "motivationalTitle": "Restez Vigilant !",
+      "motivationalMessage": "Les menaces cybernétiques évoluent, mais votre comportement aussi peut évoluer. Continuez à appliquer ce que vous avez appris et encouragez votre équipe à faire de même.",
       "downloadButton": "Télécharger le Certificat",
       "downloadingText": "Téléchargement...",
       "urgentLabel": "Urgent",
@@ -458,62 +343,62 @@
     },
     "immediateActions": [
       {
-        "iconName": "smartphone",
+        "iconName": "mail-warning",
         "title": "Faites Maintenant",
-        "description": "Téléchargez un gestionnaire de mots de passe et ajoutez vos comptes principaux",
-        "priority": "critical",
+        "description": "Vérifiez votre boîte de réception et signalez tout message suspect en utilisant le bouton de signalement.",
+        "priority": "critique",
         "timeframe": "5 minutes"
       },
       {
         "iconName": "users",
         "title": "Cette Semaine",
-        "description": "Partagez les politiques de sécurité lors de votre réunion d'équipe",
-        "priority": "high",
+        "description": "Partagez ce que vous avez appris dans cette formation avec au moins un collègue.",
+        "priority": "élevé",
         "timeframe": "Cette semaine"
       },
       {
         "iconName": "calendar",
         "title": "Ce Mois",
-        "description": "Planifiez et lancez les formations de sécurité d'équipe",
-        "priority": "medium",
+        "description": "Organisez une courte session de sensibilisation ou un suivi de microapprentissage dans votre équipe.",
+        "priority": "moyen",
         "timeframe": "Dans les 30 jours"
       }
     ],
     "resources": [
       {
-        "title": "Guide des Mots de Passe NIST",
+        "title": "Comment Signaler le Phishing dans Outlook",
+        "type": "Vidéo",
+        "url": "https://support.microsoft.com/en-us/office/report-phishing-e-mails-0d882ea5-6c83-48c2-b896-4ab2ab7c4c94",
+        "description": "Apprenez à signaler les e-mails de phishing directement depuis Outlook."
+      },
+      {
+        "title": "Google Workspace - Signaler le Phishing",
+        "type": "Article d'Aide",
+        "url": "https://support.google.com/mail/answer/8253?hl=en",
+        "description": "Étapes pour signaler les e-mails suspects dans Gmail."
+      },
+      {
+        "title": "NIST : Reconnaître le Phishing",
         "type": "PDF",
-        "url": "https://www.nist.gov/cybersecurity/nist-password-guidelines",
-        "description": "Guide complet sur la sécurité des mots de passe"
-      },
-      {
-        "title": "Vidéos de Configuration 2FA",
-        "type": "Video",
-        "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-        "description": "Authentification à deux facteurs étape par étape"
-      },
-      {
-        "title": "Outils de Test de Phishing",
-        "type": "Tool",
-        "url": "https://www.google.com",
-        "description": "Outils pour tester votre équipe"
+        "url": "https://nvlpubs.nist.gov/nistpubs/ir/2020/NIST.IR.8310.pdf",
+        "description": "Guide NIST sur la reconnaissance et la prévention des attaques de phishing."
       }
     ],
     "achievements": [
       {
-        "id": "quiz-master",
-        "name": "Maître du Quiz",
-        "iconName": "award"
+        "id": "report-hero",
+        "name": "Héros du Signalement",
+        "iconName": "alert-triangle"
       },
       {
-        "id": "fast-learner",
-        "name": "Apprenant Rapide",
-        "iconName": "trending-up"
+        "id": "phishing-shield",
+        "name": "Bouclier Anti-Phishing",
+        "iconName": "shield-check"
       },
       {
-        "id": "security-champion",
-        "name": "Champion de la Sécurité",
-        "iconName": "shield"
+        "id": "awareness-ambassador",
+        "name": "Ambassadeur de Sensibilisation",
+        "iconName": "megaphone"
       }
     ]
   }

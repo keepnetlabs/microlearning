@@ -36,7 +36,7 @@
       "metadata": {
         "scene_type": "intro",
         "points": 10,
-        "duration_seconds": 100,
+        "duration_seconds": 30,
         "hasAchievementNotification": false,
         "behavioral_science_principle": [
           "Salience",
@@ -51,40 +51,44 @@
     {
       "scene_id": "2",
       "metadata": {
-        "icon": {
-          "sceneIconName": "target"
-        },
         "scene_type": "goal",
-        "points": 15,
-        "duration_seconds": 100,
+        "points": 10,
+        "duration_seconds": 30,
         "hasAchievementNotification": false,
         "behavioral_science_principle": [
-          "Implementation Intention",
-          "Goal Priming"
-        ]
+          "Goal Priming",
+          "Implementation Intention"
+        ],
+        "icon": {
+          "sceneIconName": "target"
+        }
       }
     },
     {
       "scene_id": "3",
       "metadata": {
+        "scene_type": "scenario",
+        "points": 20,
+        "duration_seconds": 90,
+        "hasAchievementNotification": false,
+        "behavioral_science_principle": [
+          "Narrative Transportation",
+          "Mental Simulation",
+          "Social Proof"
+        ],
         "icon": {
           "sceneIconName": "play-circle"
-        },
-        "scene_type": "scenario",
-        "hasAchievementNotification": false,
-        "points": 20,
-        "duration_seconds": 100,
-        "behavioral_science_principle": ["Social Proof", "Scarcity"]
+        }
       }
     },
     {
       "scene_id": "4",
       "metadata": {
         "scene_type": "actionable_content",
-        "points": 25,
+        "points": 15,
+        "duration_seconds": 60,
         "hasAchievementNotification": false,
-        "duration_seconds": 100,
-        "behavioral_science_principle": ["Social Proof", "Scarcity"],
+        "behavioral_science_principle": ["Modeling", "Cognitive Load Theory"],
         "icon": {
           "sceneIconName": "shield-check"
         }
@@ -94,10 +98,14 @@
       "scene_id": "5",
       "metadata": {
         "scene_type": "quiz",
+        "points": 15,
+        "duration_seconds": 45,
         "hasAchievementNotification": true,
-        "points": 50,
-        "duration_seconds": 100,
-        "behavioral_science_principle": ["Social Proof", "Scarcity"],
+        "behavioral_science_principle": [
+          "Active Recall",
+          "Feedback Loop",
+          "Self-Efficacy"
+        ],
         "icon": {
           "sceneIconName": "brain-circuit"
         }
@@ -107,12 +115,15 @@
       "scene_id": "6",
       "metadata": {
         "scene_type": "survey",
-        "points": 20,
-        "hasAchievementNotification": true,
-        "duration_seconds": 100,
-        "behavioral_science_principle": ["Social Proof", "Scarcity"],
+        "points": 5,
+        "duration_seconds": 30,
+        "hasAchievementNotification": false,
+        "behavioral_science_principle": [
+          "Affect Tagging",
+          "Confidence Calibration"
+        ],
         "icon": {
-          "name": "clipboard-list"
+          "sceneIconName": "clipboard-list"
         }
       }
     },
@@ -120,11 +131,16 @@
       "scene_id": "7",
       "metadata": {
         "scene_type": "nudge",
-        "points": 30,
+        "points": 10,
+        "duration_seconds": 15,
         "hasAchievementNotification": false,
-        "behavioral_science_principle": ["Social Proof", "Scarcity"],
+        "behavioral_science_principle": [
+          "Spacing Effect",
+          "Behavioral Triggers",
+          "Habit Loop"
+        ],
         "icon": {
-          "name": "award"
+          "sceneIconName": "repeat"
         }
       }
     },
@@ -132,11 +148,16 @@
       "scene_id": "8",
       "metadata": {
         "scene_type": "summary",
-        "points": 40,
+        "points": 15,
+        "duration_seconds": 45,
         "hasAchievementNotification": true,
-        "behavioral_science_principle": ["Social Proof", "Scarcity"],
+        "behavioral_science_principle": [
+          "Primacy Effect",
+          "Recency Effect",
+          "Chunking"
+        ],
         "icon": {
-          "name": "check-circle"
+          "sceneIconName": "check-circle"
         }
       }
     }

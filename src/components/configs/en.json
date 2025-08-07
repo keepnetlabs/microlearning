@@ -5,7 +5,7 @@
       "languageNotFound": "Language not found",
       "scrollHint": "Scroll down",
       "nextSection": "Next section",
-      "achievementNotification": "Achievement unlocked! 🎉",
+      "achievementNotification": "Achievement unlocked! \ud83c\udf89",
       "closeNotification": "Close notification",
       "startLabel": "Start",
       "completedLabel": "Completed",
@@ -40,73 +40,72 @@
     }
   },
   "1": {
-    "title": "SMS Phishing Protection",
-    "subtitle": "Recognize SMS-based phishing attacks and protection methods",
-    "sectionTitle": "What You'll Learn in This Training:",
+    "title": "Phishing Awareness",
+    "subtitle": "Spot suspicious emails, protect your team",
+    "sectionTitle": "In This Training, You Will Learn:",
     "highlights": [
       {
-        "iconName": "smartphone",
-        "text": "Recognize SMS phishing attacks"
-      },
-      {
-        "iconName": "shield",
-        "text": "Protection strategies"
-      },
-      {
         "iconName": "alert-triangle",
-        "text": "Detect suspicious messages"
+        "text": "Recognize phishing emails"
+      },
+      {
+        "iconName": "shield-check",
+        "text": "Understand the risk"
+      },
+      {
+        "iconName": "smartphone",
+        "text": "Report securely"
       },
       {
         "iconName": "users",
-        "text": "Build team awareness"
+        "text": "Create a security-first culture"
       }
     ],
-    "duration": "~10 minutes",
-    "level": "All Levels",
-    "callToActionText": "Swipe to learn SMS security",
+    "duration": "~5 minutes",
+    "level": "Beginner",
+    "callToActionText": "Swipe to begin your awareness journey",
     "texts": {
       "sceneLabel": "Introduction Scene",
-      "sceneDescription": "Welcome to the SMS phishing protection training module",
-      "iconLabel": "Smartphone icon representing SMS security",
+      "sceneDescription": "Welcome to phishing awareness training",
+      "iconLabel": "Alert icon representing phishing detection",
       "titleLabel": "Training title",
-      "subtitleLabel": "Training description",
-      "cardLabel": "Learning objectives card",
-      "cardDescription": "List of skills you will learn in this training",
-      "highlightItemLabel": "Learning objective",
-      "statsLabel": "Training statistics",
-      "durationLabel": "Training duration",
-      "levelLabel": "Training difficulty level",
-      "ctaLabel": "Call to action",
-      "sparkleLabel": "Decorative sparkle effect"
+      "subtitleLabel": "Training introduction",
+      "cardLabel": "Learning overview card",
+      "cardDescription": "Skills to gain from this training",
+      "highlightItemLabel": "Learning goal",
+      "statsLabel": "Training details",
+      "durationLabel": "Time to complete",
+      "levelLabel": "Difficulty level",
+      "ctaLabel": "Start training",
+      "sparkleLabel": "Decorative animation"
     }
   },
   "2": {
-    "title": "SMS Security Goals",
+    "title": "Training Goals",
     "goals": [
       {
-        "iconName": "smartphone",
-        "title": "Recognize SMS Threats",
-        "subtitle": "Awareness",
-        "description": "Quickly recognize and identify SMS-based phishing attacks"
-      },
-      {
-        "iconName": "shield",
-        "title": "Protection Strategies",
-        "subtitle": "Defense",
-        "description": "Develop effective methods to protect against SMS attacks"
-      },
-      {
         "iconName": "alert-triangle",
-        "title": "Detect Suspicious Messages",
-        "subtitle": "Vigilance",
-        "description": "Analyze and verify suspicious SMS messages"
+        "title": "Detect Phishing",
+        "subtitle": "Identification",
+        "description": "Learn to quickly identify phishing attempts"
+      },
+      {
+        "iconName": "shield-check",
+        "title": "Report Correctly",
+        "subtitle": "Action",
+        "description": "Understand when and how to report phishing emails"
+      },
+      {
+        "iconName": "users",
+        "title": "Promote Security Culture",
+        "subtitle": "Team Behavior",
+        "description": "Build a habit of secure communication"
       }
     ]
   },
   "3": {
-    "title": "Real‑Life Scenario",
-    "subtitle": "DevOps Manager's Phishing Experience",
-    "description": "Review and learn from a real phishing attack scenario",
+    "title": "Real-Life Scenario",
+    "subtitle": "A colleague's story",
     "video": {
       "src": "https://customer-0lll6yc8omc23rbm.cloudflarestream.com/5fdb12ff1436c991f50b698a02e2faa1/manifest/video.m3u8",
       "poster": null,
@@ -120,192 +119,78 @@
       "transcriptLoading": "Loading transcript..."
     },
     "ariaTexts": {
-      "mainLabel": "Scenario Scene",
-      "mainDescription": "Real-life scenario video with transcript",
+      "mainLabel": "Scenario Video",
+      "mainDescription": "Animated reenactment of a real phishing case",
       "loadingLabel": "Loading transcript",
-      "errorLabel": "Transcript loading error",
-      "videoPlayerLabel": "Video Player",
-      "mobileHintLabel": "Mobile user hint"
+      "errorLabel": "Transcript failed to load",
+      "videoPlayerLabel": "Scenario player",
+      "mobileHintLabel": "Best viewed with sound"
     }
   },
   "4": {
-    "title": "Actionable Steps",
+    "title": "Take Action Securely",
     "actions": [
       {
-        "iconName": "key",
-        "title": "Create Strong Password",
-        "description": "At least 12 characters, uppercase and lowercase letters, numbers, and symbols",
-        "tip": "Example: 'Coffee!very7Good#2024'"
+        "iconName": "mail",
+        "title": "Identify Suspicious Email",
+        "description": "Review the email header, sender, and formatting for phishing signs.",
+        "tip": "Look for mismatched URLs or urgent requests."
       },
       {
-        "iconName": "smartphone",
-        "title": "Enable 2FA",
-        "description": "Enable multi-factor authentication on all critical accounts",
-        "tip": "Use Google Authenticator or Authy"
+        "iconName": "alert-triangle",
+        "title": "Avoid Clicking Links",
+        "description": "Do not click on any links in a suspicious email.",
+        "tip": "Hover to preview the destination before clicking."
       },
       {
-        "iconName": "database",
-        "title": "Password Manager",
-        "description": "Use unique and complex passwords for each account",
-        "tip": "1Password, Bitwarden, or LastPass"
+        "iconName": "flag",
+        "title": "Use the Report Button",
+        "description": "Use the phishing report button in your email client.",
+        "tip": "In Outlook or Gmail, look for the 'Report Phishing' icon."
       }
     ],
     "tipConfig": {
-      "iconName": "check-circle"
+      "iconName": "info"
     },
     "ariaTexts": {
       "mainLabel": "Actionable Content",
-      "mainDescription": "Actionable content section with interactive cards containing tips and guidance",
+      "mainDescription": "Actionable phishing response steps for email users",
       "headerLabel": "Scene header",
       "actionCardsLabel": "Action cards",
-      "actionCardsDescription": "Actionable content cards",
+      "actionCardsDescription": "Action steps to respond to phishing",
       "actionCardLabel": "Action card",
       "tipLabel": "Tip"
     }
   },
   "5": {
-    "title": "Cyber Security Quiz",
-    "subtitle": "Test your knowledge",
+    "title": "Quick Knowledge Check",
+    "subtitle": "Test your phishing awareness",
     "questions": {
-      "totalCount": 4,
+      "totalCount": 1,
       "maxAttempts": 2,
       "list": [
         {
-          "id": "pwd-strength",
-          "type": "multiple_choice",
-          "title": "Password Strength Assessment",
-          "description": "Which of the following passwords is the most secure?",
-          "category": "Password Security",
-          "options": [
-            {
-              "id": "weak-1",
-              "text": "password123",
-              "isCorrect": false,
-              "explanation": "Too simple and predictable"
-            },
-            {
-              "id": "medium-1",
-              "text": "P@ssw0rd!",
-              "isCorrect": false,
-              "explanation": "A common pattern"
-            },
-            {
-              "id": "strong-1",
-              "text": "Coffee!very7Good#2024",
-              "isCorrect": true,
-              "explanation": "Long, complex, and memorable"
-            },
-            {
-              "id": "weak-2",
-              "text": "123456789",
-              "isCorrect": false,
-              "explanation": "Only numbers",
-              "color": "red"
-            }
-          ],
-          "explanation": "Secure passwords are long, complex, and avoid personal information.",
-          "tips": [
-            "Use at least 12 characters",
-            "Mix uppercase, lowercase, numbers, and symbols",
-            "Avoid personal info",
-            "Use a unique password for each account"
-          ]
-        },
-        {
-          "id": "phishing-detection",
+          "id": "phishing-identification",
           "type": "true_false",
-          "title": "Phishing Attack Detection",
-          "statement": "Attackers always use unknown email addresses in phishing attacks.",
-          "correctAnswer": false,
+          "title": "Phishing Red Flags",
+          "statement": "Phishing emails often create a sense of urgency to make you act quickly.",
+          "correctAnswer": true,
           "category": "Email Security",
           "options": {
             "true": {
-              "label": "Yes",
+              "label": "True",
               "icon": "check"
             },
             "false": {
-              "label": "No",
+              "label": "False",
               "icon": "x"
             }
           },
-          "explanation": "Phishers often spoof familiar-looking addresses.",
+          "explanation": "Phishing attackers often use urgent or threatening language to create panic.",
           "tips": [
-            "Check the sender's address carefully",
-            "Don't click suspicious links",
-            "Go directly to the official website",
-            "Report to IT"
-          ]
-        },
-        {
-          "id": "password-best-practices",
-          "type": "multi_select",
-          "title": "Password Best Practices",
-          "description": "Which rules should you follow to create a secure password?",
-          "category": "Password Security",
-          "minCorrect": 3,
-          "options": [
-            {
-              "id": "length",
-              "text": "Use at least 12 characters",
-              "isCorrect": true,
-              "explanation": "Longer passwords are more secure"
-            },
-            {
-              "id": "personal-info",
-              "text": "Include your birth date",
-              "isCorrect": false,
-              "explanation": "Personal info is predictable"
-            },
-            {
-              "id": "mixed-case",
-              "text": "Mix uppercase and lowercase letters",
-              "isCorrect": true,
-              "explanation": "Increases complexity"
-            },
-            {
-              "id": "reuse",
-              "text": "Reuse the same password everywhere",
-              "isCorrect": false,
-              "explanation": "Creates risk"
-            },
-            {
-              "id": "special-chars",
-              "text": "Add special characters",
-              "isCorrect": true,
-              "explanation": "Strengthens the password"
-            },
-            {
-              "id": "avoid-personal",
-              "text": "Avoid personal information",
-              "isCorrect": true,
-              "explanation": "Makes it harder to guess"
-            }
-          ],
-          "explanation": "A secure password is at least 12 characters long, complex, and avoids personal info.",
-          "tips": [
-            "Use a unique password for each account",
-            "Use a password manager",
-            "Update regularly",
-            "Enable two-factor authentication"
-          ]
-        },
-        {
-          "id": "email-risk-assessment",
-          "type": "slider_scale",
-          "title": "Email Risk Assessment",
-          "statement": "\"URGENT! Your account is suspended, update your password now: bit.ly/update-pass\"",
-          "description": "Rate the risk level of this email",
-          "min": 1,
-          "max": 10,
-          "correctRange": { "min": 8, "max": 10 },
-          "labels": { "min": "Safe", "max": "Very Risky" },
-          "category": "Email Security",
-          "explanation": "High risk: urgent language, unknown sender, shortened link.",
-          "tips": [
-            "Watch for urgent language",
-            "Avoid shortened links",
-            "Go directly to the official site",
-            "Report to IT"
+            "Pause before clicking.",
+            "Verify with your IT/security team.",
+            "Don't respond directly."
           ]
         }
       ]
@@ -384,71 +269,71 @@
     }
   },
   "6": {
-    "title": "Training Evaluation",
+    "title": "Your Feedback Matters",
     "texts": {
-      "ratingQuestion": "How would you rate this training?",
-      "topicsQuestion": "Which topics would you like to learn in more detail?",
-      "feedbackQuestion": "Additional feedback:",
-      "feedbackPlaceholder": "Share your experience...",
-      "submitButton": "Submit",
+      "ratingQuestion": "How would you rate this microlearning training?",
+      "topicsQuestion": "Which topics would you like to explore further?",
+      "feedbackQuestion": "Any additional feedback?",
+      "feedbackPlaceholder": "Write your thoughts here...",
+      "submitButton": "Submit Feedback",
       "submittingText": "Submitting...",
-      "ratingRequiredText": "Please provide a rating",
-      "dataSecurityNotice": "Your data is securely protected",
-      "successTitle": "Thank you!",
-      "successMessage1": "Thank you for your feedback.",
-      "successMessage2": "Your evaluation will help us improve our trainings.",
-      "successMessage3": "Continue enhancing your security awareness!",
-      "thankYouMessage": "Stay secure!"
+      "ratingRequiredText": "Please rate before submitting.",
+      "dataSecurityNotice": "Your responses are anonymous and protected.",
+      "successTitle": "Thank you for your feedback!",
+      "successMessage1": "Your input helps us improve future trainings.",
+      "successMessage2": "Stay alert. Stay secure.",
+      "successMessage3": "Knowledge is your best defense.",
+      "thankYouMessage": "You're making a difference!"
     },
     "ariaTexts": {
-      "mainLabel": "Survey completion",
-      "successDescription": "Survey completed successfully. Thank you for your feedback.",
-      "successRegionLabel": "Success message",
-      "successIconLabel": "Success checkmark icon",
-      "formDescription": "Survey form with rating, topic selection, and feedback sections",
+      "mainLabel": "Training Feedback Form",
+      "successDescription": "Survey completed. Thank you for your valuable input.",
+      "successRegionLabel": "Success Message",
+      "successIconLabel": "Checkmark icon",
+      "formDescription": "Feedback form for training evaluation with rating, topic selection, and free-form comments.",
       "headerLabel": "Survey header",
-      "formContentDescription": "Survey form containing rating stars, topic checkboxes, and feedback textarea",
-      "ratingDescription": "Rate the training from 1 to 5 stars",
+      "formContentDescription": "Survey content: star rating, checkboxes, and text input",
+      "ratingDescription": "Rate your training experience",
       "starLabel": "star",
-      "topicsDescription": "Select topics you would like to learn more about",
-      "topicLabel": "Select",
-      "feedbackDescription": "Optional feedback textarea for additional comments",
-      "feedbackLabel": "Additional feedback",
-      "submitSectionLabel": "Submit survey",
-      "submittingLabel": "Submitting survey",
-      "submitLabel": "Submit survey",
-      "securityNoticeLabel": "Data security notice"
+      "topicsDescription": "Topics you’d like to explore more",
+      "topicLabel": "Topic checkbox",
+      "feedbackDescription": "Text area for comments",
+      "feedbackLabel": "Feedback field",
+      "submitSectionLabel": "Submit section",
+      "submittingLabel": "Submitting state",
+      "submitLabel": "Submit button",
+      "securityNoticeLabel": "Data privacy note"
     },
     "topics": [
-      "SMS Security",
-      "Email Security",
-      "Password Management",
-      "Two-Factor Authentication"
+      "Phishing Email Recognition",
+      "Safe Reporting Behavior",
+      "Real-world Cyber Threats",
+      "Microlearning Security Tips"
     ]
   },
   "7": {
     "texts": {
-      "title": "You're More Secure Now!",
-      "subtitle": "Time to share this knowledge with your team and start applying it",
-      "achievementsTitle": "What You've Learned:",
-      "progressMessage": "Your security level increased by 85%!"
+      "title": "Take the First Step Today",
+      "subtitle": "Your secure behavior can protect your entire organization.",
+      "achievementsTitle": "You’ve Already Made Progress:",
+      "progressMessage": "You’ve improved your security posture by 85%!"
     },
     "achievements": [
-      "Strong password creation techniques",
-      "2FA setup and importance",
-      "Using a password manager",
-      "Recognizing phishing attacks"
+      "Learned how to spot suspicious emails",
+      "Understood the importance of secure reporting",
+      "Recognized real-world phishing attempts",
+      "Gained practical tips to act confidently"
     ]
   },
   "8": {
     "texts": {
-      "completionTitle": "Congratulations! You've Completed the Training",
-      "completionSubtitle": "You've successfully refreshed your cybersecurity knowledge",
-      "achievementsTitle": "Achievements Earned",
-      "actionPlanTitle": "What to Do Next?",
+      "completionTitle": "Congratulations! 🎉 You've Completed the Training",
+      "completionSubtitle": "You've strengthened your ability to detect and report phishing emails.",
+      "achievementsTitle": "What You’ve Gained",
+      "actionPlanTitle": "Next Steps",
       "resourcesTitle": "Additional Resources",
-      "motivationalTitle": "Your Cybersecurity Journey Continues",
-      "motivationalMessage": "By completing this training, you've made a significant contribution to your organization's security. Keep applying what you've learned and encourage your team to do the same.",
+      "motivationalTitle": "Stay Vigilant!",
+      "motivationalMessage": "Cyber threats evolve, but so can your behavior. Keep applying what you've learned, and encourage your team to do the same.",
       "downloadButton": "Download Certificate",
       "downloadingText": "Downloading...",
       "urgentLabel": "Urgent",
@@ -458,62 +343,62 @@
     },
     "immediateActions": [
       {
-        "iconName": "smartphone",
+        "iconName": "mail-warning",
         "title": "Do Now",
-        "description": "Download a password manager and add your primary accounts",
+        "description": "Check your email inbox and report any suspicious messages using the reporting button.",
         "priority": "critical",
         "timeframe": "5 minutes"
       },
       {
         "iconName": "users",
         "title": "This Week",
-        "description": "Share security policies at your team meeting",
+        "description": "Share what you've learned in this training with at least one teammate.",
         "priority": "high",
         "timeframe": "This week"
       },
       {
         "iconName": "calendar",
         "title": "This Month",
-        "description": "Plan and launch team security trainings",
+        "description": "Organize a short awareness session or microlearning follow-up in your team.",
         "priority": "medium",
         "timeframe": "Within 30 days"
       }
     ],
     "resources": [
       {
-        "title": "NIST Password Guide",
-        "type": "PDF",
-        "url": "https://www.nist.gov/cybersecurity/nist-password-guidelines",
-        "description": "Comprehensive guide to password security"
-      },
-      {
-        "title": "2FA Setup Videos",
+        "title": "How to Report Phishing in Outlook",
         "type": "Video",
-        "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-        "description": "Step-by-step two-factor authentication"
+        "url": "https://support.microsoft.com/en-us/office/report-phishing-e-mails-0d882ea5-6c83-48c2-b896-4ab2ab7c4c94",
+        "description": "Learn how to report phishing emails directly from Outlook."
       },
       {
-        "title": "Phishing Testing Tools",
-        "type": "Tool",
-        "url": "https://www.google.com",
-        "description": "Tools to test your team"
+        "title": "Google Workspace - Report Phishing",
+        "type": "Help Article",
+        "url": "https://support.google.com/mail/answer/8253?hl=en",
+        "description": "Steps to report suspicious emails in Gmail."
+      },
+      {
+        "title": "NIST: Recognizing Phishing",
+        "type": "PDF",
+        "url": "https://nvlpubs.nist.gov/nistpubs/ir/2020/NIST.IR.8310.pdf",
+        "description": "NIST guide on recognizing and preventing phishing attacks."
       }
     ],
     "achievements": [
       {
-        "id": "quiz-master",
-        "name": "Quiz Master",
-        "iconName": "award"
+        "id": "report-hero",
+        "name": "Report Hero",
+        "iconName": "alert-triangle"
       },
       {
-        "id": "fast-learner",
-        "name": "Fast Learner",
-        "iconName": "trending-up"
+        "id": "phishing-shield",
+        "name": "Phishing Shield",
+        "iconName": "shield-check"
       },
       {
-        "id": "security-champion",
-        "name": "Security Champion",
-        "iconName": "shield"
+        "id": "awareness-ambassador",
+        "name": "Awareness Ambassador",
+        "iconName": "megaphone"
       }
     ]
   }

@@ -339,6 +339,9 @@ export const QuizScene = React.memo(function QuizScene({
   // Theme state for forcing re-renders when theme changes
   const [themeState, setThemeState] = React.useState(0);
 
+  // State to store the result of the last answered question for BottomSheet title
+  const [lastAnswerResult, setLastAnswerResult] = React.useState<{ wasCorrect: boolean; wasLastQuestion: boolean } | null>(null);
+
   React.useEffect(() => {
     const checkTheme = () => {
       setThemeState(prev => prev + 1);
@@ -456,16 +459,20 @@ export const QuizScene = React.memo(function QuizScene({
       setAnswers((prev: Map<string, any>) =>
         new Map(prev).set(currentQuestion?.id, answer),
       );
+
+      const isCorrect = validateAnswer(answer);
+      const wasLastQuestion = currentQuestionIndex === questions.length - 1;
+      setLastAnswerResult({ wasCorrect: isCorrect, wasLastQuestion: wasLastQuestion }); // Store the result here
+
       setShowResult(true);
       setAttempts((prev) => prev + 1);
       setIsLoading(false);
 
-      const isCorrect = validateAnswer(answer);
       if (isCorrect) {
         setIsAnswerLocked(true);
 
         // For any question type on the last question, trigger quiz completion
-        if (currentQuestionIndex === questions.length - 1) {
+        if (wasLastQuestion) {
           onQuizCompleted();
         }
       }
@@ -563,6 +570,36 @@ export const QuizScene = React.memo(function QuizScene({
     if (isAnswerLocked) return;
     resetQuestionState();
   }, [isAnswerLocked, resetQuestionState]);
+
+  // Handle BottomSheet dismissal
+  const handleBottomSheetDismiss = useCallback(() => {
+    setShowResult(false); // Sadece BottomSheet'i kapat
+    setLastAnswerResult(null); // Sonuç state'ini sıfırla
+
+    // Eğer doğru cevap verildiyse, bir dahaki soruya geç
+    if (lastAnswerResult?.wasCorrect) {
+      if (lastAnswerResult.wasLastQuestion) {
+        onQuizCompleted();
+      } else {
+        handleNextQuestion();
+      }
+    } else {
+      // Eğer yanlış cevap verildiyse
+      if (attempts < maxAttempts && !isAnswerLocked) {
+        // Hala deneme hakkı varsa, state'i reset et
+        resetQuestionState();
+      } else {
+        // Deneme hakkı kalmadıysa, bir dahaki soruya geç
+        if (currentQuestionIndex < questions.length - 1) {
+          handleNextQuestion();
+        } else {
+          // Son soruda yanlış cevap verildiyse ve deneme hakkı kalmadıysa
+          // Quiz'i tamamla ama başarısız olarak
+          onQuizCompleted();
+        }
+      }
+    }
+  }, [lastAnswerResult?.wasCorrect, lastAnswerResult?.wasLastQuestion, attempts, maxAttempts, isAnswerLocked, resetQuestionState, setShowResult, setLastAnswerResult, handleNextQuestion, onQuizCompleted, currentQuestionIndex, questions.length]);
 
   // Memoized event handlers for better performance
   const handleSliderChange = useCallback((value: number[]) => {
@@ -2029,17 +2066,13 @@ export const QuizScene = React.memo(function QuizScene({
             {isMobile && (
               <BottomSheetComponent
                 open={showResult}
-                onDismiss={() => {
-                  setShowResult(false)
-                  // Eğer soru doğru cevaplandıysa ve son soru değilse, bir sonraki soruya geç
-                  if (isAnswerCorrect && currentQuestionIndex < questions.length - 1) {
-                    handleNextQuestion()
-                  }
-                }}
-                title={isAnswerCorrect
-                  ? (currentQuestionIndex === questions.length - 1
+                onDismiss={handleBottomSheetDismiss}
+                title={lastAnswerResult
+                  ? (lastAnswerResult.wasLastQuestion && lastAnswerResult.wasCorrect
                     ? (config.texts?.quizCompleted || "Tamamlandı! 🎉")
-                    : (config.texts?.correctAnswer || "Doğru! 🎉"))
+                    : (lastAnswerResult.wasCorrect
+                      ? (config.texts?.correctAnswer || "Doğru! 🎉")
+                      : (config.texts?.wrongAnswer || "Yanlış Cevap")))
                   : (config.texts?.wrongAnswer || "Yanlış Cevap")
                 }
               >
@@ -2068,108 +2101,121 @@ export const QuizScene = React.memo(function QuizScene({
                 </div>
                 {/* Action Buttons */}
                 <div className="flex flex-col gap-3 pt-3">
-                    {!isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked && (
-                      <motion.button
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                        whileHover={{
-                          scale: 1.05,
-                          boxShadow: "0 20px 40px rgba(239, 68, 68, 0.3)"
+                  {!lastAnswerResult?.wasCorrect && attempts < maxAttempts && !isAnswerLocked && (
+                    <motion.button
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.8, delay: 0.2 }}
+                      whileHover={{
+                        scale: 1.05,
+                        boxShadow: "0 20px 40px rgba(239, 68, 68, 0.3)"
+                      }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        // BottomSheet kapandıktan sonra retry işlemini yap
+                        setTimeout(() => {
+                          retryQuestion()
+                        }, 300)
+                      }}
+                      disabled={isAnswerLocked}
+                      className={`relative flex items-center justify-center space-x-2 px-4 py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full`}
+                    >
+                      {/* Button shimmer effect */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                        animate={{ x: ['-100%', '200%'] }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          ease: "linear"
                         }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={retryQuestion}
-                        disabled={isAnswerLocked}
-                        className={`relative flex items-center justify-center space-x-2 px-4 py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full`}
-                      >
-                        {/* Button shimmer effect */}
-                        <motion.div
-                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                          animate={{ x: ['-100%', '200%'] }}
-                          transition={{
-                            duration: 2,
-                            repeat: Infinity,
-                            ease: "linear"
+                      />
+
+                      <RefreshCw size={18} className={`relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
+                      <span className={`text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
+                        {config.texts?.retryQuestion || "Tekrar Dene"}
+                      </span>
+                    </motion.button>
+                  )}
+
+                  {(lastAnswerResult?.wasCorrect || (!lastAnswerResult?.wasCorrect && attempts >= maxAttempts) || isAnswerLocked) && (
+                    <>
+                      {/* Next Question button - shown when not on last question */}
+                      {currentQuestionIndex < questions.length - 1 && (
+                        <motion.button
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ duration: 0.8, delay: 0.4 }}
+                          whileHover={{
+                            scale: 1.05,
+                            boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
                           }}
-                        />
-
-                        <RefreshCw size={18} className={`relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
-                        <span className={`text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
-                          {config.texts?.retryQuestion || "Tekrar Dene"}
-                        </span>
-                      </motion.button>
-                    )}
-
-                    {(isAnswerCorrect || (!isAnswerCorrect && attempts >= maxAttempts) || isAnswerLocked) && (
-                      <>
-                        {/* Next Question button - shown when not on last question */}
-                        {currentQuestionIndex < questions.length - 1 && (
-                          <motion.button
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 0.8, delay: 0.4 }}
-                            whileHover={{
-                              scale: 1.05,
-                              boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => {
+                            // BottomSheet kapandıktan sonra next question işlemini yap
+                            setTimeout(() => {
+                              handleNextQuestion()
+                            }, 300)
+                          }}
+                          className={`relative flex items-center justify-center space-x-2 px-4 py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full`}
+                        >
+                          {/* Button shimmer effect */}
+                          <motion.div
+                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                            animate={{ x: ['-100%', '200%'] }}
+                            transition={{
+                              duration: 2,
+                              repeat: Infinity,
+                              ease: "linear"
                             }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={handleNextQuestion}
-                            className={`relative flex items-center justify-center space-x-2 px-4 py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full`}
-                          >
-                            {/* Button shimmer effect */}
-                            <motion.div
-                              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                              animate={{ x: ['-100%', '200%'] }}
-                              transition={{
-                                duration: 2,
-                                repeat: Infinity,
-                                ease: "linear"
-                              }}
-                            />
+                          />
 
-                            <ArrowRight size={18} className={`relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
-                            <span className={`text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
-                              {config.texts?.nextQuestion || "Sonraki Soru"}
-                            </span>
-                          </motion.button>
-                        )}
+                          <ArrowRight size={18} className={`relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
+                          <span className={`text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
+                            {config.texts?.nextQuestion || "Sonraki Soru"}
+                          </span>
+                        </motion.button>
+                      )}
 
-                        {/* Next Slide button - shown when quiz is completed (last question answered correctly) */}
-                        {currentQuestionIndex === questions.length - 1 && isAnswerCorrect && (
-                          <motion.button
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 0.8, delay: 0.4 }}
-                            whileHover={{
-                              scale: 1.05,
-                              boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
-                            }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => {
+                      {/* Next Slide button - shown when quiz is completed (last question answered correctly) */}
+                      {currentQuestionIndex === questions.length - 1 && lastAnswerResult?.wasCorrect && (
+                        <motion.button
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ duration: 0.8, delay: 0.4 }}
+                          whileHover={{
+                            scale: 1.05,
+                            boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
+                          }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => {
+                            // BottomSheet kapandıktan sonra next slide işlemini yap
+                            setTimeout(() => {
                               onNextSlide();
+                            }, 300)
+                          }}
+                          className={`relative flex items-center justify-center space-x-2 px-4 py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full`}
+                        >
+                          {/* Button shimmer effect */}
+                          <motion.div
+                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                            animate={{ x: ['-100%', '200%'] }}
+                            transition={{
+                              duration: 2,
+                              repeat: Infinity,
+                              ease: "linear"
                             }}
-                            className={`relative flex items-center justify-center space-x-2 px-4 py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full`}
-                          >
-                            {/* Button shimmer effect */}
-                            <motion.div
-                              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                              animate={{ x: ['-100%', '200%'] }}
-                              transition={{
-                                duration: 2,
-                                repeat: Infinity,
-                                ease: "linear"
-                              }}
-                            />
+                          />
 
-                            <ArrowUpRight size={18} className={`relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
-                            <span className={`text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
-                              {config.texts?.nextSlide || "Sonraki Slayt"}
-                            </span>
-                          </motion.button>
-                        )}
-                      </>
-                    )}
-                  </div>
+                          <ArrowUpRight size={18} className={`relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
+                          <span className={`text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
+                            {config.texts?.nextSlide || "Sonraki Slayt"}
+                          </span>
+                        </motion.button>
+                      )}
+                    </>
+                  )}
+                </div>
               </BottomSheetComponent>
             )}
           </div>

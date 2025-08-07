@@ -179,7 +179,7 @@ export default function App() {
     return appConfig.scenes.map((scene: any) => {
       const sceneType = scene.metadata?.scene_type;
       const component = sceneComponentMap[sceneType as keyof typeof sceneComponentMap];
-
+      console.log("scene", scene);
       if (!component) {
         console.warn(`Unknown scene type: ${sceneType} for scene ${scene.scene_id}`);
         return null;

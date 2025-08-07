@@ -40,73 +40,72 @@
     }
   },
   "1": {
-    "title": "SMS Phishing Koruması",
-    "subtitle": "SMS tabanlı phishing saldırılarını tanıyın ve korunma yöntemlerini öğrenin",
+    "title": "Phishing Farkındalığı",
+    "subtitle": "Şüpheli e-postaları tanıyın, ekibinizi koruyun",
     "sectionTitle": "Bu Eğitimde Öğrenecekleriniz:",
     "highlights": [
       {
-        "iconName": "smartphone",
-        "text": "SMS phishing saldırılarını tanıma"
-      },
-      {
-        "iconName": "shield",
-        "text": "Korunma stratejileri"
-      },
-      {
         "iconName": "alert-triangle",
-        "text": "Şüpheli mesajları tespit etme"
+        "text": "Phishing e-postalarını tanıma"
+      },
+      {
+        "iconName": "shield-check",
+        "text": "Riski anlama"
+      },
+      {
+        "iconName": "smartphone",
+        "text": "Güvenli raporlama"
       },
       {
         "iconName": "users",
-        "text": "Ekip farkındalığı oluşturma"
+        "text": "Güvenlik odaklı kültür oluşturma"
       }
     ],
-    "duration": "~10 dakika",
-    "level": "Tüm Seviyeler",
-    "callToActionText": "SMS güvenliğini öğrenmek için kaydırın",
+    "duration": "~5 dakika",
+    "level": "Başlangıç",
+    "callToActionText": "Farkındalık yolculuğunuza başlamak için kaydırın",
     "texts": {
       "sceneLabel": "Giriş Sahnesi",
-      "sceneDescription": "SMS phishing koruması eğitim modülüne hoş geldiniz",
-      "iconLabel": "SMS güvenliğini temsil eden akıllı telefon ikonu",
+      "sceneDescription": "Phishing farkındalığı eğitimine hoş geldiniz",
+      "iconLabel": "Phishing tespitini temsil eden uyarı ikonu",
       "titleLabel": "Eğitim başlığı",
-      "subtitleLabel": "Eğitim açıklaması",
-      "cardLabel": "Öğrenme hedefleri kartı",
-      "cardDescription": "Bu eğitimde öğreneceğiniz becerilerin listesi",
+      "subtitleLabel": "Eğitim girişi",
+      "cardLabel": "Öğrenme genel bakış kartı",
+      "cardDescription": "Bu eğitimden kazanacağınız beceriler",
       "highlightItemLabel": "Öğrenme hedefi",
-      "statsLabel": "Eğitim istatistikleri",
-      "durationLabel": "Eğitim süresi",
-      "levelLabel": "Eğitim zorluk seviyesi",
-      "ctaLabel": "Çağrı eylemi",
-      "sparkleLabel": "Dekoratif parıltı efekti"
+      "statsLabel": "Eğitim detayları",
+      "durationLabel": "Tamamlama süresi",
+      "levelLabel": "Zorluk seviyesi",
+      "ctaLabel": "Eğitimi başlat",
+      "sparkleLabel": "Dekoratif animasyon"
     }
   },
   "2": {
-    "title": "SMS Güvenlik Hedefleri",
+    "title": "Eğitim Hedefleri",
     "goals": [
       {
-        "iconName": "smartphone",
-        "title": "SMS Tehditlerini Tanıma",
-        "subtitle": "Farkındalık",
-        "description": "SMS tabanlı phishing saldırılarını hızlıca tanıma ve tespit etme"
-      },
-      {
-        "iconName": "shield",
-        "title": "Korunma Stratejileri",
-        "subtitle": "Savunma",
-        "description": "SMS saldırılarına karşı etkili korunma yöntemleri geliştirme"
-      },
-      {
         "iconName": "alert-triangle",
-        "title": "Şüpheli Mesajları Tespit Etme",
-        "subtitle": "Vigilance",
-        "description": "Şüpheli SMS mesajlarını analiz etme ve doğrulama"
+        "title": "Phishing Tespit Etme",
+        "subtitle": "Tanımlama",
+        "description": "Phishing girişimlerini hızlıca tanımlamayı öğrenin"
+      },
+      {
+        "iconName": "shield-check",
+        "title": "Doğru Raporlama",
+        "subtitle": "Eylem",
+        "description": "Phishing e-postalarını ne zaman ve nasıl raporlayacağınızı anlayın"
+      },
+      {
+        "iconName": "users",
+        "title": "Güvenlik Kültürünü Teşvik Etme",
+        "subtitle": "Ekip Davranışı",
+        "description": "Güvenli iletişim alışkanlığı oluşturun"
       }
     ]
   },
   "3": {
     "title": "Gerçek Hayat Senaryosu",
-    "subtitle": "DevOps Yöneticisinin Phishing Deneyimi",
-    "description": "Gerçek bir phishing saldırısı senaryosunu inceleyin ve öğrenin",
+    "subtitle": "Bir meslektaşının hikayesi",
     "video": {
       "src": "https://customer-0lll6yc8omc23rbm.cloudflarestream.com/5fdb12ff1436c991f50b698a02e2faa1/manifest/video.m3u8",
       "poster": null,
@@ -114,198 +113,84 @@
       "showTranscript": true,
       "transcriptTitle": "Senaryo Transkripti",
       "transcriptLanguage": "Türkçe",
-      "transcript": "00:00:04.400 güvenlik her zaman önceliğimizdir ancak\n00:00:07.919 geçen ay yaşadığım bir deneyim beni\n00:00:10.400 davranışımı değiştirmeye zorladı bir gün öğle\n00:00:13.120 molam sırasında finans departmanından\n00:00:15.639 geliyor gibi görünen bir e-posta aldım\n00:00:17.439 bir faturayı onaylamamı istiyordu\n00:00:20.039 bir şeyler ters geliyordu fatura\n00:00:23.320 numarası garip ve birkaç\n00:00:25.519 dilbilgisi hatası vardı siber\n00:00:28.279 güvenlik eğitimim sayesinde hızlıca\n00:00:30.679 bir phishing girişimi olduğunu anladım\n00:00:33.879 birinin buna kanabileceğini düşündüm\n00:00:36.239 ama rapor etmek yerine işime devam ettim\n00:00:38.760 zaten yakalayacaklarını varsayarak bir hafta\n00:00:42.079 sonra şirketimiz bir phishing\n00:00:44.840 saldırısının veri ihlaline yol açtığını duyurdu\n00:00:47.680 müşteri bilgilerini açığa çıkaran görmezden\n00:00:51.559 geldiğim e-posta o saldırının bir parçasıydı\n00:00:54.719 rapor etseydim tüm kriz önlenebilirdi\n00:00:57.600 ihlal sonrası şirket bir\n00:00:59.600 toplantı düzenledi IT ekibi saldırının nasıl\n00:01:03.199 gerçekleştiğini ve verdiği zararı açıkladı\n00:01:05.880 sadece itibar zararı değil aynı zamanda\n00:01:08.320 mali kayıp da vardı şok oldum ve\n00:01:11.280 suçlu hissettim basit bir güvenli raporlama\n00:01:14.119 davranışı tüm farkı yaratabilirdi\n00:01:16.439 bu deneyimden öğrendiklerim şunlar\n00:01:18.439 başkasının rapor edeceğini varsaymayın\n00:01:21.320 sadece yapın herkes aynı şekilde\n00:01:24.119 düşünürse hiçbir şey\n00:01:26.439 yapılmaz hepimiz sorumluluğu\n00:01:28.560 paylaşırız şirketinizin\n00:01:30.960 raporlama sürecini bilin emin değilseniz IT'ye sorun\n00:01:37.439 raporlamayı kolaylaştıran araçlar her zaman vardır\n00:01:40.399 phishing saldırılarını asla küçümsemeyin\n00:01:43.439 tek bir sahte e-posta bile\n00:01:46.560 tüm şirketi riske atabilir bu\n00:01:49.079 olaydan sonra siber saldırılarla mücadelenin\n00:01:51.439 ancak herkes güvenli\n00:01:53.640 davranışlar uyguladığında mümkün olduğunu anladım\n00:01:56.520 phishing e-postasını tanımlamak yeterli değil\n00:02:00.000 harekete geçmeniz gerekiyor"
+      "transcript": "00:00:04.400 güvenlik her zaman önceliktir ancak geçen ay\n00:00:07.919 yaşadığım bir deneyim davranışımı\n00:00:10.400 değiştirmeme neden oldu bir gün öğle\n00:00:13.120 molam sırasında finans departmanından\n00:00:15.639 geliyor gibi görünen bir e-posta aldım\n00:00:17.439 bir faturayı onaylamamı istiyordu\n00:00:20.039 bir şey ters geliyordu fatura\n00:00:23.320 numarası garip ve birkaç\n00:00:25.519 dilbilgisi hatası vardı siber güvenlik\n00:00:28.279 eğitimim sayesinde hızlıca bunun\n00:00:30.679 bir phishing girişimi olduğunu anladım\n00:00:33.879 birinin buna kanabileceğini düşündüm\n00:00:36.239 ama rapor etmek yerine işime devam ettim\n00:00:38.760 zaten yakalayacaklarını varsayarak bir hafta\n00:00:42.079 sonra şirketimiz bir phishing\n00:00:44.840 saldırısının veri ihlaline yol açtığını\n00:00:47.680 müşteri bilgilerini açığa çıkardığını duyurdu\n00:00:51.559 görmezden geldiğim e-posta o saldırının\n00:00:54.719 bir parçasıydı rapor etseydim\n00:00:57.600 tüm kriz önlenebilirdi\n00:00:59.600 ihlal sonrası şirket bir\n00:01:03.199 toplantı düzenledi IT ekibi saldırının\n00:01:05.880 nasıl gerçekleştiğini ve verdiği zararı açıkladı\n00:01:08.320 sadece itibar zararı değil aynı zamanda\n00:01:11.280 mali kayıp da vardı şok oldum ve\n00:01:14.119 suçlu hissettim basit bir güvenli raporlama\n00:01:16.439 davranışı tüm farkı yaratabilirdi\n00:01:18.439 bu deneyimden öğrendiğim şeyler\n00:01:21.320 başka birinin rapor edeceğini varsaymayın\n00:01:24.119 sadece yapın herkes aynı şekilde\n00:01:26.439 düşünürse hiçbir şey yapılmaz hepimiz\n00:01:28.560 sorumluluğu paylaşırız şirketinizin\n00:01:30.960 raporlama sürecini bilin emin değilseniz IT'ye sorun\n00:01:37.439 raporlamayı kolaylaştıracak araçlar her zaman vardır\n00:01:40.399 phishing saldırılarını asla küçümsemeyin\n00:01:43.439 tek bir sahte e-posta bile\n00:01:46.560 tüm şirketi riske atabilir bu olaydan\n00:01:49.079 sonra siber saldırılarla mücadelenin\n00:01:51.439 ancak herkes güvenli\n00:01:53.640 davranışlar uyguladığında mümkün olduğunu anladım\n00:01:56.520 bir phishing e-postasını tanımlamak\n00:02:00.000 yeterli değil harekete geçmeniz gerekir"
     },
     "texts": {
       "transcriptLoading": "Transkript yükleniyor..."
     },
     "ariaTexts": {
-      "mainLabel": "Senaryo Sahnesi",
-      "mainDescription": "Transkript ile gerçek hayat senaryosu videosu",
+      "mainLabel": "Senaryo Videosu",
+      "mainDescription": "Gerçek bir phishing vakasının animasyonlu canlandırması",
       "loadingLabel": "Transkript yükleniyor",
-      "errorLabel": "Transkript yükleme hatası",
-      "videoPlayerLabel": "Video Oynatıcı",
-      "mobileHintLabel": "Mobil kullanıcı ipucu"
+      "errorLabel": "Transkript yüklenemedi",
+      "videoPlayerLabel": "Senaryo oynatıcısı",
+      "mobileHintLabel": "Sesle en iyi şekilde görüntülenir"
     }
   },
   "4": {
-    "title": "Uygulanabilir Adımlar",
+    "title": "Güvenli Eylem Alın",
     "actions": [
       {
-        "iconName": "key",
-        "title": "Güçlü Şifre Oluştur",
-        "description": "En az 12 karakter, büyük ve küçük harfler, sayılar ve semboller",
-        "tip": "Örnek: 'Kahve!çok7İyi#2024'"
+        "iconName": "mail",
+        "title": "Şüpheli E-postayı Tanımlayın",
+        "description": "Phishing işaretleri için e-posta başlığını, gönderenini ve formatını inceleyin.",
+        "tip": "Eşleşmeyen URL'ler veya acil istekler arayın."
       },
       {
-        "iconName": "smartphone",
-        "title": "2FA Etkinleştir",
-        "description": "Tüm kritik hesaplarda çok faktörlü kimlik doğrulamayı etkinleştirin",
-        "tip": "Google Authenticator veya Authy kullanın"
+        "iconName": "alert-triangle",
+        "title": "Bağlantılara Tıklamaktan Kaçının",
+        "description": "Şüpheli bir e-postadaki herhangi bir bağlantıya tıklamayın.",
+        "tip": "Tıklamadan önce hedefi önizlemek için üzerine gelin."
       },
       {
-        "iconName": "database",
-        "title": "Şifre Yöneticisi",
-        "description": "Her hesap için benzersiz ve karmaşık şifreler kullanın",
-        "tip": "1Password, Bitwarden veya LastPass"
+        "iconName": "flag",
+        "title": "Rapor Butonunu Kullanın",
+        "description": "E-posta istemcinizdeki phishing rapor butonunu kullanın.",
+        "tip": "Outlook veya Gmail'de 'Phishing Rapor Et' ikonunu arayın."
       }
     ],
     "tipConfig": {
-      "iconName": "check-circle"
+      "iconName": "info"
     },
     "ariaTexts": {
-      "mainLabel": "Uygulanabilir İçerik",
-      "mainDescription": "İpuçları ve rehberlik içeren interaktif kartlarla uygulanabilir içerik bölümü",
+      "mainLabel": "Eyleme Geçirilebilir İçerik",
+      "mainDescription": "E-posta kullanıcıları için eyleme geçirilebilir phishing yanıt adımları",
       "headerLabel": "Sahne başlığı",
-      "actionCardsLabel": "Aksiyon kartları",
-      "actionCardsDescription": "Uygulanabilir içerik kartları",
-      "actionCardLabel": "Aksiyon kartı",
+      "actionCardsLabel": "Eylem kartları",
+      "actionCardsDescription": "Phishing'e yanıt vermek için eylem adımları",
+      "actionCardLabel": "Eylem kartı",
       "tipLabel": "İpucu"
     }
   },
   "5": {
-    "title": "Siber Güvenlik Quiz",
-    "subtitle": "Bilginizi test edin",
+    "title": "Hızlı Bilgi Kontrolü",
+    "subtitle": "Phishing farkındalığınızı test edin",
     "questions": {
-      "totalCount": 4,
+      "totalCount": 1,
       "maxAttempts": 2,
       "list": [
         {
-          "id": "pwd-strength",
-          "type": "multiple_choice",
-          "title": "Şifre Gücü Değerlendirmesi",
-          "description": "Aşağıdaki şifrelerden hangisi en güvenlidir?",
-          "category": "Şifre Güvenliği",
-          "options": [
-            {
-              "id": "weak-1",
-              "text": "password123",
-              "isCorrect": false,
-              "explanation": "Çok basit ve tahmin edilebilir"
-            },
-            {
-              "id": "medium-1",
-              "text": "P@ssw0rd!",
-              "isCorrect": false,
-              "explanation": "Yaygın bir kalıp"
-            },
-            {
-              "id": "strong-1",
-              "text": "Kahve!çok7İyi#2024",
-              "isCorrect": true,
-              "explanation": "Uzun, karmaşık ve hatırlanabilir"
-            },
-            {
-              "id": "weak-2",
-              "text": "123456789",
-              "isCorrect": false,
-              "explanation": "Sadece sayılar",
-              "color": "red"
-            }
-          ],
-          "explanation": "Güvenli şifreler uzun, karmaşık ve kişisel bilgilerden kaçınır.",
-          "tips": [
-            "En az 12 karakter kullanın",
-            "Büyük, küçük harf, sayı ve sembol karıştırın",
-            "Kişisel bilgilerden kaçının",
-            "Her hesap için benzersiz şifre kullanın"
-          ]
-        },
-        {
-          "id": "phishing-detection",
+          "id": "phishing-identification",
           "type": "true_false",
-          "title": "Phishing Saldırısı Tespiti",
-          "statement": "Saldırganlar phishing saldırılarında her zaman bilinmeyen e-posta adresleri kullanır.",
-          "correctAnswer": false,
+          "title": "Phishing Kırmızı Bayrakları",
+          "statement": "Phishing e-postaları genellikle hızlı hareket etmenizi sağlamak için aciliyet hissi yaratır.",
+          "correctAnswer": true,
           "category": "E-posta Güvenliği",
           "options": {
             "true": {
-              "label": "Evet",
+              "label": "Doğru",
               "icon": "check"
             },
             "false": {
-              "label": "Hayır",
+              "label": "Yanlış",
               "icon": "x"
             }
           },
-          "explanation": "Phisher'lar genellikle tanıdık görünen adresleri taklit eder.",
+          "explanation": "Phishing saldırganları genellikle panik yaratmak için acil veya tehdit edici dil kullanır.",
           "tips": [
-            "Gönderen adresini dikkatlice kontrol edin",
-            "Şüpheli bağlantılara tıklamayın",
-            "Doğrudan resmi web sitesine gidin",
-            "IT'ye rapor edin"
-          ]
-        },
-        {
-          "id": "password-best-practices",
-          "type": "multi_select",
-          "title": "Şifre En İyi Uygulamaları",
-          "description": "Güvenli bir şifre oluşturmak için hangi kuralları takip etmelisiniz?",
-          "category": "Şifre Güvenliği",
-          "minCorrect": 3,
-          "options": [
-            {
-              "id": "length",
-              "text": "En az 12 karakter kullanın",
-              "isCorrect": true,
-              "explanation": "Daha uzun şifreler daha güvenlidir"
-            },
-            {
-              "id": "personal-info",
-              "text": "Doğum tarihinizi dahil edin",
-              "isCorrect": false,
-              "explanation": "Kişisel bilgiler tahmin edilebilir"
-            },
-            {
-              "id": "mixed-case",
-              "text": "Büyük ve küçük harfleri karıştırın",
-              "isCorrect": true,
-              "explanation": "Karmaşıklığı artırır"
-            },
-            {
-              "id": "reuse",
-              "text": "Aynı şifreyi her yerde kullanın",
-              "isCorrect": false,
-              "explanation": "Risk yaratır"
-            },
-            {
-              "id": "special-chars",
-              "text": "Özel karakterler ekleyin",
-              "isCorrect": true,
-              "explanation": "Şifreyi güçlendirir"
-            },
-            {
-              "id": "avoid-personal",
-              "text": "Kişisel bilgilerden kaçının",
-              "isCorrect": true,
-              "explanation": "Tahmin edilmesini zorlaştırır"
-            }
-          ],
-          "explanation": "Güvenli bir şifre en az 12 karakter uzunluğunda, karmaşık ve kişisel bilgilerden kaçınır.",
-          "tips": [
-            "Her hesap için benzersiz şifre kullanın",
-            "Şifre yöneticisi kullanın",
-            "Düzenli olarak güncelleyin",
-            "İki faktörlü kimlik doğrulamayı etkinleştirin"
-          ]
-        },
-        {
-          "id": "email-risk-assessment",
-          "type": "slider_scale",
-          "title": "E-posta Risk Değerlendirmesi",
-          "statement": "\"ACİL! Hesabınız askıya alındı, şifrenizi şimdi güncelleyin: bit.ly/guncelle-sifre\"",
-          "description": "Bu e-postanın risk seviyesini değerlendirin",
-          "min": 1,
-          "max": 10,
-          "correctRange": { "min": 8, "max": 10 },
-          "labels": { "min": "Güvenli", "max": "Çok Riskli" },
-          "category": "E-posta Güvenliği",
-          "explanation": "Yüksek risk: acil dil, bilinmeyen gönderen, kısaltılmış bağlantı.",
-          "tips": [
-            "Acil dil kullanımına dikkat edin",
-            "Kısaltılmış bağlantılardan kaçının",
-            "Doğrudan resmi siteye gidin",
-            "IT'ye rapor edin"
+            "Tıklamadan önce durun.",
+            "IT/güvenlik ekibinizle doğrulayın.",
+            "Doğrudan yanıtlamayın."
           ]
         }
       ]
@@ -323,7 +208,7 @@
       "checkAnswer": "Cevabı Kontrol Et",
       "evaluating": "Değerlendiriliyor...",
       "completeEvaluation": "Değerlendirmeyi Tamamla",
-      "mobileInstructions": "📱 Mobil: öğeyi seçin, sonra kategoriye dokunun",
+      "mobileInstructions": "📱 Mobil: öğeyi seçin, sonra bir kategoriye dokunun",
       "desktopInstructions": "🖥️ Masaüstü: öğeleri kategorilere sürükleyin",
       "options": "Seçenekler",
       "categories": "Kategoriler",
@@ -333,7 +218,7 @@
       "tips": "💡 İpuçları",
       "mobileHint": "💡 En iyi deneyim için soruları dikkatlice okuyun",
       "previousQuestion": "Önceki Soru",
-      "quizCompletionHint": "Devam etmek için quiz'i tamamlayın",
+      "quizCompletionHint": "Devam etmek için quizi tamamlayın",
       "achievementNotification": "Başarı Açıldı! 🎉",
       "scrollHint": "Aşağı kaydır",
       "nextSection": "Sonraki Bölüm",
@@ -348,15 +233,15 @@
       "mainDescription": "Çoklu soru türleri ve gerçek zamanlı geri bildirim ile interaktif quiz",
       "headerLabel": "Quiz başlığı",
       "questionLabel": "Soru içeriği",
-      "questionDescription": "Mevcut soru ve cevap seçenekleri",
+      "questionDescription": "Cevap seçenekleri ile mevcut soru",
       "multipleChoiceLabel": "Çoktan seçmeli seçenekler",
-      "multipleChoiceDescription": "Mevcut seçeneklerden birini seçin",
+      "multipleChoiceDescription": "Mevcut seçeneklerden bir cevap seçin",
       "trueFalseLabel": "Doğru veya yanlış seçenekleri",
       "trueFalseDescription": "Verilen ifade için doğru veya yanlış seçin",
       "multiSelectLabel": "Çoklu seçim seçenekleri",
-      "multiSelectDescription": "Geçerli olan birden fazla cevabı seçin",
+      "multiSelectDescription": "Geçerli olan birden fazla cevap seçin",
       "sliderLabel": "Kaydırıcı ölçek sorusu",
-      "sliderDescription": "Kaydırıcı kullanarak yanıtınızı değerlendirin",
+      "sliderDescription": "Kaydırıcı kullanarak yanıtınızı derecelendirin",
       "dragDropLabel": "Sürükle ve bırak kategorileri",
       "dragDropDescription": "Öğeleri uygun kategorilere sürükleyin veya seçmek için dokunun",
       "optionsLabel": "Mevcut seçenekler",
@@ -384,71 +269,71 @@
     }
   },
   "6": {
-    "title": "Eğitim Değerlendirmesi",
+    "title": "Geri Bildiriminiz Önemli",
     "texts": {
-      "ratingQuestion": "Bu eğitimi nasıl değerlendirirsiniz?",
-      "topicsQuestion": "Hangi konuları daha detaylı öğrenmek istersiniz?",
-      "feedbackQuestion": "Ek geri bildirim:",
-      "feedbackPlaceholder": "Deneyiminizi paylaşın...",
-      "submitButton": "Gönder",
+      "ratingQuestion": "Bu mikroöğrenme eğitimini nasıl değerlendirirsiniz?",
+      "topicsQuestion": "Hangi konuları daha fazla keşfetmek istersiniz?",
+      "feedbackQuestion": "Ek geri bildirim var mı?",
+      "feedbackPlaceholder": "Düşüncelerinizi buraya yazın...",
+      "submitButton": "Geri Bildirimi Gönder",
       "submittingText": "Gönderiliyor...",
-      "ratingRequiredText": "Lütfen bir değerlendirme sağlayın",
-      "dataSecurityNotice": "Verileriniz güvenle korunmaktadır",
-      "successTitle": "Teşekkürler!",
-      "successMessage1": "Geri bildiriminiz için teşekkürler.",
-      "successMessage2": "Değerlendirmeniz eğitimlerimizi geliştirmemize yardımcı olacak.",
-      "successMessage3": "Güvenlik farkındalığınızı geliştirmeye devam edin!",
-      "thankYouMessage": "Güvende kalın!"
+      "ratingRequiredText": "Lütfen göndermeden önce değerlendirin.",
+      "dataSecurityNotice": "Yanıtlarınız anonim ve korumalıdır.",
+      "successTitle": "Geri bildiriminiz için teşekkürler!",
+      "successMessage1": "Girdiniz gelecek eğitimleri iyileştirmemize yardımcı olur.",
+      "successMessage2": "Uyanık kalın. Güvende kalın.",
+      "successMessage3": "Bilgi en iyi savunmanızdır.",
+      "thankYouMessage": "Fark yaratıyorsunuz!"
     },
     "ariaTexts": {
-      "mainLabel": "Anket tamamlama",
-      "successDescription": "Anket başarıyla tamamlandı. Geri bildiriminiz için teşekkürler.",
-      "successRegionLabel": "Başarı mesajı",
-      "successIconLabel": "Başarı onay işareti ikonu",
-      "formDescription": "Değerlendirme yıldızları, konu onay kutuları ve geri bildirim metin alanı içeren anket formu",
+      "mainLabel": "Eğitim Geri Bildirim Formu",
+      "successDescription": "Anket tamamlandı. Değerli girdiniz için teşekkürler.",
+      "successRegionLabel": "Başarı Mesajı",
+      "successIconLabel": "Onay işareti ikonu",
+      "formDescription": "Derecelendirme, konu seçimi ve serbest form yorumları ile eğitim değerlendirmesi için geri bildirim formu.",
       "headerLabel": "Anket başlığı",
-      "formContentDescription": "Değerlendirme yıldızları, konu onay kutuları ve geri bildirim metin alanı içeren anket formu",
-      "ratingDescription": "Eğitimi 1'den 5 yıldıza kadar değerlendirin",
+      "formContentDescription": "Anket içeriği: yıldız derecelendirmesi, onay kutuları ve metin girişi",
+      "ratingDescription": "Eğitim deneyiminizi derecelendirin",
       "starLabel": "yıldız",
-      "topicsDescription": "Daha fazla öğrenmek istediğiniz konuları seçin",
-      "topicLabel": "Seç",
-      "feedbackDescription": "Ek yorumlar için isteğe bağlı geri bildirim metin alanı",
-      "feedbackLabel": "Ek geri bildirim",
-      "submitSectionLabel": "Anketi gönder",
-      "submittingLabel": "Anket gönderiliyor",
-      "submitLabel": "Anketi gönder",
-      "securityNoticeLabel": "Veri güvenliği bildirimi"
+      "topicsDescription": "Daha fazla keşfetmek istediğiniz konular",
+      "topicLabel": "Konu onay kutusu",
+      "feedbackDescription": "Yorumlar için metin alanı",
+      "feedbackLabel": "Geri bildirim alanı",
+      "submitSectionLabel": "Gönder bölümü",
+      "submittingLabel": "Gönderme durumu",
+      "submitLabel": "Gönder butonu",
+      "securityNoticeLabel": "Veri gizliliği notu"
     },
     "topics": [
-      "SMS Güvenliği",
-      "E-posta Güvenliği",
-      "Şifre Yönetimi",
-      "İki Faktörlü Kimlik Doğrulama"
+      "Phishing E-posta Tanıma",
+      "Güvenli Raporlama Davranışı",
+      "Gerçek Dünya Siber Tehditleri",
+      "Mikroöğrenme Güvenlik İpuçları"
     ]
   },
   "7": {
     "texts": {
-      "title": "Artık Daha Güvenlisiniz!",
-      "subtitle": "Bu bilgiyi ekibinizle paylaşma ve uygulamaya başlama zamanı",
-      "achievementsTitle": "Öğrendikleriniz:",
-      "progressMessage": "Güvenlik seviyeniz %85 arttı!"
+      "title": "İlk Adımı Bugün Atın",
+      "subtitle": "Güvenli davranışınız tüm organizasyonunuzu koruyabilir.",
+      "achievementsTitle": "Zaten İlerleme Kaydettiniz:",
+      "progressMessage": "Güvenlik duruşunuzu %85 iyileştirdiniz!"
     },
     "achievements": [
-      "Güçlü şifre oluşturma teknikleri",
-      "2FA kurulumu ve önemi",
-      "Şifre yöneticisi kullanımı",
-      "Phishing saldırılarını tanıma"
+      "Şüpheli e-postaları nasıl tanıyacağınızı öğrendiniz",
+      "Güvenli raporlamanın önemini anladınız",
+      "Gerçek dünya phishing girişimlerini tanıdınız",
+      "Güvenle hareket etmek için pratik ipuçları kazandınız"
     ]
   },
   "8": {
     "texts": {
-      "completionTitle": "Tebrikler! Eğitimi Tamamladınız",
-      "completionSubtitle": "Siber güvenlik bilginizi başarıyla yenilediniz",
-      "achievementsTitle": "Kazanılan Başarılar",
-      "actionPlanTitle": "Sırada Ne Var?",
+      "completionTitle": "Tebrikler! 🎉 Eğitimi Tamamladınız",
+      "completionSubtitle": "Phishing e-postalarını tespit etme ve raporlama yeteneğinizi güçlendirdiniz.",
+      "achievementsTitle": "Kazandıklarınız",
+      "actionPlanTitle": "Sonraki Adımlar",
       "resourcesTitle": "Ek Kaynaklar",
-      "motivationalTitle": "Siber Güvenlik Yolculuğunuz Devam Ediyor",
-      "motivationalMessage": "Bu eğitimi tamamlayarak organizasyonunuzun güvenliğine önemli bir katkı sağladınız. Öğrendiklerinizi uygulamaya devam edin ve ekibinizi de aynısını yapmaya teşvik edin.",
+      "motivationalTitle": "Uyanık Kalın!",
+      "motivationalMessage": "Siber tehditler evrim geçirir, ancak davranışınız da öyle olabilir. Öğrendiklerinizi uygulamaya devam edin ve ekibinizi de aynısını yapmaya teşvik edin.",
       "downloadButton": "Sertifikayı İndir",
       "downloadingText": "İndiriliyor...",
       "urgentLabel": "Acil",
@@ -458,62 +343,62 @@
     },
     "immediateActions": [
       {
-        "iconName": "smartphone",
+        "iconName": "mail-warning",
         "title": "Şimdi Yapın",
-        "description": "Şifre yöneticisi indirin ve birincil hesaplarınızı ekleyin",
-        "priority": "critical",
+        "description": "E-posta gelen kutunuzu kontrol edin ve raporlama butonunu kullanarak şüpheli mesajları rapor edin.",
+        "priority": "kritik",
         "timeframe": "5 dakika"
       },
       {
         "iconName": "users",
         "title": "Bu Hafta",
-        "description": "Ekip toplantınızda güvenlik politikalarını paylaşın",
-        "priority": "high",
+        "description": "Bu eğitimde öğrendiklerinizi en az bir takım arkadaşınızla paylaşın.",
+        "priority": "yüksek",
         "timeframe": "Bu hafta"
       },
       {
         "iconName": "calendar",
         "title": "Bu Ay",
-        "description": "Ekip güvenlik eğitimlerini planlayın ve başlatın",
-        "priority": "medium",
+        "description": "Ekibinizde kısa bir farkındalık oturumu veya mikroöğrenme takibi düzenleyin.",
+        "priority": "orta",
         "timeframe": "30 gün içinde"
       }
     ],
     "resources": [
       {
-        "title": "NIST Şifre Rehberi",
-        "type": "PDF",
-        "url": "https://www.nist.gov/cybersecurity/nist-password-guidelines",
-        "description": "Şifre güvenliği için kapsamlı rehber"
-      },
-      {
-        "title": "2FA Kurulum Videoları",
+        "title": "Outlook'ta Phishing Nasıl Raporlanır",
         "type": "Video",
-        "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-        "description": "Adım adım iki faktörlü kimlik doğrulama"
+        "url": "https://support.microsoft.com/en-us/office/report-phishing-e-mails-0d882ea5-6c83-48c2-b896-4ab2ab7c4c94",
+        "description": "Phishing e-postalarını doğrudan Outlook'tan nasıl raporlayacağınızı öğrenin."
       },
       {
-        "title": "Phishing Test Araçları",
-        "type": "Tool",
-        "url": "https://www.google.com",
-        "description": "Ekibinizi test etmek için araçlar"
+        "title": "Google Workspace - Phishing Raporlama",
+        "type": "Yardım Makalesi",
+        "url": "https://support.google.com/mail/answer/8253?hl=en",
+        "description": "Gmail'de şüpheli e-postaları raporlama adımları."
+      },
+      {
+        "title": "NIST: Phishing Tanıma",
+        "type": "PDF",
+        "url": "https://nvlpubs.nist.gov/nistpubs/ir/2020/NIST.IR.8310.pdf",
+        "description": "Phishing saldırılarını tanıma ve önleme konusunda NIST rehberi."
       }
     ],
     "achievements": [
       {
-        "id": "quiz-master",
-        "name": "Quiz Ustası",
-        "iconName": "award"
+        "id": "report-hero",
+        "name": "Rapor Kahramanı",
+        "iconName": "alert-triangle"
       },
       {
-        "id": "fast-learner",
-        "name": "Hızlı Öğrenen",
-        "iconName": "trending-up"
+        "id": "phishing-shield",
+        "name": "Phishing Kalkanı",
+        "iconName": "shield-check"
       },
       {
-        "id": "security-champion",
-        "name": "Güvenlik Şampiyonu",
-        "iconName": "shield"
+        "id": "awareness-ambassador",
+        "name": "Farkındalık Elçisi",
+        "iconName": "megaphone"
       }
     ]
   }
