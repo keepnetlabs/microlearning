@@ -279,11 +279,11 @@
       "submittingText": "Gönderiliyor...",
       "ratingRequiredText": "Lütfen göndermeden önce değerlendirin.",
       "dataSecurityNotice": "Yanıtlarınız anonim ve korumalıdır.",
-      "successTitle": "Geri bildiriminiz için teşekkürler!",
-      "successMessage1": "Girdiniz gelecek eğitimleri iyileştirmemize yardımcı olur.",
-      "successMessage2": "Uyanık kalın. Güvende kalın.",
-      "successMessage3": "Bilgi en iyi savunmanızdır.",
-      "thankYouMessage": "Fark yaratıyorsunuz!"
+      "successTitle": "Teşekkürler!",
+      "successMessage1": "Geri bildiriminiz için teşekkürler.",
+      "successMessage2": "Değerlendirmeniz eğitimlerimizi geliştirmemize yardımcı olacak.",
+      "successMessage3": "Güvenlik farkındalığınızı artırmaya devam edin!",
+      "thankYouMessage": "Güvende kalın!"
     },
     "ariaTexts": {
       "mainLabel": "Eğitim Geri Bildirim Formu",

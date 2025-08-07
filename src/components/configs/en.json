@@ -279,11 +279,11 @@
       "submittingText": "Submitting...",
       "ratingRequiredText": "Please rate before submitting.",
       "dataSecurityNotice": "Your responses are anonymous and protected.",
-      "successTitle": "Thank you for your feedback!",
-      "successMessage1": "Your input helps us improve future trainings.",
-      "successMessage2": "Stay alert. Stay secure.",
-      "successMessage3": "Knowledge is your best defense.",
-      "thankYouMessage": "You're making a difference!"
+      "successTitle": "Thank you!",
+      "successMessage1": "Thank you for your feedback.",
+      "successMessage2": "Your evaluation will help us improve our trainings.",
+      "successMessage3": "Continue enhancing your security awareness!",
+      "thankYouMessage": "Stay secure!"
     },
     "ariaTexts": {
       "mainLabel": "Training Feedback Form",

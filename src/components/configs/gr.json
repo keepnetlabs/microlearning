@@ -269,21 +269,21 @@
     }
   },
   "6": {
-    "title": "Ihr Feedback Ist Wichtig",
+    "title": "Ihr Feedback ist wichtig",
     "texts": {
       "ratingQuestion": "Wie würden Sie diese Microlearning-Schulung bewerten?",
       "topicsQuestion": "Welche Themen möchten Sie weiter erkunden?",
       "feedbackQuestion": "Haben Sie zusätzliches Feedback?",
       "feedbackPlaceholder": "Schreiben Sie Ihre Gedanken hier...",
-      "submitButton": "Feedback Einreichen",
+      "submitButton": "Feedback einreichen",
       "submittingText": "Wird eingereicht...",
       "ratingRequiredText": "Bitte bewerten Sie vor dem Einreichen.",
       "dataSecurityNotice": "Ihre Antworten sind anonym und geschützt.",
-      "successTitle": "Vielen Dank für Ihr Feedback!",
-      "successMessage1": "Ihr Beitrag hilft uns, zukünftige Schulungen zu verbessern.",
-      "successMessage2": "Bleiben Sie wachsam. Bleiben Sie sicher.",
-      "successMessage3": "Wissen ist Ihre beste Verteidigung.",
-      "thankYouMessage": "Sie machen einen Unterschied!"
+      "successTitle": "Danke!",
+      "successMessage1": "Vielen Dank für Ihr Feedback.",
+      "successMessage2": "Ihre Bewertung hilft uns, unsere Trainings zu verbessern.",
+      "successMessage3": "Stärken Sie weiterhin Ihr Sicherheitsbewusstsein!",
+      "thankYouMessage": "Bleiben Sie sicher!"
     },
     "ariaTexts": {
       "mainLabel": "Schulungs-Feedback-Formular",

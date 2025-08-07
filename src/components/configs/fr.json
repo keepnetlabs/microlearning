@@ -269,21 +269,21 @@
     }
   },
   "6": {
-    "title": "Votre Avis Compte",
+    "title": "Votre avis compte",
     "texts": {
       "ratingQuestion": "Comment évalueriez-vous cette formation de microapprentissage ?",
       "topicsQuestion": "Quels sujets aimeriez-vous explorer davantage ?",
       "feedbackQuestion": "Avez-vous des commentaires supplémentaires ?",
       "feedbackPlaceholder": "Écrivez vos réflexions ici...",
-      "submitButton": "Soumettre l'Avis",
+      "submitButton": "Soumettre l'avis",
       "submittingText": "Soumission...",
       "ratingRequiredText": "Veuillez évaluer avant de soumettre.",
       "dataSecurityNotice": "Vos réponses sont anonymes et protégées.",
-      "successTitle": "Merci pour votre avis !",
-      "successMessage1": "Votre contribution nous aide à améliorer les formations futures.",
-      "successMessage2": "Restez vigilant. Restez en sécurité.",
-      "successMessage3": "La connaissance est votre meilleure défense.",
-      "thankYouMessage": "Vous faites une différence !"
+      "successTitle": "Merci !",
+      "successMessage1": "Merci pour votre retour.",
+      "successMessage2": "Votre évaluation nous aidera à améliorer nos formations.",
+      "successMessage3": "Continuez à renforcer votre sensibilisation à la sécurité !",
+      "thankYouMessage": "Restez en sécurité !"
     },
     "ariaTexts": {
       "mainLabel": "Formulaire d'Avis de Formation",
