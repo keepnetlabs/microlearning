@@ -75,17 +75,6 @@ export function NudgeScene({ config }: NudgeSceneProps) {
                 </div>
               ))}
             </div>
-
-            <div className={`relative mt-6 p-4 glass-border-3`}>
-              <div className="relative z-10 flex items-center">
-                <div className="p-2 glass-border-0 mr-3">
-                  <TrendingUp size={14} className={`text-[#1C1C1E] dark:text-[#F2F2F7]`} />
-                </div>
-                <span className={`text-[#1C1C 1E] dark:text-[#F2F2F7]`}>
-                  {config.texts?.progressMessage || "Güvenlik seviyeniz %85 arttı!"}
-                </span>
-              </div>
-            </div>
           </div>
         </div>
       </div>

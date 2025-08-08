@@ -335,8 +335,7 @@
     "texts": {
       "title": "Key Messages",
       "subtitle": "Remember these 3 points to stay safe:",
-      "achievementsTitle": "Progress You've Made:",
-      "progressMessage": "You've improved your security posture by 85%!"
+      "achievementsTitle": "Progress You've Made:"
     },
     "achievements": [
       "Recognized the prevalence of phishing attacks",

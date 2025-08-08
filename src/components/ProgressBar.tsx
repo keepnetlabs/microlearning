@@ -154,7 +154,11 @@ const defaultConfig: ProgressBarConfig = {
 };
 
 export function ProgressBar({ currentScene, totalScenes, language = 'en', config = {} }: ProgressBarProps) {
-  const progress = (currentScene / totalScenes) * 100;
+  // Calculate progress so that the first scene (Intro) starts at 0%
+  // `currentScene` is expected as 1-based (App passes `currentScene + 1`)
+  const normalizedTotal = Math.max(totalScenes - 1, 1);
+  const normalizedCurrent = Math.max(Math.min(currentScene - 1, normalizedTotal), 0);
+  const progress = (normalizedCurrent / normalizedTotal) * 100;
   const finalConfig = { ...defaultConfig, ...config };
   const isMobile = useIsMobile();
   return (
