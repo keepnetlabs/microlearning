@@ -11,7 +11,9 @@
     "risk_area": "Phishing",
     "content_provider": "Keepnet",
     "level": "Beginner",
-    "language_availability": ["en", "tr", "fr", "gr"]
+    "language_availability": ["en", "tr", "fr", "gr"],
+    "gamification_enabled": true,
+    "total_points": 100
   },
   "theme": {
     "fontFamily": {
@@ -25,8 +27,8 @@
     "logo": {
       "src": "https://keepnetlabs.com/keepnet-logo.svg",
       "darkSrc": "https://imagedelivery.net/KxWh-mxPGDbsqJB3c5_fmA/74b2b289-fe69-4e14-ef7d-f15e2ad3bb00/public",
-      "minimizedSrc": "https://imagedelivery.net/KxWh-mxPGDbsqJB3c5_fmA/ed60ad9d-9ad1-48a7-177a-bac702cdce00/public",
-      "minimizedDarkSrc": "https://imagedelivery.net/KxWh-mxPGDbsqJB3c5_fmA/ed60ad9d-9ad1-48a7-177a-bac702cdce00/public",
+      "minimizedSrc": "https://imagedelivery.net/KxWh-mxPGDbsqJB3c5_fmA/ed60ad-d9d1-48a7-177a-bac702cdce00/public",
+      "minimizedDarkSrc": "https://imagedelivery.net/KxWh-mxPGDbsqJB3c5_fmA/ed60ad-d9d1-48a7-177a-bac702cdce00/public",
       "alt": "Keepnet Labs"
     }
   },
@@ -35,16 +37,13 @@
       "scene_id": "1",
       "metadata": {
         "scene_type": "intro",
-        "points": 10,
-        "duration_seconds": 30,
+        "points": 5,
+        "duration_seconds": 15,
         "hasAchievementNotification": false,
-        "behavioral_science_principle": [
-          "Salience",
-          "Emotionally Triggered Memory"
-        ],
+        "scientific_basis": "Gamification: Small reward for initial attention capture, based on salience and emotional memory. Keeps learner engaged early.",
         "icon": {
           "sparkleIconName": "alert-triangle",
-          "sceneIconName": "smartphone"
+          "sceneIconName": "mail-warning"
         }
       }
     },
@@ -52,15 +51,12 @@
       "scene_id": "2",
       "metadata": {
         "scene_type": "goal",
-        "points": 10,
-        "duration_seconds": 30,
+        "points": 5,
+        "duration_seconds": 20,
         "hasAchievementNotification": false,
-        "behavioral_science_principle": [
-          "Goal Priming",
-          "Implementation Intention"
-        ],
+        "scientific_basis": "Gamification: Reward for goal priming and intention setting, reinforcing motivation with minimal cognitive load.",
         "icon": {
-          "sceneIconName": "target"
+          "sceneIconName": "goal"
         }
       }
     },
@@ -68,16 +64,12 @@
       "scene_id": "3",
       "metadata": {
         "scene_type": "scenario",
-        "points": 20,
+        "points": 10,
         "duration_seconds": 90,
         "hasAchievementNotification": false,
-        "behavioral_science_principle": [
-          "Narrative Transportation",
-          "Mental Simulation",
-          "Social Proof"
-        ],
+        "scientific_basis": "Gamification: Moderate reward for narrative transportation and mental simulation. Learners imagine themselves in scenario and invest cognitive effort.",
         "icon": {
-          "sceneIconName": "play-circle"
+          "sceneIconName": "monitor-play"
         }
       }
     },
@@ -85,12 +77,12 @@
       "scene_id": "4",
       "metadata": {
         "scene_type": "actionable_content",
-        "points": 15,
-        "duration_seconds": 60,
+        "points": 25,
+        "duration_seconds": 90,
         "hasAchievementNotification": false,
-        "behavioral_science_principle": ["Modeling", "Cognitive Load Theory"],
+        "scientific_basis": "Gamification: High reward for active practice in inbox simulation. Aligns with operant conditioning — behavior rehearsal gets the largest reinforcement.",
         "icon": {
-          "sceneIconName": "shield-check"
+          "sceneIconName": "mail-check"
         }
       }
     },
@@ -98,16 +90,12 @@
       "scene_id": "5",
       "metadata": {
         "scene_type": "quiz",
-        "points": 15,
-        "duration_seconds": 45,
+        "points": 25,
+        "duration_seconds": 60,
         "hasAchievementNotification": true,
-        "behavioral_science_principle": [
-          "Active Recall",
-          "Feedback Loop",
-          "Self-Efficacy"
-        ],
+        "scientific_basis": "Gamification: High reward for active recall and feedback loop. Making decisions and seeing supportive feedback boosts self-efficacy.",
         "icon": {
-          "sceneIconName": "brain-circuit"
+          "sceneIconName": "brain"
         }
       }
     },
@@ -116,14 +104,11 @@
       "metadata": {
         "scene_type": "survey",
         "points": 5,
-        "duration_seconds": 30,
+        "duration_seconds": 20,
         "hasAchievementNotification": false,
-        "behavioral_science_principle": [
-          "Affect Tagging",
-          "Confidence Calibration"
-        ],
+        "scientific_basis": "Gamification: Small reward for self-assessment. Encourages metacognition and confidence calibration while keeping engagement high.",
         "icon": {
-          "sceneIconName": "clipboard-list"
+          "sceneIconName": "list-checks"
         }
       }
     },
@@ -132,13 +117,9 @@
       "metadata": {
         "scene_type": "nudge",
         "points": 10,
-        "duration_seconds": 15,
+        "duration_seconds": 20,
         "hasAchievementNotification": false,
-        "behavioral_science_principle": [
-          "Spacing Effect",
-          "Behavioral Triggers",
-          "Habit Loop"
-        ],
+        "scientific_basis": "Gamification: Reward for recalling 3 key takeaways (chunking, primacy/recency effect). Symbolic but reinforces closure.",
         "icon": {
           "sceneIconName": "repeat"
         }
@@ -149,15 +130,11 @@
       "metadata": {
         "scene_type": "summary",
         "points": 15,
-        "duration_seconds": 45,
+        "duration_seconds": 30,
         "hasAchievementNotification": true,
-        "behavioral_science_principle": [
-          "Primacy Effect",
-          "Recency Effect",
-          "Chunking"
-        ],
+        "scientific_basis": "Gamification: Reward for completing the training journey, achievements, and action planning. Motivational reinforcement aligns with self-determination theory.",
         "icon": {
-          "sceneIconName": "check-circle"
+          "sceneIconName": "trophy"
         }
       }
     }

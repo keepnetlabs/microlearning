@@ -34,6 +34,7 @@ interface TipConfig {
 
 interface ActionableContentSceneConfig {
   title: string;
+  subtitle: string;
   actions: ActionItem[];
 
   // Visual configuration
@@ -97,6 +98,7 @@ export function ActionableContentScene({
 
   const {
     title,
+    subtitle,
     actions,
     icon,
     tipConfig,
@@ -168,11 +170,16 @@ export function ActionableContentScene({
             </div>
           )}
           <h1
-            className="text-2xl mb-3 sm:mb-5 text-center text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold"
+            className="text-2xl mb-3 md:mb-4 text-center text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold"
             id="actionable-content-title"
           >
             {title}
           </h1>
+          {subtitle && (
+            <p className="text-base sm:text-lg md:text-xl text-[#1C1C1E] dark:text-[#F2F2F7] text-center mb-3 md:mb-4 font-medium leading-relaxed px-2">
+              {subtitle}
+            </p>
+          )}
         </header>
 
         <section
@@ -236,7 +243,7 @@ export function ActionableContentScene({
                           aria-label={ariaTexts?.tipLabel || "Tip"}
                         >
                           <div className="relative z-10 flex items-start">
-                            <div className={`text-[#1C1C1E] dark:text-[#F2F2F7] mr-2 mt-0.5 flex-shrink-0`} aria-hidden="true">
+                            <div className={`text-[#1C1C1E] dark:text-[#F2F2F7] mr-2 mt-[3px] flex-shrink-0`} aria-hidden="true">
                               {tipIconComponent}
                             </div>
                             <span className={`text-xs text-[#1C1C1E] dark:text-[#F2F2F7]`}>

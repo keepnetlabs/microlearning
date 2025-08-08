@@ -222,6 +222,19 @@ export function ScenarioScene({
         >
           {config.title}
         </motion.h1>
+        {/* Subtitle */}
+        {config.subtitle && (
+          <motion.p
+            id="scenario-scene-subtitle"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="text-base sm:text-lg md:text-xl text-[#1C1C1E] dark:text-[#F2F2F7] text-center mb-3 md:mb-4 font-medium leading-relaxed px-2"
+            aria-label="Subtitle"
+          >
+            {config.subtitle}
+          </motion.p>
+        )}
 
         {/* Description */}
         {config.description && (

@@ -462,7 +462,7 @@ export function SummaryScene({ config, completionData }: SummarySceneProps) {
           </motion.p>
 
           {/* FIXED: Completion Stats with Perfect Center Alignment */}
-          <motion.div
+          {false && <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
@@ -515,7 +515,7 @@ export function SummaryScene({ config, completionData }: SummarySceneProps) {
                 <div className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7]">{stat.label}</div>
               </motion.div>
             ))}
-          </motion.div>
+          </motion.div>}
 
           {/* Enhanced Certificate Download */}
           <div className="flex justify-center">
@@ -560,7 +560,7 @@ export function SummaryScene({ config, completionData }: SummarySceneProps) {
         </motion.div>
 
         {/* Enhanced Achievements */}
-        <motion.div
+        {config.achievements && config.achievements.length > 0 && <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.0 }}
@@ -597,9 +597,6 @@ export function SummaryScene({ config, completionData }: SummarySceneProps) {
                     initial={false}
                     transition={{ duration: 0.3 }}
                   />
-
-
-
                   <motion.div
                     className="w-8 h-8 glass-border-0 flex items-center justify-center mb-2 relative overflow-hidden"
                   >
@@ -612,7 +609,7 @@ export function SummaryScene({ config, completionData }: SummarySceneProps) {
               );
             })}
           </div>
-        </motion.div>
+        </motion.div>}
 
         {/* Enhanced Immediate Action Plan */}
         <motion.div
@@ -759,7 +756,7 @@ export function SummaryScene({ config, completionData }: SummarySceneProps) {
           className="text-center pb-4"
         >
           <motion.div
-            className={`relative p-3 glass-border-2 overflow-hidden max-w-sm w-full sm:max-w-md `}
+            className={`relative p-3 glass-border-2 overflow-hidden max-w-sm  w-full sm:max-w-md `}
             whileHover={{ scale: 1.02 }}
           >
             {/* Background pattern */}

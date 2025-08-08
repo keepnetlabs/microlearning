@@ -633,7 +633,7 @@ export const IntroScene = React.memo(({
           </motion.h1>
 
           <motion.p
-            className="text-base sm:text-lg md:text-xl text-[#1C1C1E] dark:text-[#F2F2F7] max-w-sm sm:max-w-md mt-2 sm:mt-3 font-medium leading-relaxed px-2"
+            className="text-base sm:text-lg md:text-xl text-[#1C1C1E] dark:text-[#F2F2F7] text-center mt-2 sm:mt-3 font-medium leading-relaxed px-2"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
             transition={{ duration: 0.6, delay: delays.subtitle }}
