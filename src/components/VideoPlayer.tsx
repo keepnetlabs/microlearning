@@ -10,6 +10,7 @@ import "plyr/dist/plyr.css";
 import Hls from "hls.js";
 import { motion } from "framer-motion";
 import { FileText, Lock, RotateCw } from "lucide-react";
+import { useIsMobile } from "./ui/use-mobile";
 
 // HTMLVideoElement'e _lastTime özelliği ekle
 interface VideoWithLastTime extends HTMLVideoElement {
@@ -117,6 +118,10 @@ export function VideoPlayer({
   const [hasReplayed, setHasReplayed] = useState(false);
   const [watchedRows, setWatchedRows] = useState<Set<number>>(new Set());
   const transcriptContainerRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
+  const [transcriptContainerHeight, setTranscriptContainerHeight] = useState<number | undefined>(
+    undefined,
+  );
   // Dark mode detection
   useEffect(() => {
     const checkDarkMode = () => {
@@ -134,7 +139,7 @@ export function VideoPlayer({
     return () => observer.disconnect();
   }, []);
   const transcriptScrollStyle = useMemo((): React.CSSProperties => ({
-    maxHeight: "380px",
+    height: transcriptContainerHeight,
     padding: "8px 0",
     overscrollBehavior: "contain",
     WebkitOverflowScrolling: "touch",
@@ -143,7 +148,43 @@ export function VideoPlayer({
     scrollBehavior: "smooth",
     scrollPaddingTop: "20px",
     scrollPaddingBottom: "20px",
-  }), []);
+  }), [transcriptContainerHeight]);
+
+  const measureTranscriptHeight = useCallback(() => {
+    const container = transcriptContainerRef.current;
+    if (!container) return;
+    const firstRow = container.querySelector('[data-row-index="0"]') as HTMLElement | null;
+    if (!firstRow) return;
+    const secondRow = container.querySelector('[data-row-index="1"]') as HTMLElement | null;
+
+    const firstRect = firstRow.getBoundingClientRect();
+    const rowsToShow = isMobile ? 3 : 4;
+    const verticalPadding = 16; // padding top + bottom (8px each)
+
+    let stride: number;
+    if (secondRow) {
+      const secondRect = secondRow.getBoundingClientRect();
+      stride = Math.max(0, secondRect.top - firstRect.top);
+    } else {
+      const fallbackSpacing = 8; // approximate vertical spacing between items
+      stride = firstRect.height + fallbackSpacing;
+    }
+
+    const height = Math.ceil(firstRect.height + stride * (rowsToShow - 1) + verticalPadding);
+    setTranscriptContainerHeight(height);
+  }, [isMobile]);
+
+  useEffect(() => {
+    // measure after initial render and when dependencies change
+    const id = window.requestAnimationFrame(measureTranscriptHeight);
+    return () => window.cancelAnimationFrame(id);
+  }, [measureTranscriptHeight, isTranscriptOpen, transcript]);
+
+  useEffect(() => {
+    const onResize = () => measureTranscriptHeight();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [measureTranscriptHeight]);
   const initializePlayer = useCallback(() => {
     const video = videoRef.current;
     if (video) {
@@ -251,7 +292,7 @@ export function VideoPlayer({
 
       }
     }
-  }, [src, initializePlayer]);
+  }, [src, initializePlayer, disableForwardSeek]);
 
   const parsedTranscript = useMemo(() =>
     typeof transcript === "string"
@@ -306,50 +347,7 @@ export function VideoPlayer({
       }
     }
   }, [currentRowIndex]);
-  // Industry-standard auto-scroll: Keep active item visible with smart positioning
-  useEffect(() => {
-    if (
-      currentRowIndex >= 0 &&
-      transcriptContainerRef.current
-    ) {
-      const container = transcriptContainerRef.current;
-      const activeRow = container.querySelector(
-        `[data-row-index="${currentRowIndex}"]`,
-      ) as HTMLElement;
-
-      if (activeRow && container) {
-        const containerRect = container.getBoundingClientRect();
-        const rowRect = activeRow.getBoundingClientRect();
-        const containerTop = container.scrollTop;
-        const rowTop = rowRect.top - containerRect.top + containerTop;
-
-        // Industry standard: Position active item in upper third of viewport
-        const viewportHeight = containerRect.height;
-        const targetPosition = viewportHeight * 0.3; // 30% from top
-        const buffer = 20; // pixels from top
-
-        // Check if row is outside the preferred viewing area
-        const isRowInPreferredArea =
-          rowTop >= buffer &&
-          rowTop <= targetPosition + rowRect.height;
-
-        if (!isRowInPreferredArea) {
-          const targetScrollTop = rowTop - targetPosition;
-
-          container.scrollTo({
-            top: Math.max(
-              0,
-              Math.min(
-                targetScrollTop,
-                container.scrollHeight - container.clientHeight,
-              ),
-            ),
-            behavior: "smooth",
-          });
-        }
-      }
-    }
-  }, [currentRowIndex]);
+  // Removed the alternative auto-scroll that kept the item at upper third; now centered via the previous effect
 
   const handleTranscriptRowClick = useCallback(
     (startTime: number, rowIndex: number) => {
@@ -653,33 +651,6 @@ export function VideoPlayer({
                     >
                       {transcriptTitle}
                     </h3>
-                    {parsedTranscript.length > 0 && (
-                      <div
-                        className="flex items-center space-x-2 mt-1"
-                        role="status"
-                        aria-live="polite"
-                        aria-label={`${ariaTexts?.transcriptProgressLabel || "Progress"}: ${currentRowIndex + 1} of ${parsedTranscript.length} transcript entries`}
-                      >
-                        <div
-                          className="w-16 h-2 glass-border-2  rounded-full overflow-hidden"
-                          role="progressbar"
-                          aria-valuenow={currentRowIndex + 1}
-                          aria-valuemin={1}
-                          aria-valuemax={parsedTranscript.length}
-                          aria-label={ariaTexts?.transcriptProgressLabel || "Transcript progress"}
-                        >
-                          <div
-                            className="h-full transition-all duration-300 ease-out glass-border-2"
-                            style={{
-                              width: `${((currentRowIndex + 1) / parsedTranscript.length) * 100}%`
-                            }}
-                          />
-                        </div>
-                        <span className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7]">
-                          {currentRowIndex + 1} / {parsedTranscript.length}
-                        </span>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
@@ -688,7 +659,7 @@ export function VideoPlayer({
             {/* Content */}
             <div
               ref={transcriptContainerRef}
-              className="relative z-10 overflow-y-auto custom-scrollbar"
+              className="relative z-10 overflow-y-auto"
               style={transcriptScrollStyle}
               onWheel={(e) => e.stopPropagation()}
               onTouchStart={(e) => e.stopPropagation()}
@@ -730,7 +701,8 @@ export function VideoPlayer({
                     style={{
                       padding: "8px 12px",
                       backgroundColor: "transparent",
-                      opacity: canAccess ? 1 : 0.5
+                      opacity: canAccess ? 1 : 0.5,
+                      paddingTop: index === 0 ? "0px" : "8px"
                     }}
                     role="listitem"
                     aria-label={`${ariaTexts?.transcriptEntryLabel || "Transcript entry"} ${index + 1} at ${formatTime(row.start)}`}

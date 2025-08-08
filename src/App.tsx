@@ -488,6 +488,22 @@ export default function App() {
     }
   }, [isDarkMode]);
 
+  // Compute logo source based on device and theme
+  const getLogoSrc = useCallback((): string => {
+    const logo = themeConfig?.logo ?? {};
+    const defaultSrc: string = logo.src ?? '';
+    const darkSrc: string = logo.darkSrc ?? defaultSrc;
+    const minimizedSrc: string = logo.minimizedSrc ?? defaultSrc;
+    const minimizedDarkSrc: string = logo.minimizedDarkSrc ?? darkSrc;
+
+    if (isMobile) {
+      return isDarkMode ? minimizedDarkSrc : minimizedSrc;
+    }
+    return isDarkMode ? darkSrc : defaultSrc;
+  }, [themeConfig?.logo, isMobile, isDarkMode]);
+
+  const logoSrc = useMemo(() => getLogoSrc(), [getLogoSrc]);
+
   // Listen for system theme changes only if no manual preference exists
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -1091,14 +1107,11 @@ export default function App() {
                     <div className="corner-top-left"></div>
                     <div className="corner-bottom-right"></div>
                     <img
-                      src={
-                        isMobile
-                          ? (isDarkMode ? themeConfig.logo?.minimizedDarkSrc : themeConfig.logo?.minimizedSrc)
-                          : (isDarkMode ? themeConfig.logo?.darkSrc : themeConfig.logo?.src)
-                      }
+                      key={logoSrc}
+                      src={logoSrc}
                       alt={themeConfig.logo?.alt || "Application Logo"}
                       aria-label={appConfig.theme?.ariaTexts?.logoLabel || "Application logo"}
-                      className="relative z-10 h-8 sm:h-12 md:h-14 w-auto object-contain p-1.5 sm:p-2"
+                      className="relative z-10 h-8 sm:h-10 md:h-14 w-full object-contain md:w-auto p-1.5 sm:p-2"
                     />
                   </div>
                 </motion.div>
@@ -1461,7 +1474,7 @@ export default function App() {
                   {/* Content Scroll Container - ANCHORED (doesn't move with parallax) */}
                   <div
                     ref={scrollContainerRef}
-                    className="relative z-10 h-full overflow-y-auto overflow-x-hidden scroll-smooth custom-scrollbar"
+                    className="relative z-10 h-full overflow-y-auto overflow-x-hidden scroll-smooth"
                     onScroll={handleScroll}
                     role="main"
                     aria-label={appConfig.theme?.ariaTexts?.contentLabel || "Training content"}

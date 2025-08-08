@@ -440,7 +440,7 @@ export function SummaryScene({ config, completionData }: SummarySceneProps) {
             initial={!isMobile ? { opacity: 0, y: 20 } : {}}
             animate={!isMobile ? { opacity: 1, y: 0 } : {}}
             transition={!isMobile ? { duration: 0.8, delay: 0.2 } : {}}
-            className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-3 text-[#1C1C1E] dark:text-[#F2F2F7]"
+            className="project-title"
           >
             <motion.span
               initial={!isMobile ? { width: 0 } : {}}
@@ -456,7 +456,7 @@ export function SummaryScene({ config, completionData }: SummarySceneProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-base sm:text-lg md:text-xl text-[#1C1C1E] dark:text-[#F2F2F7] mb-6 font-medium leading-relaxed dark:font-semibold"
+            className="project-subtitle"
           >
             {config.texts?.completionSubtitle}
           </motion.p>

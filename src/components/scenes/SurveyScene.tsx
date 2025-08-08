@@ -213,21 +213,21 @@ export function SurveyScene({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-3 text-center text-[#1C1C1E] dark:text-[#F2F2F7]"
+          className="project-title"
           id="survey-title"
         >
           {config?.title}
         </motion.h1>
         {config.subtitle && (
-              <motion.p
-                className="mb-3 font-medium text-base sm:text-lg md:text-xl text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 ease-out mt-0.5"
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-              >
-                {config.subtitle}
-              </motion.p>
-            )}
+          <motion.p
+            className="project-subtitle"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            {config.subtitle}
+          </motion.p>
+        )}
 
         {(!isMobile && isSubmitted) ? (
           // Desktop/tablet: Inline success panel

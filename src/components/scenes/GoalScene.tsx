@@ -94,7 +94,7 @@ const GoalCard = memo(({ goal, index }: {
           <div className="flex flex-col items-start">
             <motion.h3
               id={`goal-title-${index}`}
-              className="text-sm font-medium text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 ease-out"
+              className="text-sm font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 ease-out"
             >
               {goal.title}
             </motion.h3>
@@ -186,7 +186,7 @@ export const GoalScene = memo(({
 
         <h1
           id="goal-scene-title"
-          className="text-2xl sm:text-3xl md:text-4xl mb-3 sm:mb-4 text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold"
+          className="project-title"
         >
           {title}
         </h1>
@@ -196,7 +196,7 @@ export const GoalScene = memo(({
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-base sm:text-lg md:text-xl md:text-xl text-[#1C1C1E] dark:text-[#F2F2F7] text-center mb-3 md:mb-4 font-medium px-2"
+            className="project-subtitle"
             aria-label="Subtitle"
           >
             {config.subtitle}

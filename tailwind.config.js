@@ -75,6 +75,7 @@ module.exports = {
       backgroundImage: {
         'gradient-red': 'linear-gradient(106deg, #D77676 0%, #A53131 100%)',
         'gradient-blue': 'linear-gradient(106deg, #76B2D7 0%, #3178A5 100%)',
+        'gradient-light-blue': 'linear-gradient(106deg, rgba(90, 200, 250, 0.30) 0%, rgba(0, 122, 255, 0.30) 100%), #FFF',
         'gradient-green': 'linear-gradient(106deg, #76D79D 0%, #31A561 100%)',
         'gradient-gray':'linear-gradient(106deg, rgba(200, 200, 205, 0.30) 0%, rgba(142, 142, 147, 0.30) 100%)',
         'gradient-purple':'linear-gradient(106deg, #7676D7 0%, #4831A5 100%)',
@@ -82,7 +83,6 @@ module.exports = {
         'gradient-yellow':'linear-gradient(106deg, #E8E04F 0%, #B4960D 100%)',
         'gradient-light-yellow':'linear-gradient(106deg, rgba(255, 236, 179, 0.30) 0%, rgba(255, 204, 0, 0.30) 100%)',
         'gradient-orange':'linear-gradient(106deg, #E8AB4F 0%, #B47F0D 100%)',
-        'gradient-light-blue':'linear-gradient(106deg, rgba(90, 200, 250, 0.30) 0%, rgba(0, 122, 255, 0.30) 100%)',
         'gradient-pink':'linear-gradient(106deg, rgba(255, 99, 71, 0.30) 0%, rgba(255, 59, 48, 0.30) 100%)'
       }
     },

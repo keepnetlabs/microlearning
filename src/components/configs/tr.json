@@ -41,8 +41,8 @@
   },
   "1": {
     "iconName": "mail-warning",
-    "title": "Kimlik Avı E-postalarını Tanımak ve Raporlamak",
-    "subtitle": "Şüpheli e-postaları tanıyın, riskleri anlayın ve tek tıkla raporlayın",
+    "title": "Phishing Saldırılarını Durdur",
+    "subtitle": "Şüpheli e-postaları tanı ve güvenle raporla",
     "sectionTitle": "Bu Eğitimde Öğrenecekleriniz:",
     "highlights": [
       {
@@ -80,8 +80,8 @@
   },
   "2": {
     "iconName": "target",
-    "title": "Davranış Hedefi",
-    "subtitle":"Şüpheli e-postaları fark edin, doğru adımı atın ve güvenle raporlayın",
+    "title": "Güvenlik Hedefiniz",
+    "subtitle": "Bir sonraki şüpheli e-postayı gördüğünde durup raporlayacaksın",
     "goals": [
       {
         "iconName": "alert-triangle",
@@ -102,13 +102,17 @@
         "description": "Phishing e-postalarını güvenle raporlamanı destekler."
       }
     ],
-    "key_message": ["Şüpheli e-postayı tanı", "Tıklama", "Report butonuna bas"],
+    "key_message": [
+      "Şüpheli e-postayı tanı",
+      "Bağlantılara tıklama",
+      "Report butonunu kullan"
+    ],
     "texts": {}
   },
   "3": {
     "iconName": "monitor-play",
-    "title": "Gerçek Senaryo",
-    "subtitle": "Bir DevOps Yöneticisinin Phishing Deneyimi",
+    "title": "Gerçek Phishing Hikayesi",
+    "subtitle": "Bir DevOps Yöneticisinin pahalı hatası",
     "key_message": ["Gerçek vaka", "Phishing tespiti", "Raporlamanın önemi"],
     "video": {
       "src": "https://customer-0lll6yc8omc23rbm.cloudflarestream.com/5fdb12ff1436c991f50b698a02e2faa1/manifest/video.m3u8",
@@ -133,15 +137,15 @@
   },
   "4": {
     "iconName": "mail-check",
-    "title": "Uygulama: Phishing E-postasını Bul ve Raporla",
-    "subtitle": "E-postaları aç, phishing’i fark et ve Report’a bas",
-    "key_message": ["E-postayı incele", "Tıklama", "Report’a bas"],
+    "title": "Phishing Tespiti Pratiği",
+    "subtitle": "E-postaları kontrol et, tehditleri fark et ve güvenle raporla",
+    "key_message": ["E-postayı incele", "Bağlantılara tıklama", "Report'a bas"],
     "actions": [
       {
         "iconName": "mail",
         "title": "E-postayı İncele",
         "description": "Gönderen, konu ve içerikte şüpheli unsurları kontrol et.",
-        "tip": "Eşleşmeyen URL’ler ve acil istekler uyarı işaretidir."
+        "tip": "Eşleşmeyen URL'ler ve acil istekler uyarı işaretidir."
       },
       {
         "iconName": "alert-triangle",
@@ -151,25 +155,29 @@
       },
       {
         "iconName": "flag",
-        "title": "Report’a Bas",
+        "title": "Report'a Bas",
         "description": "Phishing olduğunu düşünüyorsan raporla.",
-        "tip": "Outlook/Gmail’de ‘Phishing Rapor Et’ seçeneğini kullan."
+        "tip": "Outlook/Gmail'de 'Phishing Rapor Et' seçeneğini kullan."
       }
     ],
     "tipConfig": {
       "iconName": "info"
     },
     "texts": {
-      "mobileHint": "💡 E-postayı aç, şüpheliyse Report’a bas.",
+      "mobileHint": "💡 E-postayı aç, şüpheliyse Report'a bas.",
       "feedbackCorrect": "✅ Harika! Phishing e-postasını raporladın.",
       "feedbackWrong": "⚠️ Tam doğru değil. Bu e-posta güvenliydi — tekrar dene."
     }
   },
   "5": {
     "iconName": "brain",
-    "title": "Hızlı Kontrol",
-    "subtitle": "Phishing farkındalığını test et",
-    "key_message": ["Soruları cevapla", "Bilgini test et", "Doğru yanıtla"],
+    "title": "Bilginizi Test Edin",
+    "subtitle": "En kritik anda doğru kararı verin",
+    "key_message": [
+      "Soruları cevapla",
+      "Bilgini test et",
+      "Doğru alışkanlık kur"
+    ],
     "questions": {
       "totalCount": 2,
       "maxAttempts": 2,
@@ -200,7 +208,7 @@
             "true": { "label": "Doğru", "icon": "check" },
             "false": { "label": "Yanlış", "icon": "x" }
           },
-          "explanation": "Raporlamak IT’nin herkesi korumasına yardımcı olur."
+          "explanation": "Raporlamak IT'nin herkesi korumasına yardımcı olur."
         }
       ]
     },
@@ -278,9 +286,11 @@
     }
   },
   "6": {
-    "title": "Güven Düzeyi Kontrolü",
+    "iconName": "list-checks",
+    "title": "Deneyiminizi Paylaşın",
+    "subtitle": "Eğitim deneyiminizi geliştirmemize yardım edin",
     "texts": {
-      "ratingQuestion": "Şu anda e-posta güvenliğiniz konusunda kendinizi ne kadar güvende hissediyorsunuz?",
+      "ratingQuestion": "E-posta güvenliği konusunda kendinizi ne kadar güvende hissediyorsunuz?",
       "topicsQuestion": "Hangi alanlarda daha fazla pratik/örnek görmek istersiniz?",
       "feedbackQuestion": "Ek geri bildiriminiz var mı?",
       "feedbackPlaceholder": "Düşüncelerinizi buraya yazın...",
@@ -317,11 +327,17 @@
   },
   "7": {
     "iconName": "repeat",
+    "subtitle": "Phishing'den güvende kalman için eylem planın",
     "texts": {
-      "title": "Ana Mesajlar",
-      "subtitle": "Güvende kalmak için bu 3 noktayı hatırla:",
-      "achievementsTitle": "Zaten İlerleme Kaydettiniz:"
+      "title": "Eylem planı",
+      "subtitle": "Bir sonraki şüpheli e-posta göründüğünde şunu yapacaksın:",
+      "achievementsTitle": "Zaten ilerleme kaydettiniz:"
     },
+    "key_message": [
+      "Şüpheli e-postayı tanı",
+      "Bağlantılara tıklama veya bilinmeyen ekleri açma",
+      "Report butonunu kullan"
+    ],
     "achievements": [
       "Phishing saldırılarının yaygınlığını fark ettiniz",
       "Şüpheli e-postaları nasıl tanıyacağınızı öğrendiniz",
@@ -355,10 +371,7 @@
         "title": "Hemen Yap",
         "description": "Bir sonraki şüpheli e-postayı raporla"
       },
-      {
-        "title": "Bu Hafta",
-        "description": "Takımını rapor etmeye teşvik et"
-      }
+      { "title": "Bu Hafta", "description": "Takımını rapor etmeye teşvik et" }
     ],
     "resources": [
       {

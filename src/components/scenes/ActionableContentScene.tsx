@@ -170,13 +170,13 @@ export function ActionableContentScene({
             </div>
           )}
           <h1
-            className="text-2xl mb-3 md:mb-4 text-2xl sm:text-3xl md:text-4xl text-center text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold"
+            className="project-title"
             id="actionable-content-title"
           >
             {title}
           </h1>
           {subtitle && (
-            <p className="text-base sm:text-lg md:text-xl text-[#1C1C1E] dark:text-[#F2F2F7] text-center mb-3 md:mb-4 font-medium leading-relaxed px-2">
+            <p className="project-subtitle">
               {subtitle}
             </p>
           )}

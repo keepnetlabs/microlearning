@@ -817,7 +817,7 @@ export const QuizScene = React.memo(function QuizScene({
 
 
     return (
-      <div className="space-y-1 sm:space-y-2.5" role="radiogroup" aria-label={ariaTexts?.trueFalseLabel || "True or false options"} aria-describedby="true-false-description">
+      <div className="sm:space-y-2.5" role="radiogroup" aria-label={ariaTexts?.trueFalseLabel || "True or false options"} aria-describedby="true-false-description">
         <div
           id="true-false-description"
           className="sr-only"
@@ -826,9 +826,8 @@ export const QuizScene = React.memo(function QuizScene({
           {ariaTexts?.trueFalseDescription || "Select true or false for the given statement"}
         </div>
         <div
-          className="p-3 rounded-lg "
         >
-          <p className="text-center text-[#1C1C1E] dark:text-[#F2F2F7]">
+          <p className="text-center text-[#1C1C1E] dark:text-[#F2F2F7] mb-4 sm:mb-0">
             {question.statement}
           </p>
         </div>
@@ -1860,7 +1859,7 @@ export const QuizScene = React.memo(function QuizScene({
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-2 sm:mb-4"
+          className="text-center"
           role="banner"
           aria-label={ariaTexts?.headerLabel || "Quiz header"}
         >
@@ -1868,17 +1867,17 @@ export const QuizScene = React.memo(function QuizScene({
             {iconNode}
           </div>}
 
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-2 sm:mb-4 font-semibold text-center text-[#1C1C1E] dark:text-white">
+          <h1 className="project-title">
             {config.title}
           </h1>
           {config.subtitle && (
-            <p className="text-sm mb-3 text-base sm:text-lg md:text-xl text-[#1C1C1E] font-medium dark:text-[#F2F2F7]">
+            <p className="project-subtitle" style={{ marginBottom: '8px' }}>
               {config.subtitle}
             </p>
           )}
 
 
-          <div className="flex items-center justify-center space-x-4 text-sm text-[#1C1C1E] dark:text-[#F2F2F7]">
+          <div className="flex items-center justify-center space-x-4 sm:text-sm text-xs mb-5 text-[#1C1C1E] dark:text-[#F2F2F7]">
             <span aria-label={`Question ${currentQuestionIndex + 1} of ${questions.length}`}>
               {config.texts?.question} {currentQuestionIndex + 1}/{questions.length}
             </span>
@@ -1909,19 +1908,13 @@ export const QuizScene = React.memo(function QuizScene({
             aria-labelledby="question-title"
           >
             {/* Question Header */}
-            <div className="text-center mb-2">
-              <h2
-                id="question-title"
-                className="mb-1.5 text-foreground dark:text-white"
-              >
-                {currentQuestion?.title}
-              </h2>
+            {currentQuestion?.description && <div className="text-center mb-2">
               {currentQuestion?.description && (
                 <p className="text-[#1C1C1E] dark:text-[#F2F2F7]">
                   {currentQuestion?.description}
                 </p>
               )}
-            </div>
+            </div>}
 
             {/* Question Content */}
             <div className="mb-5" role="group" aria-label="Answer options">{renderQuestion()}</div>
@@ -2253,6 +2246,6 @@ export const QuizScene = React.memo(function QuizScene({
           </div>
         </motion.div>
       </div>
-    </FontWrapper>
+    </FontWrapper >
   );
 });
