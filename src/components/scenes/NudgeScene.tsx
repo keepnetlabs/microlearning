@@ -1,5 +1,5 @@
 import React from "react";
-import { CheckCircle, TrendingUp, LucideIcon } from "lucide-react";
+import { CheckCircle, LucideIcon } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { NudgeSceneConfig } from "../configs/educationConfigs";
 import { FontWrapper } from "../common/FontWrapper";

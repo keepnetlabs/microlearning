@@ -81,6 +81,7 @@
   "2": {
     "iconName": "target",
     "title": "Davranış Hedefi",
+    "subtitle":"Şüpheli e-postaları fark edin, doğru adımı atın ve güvenle raporlayın",
     "goals": [
       {
         "iconName": "alert-triangle",

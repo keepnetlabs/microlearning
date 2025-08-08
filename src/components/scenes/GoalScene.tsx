@@ -3,7 +3,7 @@ import { ReactNode, useMemo, memo } from "react";
 import { LucideIcon } from "lucide-react";
 import { FontWrapper } from "../common/FontWrapper";
 import { useIsMobile } from "../ui/use-mobile";
-
+import { motion } from "framer-motion";
 // İkon mapping fonksiyonu
 const getIconComponent = (iconName: string): LucideIcon => {
   // İkon adını camelCase'e çevir (örn: "book-open" -> "BookOpen")
@@ -43,6 +43,7 @@ interface IconConfig {
 interface GoalSceneConfig {
   // Content props
   title?: string;
+  subtitle?: string;
   goals?: GoalItem[];
 
   // Visual configuration
@@ -91,16 +92,21 @@ const GoalCard = memo(({ goal, index }: {
 
           {/* APPLE TITLE & SUBTITLE TEXT - Ultra-crisp typography */}
           <div className="flex flex-col items-start">
-            <h3
+            <motion.h3
               id={`goal-title-${index}`}
               className="text-sm font-medium text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 ease-out"
             >
               {goal.title}
-            </h3>
+            </motion.h3>
             {goal.subtitle && (
-              <p className="text-xs font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 ease-out mt-0.5">
+              <motion.p
+                className="text-xs font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 ease-out mt-0.5"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+              >
                 {goal.subtitle}
-              </p>
+              </motion.p>
             )}
           </div>
         </header>
@@ -180,10 +186,23 @@ export const GoalScene = memo(({
 
         <h1
           id="goal-scene-title"
-          className="text-2xl mb-3 sm:mb-5 text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold"
+          className="text-2xl mb-3 sm:mb-4 text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold"
         >
           {title}
         </h1>
+        {config.subtitle && (
+          <motion.p
+            id="scenario-scene-subtitle"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="text-base sm:text-lg md:text-xl text-[#1C1C1E] dark:text-[#F2F2F7] text-center mb-3 md:mb-4 font-medium leading-relaxed px-2"
+            aria-label="Subtitle"
+          >
+            {config.subtitle}
+          </motion.p>
+        )}
+
 
         <section
           className={containerClass}

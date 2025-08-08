@@ -85,6 +85,7 @@
   "2": {
     "iconName": "target",
     "title": "Behavior Goal",
+    "subtitle": "Identify suspicious emails, take the right step, and report safely",
     "goals": [
       {
         "iconName": "alert-triangle",
