@@ -36,9 +36,14 @@ interface MicrolearningProgress {
 class SCORMService {
     private scorm: any = null;
     private isInitialized: boolean = false;
+    private isInitializing: boolean = false;
     private sessionStartTime: number = Date.now();
     private lastCommitTime: number = Date.now();
-    private commitTimer: NodeJS.Timeout | null = null;
+    private commitTimer: ReturnType<typeof setInterval> | null = null;
+    private listenersAttached: boolean = false;
+    private commitInProgress: boolean = false;
+    private lastSessionUpdateMs: number = Date.now();
+    private readonly MIN_COMMIT_INTERVAL_MS: number = 1500;
 
     private data: SCORMData = {
         lessonStatus: 'not attempted',
@@ -58,7 +63,8 @@ class SCORMService {
     }
 
     private async initialize(): Promise<void> {
-        if (this.isInitialized) return;
+        if (this.isInitialized || this.isInitializing) return;
+        this.isInitializing = true;
 
         try {
             // SCORM global objesi - pipwerks API
@@ -82,6 +88,10 @@ class SCORMService {
                 this.setupEventListeners();
                 this.setupPeriodicCommit(30000);
                 this.isInitialized = true;
+                // Oturum sayaçlarını başlat
+                this.sessionStartTime = Date.now();
+                this.lastSessionUpdateMs = this.sessionStartTime;
+                this.lastCommitTime = this.sessionStartTime;
 
             } else {
                 console.log('[SCORM] API bulunamadı - Standalone mod');
@@ -89,6 +99,8 @@ class SCORMService {
         } catch (error) {
             console.error('[SCORM] Başlatma hatası:', error);
             this.data.isAvailable = false;
+        } finally {
+            this.isInitializing = false;
         }
     }
 
@@ -121,9 +133,19 @@ class SCORMService {
     }
 
     private setupEventListeners(): void {
+        if (this.listenersAttached) return;
+        this.listenersAttached = true;
+
         // Sayfa kapatılırken otomatik finish
         window.addEventListener('beforeunload', () => {
-            this.finish();
+            this.updateSessionTime();
+            this.commit();
+        });
+
+        // Mobile Safari dahil bazı tarayıcılarda güvenilir kapanış
+        window.addEventListener('pagehide', () => {
+            this.updateSessionTime();
+            this.commit();
         });
 
         // Visibility change - pause/resume için
@@ -137,6 +159,11 @@ class SCORMService {
 
     private setupPeriodicCommit(intervalMs: number): void {
         if (intervalMs <= 0) return;
+
+        if (this.commitTimer) {
+            clearInterval(this.commitTimer);
+            this.commitTimer = null;
+        }
 
         this.commitTimer = setInterval(() => {
             if (this.isInitialized && !document.hidden) {
@@ -168,31 +195,43 @@ class SCORMService {
         if (!this.scorm || !this.data.isAvailable) return false;
 
         try {
+            let anyChanged = false;
+
             // Score güncelle (0-100 arası normalize et)
             const scoreRaw = Math.min(100, Math.max(0, Math.round(totalPoints)));
-            this.scorm.set('cmi.core.score.raw', scoreRaw.toString());
-            this.data.scoreRaw = scoreRaw;
+            if (scoreRaw !== this.data.scoreRaw) {
+                this.scorm.set('cmi.core.score.raw', scoreRaw.toString());
+                this.data.scoreRaw = scoreRaw;
+                anyChanged = true;
+            }
 
             // Lesson status güncelle - SCORM 1.2 standart değerleri
             let status = 'incomplete';
             if (currentScene >= totalScenes - 1) {
                 status = scoreRaw >= 80 ? 'passed' : 'completed';
-            } else if (currentScene > 0) {
-                status = 'browsed';
+            }
+            if (status !== this.data.lessonStatus) {
+                this.scorm.set('cmi.core.lesson_status', status);
+                this.data.lessonStatus = status;
+                anyChanged = true;
             }
 
-            this.scorm.set('cmi.core.lesson_status', status);
-            this.data.lessonStatus = status;
-
             // Lesson location güncelle
-            this.scorm.set('cmi.core.lesson_location', currentScene.toString());
-            this.data.lessonLocation = currentScene.toString();
+            const newLocation = currentScene.toString();
+            if (newLocation !== this.data.lessonLocation) {
+                this.scorm.set('cmi.core.lesson_location', newLocation);
+                this.data.lessonLocation = newLocation;
+                anyChanged = true;
+            }
 
             // Session time'ı güncelle
+            const now = Date.now();
+            const pendingDeltaSeconds = Math.floor((now - this.lastSessionUpdateMs) / 1000);
             this.updateSessionTime();
 
             // Değişiklikleri commit et
-            const commitResult = this.commit();
+            const shouldCommit = anyChanged || pendingDeltaSeconds > 0;
+            const commitResult = shouldCommit ? this.commit() : true;
 
             console.log('[SCORM] Progress güncellendi:', {
                 scoreRaw,
@@ -213,15 +252,24 @@ class SCORMService {
         try {
             if (isCompleted) {
                 const normalizedScore = Math.min(100, Math.max(0, score));
-                this.scorm.set('cmi.core.score.raw', normalizedScore.toString());
-                this.data.scoreRaw = normalizedScore;
+                let anyChanged = false;
+                if (normalizedScore !== this.data.scoreRaw) {
+                    this.scorm.set('cmi.core.score.raw', normalizedScore.toString());
+                    this.data.scoreRaw = normalizedScore;
+                    anyChanged = true;
+                }
 
                 const status = normalizedScore >= passingScore ? 'passed' : 'failed';
-                this.scorm.set('cmi.core.lesson_status', status);
-                this.data.lessonStatus = status;
+                if (status !== this.data.lessonStatus) {
+                    this.scorm.set('cmi.core.lesson_status', status);
+                    this.data.lessonStatus = status;
+                    anyChanged = true;
+                }
 
+                const now = Date.now();
+                const pendingDeltaSeconds = Math.floor((now - this.lastSessionUpdateMs) / 1000);
                 this.updateSessionTime();
-                const commitResult = this.commit();
+                const commitResult = (anyChanged || pendingDeltaSeconds > 0) ? this.commit() : true;
 
                 console.log('[SCORM] Quiz tamamlandı:', {
                     score: normalizedScore,
@@ -240,18 +288,24 @@ class SCORMService {
 
     private updateSessionTime(): void {
         try {
-            const sessionDuration = Date.now() - this.sessionStartTime;
-            const sessionSeconds = Math.floor(sessionDuration / 1000);
-            const sessionTimeString = this.formatSCORMTime(sessionSeconds);
+            const now = Date.now();
+            const deltaSeconds = Math.floor((now - this.lastSessionUpdateMs) / 1000);
+            if (deltaSeconds <= 0) return;
 
-            this.scorm.set('cmi.core.session_time', sessionTimeString);
-            this.data.sessionTime = sessionTimeString;
+            // SCORM 1.2: session_time commit başına geçen süre (delta)
+            const sessionTimeDelta = this.formatSCORMTime(deltaSeconds);
+            this.scorm.set('cmi.core.session_time', sessionTimeDelta);
 
-            // Total time'ı da güncelle
+            // Görsel raporlama için toplam oturum süresi
+            const totalSessionSeconds = Math.floor((now - this.sessionStartTime) / 1000);
+            this.data.sessionTime = this.formatSCORMTime(totalSessionSeconds);
+
+            // Total time'ı delta ile biriktir
             const currentTotalSeconds = this.parseTimeToSeconds(this.data.totalTime);
-            const newTotalSeconds = currentTotalSeconds + sessionSeconds;
-            const newTotalTime = this.formatSCORMTime(newTotalSeconds);
-            this.data.totalTime = newTotalTime;
+            const newTotalSeconds = currentTotalSeconds + deltaSeconds;
+            this.data.totalTime = this.formatSCORMTime(newTotalSeconds);
+
+            this.lastSessionUpdateMs = now;
 
         } catch (error) {
             console.error('[SCORM] Session time güncelleme hatası:', error);
@@ -278,6 +332,7 @@ class SCORMService {
 
         try {
             const enhancedData = {
+                version: 1,
                 ...data,
                 lastUpdate: new Date().toISOString(),
                 timeSpent: Date.now() - this.sessionStartTime
@@ -301,6 +356,12 @@ class SCORMService {
                 if (suspendData.length > 4096) {
                     suspendData = suspendData.substring(0, 4096);
                 }
+            }
+
+            // Eğer veri değişmediyse set/commit yapma
+            const currentSuspendData = this.scorm.get('cmi.suspend_data') || '';
+            if (currentSuspendData === suspendData) {
+                return true;
             }
 
             this.scorm.set('cmi.suspend_data', suspendData);
@@ -421,13 +482,22 @@ class SCORMService {
         }
     }
 
-    private formatSCORMTime(seconds: number): string {
-        const hours = Math.floor(seconds / 3600);
+    private formatSCORMTime(totalSeconds: number): string {
+        // SCORM 1.2 session_time expects HH:MM:SS or HH:MM:SS.ss; prefer HH:MM:SS for compatibility
+        const seconds = Math.max(0, Math.floor(totalSeconds));
+        let hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
         const secs = Math.floor(seconds % 60);
-        const centiseconds = Math.floor((seconds % 1) * 100);
 
-        return `${hours.toString().padStart(4, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}.${centiseconds.toString().padStart(2, '0')}`;
+        // Clamp hours to 99 to comply with conservative LMS parsers
+        if (hours > 99) {
+            hours = 99;
+        }
+
+        const hh = hours.toString().padStart(2, '0');
+        const mm = minutes.toString().padStart(2, '0');
+        const ss = secs.toString().padStart(2, '0');
+        return `${hh}:${mm}:${ss}`;
     }
 
     public isAvailable(): boolean {
@@ -445,8 +515,12 @@ class SCORMService {
 
     public commit(): boolean {
         if (!this.scorm || !this.data.isAvailable) return false;
+        if (this.commitInProgress) return true; // Mevcut commit bitmeden yenisini başlatma
+        const now = Date.now();
+        if (now - this.lastCommitTime < this.MIN_COMMIT_INTERVAL_MS) return true; // Çok sık commit'i yumuşat
 
         try {
+            this.commitInProgress = true;
             // pipwerks SCORM API'de save() kullanılır
             const result = this.scorm.save();
 
@@ -461,6 +535,8 @@ class SCORMService {
         } catch (error) {
             console.error('[SCORM] Commit hatası:', error);
             return false;
+        } finally {
+            this.commitInProgress = false;
         }
     }
 

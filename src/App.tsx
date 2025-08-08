@@ -760,10 +760,6 @@ export default function App() {
     const seconds = Math.floor((totalTimeSpent % 60000) / 1000);
     const timeSpentString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-    // SCORM'a completion data gönder
-    if (scormService.isAvailable()) {
-      scormService.updateQuizResult(true, totalPoints);
-    }
 
     return {
       totalPoints,
@@ -811,28 +807,35 @@ export default function App() {
           setIsLoading(false);
         }, 100); // Reduced from 250ms to 100ms
       }
-      scormService.saveMicrolearningProgress(currentScene + 1, { quizCompleted }, totalPoints || 0);
+      if (scormService.isAvailable()) {
+        scormService.saveMicrolearningProgress(currentScene + 1, { quizCompleted }, totalPoints || 0, scenes.length);
+      }
 
     }
   }, [currentScene, quizCompleted, isMobile]);
 
   const prevScene = useCallback(() => {
     if (currentScene > 0) {
+      const newScene = currentScene - 1;
       // INSTANT transition on mobile - NO loading delay
       if (isMobile) {
         setDirection(-1);
-        setCurrentScene(currentScene - 1);
+        setCurrentScene(newScene);
       } else {
         // Minimal delay only for desktop
         setIsLoading(true);
         setTimeout(() => {
           setDirection(-1);
-          setCurrentScene(currentScene - 1);
+          setCurrentScene(newScene);
           setIsLoading(false);
         }, 100); // Reduced from 250ms to 100ms
       }
+      // Save SCORM progress on backward navigation as well
+      if (scormService.isAvailable()) {
+        scormService.saveMicrolearningProgress(newScene, { quizCompleted }, totalPoints || 0, scenes.length);
+      }
     }
-  }, [currentScene, isMobile]);
+  }, [currentScene, isMobile, quizCompleted, totalPoints]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -887,7 +890,11 @@ export default function App() {
   const handleQuizCompleted = useCallback(() => {
     setQuizCompleted(true);
     setAchievements(prev => [...prev, 'quiz-completed'].filter((a, i, arr) => arr.indexOf(a) === i));
-  }, []);
+    // Write quiz result to SCORM immediately (do not wait for Summary)
+    if (scormService.isAvailable()) {
+      scormService.updateQuizResult(true, totalPoints || 0);
+    }
+  }, [totalPoints]);
 
   // Survey feedback submission handler
   const handleSurveySubmitted = useCallback(() => {
