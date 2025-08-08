@@ -179,8 +179,8 @@
   },
   "5": {
     "iconName": "brain",
-    "title": "Quick Check",
-    "subtitle": "Check your phishing awareness",
+    "title": "Quick Check!",
+    "subtitle": "Spot the risky move — and lock in the right behaviour.",
     "key_message": [
       "Answer the questions",
       "Check your knowledge",
@@ -193,30 +193,27 @@
         {
           "id": "report-invoice",
           "type": "multiple_choice",
-          "title": "Suspicious invoice email",
-          "description": "What should you do?",
+          "title": "Invoice approval email with a link",
+          "description": "You receive an unexpected invoice approval email from “Finance”. The sender name looks right, but the link preview shows a mismatched domain. What is the safest next step?",
           "options": [
-            { "id": "click", "text": "Click the link", "isCorrect": false },
-            {
-              "id": "report",
-              "text": "Use the report button",
-              "isCorrect": true
-            },
-            { "id": "ignore", "text": "Ignore it", "isCorrect": false }
+            { "id": "click", "text": "Open the link to check the invoice", "isCorrect": false },
+            { "id": "reply", "text": "Reply to the sender to ask if it’s genuine", "isCorrect": false },
+            { "id": "report", "text": "Use the Report button so IT can investigate", "isCorrect": true },
+            { "id": "forward", "text": "Forward it to a colleague for a second opinion", "isCorrect": false }
           ],
-          "explanation": "Using the Report button helps your security team act quickly."
+          "explanation": "Using the Report button helps the security team act quickly and protect others. Avoid clicking links or replying to suspicious emails."
         },
         {
           "id": "delete-vs-report",
           "type": "true_false",
           "title": "Delete or report?",
-          "statement": "It’s safer to delete suspicious emails instead of reporting them.",
+          "statement": "If an email looks suspicious, deleting it is enough.",
           "correctAnswer": false,
           "options": {
             "true": { "label": "True", "icon": "check" },
             "false": { "label": "False", "icon": "x" }
           },
-          "explanation": "Reporting helps IT protect everyone and spot wider attacks."
+          "explanation": "Reporting helps IT spot wider attacks, warn colleagues and remove similar emails from inboxes. Deleting it only helps you."
         }
       ]
     },
@@ -294,9 +291,10 @@
     }
   },
   "6": {
-    "title": "Confidence check",
+    "title": "Feedback",
+    "subtitle": "Help us make your training experience even better.",
     "texts": {
-      "ratingQuestion": "How confident do you feel about your email security right now?",
+      "ratingQuestion": "Please share your rating for this training.",
       "topicsQuestion": "Which areas would you like more practice or examples on?",
       "feedbackQuestion": "Any other feedback to help us improve?",
       "feedbackPlaceholder": "Type your thoughts here…",
@@ -333,9 +331,10 @@
   },
   "7": {
     "iconName": "repeat",
+    "subtitle": "Stick with these three habits to stay safe from phishing.",
     "texts": {
       "title": "Key messages",
-      "subtitle": "Keep these three points in mind:",
+      "subtitle": "Stick with these three habits to stay safe from phishing.",
       "achievementsTitle": "What you’ve achieved:"
     },
     "achievements": [

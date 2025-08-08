@@ -170,7 +170,7 @@ export function ActionableContentScene({
             </div>
           )}
           <h1
-            className="text-2xl mb-3 md:mb-4 text-center text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold"
+            className="text-2xl mb-3 md:mb-4 text-2xl sm:text-3xl md:text-4xl text-center text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold"
             id="actionable-content-title"
           >
             {title}

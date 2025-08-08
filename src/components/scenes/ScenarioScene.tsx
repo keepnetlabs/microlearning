@@ -218,7 +218,7 @@ export function ScenarioScene({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-2xl mb-1 sm:mb-3 text-[#1C1C1E] dark:text-[#F2F2F7] text-center font-semibold"
+          className="text-2xl sm:text-3xl md:text-4xl mb-1 sm:mb-4 text-[#1C1C1E] dark:text-[#F2F2F7] text-center font-semibold"
         >
           {config.title}
         </motion.h1>

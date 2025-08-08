@@ -186,7 +186,7 @@ export const GoalScene = memo(({
 
         <h1
           id="goal-scene-title"
-          className="text-2xl mb-3 sm:mb-4 text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold"
+          className="text-2xl sm:text-3xl md:text-4xl mb-3 sm:mb-4 text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold"
         >
           {title}
         </h1>
@@ -196,7 +196,7 @@ export const GoalScene = memo(({
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-base sm:text-lg md:text-xl text-[#1C1C1E] dark:text-[#F2F2F7] text-center mb-3 md:mb-4 font-medium leading-relaxed px-2"
+            className="text-base sm:text-lg md:text-xl md:text-xl text-[#1C1C1E] dark:text-[#F2F2F7] text-center mb-3 md:mb-4 font-medium px-2"
             aria-label="Subtitle"
           >
             {config.subtitle}

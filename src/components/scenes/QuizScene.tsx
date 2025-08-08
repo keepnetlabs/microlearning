@@ -18,7 +18,6 @@ import { FontWrapper } from "../common/FontWrapper";
 import { useIsMobile } from "../ui/use-mobile";
 import { BottomSheetComponent } from "../ui/bottom-sheet";
 import { useBottomSheet } from "../../hooks/useBottomSheet";
-import { Button } from "../ui/button";
 
 // Question Types
 enum QuestionType {
@@ -1869,9 +1868,15 @@ export const QuizScene = React.memo(function QuizScene({
             {iconNode}
           </div>}
 
-          <h1 className="text-2xl mb-2 sm:mb-2 font-semibold text-center text-[#1C1C1E] dark:text-white">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-2 sm:mb-4 font-semibold text-center text-[#1C1C1E] dark:text-white">
             {config.title}
           </h1>
+          {config.subtitle && (
+            <p className="text-sm mb-3 text-base sm:text-lg md:text-xl text-[#1C1C1E] font-medium dark:text-[#F2F2F7]">
+              {config.subtitle}
+            </p>
+          )}
+
 
           <div className="flex items-center justify-center space-x-4 text-sm text-[#1C1C1E] dark:text-[#F2F2F7]">
             <span aria-label={`Question ${currentQuestionIndex + 1} of ${questions.length}`}>

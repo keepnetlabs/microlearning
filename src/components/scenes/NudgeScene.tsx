@@ -48,10 +48,10 @@ export function NudgeScene({ config }: NudgeSceneProps) {
           </div>
         </div>}
 
-        <h1 className="text-2xl font-semibold mb-2 text-center leading-[1.5] text-[#1C1C1E] dark:text-white">
+        <h1 className="ttext-2xl sm:text-3xl md:text-4xl font-semibold mb-2 text-center leading-[1.5] text-[#1C1C1E] dark:text-white">
           {config.texts?.title || "Artık Daha Güvenlisiniz!"}
         </h1>
-        <p className="text-[#1C1C1E] dark:text-[#F2F2F7] mb-4 text-center">
+        <p className="text-[#1C1C1E] font-medium text-base sm:text-lg md:text-xl dark:text-[#F2F2F7] mb-4 text-center">
           {config.texts?.subtitle || "Bu bilgileri ekibinizle paylaşma ve uygulamaya başlama zamanı"}
         </p>
 
