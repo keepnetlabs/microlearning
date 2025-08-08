@@ -632,6 +632,8 @@ export default function App() {
     }
   }, [currentScene, sceneIndices.quiz, hasShownQuizHint, showQuizCompletionHint]);
 
+  // Keep Quiz result state so navigating back shows last outcome
+
   // Reset scroll position when scene changes
   const resetScrollPosition = useCallback(() => {
     if (scrollContainerRef.current) {
@@ -1489,6 +1491,7 @@ export default function App() {
                             config={currentSceneConfig}
                             onQuizCompleted={handleQuizCompleted}
                             onNextSlide={nextScene}
+                            isVisible={currentScene === sceneIndices.quiz}
                             currentQuestionIndex={quizCurrentQuestionIndex}
                             setCurrentQuestionIndex={setQuizCurrentQuestionIndex}
                             answers={quizAnswers}
@@ -1520,6 +1523,7 @@ export default function App() {
                             onSurveySubmitted={handleSurveySubmitted}
                             isSubmitted={isSurveySubmitted}
                             completionData={currentScene === sceneIndices.summary ? completionData : undefined}
+                            onNextSlide={nextScene}
                           />
                         )}
                       </motion.div>

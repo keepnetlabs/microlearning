@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Star, CheckCircle, Send, LucideIcon } from "lucide-react";
+import { Star, CheckCircle, Send, LucideIcon, ArrowUpRight } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { motion } from "framer-motion";
 import { SurveySceneConfig } from "../configs/educationConfigs";
@@ -11,12 +11,14 @@ interface SurveySceneProps {
   config: SurveySceneConfig;
   onSurveySubmitted?: () => void;
   isSubmitted?: boolean;
+  onNextSlide?: () => void;
 }
 
 export function SurveyScene({
   config,
   onSurveySubmitted,
-  isSubmitted: propIsSubmitted
+  isSubmitted: propIsSubmitted,
+  onNextSlide
 }: SurveySceneProps) {
   const [rating, setRating] = useState<number>(0);
   const [feedback, setFeedback] = useState("");
@@ -72,6 +74,8 @@ export function SurveyScene({
     if (rating === 0 || isSubmitted) return;
     setIsSubmitting(true);
     setIsSubmitted(true);
+    // Simüle submit tamamlandı
+    setIsSubmitting(false);
     if (isMobile) {
       setIsSuccessSheetOpen(true);
     }
@@ -79,6 +83,15 @@ export function SurveyScene({
     // Notify parent component about submission
     if (onSurveySubmitted) {
       onSurveySubmitted();
+    }
+  };
+
+  const handleSuccessSheetDismiss = () => {
+    setIsSuccessSheetOpen(false);
+    setIsSubmitting(false);
+    if (onNextSlide) {
+      // Kapanış animasyonuna küçük bir pay
+      setTimeout(() => onNextSlide(), 200);
     }
   };
 
@@ -481,17 +494,10 @@ export function SurveyScene({
       {isMobile && (
         <BottomSheetComponent
           open={isSuccessSheetOpen && isSubmitted}
-          onDismiss={() => setIsSuccessSheetOpen(false)}
+          onDismiss={handleSuccessSheetDismiss}
           title={config.texts?.successTitle || "Geri Bildiriminiz Alındı!"}
         >
           <div className="space-y-4 glass-border-2 p-4">
-            <div className="flex items-center justify-center">
-              <div className="relative p-3 glass-border-4 mx-auto w-fit" role="img" aria-label={config.texts?.successIconLabel || config.ariaTexts?.successIconLabel || "Success checkmark icon"}>
-                <div className="absolute inset-0 glass-border-4"></div>
-                <CheckCircle size={28} className="text-[#1C1C1E] dark:text-[#F2F2F7] relative z-10" aria-hidden="true" />
-              </div>
-            </div>
-
             <div className="text-center space-y-2">
               <p className="text-sm leading-relaxed text-[#1C1C1E] dark:text-[#F2F2F7]">
                 {config.texts?.successMessage1}
@@ -507,6 +513,31 @@ export function SurveyScene({
               </p>
             </div>
           </div>
+          {onNextSlide && (
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.15)" }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                // BottomSheet kapandıktan sonra sonraki slayda geç
+                setTimeout(() => {
+                  onNextSlide();
+                }, 300);
+                setIsSuccessSheetOpen(false);
+              }}
+              className="mt-4 relative flex items-center justify-center space-x-2 px-4 py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full"
+            >
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                animate={{ x: ['-100%', '200%'] }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+              />
+              <ArrowUpRight size={18} className="relative z-10" />
+              <span className="text-base font-medium relative z-10">Next Slide</span>
+            </motion.button>
+          )}
         </BottomSheetComponent>
       )}
     </FontWrapper>

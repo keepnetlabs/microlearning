@@ -281,6 +281,7 @@ interface QuizSceneProps {
   config: QuizSceneConfig;
   onQuizCompleted: () => void;
   onNextSlide: () => void;
+  isVisible?: boolean;
 
   // Quiz state props
   currentQuestionIndex: number;
@@ -311,6 +312,7 @@ export const QuizScene = React.memo(function QuizScene({
   config,
   onQuizCompleted,
   onNextSlide,
+  isVisible,
   currentQuestionIndex,
   setCurrentQuestionIndex,
   answers,
@@ -444,6 +446,30 @@ export const QuizScene = React.memo(function QuizScene({
     },
     [currentQuestion],
   );
+
+  // Reconstruct lastAnswerResult when coming back if showResult is true but lastAnswerResult is missing
+  useEffect(() => {
+    if (!showResult || lastAnswerResult) return;
+    if (typeof currentAnswer === 'undefined') return;
+
+    const isCorrect = validateAnswer(currentAnswer);
+    const wasLastQuestion = currentQuestionIndex === questions.length - 1;
+    setLastAnswerResult({ wasCorrect: isCorrect, wasLastQuestion });
+  }, [showResult, lastAnswerResult, currentAnswer, validateAnswer, currentQuestionIndex, questions.length]);
+
+  // When scene becomes visible again, auto-open success BottomSheet if the saved answer is correct
+  useEffect(() => {
+    if (!isVisible) return;
+    if (showResult) return;
+    if (typeof currentAnswer === 'undefined') return;
+
+    const isCorrect = validateAnswer(currentAnswer);
+    if (!isCorrect) return;
+
+    const wasLastQuestion = currentQuestionIndex === questions.length - 1;
+    setLastAnswerResult({ wasCorrect: true, wasLastQuestion });
+    setShowResult(true);
+  }, [isVisible, showResult, currentAnswer, validateAnswer, currentQuestionIndex, questions.length, setShowResult]);
 
 
 
@@ -579,7 +605,8 @@ export const QuizScene = React.memo(function QuizScene({
     // Eğer doğru cevap verildiyse, bir dahaki soruya geç
     if (lastAnswerResult?.wasCorrect) {
       if (lastAnswerResult.wasLastQuestion) {
-        onQuizCompleted();
+        // Quiz zaten tamamlandıysa veya son soru doğruysa, dismiss ile sonraki slayta geç
+        onNextSlide();
       } else {
         handleNextQuestion();
       }
@@ -599,7 +626,7 @@ export const QuizScene = React.memo(function QuizScene({
         }
       }
     }
-  }, [lastAnswerResult?.wasCorrect, lastAnswerResult?.wasLastQuestion, attempts, maxAttempts, isAnswerLocked, resetQuestionState, setShowResult, setLastAnswerResult, handleNextQuestion, onQuizCompleted, currentQuestionIndex, questions.length]);
+  }, [lastAnswerResult?.wasCorrect, lastAnswerResult?.wasLastQuestion, attempts, maxAttempts, isAnswerLocked, resetQuestionState, setShowResult, setLastAnswerResult, handleNextQuestion, onQuizCompleted, onNextSlide, currentQuestionIndex, questions.length]);
 
   // Memoized event handlers for better performance
   const handleSliderChange = useCallback((value: number[]) => {
