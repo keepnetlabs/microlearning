@@ -20,6 +20,13 @@ import { useFontFamily } from "./hooks/useFontFamily";
 import { FontFamilyProvider } from "./contexts/FontFamilyContext";
 import { scormService, destroySCORMService } from "./utils/scormService";
 
+// Computes a clean, responsive className for the header logo
+function getHeaderLogoClassName(isMobile: boolean, isFirstOrLastScene: boolean): string {
+  const baseLogoClasses = "relative z-10 h-8 sm:h-10 md:h-14 w-full object-contain md:w-auto p-1.5 sm:p-2";
+  const maxWidthClass = isMobile ? (isFirstOrLastScene ? "max-w-[88px]" : "max-w-[56px]") : "";
+  return `${baseLogoClasses} ${maxWidthClass}`.trim();
+}
+
 // Static CSS classes - Component dışında tanımlandı çünkü hiç değişmiyor
 const STATIC_CSS_CLASSES = {
   // Loading overlay
@@ -1154,13 +1161,13 @@ export default function App() {
                     <div className="corner-top-left"></div>
                     <div className="corner-bottom-right"></div>
                     <img
-                      key={logoSrc}
+                      key={logoSrc + getHeaderLogoClassName(isMobile, isFirstOrLastScene)}
                       src={isMobile && isFirstOrLastScene ?
                         (isDarkMode ? (themeConfig?.logo?.darkSrc ?? themeConfig?.logo?.src ?? '') : (themeConfig?.logo?.src ?? '')) :
                         logoSrc}
                       alt={themeConfig.logo?.alt || "Application Logo"}
                       aria-label={appConfig.theme?.ariaTexts?.logoLabel || "Application logo"}
-                      className={`relative z-10 h-8 sm:h-10 md:h-14 w-full object-contain md:w-auto p-1.5 sm:p-2 ${isMobile && isFirstOrLastScene ? 'max-w-[88px]' : ''}`}
+                      className={getHeaderLogoClassName(isMobile, isFirstOrLastScene)}
                     />
                   </div>
                 </motion.div>
