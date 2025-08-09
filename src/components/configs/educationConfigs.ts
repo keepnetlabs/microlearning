@@ -89,7 +89,7 @@ export const ColorClasses = {
 
 export interface SurveySceneConfig {
     title?: string;
-    subtitle?:string;
+    subtitle?: string;
     texts?: {
         ratingQuestion?: string;
         topicsQuestion?: string;
@@ -194,10 +194,10 @@ export interface NudgeSceneConfig {
     texts?: {
         title?: string;
         subtitle?: string;
-        achievementsTitle?: string;
+        actionsTitle?: string;
         progressMessage?: string;
     };
-    achievements?: string[];
+    key_message?: string[];
     icon?: {
         name?: string;
         size?: number;

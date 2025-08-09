@@ -10,7 +10,7 @@ interface NudgeSceneProps {
 }
 
 export function NudgeScene({ config }: NudgeSceneProps) {
-  const achievements = config.achievements || [];
+  const achievements = config['key_message'] || [];
   const isMobile = useIsMobile();
   // Dinamik icon mapping function (diğer componentlerle aynı)
   const getIconComponent = (iconName?: string): LucideIcon => {
@@ -58,7 +58,7 @@ export function NudgeScene({ config }: NudgeSceneProps) {
         <div className={`relative p-6 glass-border-3 max-w-md w-full`}>
           <div className="relative z-10 space-y-4">
             <h3 className="text-[#1C1C1E] dark:text-[#F2F2F7] mb-4 font-medium">
-              {config.texts?.achievementsTitle || "Öğrendikleriniz:"}
+              {config.texts?.actionsTitle || "Öğrendikleriniz:"}
             </h3>
 
             <div className="space-y-3">

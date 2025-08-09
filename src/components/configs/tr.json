@@ -15,8 +15,7 @@
       "toggleButtonLightMode": "Açık temaya geç",
       "toggleButtonDarkMode": "Koyu temaya geç",
       "hintTitle": "Koyu/Açık Tema",
-      "hintDescription": "Temanızı değiştirmek için sağ üstteki ay/güneş ikonuna tıklayın",
-      "surveySubmittedToast": "Geri bildiriminiz için teşekkürler!"
+      "hintDescription": "Temanızı değiştirmek için sağ üstteki ay/güneş ikonuna tıklayın"
     },
     "ariaTexts": {
       "appLabel": "Phishing Farkındalığı Eğitimi",
@@ -332,17 +331,12 @@
     "texts": {
       "title": "Eylem planı",
       "subtitle": "Bir sonraki şüpheli e-posta göründüğünde şunu yapacaksın:",
-      "achievementsTitle": "Zaten ilerleme kaydettiniz:"
+      "actionsTitle": "Sonraki adımların"
     },
     "key_message": [
       "Şüpheli e-postayı tanı",
       "Bağlantılara tıklama veya bilinmeyen ekleri açma",
       "Report butonunu kullan"
-    ],
-    "achievements": [
-      "Phishing saldırılarının yaygınlığını fark ettiniz",
-      "Şüpheli e-postaları nasıl tanıyacağınızı öğrendiniz",
-      "Güvenli raporlama alışkanlığı kazandınız"
     ]
   },
   "8": {

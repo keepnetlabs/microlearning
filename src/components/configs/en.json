@@ -349,17 +349,12 @@
     "texts": {
       "title": "Action plan",
       "subtitle": "Next time a suspicious email appears, you will do this:",
-      "achievementsTitle": "Your next steps"
+      "actionsTitle": "Your next steps"
     },
     "key_message": [
       "Recognise a suspicious email",
       "Don't click links or open unknown attachments",
       "Use the report button"
-    ],
-    "achievements": [
-      "Recognised that phishing is common",
-      "Practised how to spot suspicious emails",
-      "Built the habit of reporting safely"
     ]
   },
   "8": {
