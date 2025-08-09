@@ -569,13 +569,13 @@ export function SummaryScene({ config, completionData }: SummarySceneProps) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.8 }}
-              whileHover={{
+              whileHover={!(isFinishing || isFinished) ? {
                 scale: 1.05,
                 boxShadow: "0 20px 40px rgba(59, 130, 246, 0.3)"
-              }}
-              whileTap={{ scale: 0.95 }}
+              } : {}}
+              whileTap={!(isFinishing || isFinished) ? { scale: 0.95 } : {}}
               onClick={handleSaveAndFinish}
-              disabled={isFinishing}
+              disabled={isFinishing || isFinished}
               className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 glass-border-2 ${config.styling?.downloadButton?.gradientFrom || 'from-blue-500'} ${config.styling?.downloadButton?.gradientTo || 'to-indigo-600'} ${config.styling?.downloadButton?.textColor || 'text-white'} transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden`}
             >
               <motion.div
