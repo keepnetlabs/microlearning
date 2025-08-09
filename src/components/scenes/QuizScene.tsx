@@ -120,7 +120,8 @@ type Question =
 interface QuizSceneConfig {
   title?: string;
   subtitle?: string;
-  callToActionText?: string;
+  callToActionText?: string | { mobile?: string; desktop?: string; };
+  quizCompletionCallToActionText?: string | { mobile?: string; desktop?: string; };
   difficulty?: {
     easy?: string;
     medium?: string;
@@ -2248,13 +2249,16 @@ export const QuizScene = React.memo(function QuizScene({
           </div>
         </motion.div>
 
-        {/* Call to Action */}
-        {config.callToActionText && (
-          <CallToAction 
-            text={config.callToActionText}
-            delay={0.8}
-          />
-        )}
+        {/* Call to Action - Conditional text based on quiz state */}
+        <CallToAction 
+          text={
+            currentQuestionIndex === questions.length - 1 && showResult 
+              ? "Continue" 
+              : "Answer to Continue"
+          }
+          delay={0.8}
+          onClick={onNextSlide}
+        />
 
       </div>
     </FontWrapper >

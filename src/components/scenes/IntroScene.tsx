@@ -131,7 +131,7 @@ interface IntroSceneConfig {
   highlights?: HighlightItemData[];
   duration?: string;
   level?: string;
-  callToActionText?: string;
+  callToActionText?: string | { mobile?: string; desktop?: string; };
 
   // Visual configuration
   particles?: ParticlesConfig;
@@ -364,8 +364,9 @@ const StatsItem = React.memo(({
 });
 
 export const IntroScene = React.memo(({
-  config
-}: { config: IntroSceneConfig }) => {
+  config,
+  onNextSlide
+}: { config: IntroSceneConfig; onNextSlide?: () => void; }) => {
 
   // 🎯 OPTİMİZE EDİLDİ - Daha erken animasyon başlangıcı
   const [isVisible, setIsVisible] = useState(false);
@@ -703,9 +704,12 @@ export const IntroScene = React.memo(({
       {/* Enhanced Call to Action */}
       {callToActionText && (
         <CallToAction 
-          text={callToActionText}
+          text={typeof callToActionText === 'string' ? callToActionText : undefined}
+          mobileText={typeof callToActionText === 'object' ? callToActionText.mobile : undefined}
+          desktopText={typeof callToActionText === 'object' ? callToActionText.desktop : undefined}
           isVisible={isVisible}
           delay={delays.cta}
+          onClick={onNextSlide}
         />
       )}
     </FontWrapper>

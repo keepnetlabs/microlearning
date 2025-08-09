@@ -8,9 +8,10 @@ import { CallToAction } from "../ui/CallToAction";
 
 interface NudgeSceneProps {
   config: NudgeSceneConfig;
+  onNextSlide?: () => void;
 }
 
-export function NudgeScene({ config }: NudgeSceneProps) {
+export function NudgeScene({ config, onNextSlide }: NudgeSceneProps) {
   const achievements = config['key_message'] || [];
   const isMobile = useIsMobile();
   // Dinamik icon mapping function (diğer componentlerle aynı)
@@ -82,8 +83,11 @@ export function NudgeScene({ config }: NudgeSceneProps) {
         {/* Call to Action */}
         {config.callToActionText && (
           <CallToAction
-            text={config.callToActionText}
+            text={typeof config.callToActionText === 'string' ? config.callToActionText : undefined}
+            mobileText={typeof config.callToActionText === 'object' ? config.callToActionText.mobile : undefined}
+            desktopText={typeof config.callToActionText === 'object' ? config.callToActionText.desktop : undefined}
             delay={0.8}
+            onClick={onNextSlide}
           />
         )}
       </div>

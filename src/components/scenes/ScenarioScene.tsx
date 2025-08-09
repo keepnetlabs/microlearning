@@ -67,7 +67,7 @@ async function fetchTranscriptFromUrl(url: string): Promise<string> {
 interface ScenarioSceneConfig {
   title: string;
   subtitle: string;
-  callToActionText?: string;
+  callToActionText?: string | { mobile?: string; desktop?: string; };
   description: string;
   video: {
     src: string;
@@ -109,7 +109,8 @@ interface ScenarioSceneProps {
 
 export function ScenarioScene({
   config,
-}: ScenarioSceneProps) {
+  onNextSlide
+}: ScenarioSceneProps & { onNextSlide?: () => void; }) {
   // Default values for container classes
   const defaultContainerClassName = "flex flex-col items-center justify-start h-full px-4 sm:px-6 overflow-y-auto";
   const defaultVideoContainerClassName = "w-full max-w-sm sm:max-w-md lg:max-w-lg mb-2 sm:mb-4";
@@ -314,9 +315,12 @@ export function ScenarioScene({
         {/* Call to Action */}
         {config.callToActionText && (
           <CallToAction
-            text={config.callToActionText}
+            text={typeof config.callToActionText === 'string' ? config.callToActionText : undefined}
+            mobileText={typeof config.callToActionText === 'object' ? config.callToActionText.mobile : undefined}
+            desktopText={typeof config.callToActionText === 'object' ? config.callToActionText.desktop : undefined}
             className="mt-0 sm:mt-0"
             delay={0.8}
+            onClick={onNextSlide}
           />
         )}
 

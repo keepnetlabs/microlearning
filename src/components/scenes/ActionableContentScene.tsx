@@ -36,7 +36,7 @@ interface TipConfig {
 interface ActionableContentSceneConfig {
   title: string;
   subtitle: string;
-  callToActionText?: string;
+  callToActionText?: string | { mobile?: string; desktop?: string; };
   actions: ActionItem[];
 
   // Visual configuration
@@ -89,8 +89,9 @@ const getIconComponent = (iconName: string): LucideIcon => {
 };
 
 export function ActionableContentScene({
-  config
-}: ActionableContentSceneProps) {
+  config,
+  onNextSlide
+}: ActionableContentSceneProps & { onNextSlide?: () => void; }) {
   // Default values for container classes
   const defaultContainerClassName = "flex flex-col items-center justify-start min-h-full px-2 sm:px-6 overflow-y-auto";
 
@@ -265,8 +266,11 @@ export function ActionableContentScene({
         {/* Call to Action */}
         {config.callToActionText && (
           <CallToAction
-            text={config.callToActionText}
+            text={typeof config.callToActionText === 'string' ? config.callToActionText : undefined}
+            mobileText={typeof config.callToActionText === 'object' ? config.callToActionText.mobile : undefined}
+            desktopText={typeof config.callToActionText === 'object' ? config.callToActionText.desktop : undefined}
             delay={0.8}
+            onClick={onNextSlide}
           />
         )}
 

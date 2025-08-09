@@ -61,7 +61,10 @@
     "key_message": ["Phishing yaygın", "Herkes hedef olabilir", "Önlem mümkün"],
     "duration": "~5 dakika",
     "level": "Başlangıç",
-    "callToActionText": "Farkındalık yolculuğunuza başlamak için kaydırın",
+    "callToActionText": {
+      "mobile": "Kaydırarak başlayın",
+      "desktop": "Başlamak için tıklayın"
+    },
     "texts": {
       "sceneLabel": "Giriş Sahnesi",
       "sceneDescription": "Phishing farkındalığına hızlı başlangıç",
@@ -82,7 +85,7 @@
     "iconName": "target",
     "title": "Güvenlik Hedefiniz",
     "subtitle": "Bir sonraki şüpheli e-postayı gördüğünde durup raporlayacaksın",
-    "callToActionText": "Güvenli alışkanlıklar geliştirmeye hazır mısın",
+    "callToActionText": "Devam Et",
     "goals": [
       {
         "iconName": "alert-triangle",
@@ -114,7 +117,7 @@
     "iconName": "monitor-play",
     "title": "Gerçek Phishing Hikayesi",
     "subtitle": "Bir DevOps Yöneticisinin pahalı hatası",
-    "callToActionText": "Gerçek vakalardan öğren",
+    "callToActionText": "Devam Et",
     "key_message": ["Gerçek vaka", "Phishing tespiti", "Raporlamanın önemi"],
     "video": {
       "src": "https://customer-0lll6yc8omc23rbm.cloudflarestream.com/5fdb12ff1436c991f50b698a02e2faa1/manifest/video.m3u8",
@@ -141,7 +144,7 @@
     "iconName": "mail-check",
     "title": "Phishing Tespiti Pratiği",
     "subtitle": "E-postaları kontrol et, tehditleri fark et ve güvenle raporla",
-    "callToActionText": "Bu temel güvenlik adımlarında uzmanlaş",
+    "callToActionText": "Devam Et",
     "key_message": ["E-postayı incele", "Bağlantılara tıklama", "Report'a bas"],
     "actions": [
       {
@@ -176,7 +179,8 @@
     "iconName": "brain",
     "title": "Bilginizi Test Edin",
     "subtitle": "En kritik anda doğru kararı verin",
-    "callToActionText": "Güvenlik bilginizi teste tabi tut",
+    "callToActionText": "Cevapla ve Devam Et",
+    "quizCompletionCallToActionText": "Harika! Eylem Planına Geç",
     "key_message": [
       "Soruları cevapla",
       "Bilgini test et",
@@ -333,7 +337,7 @@
   "7": {
     "iconName": "repeat",
     "subtitle": "Phishing'den güvende kalman için eylem planın",
-    "callToActionText": "Güvenlik alışkanlıklarını pekiştir",
+    "callToActionText": "Devam Et",
     "texts": {
       "title": "Eylem planı",
       "subtitle": "Bir sonraki şüpheli e-posta göründüğünde şunu yapacaksın:",

@@ -45,7 +45,7 @@ interface GoalSceneConfig {
   // Content props
   title?: string;
   subtitle?: string;
-  callToActionText?: string;
+  callToActionText?: string | { mobile?: string; desktop?: string; };
   goals?: GoalItem[];
 
   // Visual configuration
@@ -129,8 +129,9 @@ const GoalCard = memo(({ goal, index }: {
 GoalCard.displayName = 'GoalCard';
 
 export const GoalScene = memo(({
-  config
-}: { config: GoalSceneConfig }) => {
+  config,
+  onNextSlide
+}: { config: GoalSceneConfig; onNextSlide?: () => void; }) => {
 
   // Default values for removed config properties
   const defaultContainerClassName = "flex flex-col items-center justify-center h-full text-center px-6";
@@ -222,8 +223,11 @@ export const GoalScene = memo(({
         {/* Call to Action */}
         {config.callToActionText && (
           <CallToAction 
-            text={config.callToActionText}
+            text={typeof config.callToActionText === 'string' ? config.callToActionText : undefined}
+            mobileText={typeof config.callToActionText === 'object' ? config.callToActionText.mobile : undefined}
+            desktopText={typeof config.callToActionText === 'object' ? config.callToActionText.desktop : undefined}
             delay={0.8}
+            onClick={onNextSlide}
           />
         )}
 
