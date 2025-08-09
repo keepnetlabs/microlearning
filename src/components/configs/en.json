@@ -15,7 +15,8 @@
       "toggleButtonLightMode": "Switch to light mode",
       "toggleButtonDarkMode": "Switch to dark mode",
       "hintTitle": "Dark/Light theme",
-      "hintDescription": "Use the moon/sun icon in the top-right to change your theme"
+      "hintDescription": "Use the moon/sun icon in the top-right to change your theme",
+      "surveySubmittedToast": "Thanks for your feedback!"
     },
     "ariaTexts": {
       "appLabel": "Phishing awareness training",
@@ -348,7 +349,7 @@
     "texts": {
       "title": "Action plan",
       "subtitle": "Next time a suspicious email appears, you will do this:",
-      "achievementsTitle": "What you've achieved:"
+      "achievementsTitle": "Your next steps"
     },
     "key_message": [
       "Recognise a suspicious email",
@@ -378,11 +379,6 @@
       "timeLabel": "Time",
       "completionLabel": "Completion"
     },
-    "key_message": [
-      "Training completed",
-      "Apply what you've practised",
-      "Share and encourage others"
-    ],
     "immediateActions": [
       {
         "title": "Do now",
@@ -392,6 +388,11 @@
         "title": "This week",
         "description": "Encourage your team to report suspicious emails"
       }
+    ],
+    "key_message": [
+      "Training completed",
+      "Apply what you've practised",
+      "Share and encourage others"
     ],
     "resources": [
       {

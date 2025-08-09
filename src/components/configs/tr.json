@@ -15,7 +15,8 @@
       "toggleButtonLightMode": "Açık temaya geç",
       "toggleButtonDarkMode": "Koyu temaya geç",
       "hintTitle": "Koyu/Açık Tema",
-      "hintDescription": "Temanızı değiştirmek için sağ üstteki ay/güneş ikonuna tıklayın"
+      "hintDescription": "Temanızı değiştirmek için sağ üstteki ay/güneş ikonuna tıklayın",
+      "surveySubmittedToast": "Geri bildiriminiz için teşekkürler!"
     },
     "ariaTexts": {
       "appLabel": "Phishing Farkındalığı Eğitimi",

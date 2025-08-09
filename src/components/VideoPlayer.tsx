@@ -158,8 +158,12 @@ export function VideoPlayer({
     const secondRow = container.querySelector('[data-row-index="1"]') as HTMLElement | null;
 
     const firstRect = firstRow.getBoundingClientRect();
-    const rowsToShow = isMobile ? 3 : 4;
     const verticalPadding = 16; // padding top + bottom (8px each)
+    
+    // Calculate available height in viewport
+    const viewportHeight = window.innerHeight;
+    const containerTop = container.getBoundingClientRect().top;
+    const availableHeight = viewportHeight - containerTop - 100; // Leave 100px buffer for other content
 
     let stride: number;
     if (secondRow) {
@@ -169,6 +173,14 @@ export function VideoPlayer({
       const fallbackSpacing = 8; // approximate vertical spacing between items
       stride = firstRect.height + fallbackSpacing;
     }
+
+    // Calculate maximum rows that can fit in available space
+    const maxRowsFromHeight = Math.floor((availableHeight - verticalPadding) / stride);
+    
+    // Use minimum 3 rows for mobile, 4 for desktop, but allow more if space permits
+    const minRows = isMobile ? 3 : 4;
+    const maxRows = Math.max(8, minRows); // Cap at 8 rows max
+    const rowsToShow = Math.min(maxRows, Math.max(minRows, maxRowsFromHeight));
 
     const height = Math.ceil(firstRect.height + stride * (rowsToShow - 1) + verticalPadding);
     setTranscriptContainerHeight(height);

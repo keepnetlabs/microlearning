@@ -446,6 +446,7 @@
   --rsbs-bg: transparent !important;
   --plyr-range-thumb-width: 16px;
   --rsbs-overlay-rounded: 8px;
+  --rsbs-content-opacity: 1 !important;
 }
 /* Orijinal fullscreen ikonunu gizle */
 .plyr__controls button[data-plyr="fullscreen"] svg {
@@ -507,6 +508,9 @@
 }
 .bottom-sheet-glass div[data-rsbs-header] {
   display: none;
+}
+[data-rsbs-has-footer="false"] [data-rsbs-content] {
+  opacity: 1 !important;
 }
 .bottom-sheet-glass div[role="dialog"]::before {
   content: "";

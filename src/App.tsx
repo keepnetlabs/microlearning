@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Toaster } from "sonner";
+import { Toaster } from "./components/ui/sonner";
+import { createPortal } from "react-dom";
 import { ProgressBar } from "./components/ProgressBar";
 import { NavButton } from "./components/NavButton";
 import { IntroScene } from "./components/scenes/IntroScene";
@@ -11,7 +12,7 @@ import { QuizScene } from "./components/scenes/QuizScene";
 import { SurveyScene } from "./components/scenes/SurveyScene";
 import { SummaryScene } from "./components/scenes/SummaryScene";
 import { NudgeScene } from "./components/scenes/NudgeScene";
-import { ChevronDown, Search, Loader2, X, Moon, Sun, Award, ChevronUp } from "lucide-react";
+import { ChevronDown, Search, Loader2, X, Moon, Sun, Award, ChevronUp, Star } from "lucide-react";
 import ReactCountryFlag from "react-country-flag";
 import { getCountryCode, detectBrowserLanguage, useIsMobile, languages } from "./utils/languageUtils";
 import { loadAppConfig, createConfigChangeEvent } from "./components/configs/appConfigLoader";
@@ -396,6 +397,8 @@ export default function App() {
   // Quiz completion hint state - show only once at first quiz start
   const [showQuizCompletionHint, setShowQuizCompletionHint] = useState(true);
   const [hasShownQuizHint, setHasShownQuizHint] = useState(false);
+  // Survey submitted notification state
+  const [showSurveySubmittedNotification, setShowSurveySubmittedNotification] = useState(false);
 
   // Quiz state management - moved to App level to persist across scene changes
   const [quizCurrentQuestionIndex, setQuizCurrentQuestionIndex] = useState(0);
@@ -412,6 +415,7 @@ export default function App() {
   // Dropdown refs for click outside handling
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const surveyToastTimeoutRef = useRef<number | null>(null);
 
   // Stabilized state setters with useCallback to prevent unnecessary re-renders
   const setQuizAnswersStable = useCallback((answers: Map<string, any> | ((prev: Map<string, any>) => Map<string, any>)) => {
@@ -915,8 +919,17 @@ export default function App() {
   // Survey feedback submission handler
   const handleSurveySubmitted = useCallback(() => {
     setIsSurveySubmitted(true);
-    // Removed automatic navigation - user can manually navigate when ready
-  }, []);
+    setShowSurveySubmittedNotification(true);
+    // Auto navigate after 2s
+    if (surveyToastTimeoutRef.current) {
+      clearTimeout(surveyToastTimeoutRef.current);
+    }
+    surveyToastTimeoutRef.current = window.setTimeout(() => {
+      setShowSurveySubmittedNotification(false);
+      nextScene();
+      surveyToastTimeoutRef.current = null;
+    }, 2000);
+  }, [nextScene]);
 
   // Mobile swipe gesture handlers - ONLY FOR MOBILE
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
@@ -987,6 +1000,7 @@ export default function App() {
   const CurrentSceneComponent = scenes[currentScene].component as React.ComponentType<any>;
   const currentLanguage = useMemo(() => languages.find(lang => lang.code === selectedLanguage), [selectedLanguage]);
   const currentSceneConfig = scenes[currentScene].config;
+  const isFirstOrLastScene = currentScene === 0 || currentScene === scenes.length - 1;
 
   // Ultra-optimized slide variants for mobile performance - Static for better performance
   const slideVariants = {
@@ -1108,10 +1122,12 @@ export default function App() {
                     <div className="corner-bottom-right"></div>
                     <img
                       key={logoSrc}
-                      src={logoSrc}
+                      src={isMobile && isFirstOrLastScene ?
+                        (isDarkMode ? (themeConfig?.logo?.darkSrc ?? themeConfig?.logo?.src ?? '') : (themeConfig?.logo?.src ?? '')) :
+                        logoSrc}
                       alt={themeConfig.logo?.alt || "Application Logo"}
                       aria-label={appConfig.theme?.ariaTexts?.logoLabel || "Application logo"}
-                      className="relative z-10 h-8 sm:h-10 md:h-14 w-full object-contain md:w-auto p-1.5 sm:p-2"
+                      className={`relative z-10 h-8 sm:h-10 md:h-14 w-full object-contain md:w-auto p-1.5 sm:p-2 ${isMobile && isFirstOrLastScene ? 'max-w-[88px]' : ''}`}
                     />
                   </div>
                 </motion.div>
@@ -1541,7 +1557,6 @@ export default function App() {
                         {currentScene !== sceneIndices.quiz && (
                           <CurrentSceneComponent config={currentSceneConfig}
                             onSurveySubmitted={handleSurveySubmitted}
-                            isSubmitted={isSurveySubmitted}
                             completionData={currentScene === sceneIndices.summary ? completionData : undefined}
                             onNextSlide={nextScene}
                           />
@@ -1741,6 +1756,46 @@ export default function App() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Survey Submitted Notification - via Portal to avoid transformed containers */}
+        {createPortal(
+          (
+            <AnimatePresence>
+              {showSurveySubmittedNotification && (
+                <motion.div
+                  initial={{ opacity: 0, y: 80 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 40 }}
+                  transition={{ type: 'spring', stiffness: 380, damping: 26 }}
+                  className="fixed z-[9999] right-4 sm:right-6"
+                  role="alert"
+                  aria-live="polite"
+                  aria-label={appConfig.theme?.ariaTexts?.quizCompletionLabel || "Survey submitted"}
+                  style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)' }}
+                >
+                  <div className={cssClasses.quizNotificationContent}>
+                    <div className="flex items-center space-x-2.5 relative z-10">
+                      <Star size={14} className="mr-2" aria-hidden="true" />
+                      <p className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] font-medium transition-colors duration-300">
+                        {themeConfig.texts?.surveySubmittedToast || "Geri bildiriminiz için teşekkürler!"}
+                      </p>
+                      <button
+                        onClick={() => setShowSurveySubmittedNotification(false)}
+                        className={cssClasses.quizNotificationClose}
+                        aria-label={themeConfig.texts?.closeNotification}
+                        style={{ touchAction: 'manipulation' }}
+                      >
+                        <X size={16} className="text-[#1C1C1E] font-semibold dark:text-[#F2F2F7]" style={{ marginBottom: '-1px' }} aria-hidden="true" />
+                      </button>
+                    </div>
+                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-400/5 to-orange-400/5 dark:from-amber-400/10 dark:to-orange-400/10 pointer-events-none" aria-hidden="true"></div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          ),
+          document.body
+        )}
         {/* Mobile Floating Scroll-to-Top Button */}
         <AnimatePresence>
           {showScrollToTop && (
