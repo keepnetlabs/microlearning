@@ -395,8 +395,9 @@ export default function App() {
   // Removed lastAchievementCount - not needed for optimized logic
 
   // Quiz completion hint state - show only once at first quiz start
-  const [showQuizCompletionHint, setShowQuizCompletionHint] = useState(true);
+  const [showQuizCompletionHint, setShowQuizCompletionHint] = useState(false);
   const [hasShownQuizHint, setHasShownQuizHint] = useState(false);
+  const hintTimerRef = useRef<NodeJS.Timeout | null>(null);
   // Survey submitted notification state
   const [showSurveySubmittedNotification, setShowSurveySubmittedNotification] = useState(false);
 
@@ -440,6 +441,15 @@ export default function App() {
 
   // Survey feedback submission state
   const [isSurveySubmitted, setIsSurveySubmitted] = useState(false);
+  
+  // Survey form state - persistent across scene changes
+  const [surveyState, setSurveyState] = useState({
+    rating: 0,
+    feedback: "",
+    selectedTopics: [] as number[],
+    isSubmitting: false,
+    isSubmitted: false
+  });
 
   // Scene timing tracking
   const [sceneStartTimes, setSceneStartTimes] = useState<Map<number, number>>(new Map());
@@ -596,6 +606,9 @@ export default function App() {
         setQuizCompleted(parsed.quizCompleted || false);
         setShownAchievements(parsed.shownAchievements || []);
         setIsSurveySubmitted(parsed.isSurveySubmitted || false);
+        if (parsed.surveyState) {
+          setSurveyState(parsed.surveyState);
+        }
         if (parsed.selectedLanguage) {
           setSelectedLanguage(parsed.selectedLanguage);
         }
@@ -640,17 +653,36 @@ export default function App() {
 
   // Show quiz completion hint only once at first quiz start
   useEffect(() => {
-    if (currentScene === sceneIndices.quiz && !hasShownQuizHint && showQuizCompletionHint) {
+    if (currentScene === sceneIndices.quiz && !hasShownQuizHint) {
+      setShowQuizCompletionHint(true);
       setHasShownQuizHint(true);
 
-      // Auto-hide after 5 seconds
-      const timer = setTimeout(() => {
-        setShowQuizCompletionHint(false);
-      }, 5000);
+      // Clear any existing timer
+      if (hintTimerRef.current) {
+        clearTimeout(hintTimerRef.current);
+      }
 
-      return () => clearTimeout(timer);
+      // Auto-hide after 2 seconds
+      hintTimerRef.current = setTimeout(() => {
+        setShowQuizCompletionHint(false);
+        hintTimerRef.current = null;
+      }, 2000);
+      
+      // Return cleanup function only for this specific timer
+      return () => {
+        if (hintTimerRef.current) {
+          clearTimeout(hintTimerRef.current);
+          hintTimerRef.current = null;
+        }
+      };
     }
-  }, [currentScene, sceneIndices.quiz, hasShownQuizHint, showQuizCompletionHint]);
+  }, [currentScene, sceneIndices.quiz]);
+  // Ensure quiz hint does not persist when navigating away from quiz
+  useEffect(() => {
+    if (currentScene !== sceneIndices.quiz && showQuizCompletionHint) {
+      setShowQuizCompletionHint(false);
+    }
+  }, [currentScene, sceneIndices.quiz, showQuizCompletionHint]);
 
   // Keep Quiz result state so navigating back shows last outcome
 
@@ -918,6 +950,7 @@ export default function App() {
 
   // Survey feedback submission handler
   const handleSurveySubmitted = useCallback(() => {
+    setSurveyState(prev => ({ ...prev, isSubmitted: true, isSubmitting: false }));
     setIsSurveySubmitted(true);
     setShowSurveySubmittedNotification(true);
     // Auto navigate after 2s
@@ -1557,6 +1590,8 @@ export default function App() {
                         {currentScene !== sceneIndices.quiz && (
                           <CurrentSceneComponent config={currentSceneConfig}
                             onSurveySubmitted={handleSurveySubmitted}
+                            surveyState={currentScene === sceneIndices.survey ? surveyState : undefined}
+                            onSurveyStateChange={currentScene === sceneIndices.survey ? setSurveyState : undefined}
                             completionData={currentScene === sceneIndices.summary ? completionData : undefined}
                             onNextSlide={nextScene}
                           />
@@ -1723,39 +1758,77 @@ export default function App() {
           )}
         </AnimatePresence>
 
-        {/* Enhanced Quiz Completion Notification - Industry Standard Position */}
-        <AnimatePresence>
-          {currentScene === sceneIndices.quiz && !quizCompleted && showQuizCompletionHint && (
-            <motion.div
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.95 }}
-              className={cssClasses.quizNotificationContainer}
-              role="alert"
-              aria-live="polite"
-              aria-label={appConfig.theme?.ariaTexts?.quizCompletionLabel || "Quiz completion hint"}
-            >
-              <div className={cssClasses.quizNotificationContent}>
-                <div className="flex items-center space-x-2.5 relative z-10">
-                  <p className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] font-medium transition-colors duration-300">
-                    {currentSceneConfig?.texts?.quizCompletionHint}
-                  </p>
-                  {/* Industry Standard: Close Button */}
-                  <button
-                    onClick={() => setShowQuizCompletionHint(false)}
-                    className={cssClasses.quizNotificationClose}
-                    aria-label={themeConfig.texts?.closeNotification}
-                    style={{ touchAction: 'manipulation' }}
+        {/* Enhanced Quiz Completion Notification - Portal on mobile for true sticky */}
+        {isMobile
+          ? createPortal(
+            (
+              <AnimatePresence>
+                {currentScene === sceneIndices.quiz && !quizCompleted && showQuizCompletionHint && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 80 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 40 }}
+                    transition={{ type: 'spring', stiffness: 380, damping: 26 }}
+                    className="fixed z-[9999] right-4 sm:right-6"
+                    role="alert"
+                    aria-live="polite"
+                    aria-label={appConfig.theme?.ariaTexts?.quizCompletionLabel || "Quiz completion hint"}
+                    style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)' }}
                   >
-                    <X size={16} className="text-[#1C1C1E] font-semibold dark:text-[#F2F2F7]" style={{ marginBottom: '-1px' }} aria-hidden="true" />
-                  </button>
-                </div>
-                {/* Industry Standard: Subtle Glow Effect */}
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-400/5 to-orange-400/5 dark:from-amber-400/10 dark:to-orange-400/10 pointer-events-none" aria-hidden="true"></div>
-              </div>
-            </motion.div>
+                    <div className={cssClasses.quizNotificationContent}>
+                      <div className="flex items-center space-x-2.5 relative z-10">
+                        <p className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] font-medium transition-colors duration-300">
+                          {currentSceneConfig?.texts?.quizCompletionHint}
+                        </p>
+                        <button
+                          onClick={() => setShowQuizCompletionHint(false)}
+                          className={cssClasses.quizNotificationClose}
+                          aria-label={themeConfig.texts?.closeNotification}
+                          style={{ touchAction: 'manipulation' }}
+                        >
+                          <X size={16} className="text-[#1C1C1E] font-semibold dark:text-[#F2F2F7]" style={{ marginBottom: '-1px' }} aria-hidden="true" />
+                        </button>
+                      </div>
+                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-400/5 to-orange-400/5 dark:from-amber-400/10 dark:to-orange-400/10 pointer-events-none" aria-hidden="true"></div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            ),
+            document.body
+          )
+          : (
+            <AnimatePresence>
+              {currentScene === sceneIndices.quiz && !quizCompleted && showQuizCompletionHint && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                  className={cssClasses.quizNotificationContainer}
+                  role="alert"
+                  aria-live="polite"
+                  aria-label={appConfig.theme?.ariaTexts?.quizCompletionLabel || "Quiz completion hint"}
+                >
+                  <div className={cssClasses.quizNotificationContent}>
+                    <div className="flex items-center space-x-2.5 relative z-10">
+                      <p className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] font-medium transition-colors duration-300">
+                        {currentSceneConfig?.texts?.quizCompletionHint}
+                      </p>
+                      <button
+                        onClick={() => setShowQuizCompletionHint(false)}
+                        className={cssClasses.quizNotificationClose}
+                        aria-label={themeConfig.texts?.closeNotification}
+                        style={{ touchAction: 'manipulation' }}
+                      >
+                        <X size={16} className="text-[#1C1C1E] font-semibold dark:text-[#F2F2F7]" style={{ marginBottom: '-1px' }} aria-hidden="true" />
+                      </button>
+                    </div>
+                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-400/5 to-orange-400/5 dark:from-amber-400/10 dark:to-orange-400/10 pointer-events-none" aria-hidden="true"></div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           )}
-        </AnimatePresence>
 
         {/* Survey Submitted Notification - via Portal to avoid transformed containers */}
         {createPortal(

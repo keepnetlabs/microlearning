@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Star, CheckCircle, Send, LucideIcon } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { motion } from "framer-motion";
@@ -6,19 +5,40 @@ import { SurveySceneConfig } from "../configs/educationConfigs";
 import { FontWrapper } from "../common/FontWrapper";
 import { useIsMobile } from "../ui/use-mobile";
 
+interface SurveyState {
+  rating: number;
+  feedback: string;
+  selectedTopics: number[];
+  isSubmitting: boolean;
+  isSubmitted: boolean;
+}
+
 interface SurveySceneProps {
   config: SurveySceneConfig;
-  onSurveySubmitted?: () => void
+  onSurveySubmitted?: () => void;
+  surveyState?: SurveyState;
+  onSurveyStateChange?: (state: SurveyState | ((prev: SurveyState) => SurveyState)) => void;
 }
 
 export function SurveyScene({
   config,
-  onSurveySubmitted
+  onSurveySubmitted,
+  surveyState,
+  onSurveyStateChange
 }: SurveySceneProps) {
-  const [rating, setRating] = useState<number>(0);
-  const [feedback, setFeedback] = useState("");
-  const [selectedTopics, setSelectedTopics] = useState<number[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // Use external state if provided, otherwise use local state
+  const localState = {
+    rating: 0,
+    feedback: "",
+    selectedTopics: [] as number[],
+    isSubmitting: false,
+    isSubmitted: false
+  };
+  
+  const state = surveyState || localState;
+  const setState = onSurveyStateChange || (() => {});
+  
+  const { rating, feedback, selectedTopics, isSubmitting, isSubmitted } = state;
   const isMobile = useIsMobile();
 
   const topics = config.topics || [];
@@ -48,23 +68,27 @@ export function SurveyScene({
   const IconComponent = getIconComponent(config.icon?.name);
 
   const handleTopicToggle = (index: number) => {
-    setSelectedTopics(prev =>
-      prev.includes(index)
-        ? prev.filter(i => i !== index)
-        : [...prev, index]
-    );
+    if (isSubmitted) return;
+    setState(prev => ({
+      ...prev,
+      selectedTopics: prev.selectedTopics.includes(index)
+        ? prev.selectedTopics.filter(i => i !== index)
+        : [...prev.selectedTopics, index]
+    }));
   };
 
   const handleSubmit = () => {
-    if (rating === 0) return;
-    setIsSubmitting(true);
+    if (rating === 0 || isSubmitted) return;
+    setState(prev => ({ ...prev, isSubmitting: true }));
     // Simüle submit tamamlandı
-    setIsSubmitting(false);
+    setTimeout(() => {
+      setState(prev => ({ ...prev, isSubmitting: false, isSubmitted: true }));
 
-    // Notify parent component about submission
-    if (onSurveySubmitted) {
-      onSurveySubmitted();
-    }
+      // Notify parent component about submission
+      if (onSurveySubmitted) {
+        onSurveySubmitted();
+      }
+    }, 1000);
   };
 
 
@@ -164,10 +188,11 @@ export function SurveyScene({
                 {[1, 2, 3, 4, 5].map((star) => (
                   <motion.button
                     key={star}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => setRating(star)}
-                    className={`p-2 transition-all glass-border-2`}
+                    whileHover={{ scale: !isSubmitted ? 1.1 : 1 }}
+                    whileTap={{ scale: !isSubmitted ? 0.9 : 1 }}
+                    onClick={() => !isSubmitted && setState(prev => ({ ...prev, rating: star }))}
+                    className={`p-2 transition-all glass-border-2 ${isSubmitted ? 'cursor-not-allowed opacity-70' : ''}`}
+                    disabled={isSubmitted}
                     style={{ touchAction: 'manipulation' }}
                     role="radio"
                     aria-checked={star === rating}
@@ -176,7 +201,7 @@ export function SurveyScene({
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
-                        setRating(star);
+                        !isSubmitted && setState(prev => ({ ...prev, rating: star }));
                       }
                     }}
                   >
@@ -223,7 +248,8 @@ export function SurveyScene({
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.6 + index * 0.1 }}
                     onClick={() => handleTopicToggle(index)}
-                    className={`w-full flex items-center text-sm group cursor-pointer p-1 rounded-lg transition-all`}
+                    className={`w-full flex items-center text-sm group p-1 rounded-lg transition-all ${isSubmitted ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
+                    disabled={isSubmitted}
                     style={{ touchAction: 'manipulation' }}
                     role="checkbox"
                     aria-checked={selectedTopics.includes(index)}
@@ -283,9 +309,10 @@ export function SurveyScene({
               <div className="relative">
                 <textarea
                   value={feedback}
-                  onChange={(e) => setFeedback(e.target.value)}
+                  onChange={(e) => !isSubmitted && setState(prev => ({ ...prev, feedback: e.target.value }))}
                   placeholder={config.texts?.feedbackPlaceholder || "İyileştirme önerilerinizi paylaşın..."}
-                  className={`w-full h-20 p-3 sm:p-4 glass-border-4 border-[0.5px] border-[#1C1C1E] dark:border-[#F2F2F7] placeholder:text-[#1C1C1E] dark:placeholder:text-[#F2F2F7] focus:outline-none text-[#1C1C1E] dark:text-[#F2F2F7] text-sm resize-none  transition-all `}
+                  className={`w-full h-20 p-3 sm:p-4 glass-border-4 border-[0.5px] border-[#1C1C1E] dark:border-[#F2F2F7] placeholder:text-[#1C1C1E] dark:placeholder:text-[#F2F2F7] focus:outline-none text-[#1C1C1E] dark:text-[#F2F2F7] text-sm resize-none transition-all ${isSubmitted ? 'cursor-not-allowed opacity-70' : ''}`}
+                  disabled={isSubmitted}
                   style={{ touchAction: 'manipulation' }}
                   aria-labelledby="feedback-question"
                   aria-describedby="feedback-description"
@@ -303,10 +330,10 @@ export function SurveyScene({
                 whileHover={{ scale: rating > 0 && !isSubmitting ? 1.02 : 1 }}
                 whileTap={{ scale: rating > 0 && !isSubmitting ? 0.98 : 1 }}
                 onClick={handleSubmit}
-                disabled={rating === 0 || isSubmitting}
-                className={`z-50 w-full transition-all font-medium text-sm flex items-center justify-center space-x-2 py-3 rounded-xl glass-border-2 ${rating > 0 && !isSubmitting
+                disabled={rating === 0 || isSubmitting || isSubmitted}
+                className={`z-50 w-full transition-all font-medium text-sm flex items-center justify-center space-x-2 py-3 rounded-xl glass-border-2 ${rating > 0 && !isSubmitting && !isSubmitted
                   ? ``
-                  : `cursor-not-allowed`
+                  : `cursor-not-allowed opacity-70`
                   } text-[#1C1C1E] dark:text-[#F2F2F7] overflow-hidden`}
                 style={{ touchAction: 'manipulation' }}
                 aria-label={isSubmitting ? (config.texts?.submittingLabel || config.ariaTexts?.submittingLabel || "Submitting survey") : (config.texts?.submitLabel || config.ariaTexts?.submitLabel || "Submit survey")}
@@ -327,6 +354,11 @@ export function SurveyScene({
                   <>
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin relative z-10" aria-hidden="true"></div>
                     <span className="relative z-10">{config.texts?.submittingText}</span>
+                  </>
+                ) : isSubmitted ? (
+                  <>
+                    <CheckCircle size={16} className="relative z-10" aria-hidden="true" />
+                    <span className="relative z-10">{config.texts?.submittedText || 'Submitted'}</span>
                   </>
                 ) : (
                   <>

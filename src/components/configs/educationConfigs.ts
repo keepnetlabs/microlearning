@@ -106,6 +106,7 @@ export interface SurveySceneConfig {
         thankYouMessage?: string;
         // Accessibility texts
         mainLabel?: string;
+        submittedText?: string;
         successDescription?: string;
         successRegionLabel?: string;
         successIconLabel?: string;

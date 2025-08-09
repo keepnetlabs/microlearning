@@ -296,6 +296,7 @@
       "feedbackPlaceholder": "Düşüncelerinizi buraya yazın...",
       "submitButton": "Gönder",
       "submittingText": "Gönderiliyor...",
+      "submittedText": "Gönderildi",
       "ratingRequiredText": "Lütfen göndermeden önce bir değerlendirme seçin.",
       "dataSecurityNotice": "Yanıtlarınız anonim ve korumalıdır.",
       "successTitle": "Teşekkürler!",

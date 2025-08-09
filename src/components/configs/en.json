@@ -314,6 +314,7 @@
       "feedbackPlaceholder": "Type your thoughts here…",
       "submitButton": "Submit",
       "submittingText": "Submitting…",
+      "submittedText": "Submitted",
       "ratingRequiredText": "Please select a rating before you submit.",
       "dataSecurityNotice": "Your responses are anonymous and protected.",
       "successTitle": "Thank you",
@@ -347,7 +348,7 @@
     "iconName": "repeat",
     "subtitle": "Your action plan to stay safe from phishing",
     "texts": {
-      "title": "Action plan",
+      "title": "Action Plan",
       "subtitle": "Next time a suspicious email appears, you will do this:",
       "actionsTitle": "Your next steps"
     },
