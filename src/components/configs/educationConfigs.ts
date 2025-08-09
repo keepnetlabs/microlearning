@@ -1016,6 +1016,11 @@ export interface SummarySceneConfig {
         motivationalMessage?: string;
         downloadButton?: string;
         downloadingText?: string;
+        saveAndFinish?: string;
+        savingText?: string;
+        finishedText?: string;
+        finishErrorText?: string;
+        downloadedText?: string;
         urgentLabel?: string;
         pointsLabel?: string;
         timeLabel?: string;

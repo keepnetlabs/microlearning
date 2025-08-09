@@ -10,6 +10,7 @@ import {
   Sparkles,
   Star,
   Heart,
+  CheckCircle,
   LucideIcon
 } from "lucide-react";
 import * as LucideIcons from "lucide-react";
@@ -18,6 +19,7 @@ import { useState, useEffect } from "react";
 import { SummarySceneConfig } from "../configs/educationConfigs";
 import { FontWrapper } from "../common/FontWrapper";
 import { useIsMobile } from "../ui/use-mobile";
+  import { scormService } from "../../utils/scormService";
 interface SummarySceneProps {
   config: SummarySceneConfig;
   completionData?: {
@@ -29,8 +31,12 @@ interface SummarySceneProps {
 
 export function SummaryScene({ config, completionData }: SummarySceneProps) {
   const [showCertificate, setShowCertificate] = useState(false);
+  const [hasDownloadedCertificate, setHasDownloadedCertificate] = useState(false);
   const [showConfetti, setShowConfetti] = useState(true);
   const [celebrationPhase, setCelebrationPhase] = useState(0);
+  const [isFinishing, setIsFinishing] = useState(false);
+  const [isFinished, setIsFinished] = useState(false);
+  const [finishError, setFinishError] = useState<string | null>(null);
   const isMobile = useIsMobile();
   // Start celebration sequence
   useEffect(() => {
@@ -78,7 +84,46 @@ export function SummaryScene({ config, completionData }: SummarySceneProps) {
 
   const resources = config.resources || []
 
+  const tryCloseWindow = () => {
+    try { window.top && (window.top as Window).close && (window.top as Window).close(); } catch {}
+    try { window.opener && window.close(); } catch {}
+    try {
+      // Safari/Chrome workaround
+      const newWindow = window.open('', '_self');
+      if (newWindow) newWindow.close();
+      else window.close();
+    } catch {}
+  };
+
+  const handleSaveAndFinish = () => {
+    if (isFinishing || isFinished) return;
+    setFinishError(null);
+    setIsFinishing(true);
+    try {
+      if (scormService.isAvailable()) {
+        // Ensure pending time and data are committed before quitting
+        scormService.commit();
+        const ok = scormService.finish();
+        if (!ok) {
+          setFinishError(config.texts?.finishErrorText || 'Could not finish. Please close the window or try again.');
+        } else {
+          setIsFinished(true);
+        }
+      } else {
+        // Standalone mode: show finished state anyway
+        setIsFinished(true);
+      }
+    } catch (e) {
+      setFinishError(config.texts?.finishErrorText || 'Could not finish. Please close the window or try again.');
+    } finally {
+      setIsFinishing(false);
+      // Give LMS a brief moment, then attempt to close the window
+      setTimeout(tryCloseWindow, 300);
+    }
+  }
+
   const handleDownloadCertificate = () => {
+    if (hasDownloadedCertificate) return;
     setShowCertificate(true);
 
     // Generate certificate HTML
@@ -216,6 +261,7 @@ export function SummaryScene({ config, completionData }: SummarySceneProps) {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
     setShowCertificate(false);
+    setHasDownloadedCertificate(true);
   };
 
   // Confetti component
@@ -517,8 +563,8 @@ export function SummaryScene({ config, completionData }: SummarySceneProps) {
             ))}
           </motion.div>}
 
-          {/* Enhanced Certificate Download */}
-          <div className="flex justify-center">
+          {/* Save and Finish + Download Certificate link */}
+          <div className="flex flex-col items-center gap-2">
             <motion.button
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -528,11 +574,10 @@ export function SummaryScene({ config, completionData }: SummarySceneProps) {
                 boxShadow: "0 20px 40px rgba(59, 130, 246, 0.3)"
               }}
               whileTap={{ scale: 0.95 }}
-              onClick={handleDownloadCertificate}
-              disabled={showCertificate}
+              onClick={handleSaveAndFinish}
+              disabled={isFinishing}
               className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 glass-border-2 ${config.styling?.downloadButton?.gradientFrom || 'from-blue-500'} ${config.styling?.downloadButton?.gradientTo || 'to-indigo-600'} ${config.styling?.downloadButton?.textColor || 'text-white'} transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden`}
             >
-              {/* Button shimmer effect */}
               <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
                 animate={{ x: ['-100%', '200%'] }}
@@ -542,19 +587,45 @@ export function SummaryScene({ config, completionData }: SummarySceneProps) {
                   ease: "linear"
                 }}
               />
-
-              <Download size={16} className={`sm:w-5 sm:h-5 relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
-              <span className={`text-sm sm:text-base font-medium relative text-[#1C1C1E] dark:text-[#F2F2F7] z-10`}>
-                {showCertificate ? (config.texts?.downloadingText || "") : (config.texts?.downloadButton || "")}
+              <span className={`text-sm sm:text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7] inline-flex items-center gap-2`}>
+                <CheckCircle size={16} className={`relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
+                <span>
+                  {isFinishing
+                    ? (config.texts?.savingText || 'Saving…')
+                    : isFinished
+                      ? (config.texts?.finishedText || 'Saved. You can now close this window.')
+                      : (config.texts?.saveAndFinish || 'Save and Finish')}
+                </span>
               </span>
+            </motion.button>
+            {/* Accessible status for screen readers */}
+            <div aria-live="polite" className="sr-only">
+              {isFinishing ? (config.texts?.savingText || 'Saving…') : isFinished ? (config.texts?.finishedText || 'Saved. You can now close this window.') : ''}
+            </div>
+            {finishError && (
+              <div className="text-xs text-red-500 mt-2 text-center">
+                {finishError}
+              </div>
+            )}
 
-              {showCertificate && (
-                <motion.div
-                  className="absolute inset-0 bg-white/20"
-                  animate={{ x: ['-100%', '100%'] }}
-                  transition={{ duration: 1, repeat: Infinity }}
-                />
-              )}
+            <motion.button
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 1.0 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleDownloadCertificate}
+              disabled={showCertificate || hasDownloadedCertificate}
+              className={`inline-flex mt-6 sm:text-base items-center gap-2 text-sm underline disabled:opacity-70 disabled:cursor-not-allowed text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold`}
+            >
+              <Download size={16} className={`relative font-semibold z-10 ${hasDownloadedCertificate ? 'opacity-60' : ''} text-[#1C1C1E] dark:text-[#F2F2F7]`} />
+              <span className={`relative z-10`}>
+                {showCertificate
+                  ? (config.texts?.downloadingText || 'Downloading…')
+                  : hasDownloadedCertificate
+                    ? (config.texts?.downloadedText || 'Downloaded')
+                    : (config.texts?.downloadButton || 'Download certificate')}
+              </span>
             </motion.button>
           </div>
         </motion.div>
