@@ -16,6 +16,7 @@ import * as LucideIcons from "lucide-react";
 import { LucideIcon } from "lucide-react";
 import { FontWrapper } from "../common/FontWrapper";
 import { useIsMobile } from "../ui/use-mobile";
+import { CallToAction } from "../ui/CallToAction";
 import { BottomSheetComponent } from "../ui/bottom-sheet";
 import { useBottomSheet } from "../../hooks/useBottomSheet";
 
@@ -119,6 +120,7 @@ type Question =
 interface QuizSceneConfig {
   title?: string;
   subtitle?: string;
+  callToActionText?: string;
   difficulty?: {
     easy?: string;
     medium?: string;
@@ -2245,6 +2247,15 @@ export const QuizScene = React.memo(function QuizScene({
             )}
           </div>
         </motion.div>
+
+        {/* Call to Action */}
+        {config.callToActionText && (
+          <CallToAction 
+            text={config.callToActionText}
+            delay={0.8}
+          />
+        )}
+
       </div>
     </FontWrapper >
   );

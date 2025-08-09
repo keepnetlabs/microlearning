@@ -87,6 +87,7 @@
     "iconName": "target",
     "title": "Your Security Goal",
     "subtitle": "Next time you see a suspicious email, you will pause and report it",
+    "callToActionText": "Ready to build safer habits",
     "goals": [
       {
         "iconName": "alert-triangle",
@@ -118,6 +119,7 @@
     "iconName": "monitor-play",
     "title": "Real Phishing Story",
     "subtitle": "A DevOps Manager's costly mistake",
+    "callToActionText": "Learn from real-world examples",
     "key_message": ["Real case", "Spotting phishing", "Why reporting matters"],
     "video": {
       "src": "https://customer-0lll6yc8omc23rbm.cloudflarestream.com/5fdb12ff1436c991f50b698a02e2faa1/manifest/video.m3u8",
@@ -144,6 +146,7 @@
     "iconName": "mail-check",
     "title": "Practice Phishing Detection",
     "subtitle": "Check emails, spot threats, and report safely",
+    "callToActionText": "Master these essential security steps",
     "key_message": ["Check the email", "Don't click links", "Press Report"],
     "actions": [
       {
@@ -178,6 +181,7 @@
     "iconName": "brain",
     "title": "Test Your Knowledge",
     "subtitle": "Make the right decision when it matters most",
+    "callToActionText": "Put your security knowledge to the test",
     "key_message": [
       "Answer the questions",
       "Check your knowledge",
@@ -347,6 +351,7 @@
   "7": {
     "iconName": "repeat",
     "subtitle": "Your action plan to stay safe from phishing",
+    "callToActionText": "Reinforce your security habits",
     "texts": {
       "title": "Action Plan",
       "subtitle": "Next time a suspicious email appears, you will do this:",

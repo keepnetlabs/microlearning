@@ -4,6 +4,7 @@ import { LucideIcon } from "lucide-react";
 import { FontWrapper } from "../common/FontWrapper";
 import { useIsMobile } from "../ui/use-mobile";
 import { motion } from "framer-motion";
+import { CallToAction } from "../ui/CallToAction";
 // İkon mapping fonksiyonu
 const getIconComponent = (iconName: string): LucideIcon => {
   // İkon adını camelCase'e çevir (örn: "book-open" -> "BookOpen")
@@ -44,6 +45,7 @@ interface GoalSceneConfig {
   // Content props
   title?: string;
   subtitle?: string;
+  callToActionText?: string;
   goals?: GoalItem[];
 
   // Visual configuration
@@ -216,6 +218,15 @@ export const GoalScene = memo(({
             />
           ))}
         </section>
+
+        {/* Call to Action */}
+        {config.callToActionText && (
+          <CallToAction 
+            text={config.callToActionText}
+            delay={0.8}
+          />
+        )}
+
       </main>
     </FontWrapper>
   );

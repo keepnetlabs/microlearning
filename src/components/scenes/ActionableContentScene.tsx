@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import * as LucideIcons from "lucide-react";
 import { FontWrapper } from "../common/FontWrapper";
 import { useIsMobile } from "../ui/use-mobile";
+import { CallToAction } from "../ui/CallToAction";
 
 // Props interfaces
 interface ActionItem {
@@ -35,6 +36,7 @@ interface TipConfig {
 interface ActionableContentSceneConfig {
   title: string;
   subtitle: string;
+  callToActionText?: string;
   actions: ActionItem[];
 
   // Visual configuration
@@ -183,7 +185,7 @@ export function ActionableContentScene({
         </header>
 
         <section
-          className={`${finalCardSpacing} ${finalMaxWidth} pb-4 sm:pb-6`}
+          className={`${finalCardSpacing} ${finalMaxWidth}`}
           aria-label={ariaTexts?.actionCardsLabel || "Action cards"}
           aria-describedby="actionable-content-title"
         >
@@ -259,6 +261,15 @@ export function ActionableContentScene({
             })}
           </div>
         </section>
+
+        {/* Call to Action */}
+        {config.callToActionText && (
+          <CallToAction
+            text={config.callToActionText}
+            delay={0.8}
+          />
+        )}
+
       </main>
     </FontWrapper>
   );

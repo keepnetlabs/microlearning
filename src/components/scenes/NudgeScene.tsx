@@ -4,6 +4,7 @@ import * as LucideIcons from "lucide-react";
 import { NudgeSceneConfig } from "../configs/educationConfigs";
 import { FontWrapper } from "../common/FontWrapper";
 import { useIsMobile } from "../ui/use-mobile";
+import { CallToAction } from "../ui/CallToAction";
 
 interface NudgeSceneProps {
   config: NudgeSceneConfig;
@@ -77,6 +78,14 @@ export function NudgeScene({ config }: NudgeSceneProps) {
             </div>
           </div>
         </div>
+
+        {/* Call to Action */}
+        {config.callToActionText && (
+          <CallToAction
+            text={config.callToActionText}
+            delay={0.8}
+          />
+        )}
       </div>
     </FontWrapper>
   );

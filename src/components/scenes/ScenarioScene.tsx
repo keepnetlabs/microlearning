@@ -5,6 +5,7 @@ import { LucideIcon } from "lucide-react";
 import { VideoPlayer } from "../VideoPlayer";
 import { FontWrapper } from "../common/FontWrapper";
 import { useIsMobile } from "../ui/use-mobile";
+import { CallToAction } from "../ui/CallToAction";
 
 export interface TranscriptRow {
   start: number;
@@ -66,6 +67,7 @@ async function fetchTranscriptFromUrl(url: string): Promise<string> {
 interface ScenarioSceneConfig {
   title: string;
   subtitle: string;
+  callToActionText?: string;
   description: string;
   video: {
     src: string;
@@ -307,6 +309,15 @@ export function ScenarioScene({
               className="w-full"
             />
           </motion.section>
+        )}
+
+        {/* Call to Action */}
+        {config.callToActionText && (
+          <CallToAction
+            text={config.callToActionText}
+            className="mt-0 sm:mt-0"
+            delay={0.8}
+          />
         )}
 
       </main>

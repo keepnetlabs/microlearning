@@ -198,6 +198,7 @@ export interface NudgeSceneConfig {
         actionsTitle?: string;
         progressMessage?: string;
     };
+    callToActionText?: string;
     key_message?: string[];
     icon?: {
         name?: string;

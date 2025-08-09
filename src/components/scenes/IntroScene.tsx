@@ -4,6 +4,7 @@ import React, { ReactNode, useMemo, useCallback, useState, useEffect } from "rea
 import { LucideIcon, ClockIcon, ChartBarIcon } from "lucide-react"
 import { FontWrapper } from "../common/FontWrapper";
 import { useIsMobile } from "../ui/use-mobile";
+import { CallToAction } from "../ui/CallToAction";
 // İkon mapping fonksiyonu - useCallback ile optimize edildi
 const getIconComponent = (iconName: string): LucideIcon => {
   // İkon adını camelCase'e çevir (örn: "book-open" -> "BookOpen")
@@ -700,31 +701,13 @@ export const IntroScene = React.memo(({
       </motion.div>
 
       {/* Enhanced Call to Action */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{
-          opacity: isVisible ? 1 : 0,
-          scale: isVisible ? 1 : 0.8
-        }}
-        transition={{
-          delay: delays.cta,
-          type: "spring",
-          stiffness: 200
-        }}
-        className="mt-4 sm:mt-6 relative"
-      >
-        <motion.div
-          className="relative glass-border-1 flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-full overflow-hidden transition-all duration-500 ease-out group"
-          whileHover={{
-            scale: 1.05,
-            y: -2
-          }}
-        >
-          <div className="corner-top-left"></div>
-          <div className="corner-bottom-right"></div>
-          <span className="relative z-10 text-xs text-[#1C1C1E] dark:text-[#F2F2F7] font-medium">{callToActionText}</span>
-        </motion.div>
-      </motion.div>
+      {callToActionText && (
+        <CallToAction 
+          text={callToActionText}
+          isVisible={isVisible}
+          delay={delays.cta}
+        />
+      )}
     </FontWrapper>
   );
 });
