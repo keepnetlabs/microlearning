@@ -159,11 +159,15 @@ export function VideoPlayer({
 
     const firstRect = firstRow.getBoundingClientRect();
     const verticalPadding = 16; // padding top + bottom (8px each)
-    
+
     // Calculate available height in viewport
     const viewportHeight = window.innerHeight;
     const containerTop = container.getBoundingClientRect().top;
-    const availableHeight = viewportHeight - containerTop - 100; // Leave 100px buffer for other content
+    // Detect global CTA height on mobile only and subtract it; keep legacy bottom buffer on desktop
+    const ctaElement = document.getElementById('global-cta');
+    const ctaHeight = isMobile && ctaElement ? ctaElement.getBoundingClientRect().height : 0;
+    const bottomBuffer = isMobile ? 0 : 100;
+    const availableHeight = viewportHeight - containerTop - ctaHeight - bottomBuffer;
 
     let stride: number;
     if (secondRow) {
@@ -176,14 +180,15 @@ export function VideoPlayer({
 
     // Calculate maximum rows that can fit in available space
     const maxRowsFromHeight = Math.floor((availableHeight - verticalPadding) / stride);
-    
-    // Use minimum 3 rows for mobile, 4 for desktop, but allow more if space permits
+
+    // Restore legacy-like desktop behavior; keep improved mobile
     const minRows = isMobile ? 3 : 4;
-    const maxRows = Math.max(8, minRows); // Cap at 8 rows max
+    const maxRows = isMobile ? 12 : 8;
     const rowsToShow = Math.min(maxRows, Math.max(minRows, maxRowsFromHeight));
 
     const height = Math.ceil(firstRect.height + stride * (rowsToShow - 1) + verticalPadding);
-    setTranscriptContainerHeight(height);
+    const minHeightPx = isMobile ? 125 : 0; // desktop enforces no minimum so it can fit without scrolling
+    setTranscriptContainerHeight(Math.max(height, minHeightPx));
   }, [isMobile]);
 
   useEffect(() => {
