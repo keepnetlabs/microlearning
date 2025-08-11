@@ -5,10 +5,8 @@ import { Drawer as DrawerPrimitive } from "vaul";
 
 import { cn } from "./utils";
 
-function Drawer({
-  ...props
-}: React.ComponentProps<typeof DrawerPrimitive.Root>) {
-  return <DrawerPrimitive.Root data-slot="drawer" {...props} />;
+function Drawer({ dataTestId, reducedMotion, ...props }: React.ComponentProps<typeof DrawerPrimitive.Root> & { dataTestId?: string; reducedMotion?: boolean }) {
+  return <DrawerPrimitive.Root data-slot="drawer" data-testid={dataTestId} data-reduced-motion={reducedMotion ? 'true' : undefined} {...props} />;
 }
 
 function DrawerTrigger({
@@ -31,13 +29,14 @@ function DrawerClose({
 
 function DrawerOverlay({
   className,
+  reducedMotion,
   ...props
-}: React.ComponentProps<typeof DrawerPrimitive.Overlay>) {
+}: React.ComponentProps<typeof DrawerPrimitive.Overlay> & { reducedMotion?: boolean }) {
   return (
     <DrawerPrimitive.Overlay
       data-slot="drawer-overlay"
       className={cn(
-        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50",
+        reducedMotion ? "fixed inset-0 z-50 bg-black/50" : "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50",
         className,
       )}
       {...props}
@@ -48,13 +47,16 @@ function DrawerOverlay({
 function DrawerContent({
   className,
   children,
+  reducedMotion,
+  dataTestId,
   ...props
-}: React.ComponentProps<typeof DrawerPrimitive.Content>) {
+}: React.ComponentProps<typeof DrawerPrimitive.Content> & { reducedMotion?: boolean; dataTestId?: string }) {
   return (
     <DrawerPortal data-slot="drawer-portal">
-      <DrawerOverlay />
+      <DrawerOverlay reducedMotion={reducedMotion} />
       <DrawerPrimitive.Content
         data-slot="drawer-content"
+        data-testid={dataTestId}
         className={cn(
           "group/drawer-content bg-background fixed z-50 flex h-auto flex-col",
           "data-[vaul-drawer-direction=top]:inset-x-0 data-[vaul-drawer-direction=top]:top-0 data-[vaul-drawer-direction=top]:mb-24 data-[vaul-drawer-direction=top]:max-h-[80vh] data-[vaul-drawer-direction=top]:rounded-b-lg data-[vaul-drawer-direction=top]:border-b",

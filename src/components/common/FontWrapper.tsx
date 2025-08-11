@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { useFontFamilyContext } from '../../contexts/FontFamilyContext';
 
-interface FontWrapperProps {
+interface FontWrapperProps extends React.HTMLAttributes<HTMLDivElement> {
     children: ReactNode;
     variant?: 'primary' | 'secondary' | 'monospace';
     className?: string;
@@ -12,7 +12,8 @@ export const FontWrapper: React.FC<FontWrapperProps> = ({
     children,
     variant = 'primary',
     className = '',
-    style = {}
+    style = {},
+    ...rest
 }) => {
     const { fontStyles } = useFontFamilyContext();
 
@@ -22,7 +23,7 @@ export const FontWrapper: React.FC<FontWrapperProps> = ({
     };
 
     return (
-        <div className={className} style={combinedStyle}>
+        <div className={className} style={combinedStyle} {...rest}>
             {children}
         </div>
     );

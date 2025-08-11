@@ -126,26 +126,21 @@ export const detectBrowserLanguage = () => {
 
 // Custom hook for mobile detection
 export const useIsMobile = () => {
-    const [isMobile, setIsMobile] = React.useState(() => {
-        // Provide immediate initial value to prevent flickering
-        if (typeof window !== 'undefined') {
-            return window.innerWidth < 768;
-        }
-        return false;
-    });
+    const MOBILE_BREAKPOINT = 768;
+    const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined);
 
     React.useEffect(() => {
-        const checkIsMobile = () => {
-            setIsMobile(window.innerWidth < 768);
+        const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
+        const onChange = () => {
+            setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
         };
-
-        checkIsMobile();
-        window.addEventListener('resize', checkIsMobile);
-
-        return () => window.removeEventListener('resize', checkIsMobile);
+        mql.addEventListener("change", onChange);
+        // initialize immediately
+        onChange();
+        return () => mql.removeEventListener("change", onChange);
     }, []);
 
-    return isMobile;
+    return !!isMobile;
 };
 
 // Complete list of supported languages

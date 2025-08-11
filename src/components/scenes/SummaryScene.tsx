@@ -19,7 +19,7 @@ import { useState, useEffect } from "react";
 import { SummarySceneConfig } from "../configs/educationConfigs";
 import { FontWrapper } from "../common/FontWrapper";
 import { useIsMobile } from "../ui/use-mobile";
-  import { scormService } from "../../utils/scormService";
+import { scormService } from "../../utils/scormService";
 interface SummarySceneProps {
   config: SummarySceneConfig;
   completionData?: {
@@ -29,7 +29,7 @@ interface SummarySceneProps {
   };
 }
 
-export function SummaryScene({ config, completionData }: SummarySceneProps) {
+export function SummaryScene({ config, completionData, sceneId, reducedMotion, disableDelays }: SummarySceneProps & { sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean }) {
   const [showCertificate, setShowCertificate] = useState(false);
   const [hasDownloadedCertificate, setHasDownloadedCertificate] = useState(false);
   const [showConfetti, setShowConfetti] = useState(true);
@@ -47,10 +47,14 @@ export function SummaryScene({ config, completionData }: SummarySceneProps) {
       () => setShowConfetti(false)  // End confetti
     ];
 
+    if (disableDelays) {
+      celebrations.forEach((c) => c());
+      return;
+    }
     celebrations.forEach((celebration, index) => {
       setTimeout(celebration, index * 1000);
     });
-  }, []);
+  }, [disableDelays]);
 
   // Dinamik icon mapping function (diğer componentlerle aynı)
   const getIconComponent = (iconName?: string): LucideIcon => {
@@ -85,14 +89,14 @@ export function SummaryScene({ config, completionData }: SummarySceneProps) {
   const resources = config.resources || []
 
   const tryCloseWindow = () => {
-    try { window.top && (window.top as Window).close && (window.top as Window).close(); } catch {}
-    try { window.opener && window.close(); } catch {}
+    try { window.top && (window.top as Window).close && (window.top as Window).close(); } catch { }
+    try { window.opener && window.close(); } catch { }
     try {
       // Safari/Chrome workaround
       const newWindow = window.open('', '_self');
       if (newWindow) newWindow.close();
       else window.close();
-    } catch {}
+    } catch { }
   };
 
   const handleSaveAndFinish = () => {
@@ -300,7 +304,7 @@ export function SummaryScene({ config, completionData }: SummarySceneProps) {
 
   return (
     <FontWrapper>
-      <div className={`flex flex-col items-center justify-start h-full px-4 py-2 sm:px-6 overflow-y-auto relative`}>
+      <div className={`flex flex-col items-center justify-start h-full px-4 py-2 sm:px-6 overflow-y-auto relative`} data-scene-type={(config as any)?.scene_type || 'summary'} data-scene-id={sceneId as any} data-testid="scene-summary">
         {/* Confetti Animation */}
         <AnimatePresence>
           {showConfetti && (
@@ -370,7 +374,7 @@ export function SummaryScene({ config, completionData }: SummarySceneProps) {
         <motion.div
           initial={{ opacity: isMobile ? 1 : 0, scale: isMobile ? 1 : 0.8, y: isMobile ? 0 : -20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={!isMobile ? { duration: 0.8, ease: "easeOut" } : {}}
+          transition={!isMobile ? { duration: reducedMotion ? 0 : 0.8, ease: "easeOut" } : {}}
           className="text-center mb-3 sm:mb-4 relative z-50"
         >
           {/* Success Icon with Enhanced Effects */}
@@ -577,6 +581,7 @@ export function SummaryScene({ config, completionData }: SummarySceneProps) {
               onClick={handleSaveAndFinish}
               disabled={isFinishing || isFinished}
               className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 glass-border-2 ${config.styling?.downloadButton?.gradientFrom || 'from-blue-500'} ${config.styling?.downloadButton?.gradientTo || 'to-indigo-600'} ${config.styling?.downloadButton?.textColor || 'text-white'} transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden`}
+              data-testid="btn-save-finish"
             >
               <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
@@ -617,6 +622,7 @@ export function SummaryScene({ config, completionData }: SummarySceneProps) {
               onClick={handleDownloadCertificate}
               disabled={showCertificate || hasDownloadedCertificate}
               className={`inline-flex mt-6 sm:text-base items-center gap-2 text-sm underline disabled:opacity-70 disabled:cursor-not-allowed text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold`}
+              data-testid="btn-download-certificate"
             >
               <Download size={16} className={`relative font-semibold z-10 ${hasDownloadedCertificate ? 'opacity-60' : ''} text-[#1C1C1E] dark:text-[#F2F2F7]`} />
               <span className={`relative z-10`}>

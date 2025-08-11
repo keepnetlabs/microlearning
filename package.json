@@ -61,6 +61,7 @@
     "web-vitals": "^3.5.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.54.2",
     "@types/jest": "^29.5.0",
     "autoprefixer": "^10.4.16",
     "cross-env": "^10.0.0",
@@ -72,7 +73,10 @@
     "build": "set \"GENERATE_SOURCEMAP=false\" && react-scripts build",
     "build:analyze": "set \"GENERATE_SOURCEMAP=false\" && npm run build && npx serve -s build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "e2e": "playwright test -c playwright.config.ts",
+    "e2e:safari": "playwright test -c playwright.config.ts --project=webkit-desktop",
+    "e2e:iphone": "playwright test -c playwright.config.ts --project=webkit-iphone"
   },
   "eslintConfig": {
     "extends": [

@@ -7,9 +7,10 @@ interface NavButtonProps {
   disabled?: boolean;
   label?: string;
   isDarkMode?: boolean;
+  dataTestId?: string;
 }
 
-export function NavButton({ direction, onClick, disabled, label, isDarkMode = false }: NavButtonProps) {
+export function NavButton({ direction, onClick, disabled, label, isDarkMode = false, dataTestId }: NavButtonProps) {
   const Icon = direction === "prev" ? ChevronLeft : ChevronRight;
 
   return (
@@ -38,6 +39,7 @@ export function NavButton({ direction, onClick, disabled, label, isDarkMode = fa
       }}
       aria-label={label || `${direction === "prev" ? "Önceki" : "Sonraki"} bölüm`}
       type="button"
+      data-testid={dataTestId}
     >
 
       {/* Icon container - Fixed position, no animation */}

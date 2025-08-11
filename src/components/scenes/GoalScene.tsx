@@ -130,8 +130,10 @@ GoalCard.displayName = 'GoalCard';
 
 export const GoalScene = memo(({
   config,
-  onNextSlide
-}: { config: GoalSceneConfig; onNextSlide?: () => void; }) => {
+  onNextSlide,
+  sceneId,
+  reducedMotion
+}: { config: GoalSceneConfig; onNextSlide?: () => void; sceneId?: string | number; reducedMotion?: boolean; }) => {
 
   // Default values for removed config properties
   const defaultContainerClassName = "flex flex-col items-center justify-center h-full text-center px-6";
@@ -180,6 +182,9 @@ export const GoalScene = memo(({
         className={containerClassName}
         role="main"
         aria-labelledby="goal-scene-title"
+        data-scene-type={(config as any)?.scene_type || 'goal'}
+        data-scene-id={sceneId as any}
+        data-testid="scene-goal"
       >
         {!isMobile && (
           <div className="mb-1 sm:mb-2 p-3 glass-border-3 relative">
@@ -198,7 +203,7 @@ export const GoalScene = memo(({
             id="scenario-scene-subtitle"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            transition={{ duration: reducedMotion ? 0 : 0.6, delay: reducedMotion ? 0 : 0.3 }}
             className="project-subtitle"
             aria-label="Subtitle"
           >
@@ -210,24 +215,28 @@ export const GoalScene = memo(({
         <section
           className={containerClass}
           aria-label="Training Goals"
+          data-testid="goal-list"
         >
           {memoizedGoals.map((goal, index) => (
             <GoalCard
               key={`${goal.title}-${index}`}
               goal={goal}
               index={index}
+              data-testid={`goal-card-${index}` as any}
             />
           ))}
         </section>
 
         {/* Call to Action */}
         {config.callToActionText && (
-          <CallToAction 
+          <CallToAction
             text={typeof config.callToActionText === 'string' ? config.callToActionText : undefined}
             mobileText={typeof config.callToActionText === 'object' ? config.callToActionText.mobile : undefined}
             desktopText={typeof config.callToActionText === 'object' ? config.callToActionText.desktop : undefined}
             delay={0.8}
             onClick={onNextSlide}
+            dataTestId="cta-goal"
+            reducedMotion={reducedMotion}
           />
         )}
 

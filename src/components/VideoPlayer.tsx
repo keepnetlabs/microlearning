@@ -53,6 +53,8 @@ interface VideoPlayerProps {
     transcriptTextLabel?: string;
     lockedLabel?: string;
   };
+  dataTestId?: string;
+  reducedMotion?: boolean;
 }
 function parseTactiqTranscript(raw: string): TranscriptRow[] {
   if (!raw || typeof raw !== "string") {
@@ -106,6 +108,8 @@ export function VideoPlayer({
   showTranscript = true,
   transcriptTitle = "Video Transkripti",
   ariaTexts,
+  dataTestId,
+  reducedMotion = false,
 }: VideoPlayerProps) {
   const videoRef = useRef<VideoWithLastTime>(null);
   const playerRef = useRef<Plyr | null>(null);
@@ -521,6 +525,7 @@ export function VideoPlayer({
       role="main"
       aria-label={ariaTexts?.mainLabel || "Video Player"}
       aria-describedby="video-player-description"
+      data-testid={dataTestId}
     >
       <div
         id="video-player-description"
@@ -565,8 +570,8 @@ export function VideoPlayer({
             onClick={() =>
               setIsTranscriptOpen(!isTranscriptOpen)
             }
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={reducedMotion ? undefined : { scale: 1.05 }}
+            whileTap={reducedMotion ? undefined : { scale: 0.95 }}
             className="absolute top-4 right-4 z-20 overflow-hidden transition-all duration-300"
             style={toggleButtonStyle}
             title={
@@ -597,16 +602,16 @@ export function VideoPlayer({
         {isVideoEnded && !isIOS && (
           <motion.button
             onClick={handleReplay}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={reducedMotion ? undefined : { scale: 1.05 }}
+            whileTap={reducedMotion ? undefined : { scale: 0.95 }}
             className="absolute top-4 left-4 z-20 overflow-hidden transition-all duration-300"
             style={toggleButtonStyle}
             title="Videoyu Baştan Oynat"
             aria-label={ariaTexts?.replayLabel || "Replay video from beginning"}
             disabled={isReplaying}
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: reducedMotion ? 1 : 0, scale: reducedMotion ? 1 : 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: reducedMotion ? 0 : 0.3 }}
             tabIndex={0}
             onKeyDown={(e) => {
               if ((e.key === 'Enter' || e.key === ' ') && !isReplaying) {
@@ -632,7 +637,7 @@ export function VideoPlayer({
             y: isTranscriptOpen ? 0 : 20,
             height: isTranscriptOpen ? "auto" : 0,
           }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
+          transition={{ duration: reducedMotion ? 0 : 0.3, ease: "easeOut" }}
           className="relative overflow-hidden glass-border-2"
           style={{
             display: isTranscriptOpen ? "block" : "none",
@@ -699,11 +704,11 @@ export function VideoPlayer({
                     onClick={() =>
                       handleTranscriptRowClick(row.start, index)
                     }
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: reducedMotion ? 1 : 0, y: reducedMotion ? 0 : 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{
-                      delay: index * 0.02,
-                      duration: 0.2,
+                      delay: reducedMotion ? 0 : index * 0.02,
+                      duration: reducedMotion ? 0 : 0.2,
                     }}
                     whileHover={isActive ? {
                       backgroundColor: "rgba(226, 232, 240, 0.3)",

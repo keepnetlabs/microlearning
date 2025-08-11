@@ -90,8 +90,10 @@ const getIconComponent = (iconName: string): LucideIcon => {
 
 export function ActionableContentScene({
   config,
-  onNextSlide
-}: ActionableContentSceneProps & { onNextSlide?: () => void; }) {
+  onNextSlide,
+  sceneId,
+  reducedMotion
+}: ActionableContentSceneProps & { onNextSlide?: () => void; sceneId?: string | number; reducedMotion?: boolean; }) {
   // Default values for container classes
   const defaultContainerClassName = "flex flex-col items-center justify-start min-h-full px-2 sm:px-6 overflow-y-auto";
 
@@ -157,6 +159,9 @@ export function ActionableContentScene({
         role="main"
         aria-label={ariaTexts?.mainLabel || "Actionable Content"}
         aria-describedby="actionable-content-description"
+        data-scene-type={(config as any)?.scene_type || 'actionable_content'}
+        data-scene-id={sceneId as any}
+        data-testid="scene-actionable"
       >
         <div
           id="actionable-content-description"
@@ -208,6 +213,7 @@ export function ActionableContentScene({
                   aria-labelledby={`${cardId}-title`}
                   aria-describedby={`${cardId}-description ${tipId}`}
                   className={`relative p-5 glass-border-2 transition-all duration-300 hover:scale-105`}
+                  data-testid={`action-card-${index}`}
                   tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -271,6 +277,7 @@ export function ActionableContentScene({
             desktopText={typeof config.callToActionText === 'object' ? config.callToActionText.desktop : undefined}
             delay={0.8}
             onClick={onNextSlide}
+            dataTestId="cta-actionable"
           />
         )}
 

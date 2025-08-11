@@ -109,8 +109,11 @@ interface ScenarioSceneProps {
 
 export function ScenarioScene({
   config,
-  onNextSlide
-}: ScenarioSceneProps & { onNextSlide?: () => void; }) {
+  onNextSlide,
+  sceneId,
+  reducedMotion,
+  disableDelays
+}: ScenarioSceneProps & { onNextSlide?: () => void; sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean; }) {
   // Default values for container classes
   const defaultContainerClassName = "flex flex-col items-center justify-start h-full px-4 sm:px-6 overflow-y-auto";
   const defaultVideoContainerClassName = "w-full max-w-sm sm:max-w-md lg:max-w-lg mb-2 sm:mb-4";
@@ -203,12 +206,15 @@ export function ScenarioScene({
         aria-labelledby="scenario-scene-title"
         aria-describedby="scenario-scene-description"
         aria-label={config.ariaTexts?.mainLabel || "Scenario Scene"}
+        data-scene-type={config as any ? (config as any).scene_type || 'scenario' : 'scenario'}
+        data-scene-id={sceneId as any}
+        data-testid="scene-scenario"
       >
         {/* Header Icon */}
         {!isMobile && (<motion.div
           initial={{ opacity: 0, scale: 0.8, y: -20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          transition={{ duration: reducedMotion ? 0 : 0.8, ease: "easeOut" }}
           className="mb-1 sm:mb-2 p-3 glass-border-3"
           aria-hidden="true"
         >
@@ -220,7 +226,7 @@ export function ScenarioScene({
           id="scenario-scene-title"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          transition={{ duration: reducedMotion ? 0 : 0.8, delay: reducedMotion ? 0 : 0.2 }}
           className="project-title"
         >
           {config.title}
@@ -231,7 +237,7 @@ export function ScenarioScene({
             id="scenario-scene-subtitle"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            transition={{ duration: reducedMotion ? 0 : 0.6, delay: reducedMotion ? 0 : 0.3 }}
             className="project-subtitle"
             aria-label="Subtitle"
           >
@@ -245,7 +251,7 @@ export function ScenarioScene({
             id="scenario-scene-description"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
+            transition={{ duration: reducedMotion ? 0 : 0.8, delay: reducedMotion ? 0 : 0.3 }}
             className="text-base text-[#1C1C1E] dark:text-[#F2F2F7] text-center mb-4"
           >
             {config.description}
@@ -299,6 +305,7 @@ export function ScenarioScene({
             className={config.videoContainerClassName || defaultVideoContainerClassName}
             role="region"
             aria-label={config.ariaTexts?.videoPlayerLabel || "Video Player"}
+            data-testid="scenario-video-section"
           >
             <VideoPlayer
               src={config.video.src}
@@ -308,6 +315,7 @@ export function ScenarioScene({
               showTranscript={config.video.showTranscript}
               transcriptTitle={config.video.transcriptTitle}
               className="w-full"
+              data-testid="scenario-video"
             />
           </motion.section>
         )}
@@ -321,6 +329,7 @@ export function ScenarioScene({
             className="mt-0 sm:mt-0"
             delay={0.8}
             onClick={onNextSlide}
+            dataTestId="cta-scenario"
           />
         )}
 

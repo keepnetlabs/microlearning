@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, MotionConfig } from "framer-motion";
 import { Toaster } from "./components/ui/sonner";
 import { createPortal } from "react-dom";
 import { ProgressBar } from "./components/ProgressBar";
@@ -21,7 +21,7 @@ import { FontFamilyProvider } from "./contexts/FontFamilyContext";
 import { scormService, destroySCORMService } from "./utils/scormService";
 
 // Computes a clean, responsive className for the header logo
-function getHeaderLogoClassName(isMobile: boolean, isFirstOrLastScene: boolean): string {
+export function getHeaderLogoClassName(isMobile: boolean, isFirstOrLastScene: boolean): string {
   const baseLogoClasses = "relative z-10 h-8 sm:h-10 md:h-14 w-full object-contain md:w-auto p-1.5 sm:p-2";
   const maxWidthClass = isMobile ? (isFirstOrLastScene ? "max-w-[88px]" : "max-w-[56px]") : "";
   return `${baseLogoClasses} ${maxWidthClass}`.trim();
@@ -100,10 +100,24 @@ const MemoizedSurveyScene = React.memo(SurveyScene);
 const MemoizedNudgeScene = React.memo(NudgeScene);
 const MemoizedSummaryScene = React.memo(SummaryScene);
 
-export default function App() {
+interface AppProps {
+  initialScene?: number;
+  testOverrides?: {
+    isMobile?: boolean;
+    isDarkMode?: boolean;
+    disableAnimations?: boolean;
+    disableDelays?: boolean;
+    isIOS?: boolean;
+    portalContainer?: Element;
+    language?: string;
+  };
+}
+
+export default function App(props: AppProps = {}) {
+  const { initialScene, testOverrides } = props;
   // Dinamik appConfig state'i - ileride API'den gelecek
   const [appConfig, setAppConfig] = useState(() => {
-    const detectedLanguage = detectBrowserLanguage();
+    const detectedLanguage = testOverrides?.language ?? detectBrowserLanguage();
     return loadAppConfig(detectedLanguage);
   });
 
@@ -372,9 +386,9 @@ export default function App() {
     progressLabel: themeConfig.texts?.progressLabel,
     ariaLabel: 'Training progress'
   }), [themeConfig.texts]);
-  const [currentScene, setCurrentScene] = useState(0);
+  const [currentScene, setCurrentScene] = useState(initialScene ?? 0);
   const [direction, setDirection] = useState(0);
-  const [selectedLanguage, setSelectedLanguage] = useState(() => detectBrowserLanguage());
+  const [selectedLanguage, setSelectedLanguage] = useState(() => testOverrides?.language ?? detectBrowserLanguage());
 
   // Dil değişikliği handler'ı - appConfig'i günceller
   const handleLanguageChange = useCallback((newLanguage: string) => {
@@ -448,7 +462,7 @@ export default function App() {
 
   // Survey feedback submission state
   const [isSurveySubmitted, setIsSurveySubmitted] = useState(false);
-  
+
   // Survey form state - persistent across scene changes
   const [surveyState, setSurveyState] = useState({
     rating: 0,
@@ -463,12 +477,14 @@ export default function App() {
   const [sceneTimeSpent, setSceneTimeSpent] = useState<Map<number, number>>(new Map());
 
   // Mobile detection
-  const isMobile = useIsMobile();
+  const detectedIsMobile = useIsMobile();
+  const isMobile = testOverrides?.isMobile ?? detectedIsMobile;
 
-  // iOS detection
+  // iOS detection (overridable for tests)
   const isIOS = useMemo(() => {
+    if (testOverrides?.isIOS !== undefined) return testOverrides.isIOS;
     return /iPad|iPhone|iPod/.test(navigator.userAgent);
-  }, []);
+  }, [testOverrides?.isIOS]);
 
   // Mobile swipe gesture support - ONLY FOR MOBILE
   const touchStartX = useRef<number>(0);
@@ -479,6 +495,9 @@ export default function App() {
 
   // Dark mode state - Light mode is now primary/default
   const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (testOverrides?.isDarkMode !== undefined) {
+      return testOverrides.isDarkMode;
+    }
     if (typeof window !== 'undefined') {
       const savedTheme = localStorage.getItem('theme-preference');
       if (savedTheme) {
@@ -489,6 +508,13 @@ export default function App() {
     }
     return false;
   });
+
+  // Keep isDarkMode in sync with test override if provided
+  useEffect(() => {
+    if (testOverrides?.isDarkMode !== undefined) {
+      setIsDarkMode(testOverrides.isDarkMode);
+    }
+  }, [testOverrides?.isDarkMode]);
 
   // Refs for scroll container and parallax background
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -673,8 +699,8 @@ export default function App() {
       hintTimerRef.current = setTimeout(() => {
         setShowQuizCompletionHint(false);
         hintTimerRef.current = null;
-      }, 2000);
-      
+      }, testOverrides?.disableDelays ? 0 : 2000);
+
       // Return cleanup function only for this specific timer
       return () => {
         if (hintTimerRef.current) {
@@ -864,7 +890,7 @@ export default function App() {
           setVisitedScenes(prev => new Set([...prev, newScene]));
           awardPoints(currentScene);
           setIsLoading(false);
-        }, 100); // Reduced from 250ms to 100ms
+        }, testOverrides?.disableDelays ? 0 : 100); // Reduced from 250ms to 100ms
       }
       if (scormService.isAvailable()) {
         scormService.saveMicrolearningProgress(currentScene + 1, { quizCompleted }, totalPoints || 0, scenes.length);
@@ -887,7 +913,7 @@ export default function App() {
           setDirection(-1);
           setCurrentScene(newScene);
           setIsLoading(false);
-        }, 100); // Reduced from 250ms to 100ms
+        }, testOverrides?.disableDelays ? 0 : 100); // Reduced from 250ms to 100ms
       }
       // Save SCORM progress on backward navigation as well
       if (scormService.isAvailable()) {
@@ -968,7 +994,7 @@ export default function App() {
       setShowSurveySubmittedNotification(false);
       nextScene();
       surveyToastTimeoutRef.current = null;
-    }, 2000);
+    }, testOverrides?.disableDelays ? 0 : 2000);
   }, [nextScene]);
 
   // Mobile swipe gesture handlers - ONLY FOR MOBILE
@@ -1063,724 +1089,776 @@ export default function App() {
     })
   };
 
+  const shouldAnimate = !(testOverrides?.disableAnimations);
+  const slideTransition = useMemo(() => ({
+    x: {
+      type: isMobile ? 'tween' : 'spring',
+      duration: shouldAnimate ? (isMobile ? 0.2 : MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.DESKTOP) : 0,
+      ease: 'easeOut',
+      stiffness: shouldAnimate && !isMobile ? 300 : undefined,
+      damping: shouldAnimate && !isMobile ? 25 : undefined
+    },
+    opacity: {
+      duration: shouldAnimate ? (isMobile ? 0.1 : MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.SCALE) : 0,
+      ease: 'easeOut'
+    },
+    scale: {
+      duration: shouldAnimate ? (isMobile ? 0.1 : MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.SCALE) : 0,
+      ease: 'easeOut'
+    }
+  }), [isMobile, shouldAnimate]);
+
+  const portalTarget = testOverrides?.portalContainer ?? document.body;
+  const reducedMotionSetting = testOverrides?.disableAnimations ? "always" : "user";
+  const reducedMotionBool = !!testOverrides?.disableAnimations;
+  const disableDelaysBool = !!testOverrides?.disableDelays;
+
   return (
-    <FontFamilyProvider fontFamilyConfig={themeConfig.fontFamily}>
-      <div
-        className={cssClasses.mainContainer}
-        style={{
-          // Hardware acceleration for better mobile performance
-          transform: 'translateZ(0)',
-          willChange: 'transform',
-          ...fontStyles.primary
-        }}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        role="application"
-        aria-label={appConfig.theme?.ariaTexts?.appLabel || "Cyber Security Training Application"}
-        aria-describedby="app-description"
-      >
-        {/* Hidden description for screen readers */}
-        <div id="app-description" className="sr-only">
-          {appConfig.theme?.ariaTexts?.appDescription || "Interactive cyber security training application with multiple learning modules and progress tracking"}
-        </div>
-        {/* Loading Overlay - Only show on desktop */}
-        <AnimatePresence>
-          {isLoading && !isMobile && (
+    <MotionConfig reducedMotion={reducedMotionSetting}>
+      <FontFamilyProvider fontFamilyConfig={themeConfig.fontFamily}>
+        <div
+          className={cssClasses.mainContainer}
+          style={{
+            // Hardware acceleration for better mobile performance
+            transform: 'translateZ(0)',
+            willChange: 'transform',
+            ...fontStyles.primary
+          }}
+          data-testid="app-root"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          role="application"
+          aria-label={appConfig.theme?.ariaTexts?.appLabel || "Cyber Security Training Application"}
+          aria-describedby="app-description"
+        >
+          {/* Hidden description for screen readers */}
+          <div id="app-description" className="sr-only">
+            {appConfig.theme?.ariaTexts?.appDescription || "Interactive cyber security training application with multiple learning modules and progress tracking"}
+          </div>
+          {/* Loading Overlay - Only show on desktop */}
+          <AnimatePresence>
+            {isLoading && !isMobile && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className={cssClasses.loadingOverlay}
+                role="status"
+                aria-live="polite"
+                aria-label={appConfig.theme?.ariaTexts?.loadingLabel || "Loading content"}
+              >
+                <div className={cssClasses.loadingContainer}>
+                  <Loader2 size={20} className={cssClasses.loadingSpinner} aria-hidden="true" />
+                  <span className={cssClasses.loadingText}>
+                    {themeConfig.texts?.loading}
+                  </span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Optimized background - Disabled on mobile for performance */}
+          {!isMobile && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className={cssClasses.loadingOverlay}
-              role="status"
-              aria-live="polite"
-              aria-label={appConfig.theme?.ariaTexts?.loadingLabel || "Loading content"}
+              className={cssClasses.backgroundContainer}
+              style={{
+                transform: `translateY(${scrollY * 0.3}px)`,
+                transition: 'transform 0.1s ease-out'
+              }}
+              aria-hidden="true"
             >
-              <div className={cssClasses.loadingContainer}>
-                <Loader2 size={20} className={cssClasses.loadingSpinner} aria-hidden="true" />
-                <span className={cssClasses.loadingText}>
-                  {themeConfig.texts?.loading}
-                </span>
-              </div>
+              {/* Simplified background elements for better performance */}
+              <motion.div
+                className="absolute top-1/2 left-1/2 w-6 h-6 bg-blue-200/15 dark:bg-blue-700/10 rounded-full blur-sm"
+                style={{
+                  transform: `translateY(${scrollY * 0.6}px)`
+                }}
+                aria-hidden="true"
+              />
+
+              <motion.div
+                className="absolute top-2/3 right-1/3 w-4 h-4 bg-purple-200/12 dark:bg-purple-700/8 rounded-full blur-sm"
+                style={{
+                  transform: `translateY(${scrollY * -0.35}px)`
+                }}
+                aria-hidden="true"
+              />
             </motion.div>
           )}
-        </AnimatePresence>
 
-        {/* Optimized background - Disabled on mobile for performance */}
-        {!isMobile && (
-          <motion.div
-            className={cssClasses.backgroundContainer}
-            style={{
-              transform: `translateY(${scrollY * 0.3}px)`,
-              transition: 'transform 0.1s ease-out'
-            }}
-            aria-hidden="true"
+          {/* Optimized Mobile Header - Enhanced dark mode contrast */}
+          <header
+            className={`${cssClasses.headerContainer} ${isIOS && currentScene >= 4 ? 'pt-2.5' : ''}`}
+            role="banner"
+            aria-label={appConfig.theme?.ariaTexts?.headerLabel || "Application header"}
           >
-            {/* Simplified background elements for better performance */}
-            <motion.div
-              className="absolute top-1/2 left-1/2 w-6 h-6 bg-blue-200/15 dark:bg-blue-700/10 rounded-full blur-sm"
-              style={{
-                transform: `translateY(${scrollY * 0.6}px)`
-              }}
-              aria-hidden="true"
-            />
-
-            <motion.div
-              className="absolute top-2/3 right-1/3 w-4 h-4 bg-purple-200/12 dark:bg-purple-700/8 rounded-full blur-sm"
-              style={{
-                transform: `translateY(${scrollY * -0.35}px)`
-              }}
-              aria-hidden="true"
-            />
-          </motion.div>
-        )}
-
-        {/* Optimized Mobile Header - Enhanced dark mode contrast */}
-        <header
-          className={`${cssClasses.headerContainer} ${isIOS && currentScene >= 4 ? 'pt-2.5' : ''}`}
-          role="banner"
-          aria-label={appConfig.theme?.ariaTexts?.headerLabel || "Application header"}
-        >
-          <div className={cssClasses.headerContent}>
-            {/* Header Layout - Logo Left, Progress Center, Controls Right */}
-            <div className="flex items-center justify-between">
-              {/* Left - Logo */}
-              <div className="flex items-center justify-center" role="banner">
-                <motion.div
-                  className="relative flex items-center group"
-                  whileHover={{ scale: 1.02, y: -1 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {/* Cam Panel */}
-                  <div
-                    className={`relative bg-transparent glass-border-${isMobile ? 4 : 2}`}
-                    style={{
-                      filter: "drop-shadow(-8px - 10px 46px #000)"
-                    }}
+            <div className={cssClasses.headerContent}>
+              {/* Header Layout - Logo Left, Progress Center, Controls Right */}
+              <div className="flex items-center justify-between">
+                {/* Left - Logo */}
+                <div className="flex items-center justify-center" role="banner">
+                  <motion.div
+                    className="relative flex items-center group"
+                    whileHover={{ scale: 1.02, y: -1 }}
+                    transition={{ duration: 0.2 }}
                   >
-                    <div className="corner-top-left"></div>
-                    <div className="corner-bottom-right"></div>
-                    <img
-                      key={logoSrc + getHeaderLogoClassName(isMobile, isFirstOrLastScene)}
-                      src={isMobile && isFirstOrLastScene ?
-                        (isDarkMode ? (themeConfig?.logo?.darkSrc ?? themeConfig?.logo?.src ?? '') : (themeConfig?.logo?.src ?? '')) :
-                        logoSrc}
-                      alt={themeConfig.logo?.alt || "Application Logo"}
-                      aria-label={appConfig.theme?.ariaTexts?.logoLabel || "Application logo"}
-                      className={getHeaderLogoClassName(isMobile, isFirstOrLastScene)}
+                    {/* Cam Panel */}
+                    <div
+                      className={`relative bg-transparent glass-border-${isMobile ? 4 : 2}`}
+                      style={{
+                        filter: "drop-shadow(-8px - 10px 46px #000)"
+                      }}
+                    >
+                      <div className="corner-top-left"></div>
+                      <div className="corner-bottom-right"></div>
+                      <img
+                        key={logoSrc + getHeaderLogoClassName(isMobile, isFirstOrLastScene)}
+                        src={isMobile && isFirstOrLastScene ?
+                          (isDarkMode ? (themeConfig?.logo?.darkSrc ?? themeConfig?.logo?.src ?? '') : (themeConfig?.logo?.src ?? '')) :
+                          logoSrc}
+                        alt={themeConfig.logo?.alt || "Application Logo"}
+                        aria-label={appConfig.theme?.ariaTexts?.logoLabel || "Application logo"}
+                        className={getHeaderLogoClassName(isMobile, isFirstOrLastScene)}
+                      />
+                    </div>
+                  </motion.div>
+                </div>
+
+                {/* Center - Progress Bar */}
+                <div className="flex-1" role="progressbar" aria-label={appConfig.theme?.ariaTexts?.progressLabel || "Training progress"}>
+                  <div className="relative" data-testid="progress-bar">
+                    <MemoizedProgressBar
+                      currentScene={currentScene + 1}
+                      totalScenes={scenes.length}
+                      language={selectedLanguage}
+                      config={progressBarConfig}
+                      reducedMotion={reducedMotionBool}
                     />
                   </div>
-                </motion.div>
-              </div>
-
-              {/* Center - Progress Bar */}
-              <div className="flex-1" role="progressbar" aria-label={appConfig.theme?.ariaTexts?.progressLabel || "Training progress"}>
-                <div className="relative">
-                  <MemoizedProgressBar
-                    currentScene={currentScene + 1}
-                    totalScenes={scenes.length}
-                    language={selectedLanguage}
-                    config={progressBarConfig}
-                  />
                 </div>
-              </div>
 
-              {/* Right - Controls */}
-              <div className={cssClasses.controlsContainer}>
-                {/* ENHANCED LIQUID GLASS POINTS BADGE - Mobile Optimized */}
-                <motion.div
-                  className={`${cssClasses.pointsBadge} hidden sm:block`}
-                  whileHover={{
-                    scale: 1.02,
-                    y: -1
-                  }}
-                  role="status"
-                  aria-label={appConfig.theme?.ariaTexts?.pointsLabel || "Total points earned"}
-                  aria-live="polite"
-                >
-                  {/* Badge Content */}
-                  <div className="relative z-10 flex justify-center h-full items-center space-x-1 sm:space-x-1.5 md:space-x-1.5">
-                    <Award size={isMobile ? 16 : 20} className="text-[#1C1C1E] dark:text-[#F2F2F7] sm:w-4 sm:h-4 md:w-5 md:h-5 transition-colors duration-300" aria-hidden="true" />
-                    <span className={cssClasses.pointsText} aria-label={`${totalPoints} ${appConfig.theme?.ariaTexts?.pointsDescription || "points earned"}`}>
-                      {totalPoints}
-                    </span>
-                  </div>
-                </motion.div>
-
-                {/* ENHANCED LIQUID GLASS THEME TOGGLE BUTTON - Mobile Optimized */}
-                <motion.button
-                  onClick={toggleTheme}
-                  className={`${cssClasses.themeButton} hidden sm:block`}
-                  whileHover={{
-                    scale: 1.05,
-                    y: -2
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                  aria-label={isDarkMode ? themeConfig.texts?.toggleButtonLightMode : themeConfig.texts?.toggleButtonDarkMode}
-                  title={isDarkMode ? themeConfig.texts?.toggleButtonLightMode : themeConfig.texts?.toggleButtonDarkMode}
-                  aria-checked={isDarkMode}
-                  role="switch"
-                  aria-describedby="theme-toggle-description"
-                >
-                  {/* Hover glow effect */}
+                {/* Right - Controls */}
+                <div className={cssClasses.controlsContainer}>
+                  {/* ENHANCED LIQUID GLASS POINTS BADGE - Mobile Optimized */}
                   <motion.div
-                    className="absolute inset-0 rounded-lg sm:rounded-xl opacity-0 pointer-events-none"
-                    style={{
-                      background: `linear-gradient(135deg, 
-                      rgba(59, 130, 246, 0.20) 0%, 
-                      rgba(99, 102, 241, 0.15) 50%, 
-                      rgba(139, 92, 246, 0.12) 100%
-                    )`
-                    }}
-                    transition={{ duration: 0.4, ease: "easeOut" }}
-                  />
-
-                  {/* Icon Container */}
-                  <div className="relative z-10">
-                    <AnimatePresence mode="wait">
-                      {isDarkMode ? (
-                        <motion.div
-                          key="light"
-                          initial={{ scale: 0, rotate: -90 }}
-                          animate={{ scale: 1, rotate: 0 }}
-                          exit={{ scale: 0, rotate: 90 }}
-                          transition={{ duration: 0.3, ease: "easeOut" }}
-                        >
-                          <Sun
-                            size={40}
-                            className="text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 w-5 h-5 sm:w-6 sm:h-6"
-                            aria-hidden="true"
-                          />
-                        </motion.div>
-                      ) : (
-                        <motion.div
-                          key="dark"
-                          initial={{ scale: 0, rotate: 90 }}
-                          animate={{ scale: 1, rotate: 0 }}
-                          exit={{ scale: 0, rotate: -90 }}
-                          transition={{ duration: 0.3, ease: "easeOut" }}
-                        >
-                          <Moon
-                            size={40}
-                            className="text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 w-5 h-5 sm:w-6 sm:h-6"
-                            aria-hidden="true"
-                          />
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                  {/* Hidden description for screen readers */}
-                  <div id="theme-toggle-description" className="sr-only">
-                    {appConfig.theme?.ariaTexts?.themeToggleDescription || "Toggle between light and dark theme"}
-                  </div>
-                </motion.button>
-
-                {/* ENHANCED LIQUID GLASS LANGUAGE SELECTOR - Mobile Optimized */}
-                <div className="relative" ref={dropdownRef} role="combobox" aria-haspopup="listbox" aria-expanded={isLanguageDropdownOpen} aria-controls="language-dropdown-list">
-                  <motion.button
-                    onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
-                    className={`${cssClasses.languageButton} ${!isMobile ? 'glass-border-3' : 'glass-border-4'}`}
+                    className={`${cssClasses.pointsBadge} hidden sm:block`}
                     whileHover={{
                       scale: 1.02,
                       y: -1
                     }}
-                    whileTap={{ scale: 0.98 }}
-                    aria-label={appConfig.theme?.ariaTexts?.languageSelectorLabel || "Language selector"}
-                    aria-expanded={isLanguageDropdownOpen}
-                    aria-describedby="language-selector-description"
-                    style={{
-                      transform: 'translateZ(0)',
-                      willChange: 'transform',
-                      touchAction: 'manipulation'
-                    }}
+                    role="status"
+                    aria-label={appConfig.theme?.ariaTexts?.pointsLabel || "Total points earned"}
+                    aria-live="polite"
                   >
-
-                    {/* Content */}
-                    <div className="relative z-10 flex items-center space-x-0.5 sm:space-x-1 md:space-x-2">
-                      <ReactCountryFlag
-                        countryCode={getCountryCode(currentLanguage?.code || 'tr')}
-                        svg
-                        style={{ fontSize: isMobile ? '1rem' : '1.2rem' }}
-                        aria-hidden="true"
-                      />
-                      <span className="text-[14px] text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold transition-colors duration-300">
-                        {getCountryCode(currentLanguage?.code || 'tr')}
+                    {/* Badge Content */}
+                    <div className="relative z-10 flex justify-center h-full items-center space-x-1 sm:space-x-1.5 md:space-x-1.5">
+                      <Award size={isMobile ? 16 : 20} className="text-[#1C1C1E] dark:text-[#F2F2F7] sm:w-4 sm:h-4 md:w-5 md:h-5 transition-colors duration-300" aria-hidden="true" />
+                      <span className={cssClasses.pointsText} aria-label={`${totalPoints} ${appConfig.theme?.ariaTexts?.pointsDescription || "points earned"}`}>
+                        {totalPoints}
                       </span>
-                      <ChevronDown
-                        size={8}
-                        className={`${cssClasses.languageChevron} hidden sm:block`}
-                        style={{ transform: isLanguageDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
-                        aria-hidden="true"
-                      />
+                    </div>
+                  </motion.div>
+
+                  {/* ENHANCED LIQUID GLASS THEME TOGGLE BUTTON - Mobile Optimized */}
+                  <motion.button
+                    onClick={toggleTheme}
+                    className={`${cssClasses.themeButton} hidden sm:block`}
+                    whileHover={{
+                      scale: 1.05,
+                      y: -2
+                    }}
+                    whileTap={{ scale: 0.95 }}
+                    aria-label={isDarkMode ? themeConfig.texts?.toggleButtonLightMode : themeConfig.texts?.toggleButtonDarkMode}
+                    title={isDarkMode ? themeConfig.texts?.toggleButtonLightMode : themeConfig.texts?.toggleButtonDarkMode}
+                    aria-checked={isDarkMode}
+                    role="switch"
+                    aria-describedby="theme-toggle-description"
+                    data-testid="theme-toggle"
+                  >
+                    {/* Hover glow effect */}
+                    <motion.div
+                      className="absolute inset-0 rounded-lg sm:rounded-xl opacity-0 pointer-events-none"
+                      style={{
+                        background: `linear-gradient(135deg, 
+                      rgba(59, 130, 246, 0.20) 0%, 
+                      rgba(99, 102, 241, 0.15) 50%, 
+                      rgba(139, 92, 246, 0.12) 100%
+                    )`
+                      }}
+                      transition={{ duration: 0.4, ease: "easeOut" }}
+                    />
+
+                    {/* Icon Container */}
+                    <div className="relative z-10">
+                      <AnimatePresence mode="wait">
+                        {isDarkMode ? (
+                          <motion.div
+                            key="light"
+                            initial={{ scale: 0, rotate: -90 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            exit={{ scale: 0, rotate: 90 }}
+                            transition={{ duration: 0.3, ease: "easeOut" }}
+                          >
+                            <Sun
+                              size={40}
+                              className="text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 w-5 h-5 sm:w-6 sm:h-6"
+                              aria-hidden="true"
+                            />
+                          </motion.div>
+                        ) : (
+                          <motion.div
+                            key="dark"
+                            initial={{ scale: 0, rotate: 90 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            exit={{ scale: 0, rotate: -90 }}
+                            transition={{ duration: 0.3, ease: "easeOut" }}
+                          >
+                            <Moon
+                              size={40}
+                              className="text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 w-5 h-5 sm:w-6 sm:h-6"
+                              aria-hidden="true"
+                            />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
                     {/* Hidden description for screen readers */}
-                    <div id="language-selector-description" className="sr-only">
-                      {appConfig.theme?.ariaTexts?.languageSelectorDescription || "Select your preferred language for the application"}
+                    <div id="theme-toggle-description" className="sr-only">
+                      {appConfig.theme?.ariaTexts?.themeToggleDescription || "Toggle between light and dark theme"}
                     </div>
                   </motion.button>
 
-                  {/* Enhanced Language Dropdown */}
-                  <AnimatePresence>
-                    {isLanguageDropdownOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: -8 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: -8 }}
-                        transition={{ duration: 0.2, ease: "easeOut" }}
-                        className={`glass-border-2 absolute top-full right-0 mt-2 w-64 sm:w-72 rounded-2xl z-50 overflow-hidden transition-colors duration-300`}
-                        role="listbox"
-                        id="language-dropdown-list"
-                        aria-label={appConfig.theme?.ariaTexts?.languageListLabel || "Language Selector"}
-                        aria-describedby="language-list-description"
-                        style={{
-                          position: 'absolute'
-                        }}
-                      >
-                        {/* Enhanced Search Input */}
-                        <div className="relative p-2.5 border-b transition-colors duration-300">
-                          <div
-                            className="relative glass-border-2 cursor-text"
-                            onClick={() => searchInputRef.current?.focus()}
-                          >
-                            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[#1C1C1E] dark:text-[#F2F2F7] pointer-events-none z-10">
-                              <Search size={12} />
-                            </span>
-                            <input
-                              ref={searchInputRef}
-                              type="text"
-                              placeholder="..."
-                              value={languageSearchTerm}
-                              onChange={(e) => setLanguageSearchTerm(e.target.value)}
-                              className={`w-full pl-6 pr-3 py-1.5 bg-transparent text-xs rounded-lg placeholder-[#1C1C1E] dark:placeholder-[#F2F2F7] text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 focus:ring-inset`}
-                              aria-label="..."
-                              aria-describedby="language-search-description"
-                              role="searchbox"
-                              onFocus={(e) => e.target.select()}
-                            />
-                            {/* Hidden description for search input */}
-                            <div id="language-search-description" className="sr-only">
-                              {appConfig.theme?.ariaTexts?.languageSearchDescription}
-                            </div>
-                          </div>
-                        </div>
+                  {/* ENHANCED LIQUID GLASS LANGUAGE SELECTOR - Mobile Optimized */}
+                  <div className="relative" ref={dropdownRef} role="combobox" aria-haspopup="listbox" aria-expanded={isLanguageDropdownOpen} aria-controls="language-dropdown-list">
+                    <motion.button
+                      onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
+                      className={`${cssClasses.languageButton} ${!isMobile ? 'glass-border-3' : 'glass-border-4'}`}
+                      whileHover={{
+                        scale: 1.02,
+                        y: -1
+                      }}
+                      whileTap={{ scale: 0.98 }}
+                      aria-label={appConfig.theme?.ariaTexts?.languageSelectorLabel || "Language selector"}
+                      aria-expanded={isLanguageDropdownOpen}
+                      aria-describedby="language-selector-description"
+                      style={{
+                        transform: 'translateZ(0)',
+                        willChange: 'transform',
+                        touchAction: 'manipulation'
+                      }}
+                      data-testid="language-button"
+                    >
 
-                        {/* Enhanced Language List */}
-                        <div
-                          className={cssClasses.languageList}
-                          style={{
-                            WebkitOverflowScrolling: 'touch',
-                            touchAction: 'pan-y'
-                          }}
+                      {/* Content */}
+                      <div className="relative z-10 flex items-center space-x-0.5 sm:space-x-1 md:space-x-2">
+                        <ReactCountryFlag
+                          countryCode={getCountryCode(currentLanguage?.code || 'tr')}
+                          svg
+                          style={{ fontSize: isMobile ? '1rem' : '1.2rem' }}
+                          aria-hidden="true"
+                        />
+                        <span className="text-[14px] text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold transition-colors duration-300">
+                          {getCountryCode(currentLanguage?.code || 'tr')}
+                        </span>
+                        <ChevronDown
+                          size={8}
+                          className={`${cssClasses.languageChevron} hidden sm:block`}
+                          style={{ transform: isLanguageDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                          aria-hidden="true"
+                        />
+                      </div>
+                      {/* Hidden description for screen readers */}
+                      <div id="language-selector-description" className="sr-only">
+                        {appConfig.theme?.ariaTexts?.languageSelectorDescription || "Select your preferred language for the application"}
+                      </div>
+                    </motion.button>
+
+                    {/* Enhanced Language Dropdown */}
+                    <AnimatePresence>
+                      {isLanguageDropdownOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.95, y: -8 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.95, y: -8 }}
+                          transition={{ duration: 0.2, ease: "easeOut" }}
+                          className={`glass-border-2 absolute top-full right-0 mt-2 w-64 sm:w-72 rounded-2xl z-50 overflow-hidden transition-colors duration-300`}
                           role="listbox"
-                          aria-label="Available languages"
+                          id="language-dropdown-list"
+                          aria-label={appConfig.theme?.ariaTexts?.languageListLabel || "Language Selector"}
+                          aria-describedby="language-list-description"
+                          style={{
+                            position: 'absolute'
+                          }}
                         >
-                          {/* Hidden description for screen readers */}
-                          <div id="language-list-description" className="sr-only">
-                            {appConfig.theme?.ariaTexts?.languageListDescription || "List of available languages for the application"}
-                          </div>
-                          {filteredLanguages.length === 0 ? (
-                            <div className="px-3 py-2 text-xs text-[#1C1C1E] dark:text-[#F2F2F7] text-center transition-colors duration-300">
-                              {themeConfig.texts?.languageNotFound}
+                          {/* Enhanced Search Input */}
+                          <div className="relative p-2.5 border-b transition-colors duration-300">
+                            <div
+                              className="relative glass-border-2 cursor-text"
+                              onClick={() => searchInputRef.current?.focus()}
+                            >
+                              <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[#1C1C1E] dark:text-[#F2F2F7] pointer-events-none z-10">
+                                <Search size={12} />
+                              </span>
+                              <input
+                                ref={searchInputRef}
+                                type="text"
+                                placeholder="..."
+                                value={languageSearchTerm}
+                                onChange={(e) => setLanguageSearchTerm(e.target.value)}
+                                className={`w-full pl-6 pr-3 py-1.5 bg-transparent text-xs rounded-lg placeholder-[#1C1C1E] dark:placeholder-[#F2F2F7] text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 focus:ring-inset`}
+                                aria-label="..."
+                                aria-describedby="language-search-description"
+                                role="searchbox"
+                                onFocus={(e) => e.target.select()}
+                              />
+                              {/* Hidden description for search input */}
+                              <div id="language-search-description" className="sr-only">
+                                {appConfig.theme?.ariaTexts?.languageSearchDescription}
+                              </div>
                             </div>
-                          ) : (
-                            <>
-                              {/*Languages */}
-                              {languageSearchTerm ? (
-                                // Show all filtered results when searching
-                                filteredLanguages.map((language, index) => (
-                                  <motion.button
-                                    key={`search-${language.code}`}
-                                    initial={{ opacity: 0, x: -8 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: Math.min(index * 0.01, 0.2) }}
-                                    onClick={() => {
-                                      handleLanguageChange(language.code);
-                                      setIsLanguageDropdownOpen(false);
-                                      setLanguageSearchTerm('');
-                                    }}
-                                    className={`relative z-10 w-full flex items-center space-x-2.5 px-3 py-3 text-left transition-all duration-200 focus:outline-none`}
-                                    style={{ touchAction: 'manipulation' }}
-                                    role="option"
-                                    aria-selected={selectedLanguage === language.code}
-                                  >
-                                    <span className="text-xs">{language.flag}</span>
-                                    <span className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] font-medium flex-1 min-w-0 truncate transition-colors duration-300">
-                                      {language.name}
-                                    </span>
-                                    <span className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] flex-shrink-0 transition-colors duration-300">
-                                      {language.code.toUpperCase()}
-                                    </span>
-                                  </motion.button>
-                                ))
-                              ) : (
-                                // Show other languages when not searching
-                                filteredLanguages.map((language, index) => (
-                                  <motion.button
-                                    key={`other-${language.code}`}
-                                    initial={{ opacity: 0, x: -8 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: index * 0.01 }}
-                                    onClick={() => {
-                                      handleLanguageChange(language.code);
-                                      setIsLanguageDropdownOpen(false);
-                                      setLanguageSearchTerm('');
-                                    }}
-                                    className={`relative z-10 w-full flex items-center space-x-2.5 px-3 py-3 text-left transition-all duration-200 focus:outline-none`}
-                                    style={{ touchAction: 'manipulation' }}
-                                    role="option"
-                                    aria-selected={selectedLanguage === language.code}
-                                  >
-                                    <ReactCountryFlag
-                                      countryCode={getCountryCode(language.code)}
-                                      svg
-                                      style={{ fontSize: '0.75rem' }}
-                                    />
-                                    <span className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] font-medium flex-1 min-w-0 truncate transition-colors duration-300">
-                                      {language.name}
-                                    </span>
-                                    <span className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] flex-shrink-0 transition-colors duration-300">
-                                      {getCountryCode(language.code)}
-                                    </span>
-                                    {selectedLanguage === language.code && (
-                                      <div className="w-1 h-1 bg-[#1C1C1E] dark:bg-[#F2F2F7] rounded-full flex-shrink-0"></div>
-                                    )}
-                                  </motion.button>
-                                ))
-                              )}
-                            </>
-                          )}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                          </div>
+
+                          {/* Enhanced Language List */}
+                          <div
+                            className={cssClasses.languageList}
+                            style={{
+                              WebkitOverflowScrolling: 'touch',
+                              touchAction: 'pan-y'
+                            }}
+                            role="listbox"
+                            aria-label="Available languages"
+                          >
+                            {/* Hidden description for screen readers */}
+                            <div id="language-list-description" className="sr-only">
+                              {appConfig.theme?.ariaTexts?.languageListDescription || "List of available languages for the application"}
+                            </div>
+                            {filteredLanguages.length === 0 ? (
+                              <div className="px-3 py-2 text-xs text-[#1C1C1E] dark:text-[#F2F2F7] text-center transition-colors duration-300">
+                                {themeConfig.texts?.languageNotFound}
+                              </div>
+                            ) : (
+                              <>
+                                {/*Languages */}
+                                {languageSearchTerm ? (
+                                  // Show all filtered results when searching
+                                  filteredLanguages.map((language, index) => (
+                                    <motion.button
+                                      key={`search-${language.code}`}
+                                      initial={{ opacity: 0, x: -8 }}
+                                      animate={{ opacity: 1, x: 0 }}
+                                      transition={{ delay: Math.min(index * 0.01, 0.2) }}
+                                      onClick={() => {
+                                        handleLanguageChange(language.code);
+                                        setIsLanguageDropdownOpen(false);
+                                        setLanguageSearchTerm('');
+                                      }}
+                                      className={`relative z-10 w-full flex items-center space-x-2.5 px-3 py-3 text-left transition-all duration-200 focus:outline-none`}
+                                      style={{ touchAction: 'manipulation' }}
+                                      role="option"
+                                      aria-selected={selectedLanguage === language.code}
+                                    >
+                                      <span className="text-xs">{language.flag}</span>
+                                      <span className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] font-medium flex-1 min-w-0 truncate transition-colors duration-300">
+                                        {language.name}
+                                      </span>
+                                      <span className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] flex-shrink-0 transition-colors duration-300">
+                                        {language.code.toUpperCase()}
+                                      </span>
+                                    </motion.button>
+                                  ))
+                                ) : (
+                                  // Show other languages when not searching
+                                  filteredLanguages.map((language, index) => (
+                                    <motion.button
+                                      key={`other-${language.code}`}
+                                      initial={{ opacity: 0, x: -8 }}
+                                      animate={{ opacity: 1, x: 0 }}
+                                      transition={{ delay: index * 0.01 }}
+                                      onClick={() => {
+                                        handleLanguageChange(language.code);
+                                        setIsLanguageDropdownOpen(false);
+                                        setLanguageSearchTerm('');
+                                      }}
+                                      className={`relative z-10 w-full flex items-center space-x-2.5 px-3 py-3 text-left transition-all duration-200 focus:outline-none`}
+                                      style={{ touchAction: 'manipulation' }}
+                                      role="option"
+                                      aria-selected={selectedLanguage === language.code}
+                                    >
+                                      <ReactCountryFlag
+                                        countryCode={getCountryCode(language.code)}
+                                        svg
+                                        style={{ fontSize: '0.75rem' }}
+                                      />
+                                      <span className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] font-medium flex-1 min-w-0 truncate transition-colors duration-300">
+                                        {language.name}
+                                      </span>
+                                      <span className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] flex-shrink-0 transition-colors duration-300">
+                                        {getCountryCode(language.code)}
+                                      </span>
+                                      {selectedLanguage === language.code && (
+                                        <div className="w-1 h-1 bg-[#1C1C1E] dark:bg-[#F2F2F7] rounded-full flex-shrink-0"></div>
+                                      )}
+                                    </motion.button>
+                                  ))
+                                )}
+                              </>
+                            )}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </header>
-        {/* Navigation Area - Optimized spacing */}
-        <main className="flex-1 relative sm:flex sm:items-center" role="main" aria-label={appConfig.theme?.ariaTexts?.contentLabel || "Training content area"}>
-          {/* Left Navigation - Hidden on mobile and only show when active */}
-          {currentScene > 0 && (
-            <div className="absolute left-2 sm:left-4 z-30 top-1/2 transform -translate-y-1/2 hidden md:block">
-              <MemoizedNavButton
-                direction="prev"
-                onClick={prevScene}
-                disabled={false}
-                label="Önceki bölüm"
-                isDarkMode={isDarkMode}
-              />
-            </div>
-          )}
-          {/* APPLE VISIONOS FLOATING GLASS CARD - Enhanced prominence with darker background */}
-          <div className="flex-1 mx-2 sm:mx-4 md:mx-16 lg:mx-20 xl:mx-24 sm:my-3 md:my-6 sm:flex sm:items-center sm:justify-center">
-            <div className="w-full sm:h-[calc(100vh-140px)] relative mb-2 sm:mb-0">
-              <AnimatePresence initial={false} custom={direction} mode="wait">
-                <motion.div
-                  key={currentScene}
-                  custom={direction}
-                  variants={slideVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{
-                    // Ultra-fast mobile animations
-                    x: {
-                      type: isMobile ? "tween" : "spring",
-                      duration: isMobile ? 0.2 : MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.DESKTOP,
-                      ease: isMobile ? "easeOut" : "easeOut",
-                      stiffness: isMobile ? undefined : 300,
-                      damping: isMobile ? undefined : 25
-                    },
-                    opacity: {
-                      duration: isMobile ? 0.1 : MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.SCALE,
-                      ease: "easeOut"
-                    },
-                    scale: {
-                      duration: isMobile ? 0.1 : MEMOIZED_CONSTANTS.ANIMATION_DURATIONS.SCALE,
-                      ease: "easeOut"
-                    }
-                  }}
-                  className={cssClasses.contentCard}
-                  onAnimationComplete={handleAnimationComplete}
-                  whileHover={!isMobile ? {
-                    y: -2,
-                    scale: 1.002,
-                    transition: { type: "spring", stiffness: 400, damping: 25 }
-                  } : undefined}
-                  style={{
-                    // Hardware acceleration + Card stays anchored during scroll
-                    transform: 'translateZ(0)',
-                    willChange: 'transform',
-                    transformStyle: "preserve-3d",
-                    transformOrigin: "center center",
-                    // Dark mode specific styling
-                    ...(isDarkMode && {
-                      background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.06) 100%)',
-                      backdropFilter: 'blur(24px)',
-                      WebkitBackdropFilter: 'blur(24px)'
-                    }),
-                    // Light mode styling
-                    ...(!isDarkMode && {
-                      backdropFilter: isMobile ? 'blur(12px)' : 'blur(24px)',
-                      WebkitBackdropFilter: isMobile ? 'blur(12px)' : 'blur(24px)'
-                    })
-                  }}
-                >
-                  {/* Content Scroll Container - ANCHORED (doesn't move with parallax) */}
-                  <div
-                    ref={scrollContainerRef}
-                    className="relative z-10 h-full overflow-y-auto overflow-x-hidden scroll-smooth"
-                    onScroll={handleScroll}
-                    role="main"
-                    aria-label={appConfig.theme?.ariaTexts?.contentLabel || "Training content"}
-                    aria-describedby="content-description"
+          </header>
+          {/* Navigation Area - Optimized spacing */}
+          <main className="flex-1 relative sm:flex sm:items-center" role="main" aria-label={appConfig.theme?.ariaTexts?.contentLabel || "Training content area"}>
+            {/* Left Navigation - Hidden on mobile and only show when active */}
+            {currentScene > 0 && (
+              <div className="absolute left-2 sm:left-4 z-30 top-1/2 transform -translate-y-1/2 hidden md:block" data-testid="nav-prev">
+                <MemoizedNavButton
+                  direction="prev"
+                  onClick={prevScene}
+                  disabled={false}
+                  label="Önceki bölüm"
+                  isDarkMode={isDarkMode}
+                />
+              </div>
+            )}
+            {/* APPLE VISIONOS FLOATING GLASS CARD - Enhanced prominence with darker background */}
+            <div className="flex-1 mx-2 sm:mx-4 md:mx-16 lg:mx-20 xl:mx-24 sm:my-3 md:my-6 sm:flex sm:items-center sm:justify-center">
+              <div className="w-full sm:h-[calc(100vh-140px)] relative mb-2 sm:mb-0">
+                <AnimatePresence initial={false} custom={direction} mode="wait">
+                  <motion.div
+                    key={currentScene}
+                    custom={direction}
+                    variants={slideVariants}
+                    initial="enter"
+                    animate="center"
+                    exit="exit"
+                    transition={slideTransition}
+                    className={cssClasses.contentCard}
+                    onAnimationComplete={handleAnimationComplete}
+                    whileHover={!isMobile ? {
+                      y: -2,
+                      scale: 1.002,
+                      transition: { type: "spring", stiffness: 400, damping: 25 }
+                    } : undefined}
                     style={{
-                      scrollbarWidth: 'thin',
-                      WebkitOverflowScrolling: 'touch',
-                      scrollbarColor: 'transparent transparent',
-                      touchAction: 'pan-y',
-                      overscrollBehavior: 'contain',
-                      // Hardware acceleration
-                      transform: 'translateZ(0)'
+                      // Hardware acceleration + Card stays anchored during scroll
+                      transform: 'translateZ(0)',
+                      willChange: 'transform',
+                      transformStyle: "preserve-3d",
+                      transformOrigin: "center center",
+                      // Dark mode specific styling
+                      ...(isDarkMode && {
+                        background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.06) 100%)',
+                        backdropFilter: 'blur(24px)',
+                        WebkitBackdropFilter: 'blur(24px)'
+                      }),
+                      // Light mode styling
+                      ...(!isDarkMode && {
+                        backdropFilter: isMobile ? 'blur(12px)' : 'blur(24px)',
+                        WebkitBackdropFilter: isMobile ? 'blur(12px)' : 'blur(24px)'
+                      })
                     }}
                   >
-                    {/* Hidden description for screen readers */}
-                    <div id="content-description" className="sr-only">
-                      {appConfig.theme?.ariaTexts?.contentDescription || "Scrollable training content area with interactive learning modules"}
-                    </div>
-                    {/* Optimized Content Padding - Industry Standards */}
-                    <div className="p-2 py-4 sm:p-3 sm:py-4 md:p-4 lg:p-5">
-                      <motion.div
-                        initial={{ opacity: 0, y: isMobile ? 20 : 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{
-                          duration: isMobile ? 0.4 : 0.6,
-                          delay: isMobile ? 0.2 : 0.4,
-                          ease: [0.25, 0.46, 0.45, 0.94]
-                        }}
-                        className="w-full"
-                      >
-                        {/* Quiz Scene - Always mounted to preserve state */}
-                        <div style={{ display: currentScene === sceneIndices.quiz ? 'block' : 'none' }}>
-                          <MemoizedQuizScene
-                            config={currentSceneConfig}
-                            onQuizCompleted={handleQuizCompleted}
-                            onNextSlide={nextScene}
-                            isVisible={currentScene === sceneIndices.quiz}
-                            currentQuestionIndex={quizCurrentQuestionIndex}
-                            setCurrentQuestionIndex={setQuizCurrentQuestionIndex}
-                            answers={quizAnswers}
-                            setAnswers={setQuizAnswersStable}
-                            showResult={quizShowResult}
-                            setShowResult={setQuizShowResultStable}
-                            attempts={quizAttempts}
-                            setAttempts={setQuizAttemptsStable}
-                            isAnswerLocked={quizIsAnswerLocked}
-                            setIsAnswerLocked={setQuizIsAnswerLockedStable}
-                            isLoading={quizIsLoading}
-                            setIsLoading={setQuizIsLoadingStable}
-                            multiSelectAnswers={quizMultiSelectAnswers}
-                            setMultiSelectAnswers={setQuizMultiSelectAnswers}
-                            sliderValue={quizSliderValue}
-                            setSliderValue={setQuizSliderValue}
-                            draggedItems={quizDraggedItems}
-                            setDraggedItems={setQuizDraggedItems}
-                            selectedItem={quizSelectedItem}
-                            setSelectedItem={setQuizSelectedItem}
-                            questionLoadingText={themeConfig.texts?.questionLoading}
-                            isDarkMode={isDarkMode}
-                          />
-                        </div>
+                    {/* Content Scroll Container - ANCHORED (doesn't move with parallax) */}
+                    <div
+                      ref={scrollContainerRef}
+                      className="relative z-10 h-full overflow-y-auto overflow-x-hidden scroll-smooth"
+                      onScroll={handleScroll}
+                      role="main"
+                      aria-label={appConfig.theme?.ariaTexts?.contentLabel || "Training content"}
+                      aria-describedby="content-description"
+                      style={{
+                        scrollbarWidth: 'thin',
+                        WebkitOverflowScrolling: 'touch',
+                        scrollbarColor: 'transparent transparent',
+                        touchAction: 'pan-y',
+                        overscrollBehavior: 'contain',
+                        // Hardware acceleration
+                        transform: 'translateZ(0)'
+                      }}
+                      data-testid="scene-scroll"
+                    >
+                      {/* Hidden description for screen readers */}
+                      <div id="content-description" className="sr-only">
+                        {appConfig.theme?.ariaTexts?.contentDescription || "Scrollable training content area with interactive learning modules"}
+                      </div>
+                      {/* Optimized Content Padding - Industry Standards */}
+                      <div className="p-2 py-4 sm:p-3 sm:py-4 md:p-4 lg:p-5">
+                        <motion.div
+                          initial={{ opacity: 0, y: isMobile ? 20 : 30 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{
+                            duration: isMobile ? 0.4 : 0.6,
+                            delay: isMobile ? 0.2 : 0.4,
+                            ease: [0.25, 0.46, 0.45, 0.94]
+                          }}
+                          className="w-full"
+                        >
+                          {/* Quiz Scene - Always mounted to preserve state */}
+                          <div style={{ display: currentScene === sceneIndices.quiz ? 'block' : 'none' }} data-scene-type={(currentSceneConfig as any)?.scene_type || 'quiz'} data-scene-id={(scenes[currentScene] as any)?.sceneId}>
+                            <MemoizedQuizScene
+                              config={currentSceneConfig}
+                              onQuizCompleted={handleQuizCompleted}
+                              onNextSlide={nextScene}
+                              isVisible={currentScene === sceneIndices.quiz}
+                              currentQuestionIndex={quizCurrentQuestionIndex}
+                              setCurrentQuestionIndex={setQuizCurrentQuestionIndex}
+                              answers={quizAnswers}
+                              setAnswers={setQuizAnswersStable}
+                              showResult={quizShowResult}
+                              setShowResult={setQuizShowResultStable}
+                              attempts={quizAttempts}
+                              setAttempts={setQuizAttemptsStable}
+                              isAnswerLocked={quizIsAnswerLocked}
+                              setIsAnswerLocked={setQuizIsAnswerLockedStable}
+                              isLoading={quizIsLoading}
+                              setIsLoading={setQuizIsLoadingStable}
+                              multiSelectAnswers={quizMultiSelectAnswers}
+                              setMultiSelectAnswers={setQuizMultiSelectAnswers}
+                              sliderValue={quizSliderValue}
+                              setSliderValue={setQuizSliderValue}
+                              draggedItems={quizDraggedItems}
+                              setDraggedItems={setQuizDraggedItems}
+                              selectedItem={quizSelectedItem}
+                              setSelectedItem={setQuizSelectedItem}
+                              questionLoadingText={themeConfig.texts?.questionLoading}
+                              isDarkMode={isDarkMode}
+                              reducedMotion={reducedMotionBool}
+                              disableDelays={disableDelaysBool}
+                            />
+                          </div>
 
-                        {/* Other scenes */}
-                        {currentScene !== sceneIndices.quiz && (
-                          <CurrentSceneComponent config={currentSceneConfig}
-                            onSurveySubmitted={handleSurveySubmitted}
-                            surveyState={currentScene === sceneIndices.survey ? surveyState : undefined}
-                            onSurveyStateChange={currentScene === sceneIndices.survey ? setSurveyState : undefined}
-                            completionData={currentScene === sceneIndices.summary ? completionData : undefined}
-                            onNextSlide={nextScene}
-                          />
-                        )}
-                      </motion.div>
+                          {/* Other scenes */}
+                          {currentScene !== sceneIndices.quiz && (
+                            <CurrentSceneComponent config={currentSceneConfig}
+                              sceneId={(scenes[currentScene] as any)?.sceneId}
+                              onSurveySubmitted={handleSurveySubmitted}
+                              surveyState={currentScene === sceneIndices.survey ? surveyState : undefined}
+                              onSurveyStateChange={currentScene === sceneIndices.survey ? setSurveyState : undefined}
+                              completionData={currentScene === sceneIndices.summary ? completionData : undefined}
+                              onNextSlide={nextScene}
+                              reducedMotion={reducedMotionBool}
+                              disableDelays={disableDelaysBool}
+                            />
+                          )}
+                        </motion.div>
+                      </div>
                     </div>
-                  </div>
-                  {/* Enhanced Scroll Indicator - Hidden on mobile for better UX */}
-                  <AnimatePresence>
-                    {showScrollIndicator && !scrollPosition.bottom && currentScene !== 2 && !isMobile && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        className="absolute bottom-4 left-0 right-0 mx-auto z-20 pointer-events-none flex justify-center"
-                      >
-                        <div className="flex items-center space-x-2 px-4 py-2.5 transition-colors duration-300 backdrop-blur-xl glass-border-2 min-w-fit">
-                          <div className="corner-top-left"></div>
-                          <div className="corner-bottom-right"></div>
-                          <span className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] font-medium transition-colors duration-300 whitespace-nowrap">
-                            {themeConfig.texts?.scrollHint}
-                          </span>
-                          <ChevronDown size={14} className="text-[#1C1C1E] dark:text-[#F2F2F7] animate-bounce flex-shrink-0" style={{ animationDuration: '2s' }} />
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              </AnimatePresence>
+                    {/* Enhanced Scroll Indicator - Hidden on mobile for better UX */}
+                    <AnimatePresence>
+                      {showScrollIndicator && !scrollPosition.bottom && currentScene !== 2 && !isMobile && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 10 }}
+                          className="absolute bottom-4 left-0 right-0 mx-auto z-20 pointer-events-none flex justify-center"
+                        >
+                          <div className="flex items-center space-x-2 px-4 py-2.5 transition-colors duration-300 backdrop-blur-xl glass-border-2 min-w-fit">
+                            <div className="corner-top-left"></div>
+                            <div className="corner-bottom-right"></div>
+                            <span className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] font-medium transition-colors duration-300 whitespace-nowrap">
+                              {themeConfig.texts?.scrollHint}
+                            </span>
+                            <ChevronDown size={14} className="text-[#1C1C1E] dark:text-[#F2F2F7] animate-bounce flex-shrink-0" style={{ animationDuration: '2s' }} />
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
             </div>
-          </div>
 
-          {/* Right Navigation - Hidden on mobile and on last scene */}
-          {currentScene < scenes.length - 1 && (
-            <div className="absolute right-2 sm:right-4 z-30 top-1/2 transform -translate-y-1/2 hidden md:block">
-              <MemoizedNavButton
-                direction="next"
-                onClick={nextScene}
-                disabled={!canProceedNext()}
-                label={themeConfig.texts?.nextSection}
-                isDarkMode={isDarkMode}
+            {/* Right Navigation - Hidden on mobile and on last scene */}
+            {currentScene < scenes.length - 1 && (
+              <div className="absolute right-2 sm:right-4 z-30 top-1/2 transform -translate-y-1/2 hidden md:block" data-testid="nav-next">
+                <MemoizedNavButton
+                  direction="next"
+                  onClick={nextScene}
+                  disabled={!canProceedNext()}
+                  label={themeConfig.texts?.nextSection}
+                  isDarkMode={isDarkMode}
+                />
+              </div>
+            )}
+            {/* ULTRA RESPONSIVE Mobile Touch Gesture Layer */}
+            <div
+              className="absolute inset-0 pointer-events-none md:hidden z-10"
+              style={{
+                pointerEvents: 'none',
+                zIndex: "-1"
+              }}
+            >
+              {/* Optimized Left Gesture Area */}
+              <div
+                className="absolute left-0 top-0 bottom-0 w-16 pointer-events-auto"
+                style={{
+                  touchAction: 'pan-x',
+                  background: 'transparent',
+                  pointerEvents: currentScene === sceneIndices.goal ? 'none' : 'auto',
+                  zIndex: "-1"
+                }}
+                onTouchStart={(e) => {
+                  const startX = e.touches[0].clientX;
+                  const startY = e.touches[0].clientY;
+                  let hasMovedHorizontally = false;
+
+                  const handleTouchMove = (moveEvent: TouchEvent) => {
+                    const diffX = Math.abs(startX - moveEvent.touches[0].clientX);
+                    const diffY = Math.abs(startY - moveEvent.touches[0].clientY);
+                    if (diffX > diffY && diffX > 5) hasMovedHorizontally = true;
+                  };
+
+                  const handleTouchEnd = (endEvent: TouchEvent) => {
+                    if (!hasMovedHorizontally) {
+                      document.removeEventListener('touchmove', handleTouchMove);
+                      document.removeEventListener('touchend', handleTouchEnd);
+                      return;
+                    }
+
+                    const diffX = startX - endEvent.changedTouches[0].clientX;
+                    if (diffX < -30 && currentScene > 0) prevScene();
+
+                    document.removeEventListener('touchmove', handleTouchMove);
+                    document.removeEventListener('touchend', handleTouchEnd);
+                  };
+
+                  document.addEventListener('touchmove', handleTouchMove, { passive: true });
+                  document.addEventListener('touchend', handleTouchEnd);
+                }}
+              />
+
+              {/* Optimized Right Gesture Area */}
+              <div
+                className="absolute right-0 top-0 bottom-0 w-16 pointer-events-auto"
+                style={{
+                  touchAction: 'pan-x',
+                  background: 'transparent',
+                  pointerEvents: currentScene === sceneIndices.goal ? 'none' : 'auto',
+                  zIndex: "-1"
+                }}
+                onTouchStart={(e) => {
+                  const startX = e.touches[0].clientX;
+                  const startY = e.touches[0].clientY;
+                  let hasMovedHorizontally = false;
+
+                  const handleTouchMove = (moveEvent: TouchEvent) => {
+                    const diffX = Math.abs(startX - moveEvent.touches[0].clientX);
+                    const diffY = Math.abs(startY - moveEvent.touches[0].clientY);
+                    if (diffX > diffY && diffX > 5) hasMovedHorizontally = true;
+                  };
+
+                  const handleTouchEnd = (endEvent: TouchEvent) => {
+                    if (!hasMovedHorizontally) {
+                      document.removeEventListener('touchmove', handleTouchMove);
+                      document.removeEventListener('touchend', handleTouchEnd);
+                      return;
+                    }
+
+                    const diffX = startX - endEvent.changedTouches[0].clientX;
+                    if (diffX > 30 && canProceedNext() && currentScene < scenes.length - 1) {
+                      nextScene();
+                    }
+
+                    document.removeEventListener('touchmove', handleTouchMove);
+                    document.removeEventListener('touchend', handleTouchEnd);
+                  };
+
+                  document.addEventListener('touchmove', handleTouchMove, { passive: true });
+                  document.addEventListener('touchend', handleTouchEnd);
+                }}
               />
             </div>
-          )}
-          {/* ULTRA RESPONSIVE Mobile Touch Gesture Layer */}
-          <div
-            className="absolute inset-0 pointer-events-none md:hidden z-10"
-            style={{
-              pointerEvents: 'none',
-              zIndex: "-1"
-            }}
-          >
-            {/* Optimized Left Gesture Area */}
-            <div
-              className="absolute left-0 top-0 bottom-0 w-16 pointer-events-auto"
-              style={{
-                touchAction: 'pan-x',
-                background: 'transparent',
-                pointerEvents: currentScene === sceneIndices.goal ? 'none' : 'auto',
-                zIndex: "-1"
-              }}
-              onTouchStart={(e) => {
-                const startX = e.touches[0].clientX;
-                const startY = e.touches[0].clientY;
-                let hasMovedHorizontally = false;
+          </main>
 
-                const handleTouchMove = (moveEvent: TouchEvent) => {
-                  const diffX = Math.abs(startX - moveEvent.touches[0].clientX);
-                  const diffY = Math.abs(startY - moveEvent.touches[0].clientY);
-                  if (diffX > diffY && diffX > 5) hasMovedHorizontally = true;
-                };
-
-                const handleTouchEnd = (endEvent: TouchEvent) => {
-                  if (!hasMovedHorizontally) {
-                    document.removeEventListener('touchmove', handleTouchMove);
-                    document.removeEventListener('touchend', handleTouchEnd);
-                    return;
-                  }
-
-                  const diffX = startX - endEvent.changedTouches[0].clientX;
-                  if (diffX < -30 && currentScene > 0) prevScene();
-
-                  document.removeEventListener('touchmove', handleTouchMove);
-                  document.removeEventListener('touchend', handleTouchEnd);
-                };
-
-                document.addEventListener('touchmove', handleTouchMove, { passive: true });
-                document.addEventListener('touchend', handleTouchEnd);
-              }}
-            />
-
-            {/* Optimized Right Gesture Area */}
-            <div
-              className="absolute right-0 top-0 bottom-0 w-16 pointer-events-auto"
-              style={{
-                touchAction: 'pan-x',
-                background: 'transparent',
-                pointerEvents: currentScene === sceneIndices.goal ? 'none' : 'auto',
-                zIndex: "-1"
-              }}
-              onTouchStart={(e) => {
-                const startX = e.touches[0].clientX;
-                const startY = e.touches[0].clientY;
-                let hasMovedHorizontally = false;
-
-                const handleTouchMove = (moveEvent: TouchEvent) => {
-                  const diffX = Math.abs(startX - moveEvent.touches[0].clientX);
-                  const diffY = Math.abs(startY - moveEvent.touches[0].clientY);
-                  if (diffX > diffY && diffX > 5) hasMovedHorizontally = true;
-                };
-
-                const handleTouchEnd = (endEvent: TouchEvent) => {
-                  if (!hasMovedHorizontally) {
-                    document.removeEventListener('touchmove', handleTouchMove);
-                    document.removeEventListener('touchend', handleTouchEnd);
-                    return;
-                  }
-
-                  const diffX = startX - endEvent.changedTouches[0].clientX;
-                  if (diffX > 30 && canProceedNext() && currentScene < scenes.length - 1) {
-                    nextScene();
-                  }
-
-                  document.removeEventListener('touchmove', handleTouchMove);
-                  document.removeEventListener('touchend', handleTouchEnd);
-                };
-
-                document.addEventListener('touchmove', handleTouchMove, { passive: true });
-                document.addEventListener('touchend', handleTouchEnd);
-              }}
-            />
-          </div>
-        </main>
-
-        {/* Enhanced Achievement Notifications */}
-        <AnimatePresence>
-          {showAchievementNotification && achievements.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, x: 300 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 300 }}
-              className={cssClasses.achievementContainer}
-              role="alert"
-              aria-live="polite"
-              aria-label={appConfig.theme?.ariaTexts?.achievementLabel || "Achievement notification"}
-            >
-              <div className={cssClasses.achievementContent}>
-                <div className="flex items-center space-x-3 relative z-10">
-                  <Award size={16} className="text-[#1C1C1E] dark:text-[#F2F2F7] flex-shrink-0" aria-hidden="true" />
-                  <span className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold transition-colors duration-300">
-                    {themeConfig.texts?.achievementNotification}
-                  </span>
-                  <button
-                    onClick={() => setShowAchievementNotification(false)}
-                    className={cssClasses.achievementClose}
-                    aria-label={themeConfig.texts?.closeNotification}
-                    style={{ touchAction: 'manipulation' }}
-                  >
-                    <X size={14} className="text-[#1C1C1E] dark:text-[#F2F2F7]" aria-hidden="true" />
-                  </button>
+          {/* Enhanced Achievement Notifications */}
+          <AnimatePresence>
+            {showAchievementNotification && achievements.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, x: 300 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 300 }}
+                className={cssClasses.achievementContainer}
+                role="alert"
+                aria-live="polite"
+                aria-label={appConfig.theme?.ariaTexts?.achievementLabel || "Achievement notification"}
+              >
+                <div className={cssClasses.achievementContent}>
+                  <div className="flex items-center space-x-3 relative z-10">
+                    <Award size={16} className="text-[#1C1C1E] dark:text-[#F2F2F7] flex-shrink-0" aria-hidden="true" />
+                    <span className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold transition-colors duration-300">
+                      {themeConfig.texts?.achievementNotification}
+                    </span>
+                    <button
+                      onClick={() => setShowAchievementNotification(false)}
+                      className={cssClasses.achievementClose}
+                      aria-label={themeConfig.texts?.closeNotification}
+                      style={{ touchAction: 'manipulation' }}
+                    >
+                      <X size={14} className="text-[#1C1C1E] dark:text-[#F2F2F7]" aria-hidden="true" />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-        {/* Enhanced Quiz Completion Notification - Portal on mobile for true sticky */}
-        {isMobile
-          ? createPortal(
-            (
+          {/* Enhanced Quiz Completion Notification - Portal on mobile for true sticky */}
+          {isMobile
+            ? createPortal(
+              (
+                <AnimatePresence>
+                  {currentScene === sceneIndices.quiz && !quizCompleted && showQuizCompletionHint && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 80 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 40 }}
+                      transition={{ type: 'spring', stiffness: 380, damping: 26 }}
+                      className="fixed z-[9999] right-4 sm:right-6"
+                      role="alert"
+                      aria-live="polite"
+                      aria-label={appConfig.theme?.ariaTexts?.quizCompletionLabel || "Quiz completion hint"}
+                      style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)' }}
+                    >
+                      <div className={cssClasses.quizNotificationContent}>
+                        <div className="flex items-center space-x-2.5 relative z-10">
+                          <p className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] font-medium transition-colors duration-300">
+                            {currentSceneConfig?.texts?.quizCompletionHint}
+                          </p>
+                          <button
+                            onClick={() => setShowQuizCompletionHint(false)}
+                            className={cssClasses.quizNotificationClose}
+                            aria-label={themeConfig.texts?.closeNotification}
+                            style={{ touchAction: 'manipulation' }}
+                          >
+                            <X size={16} className="text-[#1C1C1E] font-semibold dark:text-[#F2F2F7]" style={{ marginBottom: '-1px' }} aria-hidden="true" />
+                          </button>
+                        </div>
+                        <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-400/5 to-orange-400/5 dark:from-amber-400/10 dark:to-orange-400/10 pointer-events-none" aria-hidden="true"></div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              ),
+              portalTarget
+            )
+            : (
               <AnimatePresence>
                 {currentScene === sceneIndices.quiz && !quizCompleted && showQuizCompletionHint && (
                   <motion.div
-                    initial={{ opacity: 0, y: 80 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 40 }}
-                    transition={{ type: 'spring', stiffness: 380, damping: 26 }}
-                    className="fixed z-[9999] right-4 sm:right-6"
+                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                    className={cssClasses.quizNotificationContainer}
                     role="alert"
                     aria-live="polite"
                     aria-label={appConfig.theme?.ariaTexts?.quizCompletionLabel || "Quiz completion hint"}
-                    style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)' }}
                   >
                     <div className={cssClasses.quizNotificationContent}>
                       <div className="flex items-center space-x-2.5 relative z-10">
@@ -1801,105 +1879,72 @@ export default function App() {
                   </motion.div>
                 )}
               </AnimatePresence>
-            ),
-            document.body
-          )
-          : (
-            <AnimatePresence>
-              {currentScene === sceneIndices.quiz && !quizCompleted && showQuizCompletionHint && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 20, scale: 0.95 }}
-                  className={cssClasses.quizNotificationContainer}
-                  role="alert"
-                  aria-live="polite"
-                  aria-label={appConfig.theme?.ariaTexts?.quizCompletionLabel || "Quiz completion hint"}
-                >
-                  <div className={cssClasses.quizNotificationContent}>
-                    <div className="flex items-center space-x-2.5 relative z-10">
-                      <p className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] font-medium transition-colors duration-300">
-                        {currentSceneConfig?.texts?.quizCompletionHint}
-                      </p>
-                      <button
-                        onClick={() => setShowQuizCompletionHint(false)}
-                        className={cssClasses.quizNotificationClose}
-                        aria-label={themeConfig.texts?.closeNotification}
-                        style={{ touchAction: 'manipulation' }}
-                      >
-                        <X size={16} className="text-[#1C1C1E] font-semibold dark:text-[#F2F2F7]" style={{ marginBottom: '-1px' }} aria-hidden="true" />
-                      </button>
-                    </div>
-                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-400/5 to-orange-400/5 dark:from-amber-400/10 dark:to-orange-400/10 pointer-events-none" aria-hidden="true"></div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          )}
+            )}
 
-        {/* Survey Submitted Notification - via Portal to avoid transformed containers */}
-        {createPortal(
-          (
-            <AnimatePresence>
-              {showSurveySubmittedNotification && (
-                <motion.div
-                  initial={{ opacity: 0, y: 80 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 40 }}
-                  transition={{ type: 'spring', stiffness: 380, damping: 26 }}
-                  className="fixed z-[9999] right-4 sm:right-6"
-                  role="alert"
-                  aria-live="polite"
-                  aria-label={appConfig.theme?.ariaTexts?.quizCompletionLabel || "Survey submitted"}
-                  style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)' }}
-                >
-                  <div className={cssClasses.quizNotificationContent}>
-                    <div className="flex items-center space-x-2.5 relative z-10">
-                      <Star size={14} className="mr-2" aria-hidden="true" />
-                      <p className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] font-medium transition-colors duration-300">
-                        {themeConfig.texts?.surveySubmittedToast || "Geri bildiriminiz için teşekkürler!"}
-                      </p>
-                      <button
-                        onClick={() => setShowSurveySubmittedNotification(false)}
-                        className={cssClasses.quizNotificationClose}
-                        aria-label={themeConfig.texts?.closeNotification}
-                        style={{ touchAction: 'manipulation' }}
-                      >
-                        <X size={16} className="text-[#1C1C1E] font-semibold dark:text-[#F2F2F7]" style={{ marginBottom: '-1px' }} aria-hidden="true" />
-                      </button>
+          {/* Survey Submitted Notification - via Portal to avoid transformed containers */}
+          {createPortal(
+            (
+              <AnimatePresence>
+                {showSurveySubmittedNotification && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 80 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 40 }}
+                    transition={{ type: 'spring', stiffness: 380, damping: 26 }}
+                    className="fixed z-[9999] right-4 sm:right-6"
+                    role="alert"
+                    aria-live="polite"
+                    aria-label={appConfig.theme?.ariaTexts?.quizCompletionLabel || "Survey submitted"}
+                    style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)' }}
+                  >
+                    <div className={cssClasses.quizNotificationContent}>
+                      <div className="flex items-center space-x-2.5 relative z-10">
+                        <Star size={14} className="mr-2" aria-hidden="true" />
+                        <p className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] font-medium transition-colors duration-300">
+                          {themeConfig.texts?.surveySubmittedToast || "Geri bildiriminiz için teşekkürler!"}
+                        </p>
+                        <button
+                          onClick={() => setShowSurveySubmittedNotification(false)}
+                          className={cssClasses.quizNotificationClose}
+                          aria-label={themeConfig.texts?.closeNotification}
+                          style={{ touchAction: 'manipulation' }}
+                        >
+                          <X size={16} className="text-[#1C1C1E] font-semibold dark:text-[#F2F2F7]" style={{ marginBottom: '-1px' }} aria-hidden="true" />
+                        </button>
+                      </div>
+                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-400/5 to-orange-400/5 dark:from-amber-400/10 dark:to-orange-400/10 pointer-events-none" aria-hidden="true"></div>
                     </div>
-                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-400/5 to-orange-400/5 dark:from-amber-400/10 dark:to-orange-400/10 pointer-events-none" aria-hidden="true"></div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          ),
-          document.body
-        )}
-        {/* Mobile Floating Scroll-to-Top Button */}
-        <AnimatePresence>
-          {showScrollToTop && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              className="md:hidden fixed bottom-4 right-4 z-[9999]"
-            >
-              <motion.button
-                onClick={handleScrollToTop}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="flex items-center justify-center w-14 h-14 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border border-white/40 dark:border-gray-600/60 rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
-                title={appConfig.theme?.ariaTexts?.scrollToTopLabel || "Sayfanın Başına Dön"}
-                aria-label={appConfig.theme?.ariaTexts?.scrollToTopLabel || "Scroll to top of page"}
-              >
-                <ChevronUp className="w-6 h-6 text-blue-600 dark:text-blue-400" aria-hidden="true" />
-              </motion.button>
-            </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            ),
+            portalTarget
           )}
-        </AnimatePresence>
-        <Toaster />
-      </div>
-    </FontFamilyProvider>
+          {/* Mobile Floating Scroll-to-Top Button */}
+          <AnimatePresence>
+            {showScrollToTop && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="md:hidden fixed bottom-4 right-4 z-[9999]"
+              >
+                <motion.button
+                  onClick={handleScrollToTop}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="flex items-center justify-center w-14 h-14 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border border-white/40 dark:border-gray-600/60 rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
+                  title={appConfig.theme?.ariaTexts?.scrollToTopLabel || "Sayfanın Başına Dön"}
+                  aria-label={appConfig.theme?.ariaTexts?.scrollToTopLabel || "Scroll to top of page"}
+                >
+                  <ChevronUp className="w-6 h-6 text-blue-600 dark:text-blue-400" aria-hidden="true" />
+                </motion.button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <Toaster />
+        </div>
+      </FontFamilyProvider>
+    </MotionConfig>
   );
 }

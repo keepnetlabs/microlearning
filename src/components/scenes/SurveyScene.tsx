@@ -24,8 +24,11 @@ export function SurveyScene({
   config,
   onSurveySubmitted,
   surveyState,
-  onSurveyStateChange
-}: SurveySceneProps) {
+  onSurveyStateChange,
+  sceneId,
+  reducedMotion,
+  disableDelays
+}: SurveySceneProps & { sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean }) {
   // Use external state if provided, otherwise use local state
   const localState = {
     rating: 0,
@@ -34,10 +37,10 @@ export function SurveyScene({
     isSubmitting: false,
     isSubmitted: false
   };
-  
+
   const state = surveyState || localState;
-  const setState = onSurveyStateChange || (() => {});
-  
+  const setState = onSurveyStateChange || (() => { });
+
   const { rating, feedback, selectedTopics, isSubmitting, isSubmitted } = state;
   const isMobile = useIsMobile();
 
@@ -88,7 +91,7 @@ export function SurveyScene({
       if (onSurveySubmitted) {
         onSurveySubmitted();
       }
-    }, 1000);
+    }, disableDelays ? 0 : 1000);
   };
 
 
@@ -99,6 +102,9 @@ export function SurveyScene({
         role="main"
         aria-label={config.texts?.mainLabel || config.ariaTexts?.mainLabel || "Survey form"}
         aria-describedby="survey-description"
+        data-scene-type={(config as any)?.scene_type || 'survey'}
+        data-scene-id={sceneId as any}
+        data-testid="scene-survey"
       >
         <div
           id="survey-description"
@@ -111,7 +117,7 @@ export function SurveyScene({
         {!isMobile && <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          transition={{ duration: reducedMotion ? 0 : 0.8, ease: "easeOut" }}
           className="mb-1 sm:mb-2 relative"
           role="banner"
           aria-label={config.texts?.headerLabel || config.ariaTexts?.headerLabel || "Survey header"}
@@ -128,7 +134,7 @@ export function SurveyScene({
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          transition={{ duration: reducedMotion ? 0 : 0.8, delay: reducedMotion ? 0 : 0.2 }}
           className="project-title"
           id="survey-title"
         >
@@ -139,7 +145,7 @@ export function SurveyScene({
             className="project-subtitle"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            transition={{ duration: reducedMotion ? 0 : 0.6, delay: reducedMotion ? 0 : 0.3 }}
           >
             {config.subtitle}
           </motion.p>
@@ -149,7 +155,7 @@ export function SurveyScene({
         <motion.div
           initial={{ opacity: 0, y: 40, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
+          transition={{ duration: reducedMotion ? 0 : 0.8, delay: reducedMotion ? 0 : 0.4 }}
           className={`relative ${!isMobile ? 'glass-border-4' : ''} max-w-xs sm:max-w-md w-full space-y-2 sm:p-6 `}
           role="region"
           aria-labelledby="survey-title"
@@ -204,6 +210,7 @@ export function SurveyScene({
                         !isSubmitted && setState(prev => ({ ...prev, rating: star }));
                       }
                     }}
+                    data-testid={`rating-star-${star}`}
                   >
                     <Star
                       size={'20'}
@@ -261,6 +268,7 @@ export function SurveyScene({
                         handleTopicToggle(index);
                       }
                     }}
+                    data-testid={`topic-${index}`}
                   >
                     <div className="relative mr-3">
                       {/* Custom Checkbox */}
@@ -338,6 +346,7 @@ export function SurveyScene({
                 style={{ touchAction: 'manipulation' }}
                 aria-label={isSubmitting ? (config.texts?.submittingLabel || config.ariaTexts?.submittingLabel || "Submitting survey") : (config.texts?.submitLabel || config.ariaTexts?.submitLabel || "Submit survey")}
                 aria-describedby={rating === 0 ? "rating-required" : undefined}
+                data-testid="btn-submit-survey"
               >
                 {/* Button shimmer effect */}
                 <motion.div

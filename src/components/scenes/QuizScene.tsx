@@ -18,7 +18,6 @@ import { FontWrapper } from "../common/FontWrapper";
 import { useIsMobile } from "../ui/use-mobile";
 import { CallToAction } from "../ui/CallToAction";
 import { BottomSheetComponent } from "../ui/bottom-sheet";
-import { useBottomSheet } from "../../hooks/useBottomSheet";
 
 // Question Types
 enum QuestionType {
@@ -284,6 +283,8 @@ interface QuizSceneProps {
   onQuizCompleted: () => void;
   onNextSlide: () => void;
   isVisible?: boolean;
+  reducedMotion?: boolean;
+  disableDelays?: boolean;
 
   // Quiz state props
   currentQuestionIndex: number;
@@ -341,7 +342,7 @@ export const QuizScene = React.memo(function QuizScene({
   // Destructure ariaTexts from config for accessibility
   const { ariaTexts } = config || {};
   // Theme state for forcing re-renders when theme changes
-  const [themeState, setThemeState] = React.useState(0);
+  const [/* themeState */, setThemeState] = React.useState(0);
 
   // State to store the result of the last answered question for BottomSheet title
   const [lastAnswerResult, setLastAnswerResult] = React.useState<{ wasCorrect: boolean; wasLastQuestion: boolean } | null>(null);
@@ -377,7 +378,7 @@ export const QuizScene = React.memo(function QuizScene({
   const isMobile = useIsMobile();
 
   // BottomSheet hook for mobile result panel
-  const { isOpen: isBottomSheetOpen, open: openBottomSheet, close: closeBottomSheet } = useBottomSheet();
+  // BottomSheet is controlled via props to BottomSheetComponent; internal hook not used here
 
   // Get questions from config
   const questions = useMemo(() => config?.questions?.list || [], [config?.questions?.list]);
@@ -633,7 +634,7 @@ export const QuizScene = React.memo(function QuizScene({
   // Memoized event handlers for better performance
   const handleSliderChange = useCallback((value: number[]) => {
     setSliderValue(value[0]);
-  }, []);
+  }, [setSliderValue]);
 
   const handleMultiSelectToggle = useCallback((optionId: string) => {
     if (showResult || isLoading) return;
@@ -642,7 +643,7 @@ export const QuizScene = React.memo(function QuizScene({
         ? prev.filter((id) => id !== optionId)
         : [...prev, optionId],
     );
-  }, [showResult, isLoading]);
+  }, [showResult, isLoading, setMultiSelectAnswers]);
 
   // Prevent page navigation when interacting with slider
   const handleSliderContainerTouch = useCallback((e: React.TouchEvent) => {
@@ -799,7 +800,17 @@ export const QuizScene = React.memo(function QuizScene({
         })}
       </div>
     );
-  }, [currentQuestion, currentAnswer, showResult, isLoading, handleAnswer]);
+  }, [currentQuestion, currentAnswer, showResult, isLoading, handleAnswer, ariaTexts?.multipleChoiceLabel, ariaTexts?.multipleChoiceDescription, ariaTexts?.correctAnswerLabel, ariaTexts?.incorrectAnswerLabel]);
+
+  const renderTrueFalseIcon = useCallback((iconName: string) => {
+    const IconComponent = getIconComponent(iconName);
+    return (
+      <IconComponent
+        className={`w-6 h-6 text-[#1C1C1E] dark:text-[#F2F2F7]`}
+        strokeWidth={2}
+      />
+    );
+  }, []);
 
   const renderTrueFalse = useCallback(() => {
     const question = currentQuestion as TrueFalseQuestion;
@@ -914,7 +925,7 @@ export const QuizScene = React.memo(function QuizScene({
                         transition: { duration: 0.4 }
                       } : {}}
                     >
-                      {renderTrueFalseIcon(option.icon, option.value)}
+                      {renderTrueFalseIcon(option.icon)}
                     </motion.div>
                   </motion.div>
 
@@ -979,7 +990,7 @@ export const QuizScene = React.memo(function QuizScene({
         </div>
       </div>
     );
-  }, [currentQuestion, currentAnswer, showResult, isLoading, handleAnswer]);
+  }, [currentQuestion, currentAnswer, showResult, isLoading, handleAnswer, ariaTexts?.trueFalseLabel, ariaTexts?.trueFalseDescription, renderTrueFalseIcon]);
 
   const renderMultiSelect = useCallback(() => {
     const question = currentQuestion as MultiSelectQuestion;
@@ -1110,7 +1121,7 @@ export const QuizScene = React.memo(function QuizScene({
         </div>
       </div>
     );
-  }, [currentQuestion, multiSelectAnswers, showResult, isLoading, handleMultiSelectToggle, handleAnswer]);
+  }, [currentQuestion, multiSelectAnswers, showResult, isLoading, handleMultiSelectToggle, handleAnswer, config.texts?.checkAnswer]);
 
   const renderSliderScale = useCallback(() => {
     const question = currentQuestion as SliderScaleQuestion;
@@ -1230,7 +1241,7 @@ export const QuizScene = React.memo(function QuizScene({
         </div>
       </div>
     );
-  }, [currentQuestion, sliderValue, showResult, isLoading, handleSliderChange, handleAnswer, themeState]);
+  }, [currentQuestion, sliderValue, showResult, isLoading, handleSliderChange, handleAnswer, handleSliderContainerTouch, handleSliderContainerWheel, config.texts?.evaluating, config.texts?.completeEvaluation]);
 
   const renderDragDrop = useCallback(() => {
     const question = currentQuestion as DragDropQuestion;
@@ -1666,7 +1677,7 @@ export const QuizScene = React.memo(function QuizScene({
         )}
       </div>
     );
-  }, [currentQuestion, draggedItems, selectedItem, showResult, isLoading, setSelectedItem, setDraggedItems, handleAnswer]);
+  }, [currentQuestion, draggedItems, selectedItem, showResult, isLoading, setSelectedItem, setDraggedItems, handleAnswer, config.texts?.mobileInstructions, config.texts?.desktopInstructions, config.texts?.options, config.texts?.tapHere, config.texts?.clearCategory, config.texts?.checkAnswer, config.texts?.evaluating, config.texts?.checkAnswerButton, config.texts?.categories, config.texts?.removeItem]);
 
   const renderQuestion = useCallback(() => {
     switch (currentQuestion?.type) {
@@ -1686,13 +1697,13 @@ export const QuizScene = React.memo(function QuizScene({
   }, [currentQuestion?.type, renderMultipleChoice, renderTrueFalse, renderMultiSelect, renderSliderScale, renderDragDrop]);
 
   const isAnswerCorrect = useMemo(() => {
-    if (currentQuestion?.type === QuestionType.TRUE_FALSE) {
-      return currentAnswer === currentQuestion.correctAnswer;
+    const type = currentQuestion?.type;
+    if (type === QuestionType.TRUE_FALSE) {
+      const correct = (currentQuestion as TrueFalseQuestion | undefined)?.correctAnswer;
+      return currentAnswer === correct;
     }
     return currentAnswer ? validateAnswer(currentAnswer) : false;
-  },
-    [currentAnswer, validateAnswer]
-  );
+  }, [currentAnswer, validateAnswer, currentQuestion]);
 
   useEffect(() => {
     if (currentQuestion?.type === QuestionType.SLIDER_SCALE && !showResult && sliderContainerRef.current) {
@@ -1789,15 +1800,7 @@ export const QuizScene = React.memo(function QuizScene({
     return LucideIcons.HelpCircle;
   };
 
-  const renderTrueFalseIcon = (iconName: string, isTrue: boolean) => {
-    const IconComponent = getIconComponent(iconName);
-    return (
-      <IconComponent
-        className={`w-6 h-6 text-[#1C1C1E] dark:text-[#F2F2F7]`}
-        strokeWidth={2}
-      />
-    );
-  };
+
 
 
 
@@ -1849,6 +1852,7 @@ export const QuizScene = React.memo(function QuizScene({
         aria-label={ariaTexts?.mainLabel || `Quiz: ${config.title}`}
         aria-describedby="quiz-description"
         tabIndex={-1}
+        data-testid="scene-quiz"
       >
         <div
           id="quiz-description"
@@ -1920,7 +1924,9 @@ export const QuizScene = React.memo(function QuizScene({
             </div>}
 
             {/* Question Content */}
-            <div className="mb-5" role="group" aria-label="Answer options">{renderQuestion()}</div>
+            <div className="mb-5" role="group" aria-label="Answer options" data-testid="quiz-question">
+              {renderQuestion()}
+            </div>
 
             {/* Result Panel - Desktop */}
             {!isMobile && (
@@ -1995,6 +2001,7 @@ export const QuizScene = React.memo(function QuizScene({
                             onClick={retryQuestion}
                             disabled={isAnswerLocked}
                             className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
+                            data-testid="btn-retry-question"
                           >
                             {/* Button shimmer effect */}
                             <motion.div
@@ -2029,6 +2036,7 @@ export const QuizScene = React.memo(function QuizScene({
                                 whileTap={{ scale: 0.95 }}
                                 onClick={handleNextQuestion}
                                 className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
+                                data-testid="btn-next-question"
                               >
                                 {/* Button shimmer effect */}
                                 <motion.div
@@ -2063,6 +2071,7 @@ export const QuizScene = React.memo(function QuizScene({
                                   onNextSlide();
                                 }}
                                 className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
+                                data-testid="btn-next-slide"
                               >
                                 {/* Button shimmer effect */}
                                 <motion.div
@@ -2250,10 +2259,10 @@ export const QuizScene = React.memo(function QuizScene({
         </motion.div>
 
         {/* Call to Action - Conditional text based on quiz state */}
-        <CallToAction 
+        <CallToAction
           text={
-            currentQuestionIndex === questions.length - 1 && showResult 
-              ? "Continue" 
+            currentQuestionIndex === questions.length - 1 && showResult
+              ? "Continue"
               : "Answer to Continue"
           }
           delay={0.8}

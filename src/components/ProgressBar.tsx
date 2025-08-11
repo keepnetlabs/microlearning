@@ -61,6 +61,8 @@ interface ProgressBarProps {
   totalScenes: number;
   language?: string;
   config?: Partial<ProgressBarConfig>;
+  dataTestId?: string;
+  reducedMotion?: boolean;
 }
 
 const defaultConfig: ProgressBarConfig = {
@@ -153,7 +155,7 @@ const defaultConfig: ProgressBarConfig = {
   ariaLabel: 'Eğitim ilerlemesi'
 };
 
-export function ProgressBar({ currentScene, totalScenes, language = 'en', config = {} }: ProgressBarProps) {
+export function ProgressBar({ currentScene, totalScenes, language = 'en', config = {}, dataTestId, reducedMotion = false }: ProgressBarProps) {
   // Calculate progress so that the first scene (Intro) starts at 0%
   // `currentScene` is expected as 1-based (App passes `currentScene + 1`)
   const normalizedTotal = Math.max(totalScenes - 1, 1);
@@ -161,8 +163,28 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
   const progress = (normalizedCurrent / normalizedTotal) * 100;
   const finalConfig = { ...defaultConfig, ...config };
   const isMobile = useIsMobile();
+  const tooltipTransition = {
+    duration: reducedMotion ? 0 : 0.8,
+    ease: "easeOut" as const,
+    type: reducedMotion ? undefined : ("spring" as const),
+    stiffness: reducedMotion ? 0 : 100,
+    damping: reducedMotion ? 0 : 15,
+  };
+  const fillTransition = {
+    duration: reducedMotion ? 0 : 1.2,
+    ease: "easeOut" as const,
+    type: reducedMotion ? undefined : ("spring" as const),
+    stiffness: reducedMotion ? 0 : 80,
+  };
+  const flowingTransition = {
+    duration: reducedMotion ? 0 : 3,
+    repeat: reducedMotion ? 0 : Infinity,
+    ease: "easeInOut" as const,
+    repeatDelay: reducedMotion ? 0 : 1,
+  };
+
   return (
-    <div className={`w-full ${isMobile && progress === 100 ? 'mr-8' : 'mr-0'}`} role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label={`${finalConfig.ariaLabel}: %${Math.round(progress)} ${finalConfig.progressLabel}`}>
+    <div className={`w-full ${isMobile && progress === 100 ? 'mr-8' : 'mr-0'}`} role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label={`${finalConfig.ariaLabel}: %${Math.round(progress)} ${finalConfig.progressLabel}`} data-testid={dataTestId}>
       {/* Mobile Progress Bar - Header Bottom Row */}
       <div className="md:hidden md:mt-4">
         {/* Responsive Container with Margins */}
@@ -170,19 +192,13 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
           {/* Progress Tooltip - Pill-shaped thumb on progress bar */}
           <div className="relative w-full">
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: reducedMotion ? 1 : 0, scale: reducedMotion ? 1 : 0.9 }}
               animate={{
                 opacity: 1,
                 scale: 1,
                 left: `calc(${progress}% - 8px)`
               }}
-              transition={{
-                duration: 0.8,
-                ease: "easeOut",
-                type: "spring",
-                stiffness: 100,
-                damping: 15
-              }}
+              transition={tooltipTransition}
               className="absolute z-20"
               style={{
                 top: '50%',
@@ -229,7 +245,7 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
               className="relative h-full overflow-hidden"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
-              transition={{ duration: 1.2, ease: "easeOut", type: "spring", stiffness: 80 }}
+              transition={fillTransition}
               style={{
                 // CLEAN INDUSTRY STANDARD PROGRESS FILL - Apple/Google style
                 background: "rgba(242, 242, 247, 0.10)",
@@ -239,16 +255,8 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
               {/* Enhanced flowing animation with liquid glass effect */}
               <motion.div
                 className="absolute inset-0"
-                animate={{
-                  x: ['-100%', '200%'],
-                  opacity: [0, 0.6, 0]
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  repeatDelay: 1
-                }}
+                animate={reducedMotion ? undefined : { x: ['-100%', '200%'], opacity: [0, 0.6, 0] }}
+                transition={flowingTransition}
                 style={{
                   width: '150%',
                   background: `linear-gradient(90deg, 
@@ -369,16 +377,8 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
               {/* Enhanced flowing animation with liquid glass effect */}
               <motion.div
                 className="absolute inset-0"
-                animate={{
-                  x: ['-100%', '200%'],
-                  opacity: [0, 0.6, 0]
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  repeatDelay: 1
-                }}
+                animate={reducedMotion ? undefined : { x: ['-100%', '200%'], opacity: [0, 0.6, 0] }}
+                transition={flowingTransition}
                 style={{
                   width: '150%',
                   background: `linear-gradient(90deg, 

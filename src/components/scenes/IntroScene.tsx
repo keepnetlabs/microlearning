@@ -365,8 +365,11 @@ const StatsItem = React.memo(({
 
 export const IntroScene = React.memo(({
   config,
-  onNextSlide
-}: { config: IntroSceneConfig; onNextSlide?: () => void; }) => {
+  onNextSlide,
+  sceneId,
+  reducedMotion,
+  disableDelays
+}: { config: IntroSceneConfig; onNextSlide?: () => void; sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean; }) => {
 
   // 🎯 OPTİMİZE EDİLDİ - Daha erken animasyon başlangıcı
   const [isVisible, setIsVisible] = useState(false);
@@ -374,10 +377,10 @@ export const IntroScene = React.memo(({
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(true);
-    }, 10); // 10ms delay ile animasyonlar daha erken başlar
+    }, disableDelays ? 0 : 10); // 10ms delay ile animasyonlar daha erken başlar
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [disableDelays]);
 
   const {
     title,
@@ -506,7 +509,7 @@ export const IntroScene = React.memo(({
   }), [sparkles]);
 
   return (
-    <FontWrapper variant="primary" className={containerClassName}>
+    <FontWrapper variant="primary" className={containerClassName} data-scene-type={(config as any)?.scene_type || 'intro'} data-scene-id={sceneId as any} data-testid="scene-intro">
       {/* Apple-style Background Sparkles - Balanced */}
       {sparkles?.enabled && (
         <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
@@ -555,7 +558,7 @@ export const IntroScene = React.memo(({
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 30 }}
-        transition={{ duration: 0.6, ease: "easeOut", delay: delays.welcome }}
+        transition={{ duration: reducedMotion ? 0 : 0.6, ease: "easeOut", delay: reducedMotion ? 0 : delays.welcome }}
         className="relative"
       >
         {/* Scene Icon with Enhanced Effects */}
@@ -567,10 +570,10 @@ export const IntroScene = React.memo(({
             rotateY: isVisible ? 0 : 180
           }}
           transition={{
-            duration: 0.8,
-            delay: delays.icon,
-            type: "spring",
-            stiffness: 200
+            duration: reducedMotion ? 0 : 0.8,
+            delay: reducedMotion ? 0 : delays.icon,
+            type: reducedMotion ? undefined : "spring",
+            stiffness: reducedMotion ? 0 : 200
           }}
           className="flex justify-center mb-1 sm:mb-2 relative"
         >
@@ -617,18 +620,18 @@ export const IntroScene = React.memo(({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
-          transition={{ duration: 0.6, delay: delays.title }}
+          transition={{ duration: reducedMotion ? 0 : 0.6, delay: reducedMotion ? 0 : delays.title }}
         >
           <motion.h1
             className="project-title"
             initial={{ opacity: 0 }}
             animate={{ opacity: isVisible ? 1 : 0 }}
-            transition={{ duration: 0.7, delay: delays.titleWords }}
+            transition={{ duration: reducedMotion ? 0 : 0.7, delay: reducedMotion ? 0 : delays.titleWords }}
           >
             <motion.span
               initial={{ display: "inline-block", opacity: 0, y: 20 }}
               animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
-              transition={{ delay: delays.titleWordStagger }}
+              transition={{ delay: reducedMotion ? 0 : delays.titleWordStagger }}
             >
               {title}
             </motion.span>
@@ -638,7 +641,7 @@ export const IntroScene = React.memo(({
             className="project-subtitle"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
-            transition={{ duration: 0.6, delay: delays.subtitle }}
+            transition={{ duration: reducedMotion ? 0 : 0.6, delay: reducedMotion ? 0 : delays.subtitle }}
           >
             {subtitle}
           </motion.p>
@@ -654,10 +657,10 @@ export const IntroScene = React.memo(({
           scale: isVisible ? 1 : 0.95
         }}
         transition={{
-          duration: 0.6,
-          delay: delays.card,
-          type: "spring",
-          stiffness: 120
+          duration: reducedMotion ? 0 : 0.6,
+          delay: reducedMotion ? 0 : delays.card,
+          type: reducedMotion ? undefined : "spring",
+          stiffness: reducedMotion ? 0 : 120
         }}
         whileHover={{
           y: -5,
@@ -703,13 +706,14 @@ export const IntroScene = React.memo(({
 
       {/* Enhanced Call to Action */}
       {callToActionText && (
-        <CallToAction 
+        <CallToAction
           text={typeof callToActionText === 'string' ? callToActionText : undefined}
           mobileText={typeof callToActionText === 'object' ? callToActionText.mobile : undefined}
           desktopText={typeof callToActionText === 'object' ? callToActionText.desktop : undefined}
           isVisible={isVisible}
           delay={delays.cta}
           onClick={onNextSlide}
+          dataTestId="cta-intro"
         />
       )}
     </FontWrapper>
