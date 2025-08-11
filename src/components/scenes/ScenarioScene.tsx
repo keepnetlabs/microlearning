@@ -94,6 +94,8 @@ interface ScenarioSceneConfig {
   videoContainerClassName?: string;
   texts?: {
     transcriptLoading?: string;
+    ctaLocked?: string;
+    ctaUnlocked?: string;
   };
   ariaTexts?: {
     mainLabel?: string;
@@ -121,6 +123,7 @@ export function ScenarioScene({
   const [transcriptData, setTranscriptData] = useState<string>('');
   const [isLoadingTranscript, setIsLoadingTranscript] = useState(false);
   const [transcriptError, setTranscriptError] = useState<string | null>(null);
+  const [isVideoCompleted, setIsVideoCompleted] = useState(false);
 
   // URL algılama fonksiyonu
   const isUrl = (str: string): boolean => {
@@ -316,6 +319,7 @@ export function ScenarioScene({
               transcriptTitle={config.video.transcriptTitle}
               className="w-full"
               data-testid="scenario-video"
+              onEnded={() => setIsVideoCompleted(true)}
             />
           </motion.section>
         )}
@@ -323,13 +327,20 @@ export function ScenarioScene({
         {/* Call to Action */}
         {config.callToActionText && (
           <CallToAction
-            text={typeof config.callToActionText === 'string' ? config.callToActionText : undefined}
-            mobileText={typeof config.callToActionText === 'object' ? config.callToActionText.mobile : undefined}
-            desktopText={typeof config.callToActionText === 'object' ? config.callToActionText.desktop : undefined}
+            text={isVideoCompleted
+              ? (
+                typeof config.callToActionText === 'string'
+                  ? config.callToActionText
+                  : config.texts?.ctaUnlocked || 'Continue'
+              )
+              : (config.texts?.ctaLocked || 'Watch to continue')}
+            mobileText={isVideoCompleted && typeof config.callToActionText === 'object' ? config.callToActionText.mobile : undefined}
+            desktopText={isVideoCompleted && typeof config.callToActionText === 'object' ? config.callToActionText.desktop : undefined}
             className="mt-0 sm:mt-0"
             delay={0.8}
             onClick={onNextSlide}
             dataTestId="cta-scenario"
+            disabled={!isVideoCompleted}
           />
         )}
 

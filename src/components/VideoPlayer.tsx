@@ -34,6 +34,7 @@ interface VideoPlayerProps {
   transcript?: TranscriptRow[] | string;
   showTranscript?: boolean;
   transcriptTitle?: string;
+  onEnded?: () => void;
   ariaTexts?: {
     mainLabel?: string;
     mainDescription?: string;
@@ -107,6 +108,7 @@ export function VideoPlayer({
   transcript,
   showTranscript = true,
   transcriptTitle = "Video Transkripti",
+  onEnded,
   ariaTexts,
   dataTestId,
   reducedMotion = false,
@@ -458,7 +460,12 @@ export function VideoPlayer({
 
   const handleVideoEnded = useCallback(() => {
     setIsVideoEnded(true);
-  }, []);
+    if (typeof onEnded === 'function') {
+      try {
+        onEnded();
+      } catch { }
+    }
+  }, [onEnded]);
   useEffect(() => {
     const video = videoRef.current;
     if (video) {

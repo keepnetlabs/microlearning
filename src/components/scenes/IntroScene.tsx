@@ -667,7 +667,7 @@ export const IntroScene = React.memo(({
           scale: 1.02,
           transition: { type: "spring", stiffness: 400 }
         }}
-        className={`relative p-4 sm:p-6 md:p-8 glass-border-1 max-w-xs sm:max-w-md w-full mx-2`}
+        className={`relative p-4 sm:p-6 md:p-8 max-w-xs sm:max-w-md w-full mx-2 ${!isMobile ? 'glass-border-1' : 'glass-border-2'}`}
       >
         <div className="corner-top-left"></div>
         <div className="corner-bottom-right"></div>

@@ -16,6 +16,7 @@ interface CallToActionProps {
   dataTestId?: string;
   reducedMotion?: boolean;
   portalContainer?: Element;
+  disabled?: boolean;
 }
 
 export function CallToAction({
@@ -29,7 +30,8 @@ export function CallToAction({
   reserveSpace = true,
   dataTestId,
   reducedMotion = false,
-  portalContainer
+  portalContainer,
+  disabled = false
 }: CallToActionProps) {
   const isMobile = useIsMobile();
   const buttonRef = useRef<HTMLButtonElement | null>(null);
@@ -85,13 +87,15 @@ export function CallToAction({
           boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
         }}
         whileTap={reducedMotion ? undefined : { scale: 0.95 }}
-        onClick={onClick}
-        className={`group relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] ${buttonMobileClasses}`}
+        onClick={(e) => { if (!disabled) onClick?.(); e.currentTarget.blur(); }}
+        disabled={disabled}
+        aria-disabled={disabled}
+        className={`group relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] ${buttonMobileClasses} ${disabled ? 'opacity-60 pointer-events-none' : ''}`}
       >
         {/* Button shimmer effect */}
         <motion.div
           className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-          animate={reducedMotion ? undefined : { x: ['-100%', '200%'] }}
+          animate={disabled || reducedMotion ? undefined : { x: ['-100%', '200%'] }}
           transition={reducedMotion ? undefined : {
             duration: 2,
             repeat: Infinity,

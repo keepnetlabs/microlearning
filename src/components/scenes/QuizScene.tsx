@@ -2267,6 +2267,8 @@ export const QuizScene = React.memo(function QuizScene({
           }
           delay={0.8}
           onClick={onNextSlide}
+          disabled={!(currentQuestionIndex === questions.length - 1 && showResult)}
+          dataTestId="cta-quiz"
         />
 
       </div>

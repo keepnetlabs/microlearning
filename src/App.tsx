@@ -273,7 +273,7 @@ export default function App(props: AppProps = {}) {
     loadingSpinner: `animate-spin`,
 
     // Content card
-    contentCard: `absolute inset-0 w-full h-full glass-border-2 overflow-hidden transition-colors duration-300`,
+    contentCard: `relative inset-0 w-full h-full overflow-hidden transition-colors duration-300`,
 
     // Navigation button
     navButton: `relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full backdrop-blur-xl border border-${themeConfig.colors?.surface || 'white'}/60 dark:border-gray-600/60 shadow-lg transition-all duration-300 focus:outline-none`,
@@ -1539,7 +1539,7 @@ export default function App(props: AppProps = {}) {
                     animate="center"
                     exit="exit"
                     transition={slideTransition}
-                    className={cssClasses.contentCard}
+                    className={`${cssClasses.contentCard} ${!isMobile ? 'glass-border-2' : 'glass-desktop-2'}`}
                     onAnimationComplete={handleAnimationComplete}
                     whileHover={!isMobile ? {
                       y: -2,
@@ -1589,7 +1589,7 @@ export default function App(props: AppProps = {}) {
                         {appConfig.theme?.ariaTexts?.contentDescription || "Scrollable training content area with interactive learning modules"}
                       </div>
                       {/* Optimized Content Padding - Industry Standards */}
-                      <div className="p-2 py-4 sm:p-3 sm:py-4 md:p-4 lg:p-5">
+                      <div className="p-2 py-0 sm:p-3 sm:py-4 md:p-4 lg:p-5">
                         <motion.div
                           initial={{ opacity: 0, y: isMobile ? 20 : 30 }}
                           animate={{ opacity: 1, y: 0 }}
