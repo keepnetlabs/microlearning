@@ -384,12 +384,6 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
               className="relative w-16 h-16 sm:w-20 sm:h-20 glass-border-2 flex items-center justify-center mx-auto"
               animate={{
                 scale: celebrationPhase >= 1 ? [1, 1.2, 1.05, 1] : [1, 1.05, 1],
-                boxShadow: [
-                  "0 20px 40px rgba(16, 185, 129, 0.2)",
-                  "0 25px 50px rgba(16, 185, 129, 0.4)",
-                  "0 30px 60px rgba(16, 185, 129, 0.3)",
-                  "0 20px 40px rgba(16, 185, 129, 0.2)"
-                ]
               }}
               transition={{
                 duration: celebrationPhase >= 1 ? 1 : 2,

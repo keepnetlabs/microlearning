@@ -163,7 +163,7 @@ export async function completeQuizIfPresent(page: Page): Promise<boolean> {
             }
         }
 
-        const retryByText = page.getByRole('button', { name: /Tekrar Dene|Retry/i }).first();
+        const retryByText = page.getByRole('button', { name: /Try again|Tekrar Dene|Retry/i }).first();
         if (await retryByText.isVisible().catch(() => false) && await retryByText.isEnabled().catch(() => false)) {
             if (await tryClick(retryByText, 800)) {
                 await page.waitForTimeout(140);
