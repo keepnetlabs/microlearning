@@ -61,6 +61,7 @@
     "web-vitals": "^3.5.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
     "@playwright/test": "^1.54.2",
     "@types/jest": "^29.5.0",
     "autoprefixer": "^10.4.16",
