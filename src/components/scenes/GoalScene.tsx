@@ -96,13 +96,13 @@ const GoalCard = memo(({ goal, index }: {
           <div className="flex flex-col items-start">
             <motion.h3
               id={`goal-title-${index}`}
-              className="text-sm font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 ease-out"
+              className="text-base font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 ease-out"
             >
               {goal.title}
             </motion.h3>
             {goal.subtitle && (
               <motion.p
-                className="text-xs font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 ease-out mt-0.5"
+                className="text-sm font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 ease-out mt-0.5"
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
@@ -116,7 +116,7 @@ const GoalCard = memo(({ goal, index }: {
         {/* APPLE DESCRIPTION TEXT - Perfect readability */}
         <p
           id={`goal-description-${index}`}
-          className="text-xs text-left text-[#1C1C1E] dark:text-[#F2F2F7] leading-relaxed transition-colors duration-300 ease-out font-medium"
+          className="text-sm text-left text-[#1C1C1E] dark:text-[#F2F2F7] leading-relaxed transition-colors duration-300 ease-out font-medium"
         >
           {goal.description}
         </p>

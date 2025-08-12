@@ -79,7 +79,9 @@ class SCORMService {
                 // SCORM API'yi initialize et
                 const initSuccess = SCORM.init();
                 if (!initSuccess) {
-                    console.error('[SCORM] Initialize başarısız:', SCORM.debug.getCode());
+                    const errorCode = SCORM.debug.getCode();
+                    const errorInfo = SCORM.debug.getInfo();
+                    console.error('[SCORM] Initialize başarısız:', `${errorCode}: ${errorInfo}`);
                     this.data.isAvailable = false;
                     return;
                 }
@@ -117,6 +119,11 @@ class SCORMService {
             this.data.lessonLocation = this.scorm.get('cmi.core.lesson_location') || '';
             this.data.studentId = this.scorm.get('cmi.core.student_id') || '';
             this.data.studentName = this.scorm.get('cmi.core.student_name') || '';
+
+            // Entry değerini set et - resume veya ab-initio
+            const hasProgress = this.data.lessonStatus !== 'not attempted' || this.data.lessonLocation !== '';
+            const entryValue = hasProgress ? 'resume' : 'ab-initio';
+            this.scorm.set('cmi.core.entry', entryValue);
 
             // Score max ve min'i set et (ilk kez açılıyorsa)
             if (!this.scorm.get('cmi.core.score.max')) {
@@ -304,6 +311,9 @@ class SCORMService {
             const currentTotalSeconds = this.parseTimeToSeconds(this.data.totalTime);
             const newTotalSeconds = currentTotalSeconds + deltaSeconds;
             this.data.totalTime = this.formatSCORMTime(newTotalSeconds);
+            
+            // SCORM'a total_time'ı set et
+            this.scorm.set('cmi.core.total_time', this.data.totalTime);
 
             this.lastSessionUpdateMs = now;
 
@@ -510,7 +520,9 @@ class SCORMService {
 
     public getLastError(): string {
         if (!this.scorm) return 'SCORM service not initialized';
-        return this.scorm.debug.getCode();
+        const errorCode = this.scorm.debug.getCode();
+        const errorDescription = this.scorm.debug.getInfo();
+        return errorCode !== '0' ? `${errorCode}: ${errorDescription}` : 'No error';
     }
 
     public commit(): boolean {
@@ -528,7 +540,9 @@ class SCORMService {
                 this.lastCommitTime = Date.now();
                 console.log('[SCORM] Commit başarılı');
             } else {
-                console.error('[SCORM] Commit başarısız:', this.scorm.debug.getCode());
+                const errorCode = this.scorm.debug.getCode();
+                const errorInfo = this.scorm.debug.getInfo();
+                console.error('[SCORM] Commit başarısız:', `${errorCode}: ${errorInfo}`);
             }
 
             return result;

@@ -1,14 +1,17 @@
 import { test, expect } from '@playwright/test';
+import { tryGoToSceneType } from './helpers/navigation';
 
 test.describe('iPhone CTA safe-area padding', () => {
     test.use({});
 
     test('CTA container has bottom padding on mobile', async ({ page }) => {
         await page.goto('/');
-        const cta = page.locator('#global-cta');
-        // If CTA yoksa (config), testi atla
+        // Try intro first, fallback to goal scene
+        let cta = page.locator('#global-cta');
         if (!(await cta.isVisible().catch(() => false))) {
-            test.skip(true, 'CTA not present on intro');
+            const hasGoal = await tryGoToSceneType(page, 'goal');
+            test.skip(!hasGoal, 'CTA not present on intro or goal');
+            cta = page.locator('#global-cta');
         }
         const padding = await cta.evaluate((el) => getComputedStyle(el).paddingBottom);
         // Beklenen: min 16px ya da safe-area resolved değeri

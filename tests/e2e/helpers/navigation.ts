@@ -39,27 +39,21 @@ export async function goNext(page: Page): Promise<boolean> {
             return true;
         } catch { }
     }
-    // Fallback to CTA (click inner button for stability)
-    const cta = page.getByTestId('cta-intro');
-    if (await cta.isVisible().catch(() => false)) {
-        const ctaButton = cta.locator('button');
+    // Fallback to any CTA (data-testid starts with cta-)
+    const anyCta = page.locator('[data-testid^="cta-"]').first();
+    if (await anyCta.isVisible().catch(() => false)) {
+        const ctaButton = anyCta.locator('button');
         if (await ctaButton.isVisible().catch(() => false)) {
-            // brief settle time for animations
             await page.waitForTimeout(60);
-            try {
-                await ctaButton.click({ noWaitAfter: true, timeout: 500 });
-                return true;
-            } catch {
-                // try once more after a short wait
-                await page.waitForTimeout(120);
-                try {
-                    await ctaButton.click({ noWaitAfter: true, timeout: 500 });
-                    return true;
-                } catch {
-                    return false;
-                }
-            }
+            if (await tryClick(ctaButton, 700)) return true;
         }
+        // Some CTA may be the button itself
+        if (await tryClick(anyCta, 700)) return true;
+    }
+    // Fallback by button text
+    const nextByText = page.getByRole('button', { name: /Devam|Continue|Next|Proceed|Sonraki/i }).first();
+    if (await nextByText.isVisible().catch(() => false) && await nextByText.isEnabled().catch(() => false)) {
+        if (await tryClick(nextByText, 700)) return true;
     }
     return false;
 }
@@ -119,6 +113,7 @@ export async function completeQuizIfPresent(page: Page): Promise<boolean> {
             await page.waitForTimeout(100);
         }
 
+        // Desktop test id
         const nextQ = page.getByTestId('btn-next-question');
         if (await nextQ.isVisible().catch(() => false) && await nextQ.isEnabled().catch(() => false)) {
             if (await tryClick(nextQ, 600)) {
@@ -127,10 +122,27 @@ export async function completeQuizIfPresent(page: Page): Promise<boolean> {
             }
         }
 
+        // Mobile bottom sheet button by text
+        const nextQByText = page.getByRole('button', { name: /Sonraki Soru|Next Question/i }).first();
+        if (await nextQByText.isVisible().catch(() => false) && await nextQByText.isEnabled().catch(() => false)) {
+            if (await tryClick(nextQByText, 800)) {
+                await page.waitForTimeout(140);
+                continue;
+            }
+        }
+
         const nextSlide = page.getByTestId('btn-next-slide');
         if (await nextSlide.isVisible().catch(() => false) && await nextSlide.isEnabled().catch(() => false)) {
             if (await tryClick(nextSlide, 600)) {
                 await page.waitForTimeout(120);
+                continue;
+            }
+        }
+
+        const nextSlideByText = page.getByRole('button', { name: /Sonraki Slayt|Next Slide/i }).first();
+        if (await nextSlideByText.isVisible().catch(() => false) && await nextSlideByText.isEnabled().catch(() => false)) {
+            if (await tryClick(nextSlideByText, 800)) {
+                await page.waitForTimeout(140);
                 continue;
             }
         }
@@ -149,6 +161,22 @@ export async function completeQuizIfPresent(page: Page): Promise<boolean> {
                 await page.waitForTimeout(120);
                 continue;
             }
+        }
+
+        const retryByText = page.getByRole('button', { name: /Tekrar Dene|Retry/i }).first();
+        if (await retryByText.isVisible().catch(() => false) && await retryByText.isEnabled().catch(() => false)) {
+            if (await tryClick(retryByText, 800)) {
+                await page.waitForTimeout(140);
+                continue;
+            }
+        }
+
+        // Attempt to close any dialog/bottom-sheet if open
+        const dialog = page.getByRole('dialog').first();
+        if (await dialog.isVisible().catch(() => false)) {
+            // Try escape first
+            await page.keyboard.press('Escape').catch(() => { });
+            await page.waitForTimeout(120);
         }
 
         // If nothing to click, break
@@ -177,7 +205,7 @@ export async function goToSceneType(page: Page, targetType: string, maxSteps = 1
     await expect(page.locator(`[data-scene-type="${targetType}"]`).first()).toBeVisible();
 }
 
-export async function tryGoToSceneType(page: Page, targetType: string, maxSteps = 12, budgetMs = 6000): Promise<boolean> {
+export async function tryGoToSceneType(page: Page, targetType: string, maxSteps = 16, budgetMs = 10000): Promise<boolean> {
     const deadline = Date.now() + budgetMs;
     for (let i = 0; i < maxSteps && Date.now() < deadline; i++) {
         if (await isSceneVisible(page, targetType)) return true;
@@ -185,13 +213,13 @@ export async function tryGoToSceneType(page: Page, targetType: string, maxSteps 
         if (await isSceneVisible(page, 'quiz')) {
             const progressed = await completeQuizIfPresent(page);
             if (progressed) {
-                await page.waitForTimeout(120);
+                await page.waitForTimeout(160);
                 continue;
             }
         }
         const moved = await goNext(page);
         if (!moved) break;
-        await page.waitForTimeout(120);
+        await page.waitForTimeout(160);
     }
     return await isSceneVisible(page, targetType);
 }

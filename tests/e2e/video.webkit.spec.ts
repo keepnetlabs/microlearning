@@ -1,12 +1,13 @@
 import { test, expect } from '@playwright/test';
+import { tryGoToSceneType } from './helpers/navigation';
 
 test.describe('Video player basic controls (if present)', () => {
     test('poster or video container visible', async ({ page }) => {
         await page.goto('/');
+        const reachable = await tryGoToSceneType(page, 'scenario');
+        test.skip(!reachable, 'Scenario scene not present');
         const scenario = page.getByTestId('scene-scenario');
-        if (!(await scenario.isVisible().catch(() => false))) {
-            test.skip(true, 'Scenario scene not present');
-        }
+        await expect(scenario).toBeVisible();
         const section = page.getByTestId('scenario-video-section');
         await expect(section).toBeVisible();
         // Basic check for video container inside

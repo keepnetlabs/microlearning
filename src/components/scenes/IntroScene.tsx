@@ -314,7 +314,7 @@ const HighlightItemComponent = React.memo(({
           <item.Icon size={14} className={`text-[#1C1C1E] dark:text-[#F2F2F7] relative z-10 sm:w-4 sm:h-4`} strokeWidth={2} />
         </motion.div>
       </div>
-      <span className="text-xs sm:text-[12px] max-h-[24px] text-[#1C1C1E] dark:text-[#F2F2F7] font-medium leading-relaxed group-hover:text-[#1C1C1E] dark:group-hover:text-white transition-colors">
+      <span className="text-sm max-h-[24px] text-[#1C1C1E] dark:text-[#F2F2F7] font-medium leading-relaxed group-hover:text-[#1C1C1E] dark:group-hover:text-white transition-colors">
         {item.text}
       </span>
     </motion.div>

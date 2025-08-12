@@ -147,7 +147,7 @@ export function ActionableContentScene({
   const tipIconComponent = useMemo(() => {
     if (tipConfig.iconName) {
       const TipIcon = getIconComponent(tipConfig.iconName);
-      return <TipIcon size={tipConfig.iconSize || 12} aria-hidden="true" />;
+      return <TipIcon size={tipConfig.iconSize || 14} aria-hidden="true" />;
     }
     return null;
   }, [tipConfig.iconName, tipConfig.iconSize]);
@@ -235,13 +235,13 @@ export function ActionableContentScene({
                       <div className="flex-1">
                         <h3
                           id={`${cardId}-title`}
-                          className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] font-medium mb-2"
+                          className="text-base text-[#1C1C1E] dark:text-[#F2F2F7] font-medium mb-2"
                         >
                           {action.title}
                         </h3>
                         <p
                           id={`${cardId}-description`}
-                          className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] mb-3 leading-relaxed"
+                          className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] mb-3 leading-relaxed"
                         >
                           {action.description}
                         </p>
@@ -255,7 +255,7 @@ export function ActionableContentScene({
                             <div className={`text-[#1C1C1E] dark:text-[#F2F2F7] mr-2 mt-[3px] flex-shrink-0`} aria-hidden="true">
                               {tipIconComponent}
                             </div>
-                            <span className={`text-xs text-[#1C1C1E] dark:text-[#F2F2F7]`}>
+                            <span className={`text-sm text-[#1C1C1E] dark:text-[#F2F2F7] text-sm`}>
                               {action.tip}
                             </span>
                           </div>

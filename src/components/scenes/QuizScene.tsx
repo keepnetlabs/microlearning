@@ -645,6 +645,13 @@ export const QuizScene = React.memo(function QuizScene({
     );
   }, [showResult, isLoading, setMultiSelectAnswers]);
 
+  // Resolve CTA text which can be a string or per-device object
+  const resolveCTA = useCallback((text?: string | { mobile?: string; desktop?: string }) => {
+    if (!text) return undefined;
+    if (typeof text === 'string') return text;
+    return isMobile ? (text.mobile ?? text.desktop) : (text.desktop ?? text.mobile);
+  }, [isMobile]);
+
   // Prevent page navigation when interacting with slider
   const handleSliderContainerTouch = useCallback((e: React.TouchEvent) => {
     // Only prevent if it's not on the slider or button
@@ -1972,7 +1979,7 @@ export const QuizScene = React.memo(function QuizScene({
                       </div>
                     )}
 
-                    {/* Simple Action Buttons */}
+                    {/* Simple Action Buttons (Retry only) */}
                     <div className="flex justify-between items-center pt-3 border-t">
                       {/* Status */}
                       <div className="text-sm">
@@ -2021,77 +2028,7 @@ export const QuizScene = React.memo(function QuizScene({
                           </motion.button>
                         )}
 
-                        {(isAnswerCorrect || (!isAnswerCorrect && attempts >= maxAttempts) || isAnswerLocked) && (
-                          <>
-                            {/* Next Question button - shown when not on last question */}
-                            {currentQuestionIndex < questions.length - 1 && (
-                              <motion.button
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ duration: 0.8, delay: 0.4 }}
-                                whileHover={{
-                                  scale: 1.05,
-                                  boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
-                                }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={handleNextQuestion}
-                                className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
-                                data-testid="btn-next-question"
-                              >
-                                {/* Button shimmer effect */}
-                                <motion.div
-                                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                                  animate={{ x: ['-100%', '200%'] }}
-                                  transition={{
-                                    duration: 2,
-                                    repeat: Infinity,
-                                    ease: "linear"
-                                  }}
-                                />
-
-                                <ArrowRight size={16} className={`sm:w-5 sm:h-5 relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
-                                <span className={`text-sm sm:text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
-                                  {config.texts?.nextQuestion || "Sonraki Soru"}
-                                </span>
-                              </motion.button>
-                            )}
-
-                            {/* Next Slide button - shown when quiz is completed (last question answered correctly) */}
-                            {currentQuestionIndex === questions.length - 1 && isAnswerCorrect && (
-                              <motion.button
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ duration: 0.8, delay: 0.4 }}
-                                whileHover={{
-                                  scale: 1.05,
-                                  boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
-                                }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => {
-                                  onNextSlide();
-                                }}
-                                className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
-                                data-testid="btn-next-slide"
-                              >
-                                {/* Button shimmer effect */}
-                                <motion.div
-                                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                                  animate={{ x: ['-100%', '200%'] }}
-                                  transition={{
-                                    duration: 2,
-                                    repeat: Infinity,
-                                    ease: "linear"
-                                  }}
-                                />
-
-                                <ArrowUpRight size={16} className={`sm:w-5 sm:h-5 relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
-                                <span className={`text-sm sm:text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
-                                  {config.texts?.nextSlide || "Sonraki Slayt"}
-                                </span>
-                              </motion.button>
-                            )}
-                          </>
-                        )}
+                        {/* Next buttons removed; CTA at bottom handles navigation */}
                       </div>
                     </div>
                   </motion.div>
@@ -2258,16 +2195,25 @@ export const QuizScene = React.memo(function QuizScene({
           </div>
         </motion.div>
 
-        {/* Call to Action - Conditional text based on quiz state */}
+        {/* Call To Action */}
         <CallToAction
           text={
-            currentQuestionIndex === questions.length - 1 && showResult
-              ? "Continue"
-              : "Answer to Continue"
+            showResult
+              ? (currentQuestionIndex === questions.length - 1
+                ? (resolveCTA(config.quizCompletionCallToActionText) || config.texts?.quizCompleted || "Continue")
+                : (config.texts?.nextQuestion || "Next Question"))
+              : (resolveCTA(config.callToActionText) || "Answer to Continue")
           }
           delay={0.8}
-          onClick={onNextSlide}
-          disabled={!(currentQuestionIndex === questions.length - 1 && showResult)}
+          onClick={() => {
+            if (!showResult) return;
+            if (currentQuestionIndex === questions.length - 1) {
+              onNextSlide();
+            } else {
+              handleNextQuestion();
+            }
+          }}
+          disabled={!showResult}
           dataTestId="cta-quiz"
         />
 

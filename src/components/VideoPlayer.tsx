@@ -675,7 +675,7 @@ export function VideoPlayer({
                   </div>
                   <div>
                     <h3
-                      className="text-sm font-medium text-[#1C1C1E] dark:text-[#F2F2F7]"
+                      className="text-base font-medium text-[#1C1C1E] dark:text-[#F2F2F7]"
                       id="transcript-title"
                     >
                       {transcriptTitle}
@@ -749,7 +749,7 @@ export function VideoPlayer({
                       {/* Timestamp */}
                       <div className="flex-shrink-0 self-center">
                         <span
-                          className={`font-medium transition-colors duration-200 flex items-center gap-1 text-xs ${isActive
+                          className={`font-medium transition-colors duration-200 flex items-center gap-1 text-sm ${isActive
                             ? "font-semibold text-[#1C1C1E] dark:text-[#F2F2F7]"
                             : canAccess
                               ? "text-[#1C1C1E] dark:text-[#F2F2F7]"
@@ -784,14 +784,13 @@ export function VideoPlayer({
                           </div>
 
                           <p
-                            className={`leading-relaxed transition-colors duration-200 ${isActive
+                            className={`leading-relaxed transition-colors text-sm duration-200 ${isActive
                               ? "text-[#1C1C1E] dark:text-slate-50 font-medium"
                               : canAccess
                                 ? "text-[#1C1C1E] dark:text-[#F2F2F7]"
                                 : "text-[#1C1C1E] dark:text-[#F2F2F7] opacity-50"
                               }`}
                             style={{
-                              fontSize: "13px",
                               lineHeight: "1.5",
                               fontWeight: isActive ? "500" : "400",
                               marginTop: "0"

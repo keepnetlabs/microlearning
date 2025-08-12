@@ -339,7 +339,7 @@ export function SurveyScene({
                 whileTap={{ scale: rating > 0 && !isSubmitting ? 0.98 : 1 }}
                 onClick={handleSubmit}
                 disabled={rating === 0 || isSubmitting || isSubmitted}
-                className={`z-50 w-full transition-all font-medium text-sm flex items-center justify-center space-x-2 py-3 rounded-xl glass-border-2 ${rating > 0 && !isSubmitting && !isSubmitted
+                className={`z-50 w-full transition-all flex items-center justify-center space-x-2 py-3 rounded-xl glass-border-2 ${rating > 0 && !isSubmitting && !isSubmitted
                   ? ``
                   : `cursor-not-allowed opacity-70`
                   } text-[#1C1C1E] dark:text-[#F2F2F7] overflow-hidden`}
@@ -362,17 +362,17 @@ export function SurveyScene({
                 {isSubmitting ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin relative z-10" aria-hidden="true"></div>
-                    <span className="relative z-10">{config.texts?.submittingText}</span>
+                    <span className="relative z-10 font-medium">{config.texts?.submittingText}</span>
                   </>
                 ) : isSubmitted ? (
                   <>
                     <CheckCircle size={16} className="relative z-10" aria-hidden="true" />
-                    <span className="relative z-10">{config.texts?.submittedText || 'Submitted'}</span>
+                    <span className="relative z-10 font-medium">{config.texts?.submittedText || 'Submitted'}</span>
                   </>
                 ) : (
                   <>
                     <Send size={16} className="relative z-10" aria-hidden="true" />
-                    <span className="relative z-10">{config.texts?.submitButton}</span>
+                    <span className="relative z-10 font-medium">{config.texts?.submitButton}</span>
                   </>
                 )}
               </motion.button>
@@ -387,18 +387,6 @@ export function SurveyScene({
                   {config.texts?.ratingRequiredText}
                 </p>
               )}
-            </section>
-
-            {/* Data Security Notice */}
-            <section
-              role="complementary"
-              aria-label={config.texts?.securityNoticeLabel || config.ariaTexts?.securityNoticeLabel || "Data security notice"}
-            >
-              <div className="pt-2">
-                <p className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] text-center leading-relaxed">
-                  {config.texts?.dataSecurityNotice}
-                </p>
-              </div>
             </section>
           </div>
         </motion.div>
