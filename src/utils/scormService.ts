@@ -38,6 +38,7 @@ class SCORMService {
     // Embed bridge
     private isEmbedMode: boolean = false;
     private parentOrigin: string = '*';
+    private embedSuspendDataCache: any | null = null;
 
     private data: SCORMData = {
         lessonStatus: 'not attempted',
@@ -63,6 +64,18 @@ class SCORMService {
                 const sp = new URLSearchParams(window.location.search);
                 const po = sp.get('parentOrigin');
                 if (po && po.trim()) this.parentOrigin = po;
+                if (this.isEmbedMode) {
+                    // Listen for suspend data replies from parent shell
+                    window.addEventListener('message', (e: MessageEvent) => {
+                        try {
+                            if (this.parentOrigin !== '*' && e.origin !== this.parentOrigin) return;
+                            const data: any = (e as any).data || {};
+                            if (data && data.type === 'scorm:suspendData') {
+                                this.embedSuspendDataCache = data.payload || null;
+                            }
+                        } catch { }
+                    });
+                }
             }
         } catch { }
     }
@@ -86,6 +99,8 @@ class SCORMService {
                 // We can still use event listeners to flush any pending messages
                 this.setupEventListeners();
                 // No periodic commit needed in embed proxy mode
+                // Request initial suspend_data from parent
+                this.postToParent('scorm:getSuspendData');
                 return;
             }
             // SCORM global object - pipwerks API
@@ -345,6 +360,11 @@ class SCORMService {
 
     private updateSessionTime(): void {
         try {
+            // No-op in embed or when SCORM API is unavailable
+            if (!this.scorm || !this.data.isAvailable) {
+                this.lastSessionUpdateMs = Date.now();
+                return;
+            }
             const now = Date.now();
             const deltaSeconds = Math.floor((now - this.lastSessionUpdateMs) / 1000);
             if (deltaSeconds <= 0) return;
@@ -388,7 +408,25 @@ class SCORMService {
     }
 
     public saveSuspendData(data: any): boolean {
-        if (!this.scorm || !this.data.isAvailable) return false;
+        // Embed proxy when SCORM is unavailable
+        if (!this.scorm || !this.data.isAvailable) {
+            if (this.isEmbedMode) {
+                try {
+                    const enhancedData = {
+                        version: 1,
+                        ...data,
+                        lastUpdate: new Date().toISOString(),
+                        timeSpent: Date.now() - this.sessionStartTime
+                    };
+                    this.postToParent('scorm:setSuspendData', enhancedData);
+                    return true;
+                } catch (error) {
+                    console.error('[SCORM] Suspend data postMessage error:', error);
+                    return false;
+                }
+            }
+            return false;
+        }
 
         try {
             const enhancedData = {
@@ -441,7 +479,13 @@ class SCORMService {
     }
 
     public loadSuspendData(): MicrolearningProgress | null {
-        if (!this.scorm || !this.data.isAvailable) return null;
+        if (!this.scorm || !this.data.isAvailable) {
+            // In embed mode, return last received suspend data (if any)
+            if (this.isEmbedMode) {
+                return this.embedSuspendDataCache as any;
+            }
+            return null;
+        }
 
         try {
             const suspendData = this.scorm.get('cmi.suspend_data');
