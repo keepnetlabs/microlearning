@@ -136,7 +136,7 @@ export const GoalScene = memo(({
 }: { config: GoalSceneConfig; onNextSlide?: () => void; sceneId?: string | number; reducedMotion?: boolean; }) => {
 
   // Default values for removed config properties
-  const defaultContainerClassName = "flex flex-col items-center justify-center h-full text-center px-6";
+  const defaultContainerClassName = "flex flex-col items-center justify-center h-full text-center";
   const defaultCardSpacing = "space-y-6";
   const defaultMaxWidth = "max-w-md w-full";
 

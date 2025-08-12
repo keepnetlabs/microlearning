@@ -2119,6 +2119,40 @@ export const QuizScene = React.memo(function QuizScene({
                       )}
                     </>
                   )}
+
+                  {/* Retry button - shown when incorrect and attempts remain */}
+                  {!lastAnswerResult?.wasCorrect && attempts < maxAttempts && !isAnswerLocked && (
+                    <motion.button
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.8, delay: 0.2 }}
+                      whileHover={{
+                        scale: 1.05,
+                        boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
+                      }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        setTimeout(() => {
+                          retryQuestion();
+                        }, 300);
+                      }}
+                      className={`relative flex items-center justify-center space-x-2 px-4 py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full`}
+                    >
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                        animate={{ x: ['-100%', '200%'] }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          ease: "linear"
+                        }}
+                      />
+                      <RefreshCw size={18} className={`relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
+                      <span className={`text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
+                        {config.texts?.retryQuestion || "Tekrar Dene"}
+                      </span>
+                    </motion.button>
+                  )}
                 </div>
               </BottomSheetComponent>
             )}
@@ -2132,7 +2166,13 @@ export const QuizScene = React.memo(function QuizScene({
               ? (!isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked
                 ? (config.texts?.retryQuestion || "Try Again")
                 : (currentQuestionIndex === questions.length - 1
-                  ? (resolveCTA(config.quizCompletionCallToActionText) || config.texts?.quizCompleted || "Continue")
+                  ? (
+                    // Prefer explicit completion CTA, then Next Slide label, then generic completed text
+                    resolveCTA(config.quizCompletionCallToActionText) ||
+                    config.texts?.nextSlide ||
+                    config.texts?.quizCompleted ||
+                    "Sonraki Slayt"
+                  )
                   : (config.texts?.nextQuestion || "Next Question")))
               : (resolveCTA(config.callToActionText) || "Answer to Continue")
           }

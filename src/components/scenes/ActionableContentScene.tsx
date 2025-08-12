@@ -95,7 +95,7 @@ export function ActionableContentScene({
   reducedMotion
 }: ActionableContentSceneProps & { onNextSlide?: () => void; sceneId?: string | number; reducedMotion?: boolean; }) {
   // Default values for container classes
-  const defaultContainerClassName = "flex flex-col items-center justify-start min-h-full px-2 sm:px-6 overflow-y-auto";
+  const defaultContainerClassName = "flex flex-col items-center justify-start min-h-full sm:px-6 overflow-y-auto";
 
   // Default layout configuration
   const defaultCardSpacing = "space-y-4";

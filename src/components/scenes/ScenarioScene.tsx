@@ -117,7 +117,7 @@ export function ScenarioScene({
   disableDelays
 }: ScenarioSceneProps & { onNextSlide?: () => void; sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean; }) {
   // Default values for container classes
-  const defaultContainerClassName = "flex flex-col items-center justify-start h-full px-4 sm:px-6 overflow-y-auto";
+  const defaultContainerClassName = "flex flex-col items-center justify-start h-full sm:px-6 overflow-y-auto";
   const defaultVideoContainerClassName = "w-full max-w-sm sm:max-w-md lg:max-w-lg";
 
   const [transcriptData, setTranscriptData] = useState<string>('');

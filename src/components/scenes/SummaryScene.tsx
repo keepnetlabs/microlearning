@@ -304,7 +304,7 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
 
   return (
     <FontWrapper>
-      <div className={`flex flex-col items-center justify-start h-full px-4 py-2 sm:px-6 overflow-y-auto relative`} data-scene-type={(config as any)?.scene_type || 'summary'} data-scene-id={sceneId as any} data-testid="scene-summary">
+      <div className={`flex flex-col items-center justify-start h-full px-1.5 py-2 sm:px-6 overflow-y-auto relative`} data-scene-type={(config as any)?.scene_type || 'summary'} data-scene-id={sceneId as any} data-testid="scene-summary">
         {/* Confetti Animation */}
         <AnimatePresence>
           {showConfetti && (

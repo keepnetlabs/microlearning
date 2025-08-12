@@ -34,7 +34,7 @@ const DEFAULT_SPARKLES = {
   drifting: { count: 6, opacity: 15, size: 0.5, duration: 18, delay: 5 },
   breathing: { count: 7, opacity: 12, size: 0.5, duration: 11, delay: 6 }
 };
-const DEFAULT_CONTAINER_CLASSNAME = "flex flex-col items-center justify-center h-full text-center relative overflow-hidden px-2 sm:px-4";
+const DEFAULT_CONTAINER_CLASSNAME = "flex flex-col items-center justify-center h-full text-center relative overflow-hidden sm:px-4";
 const DEFAULT_ANIMATION_DELAYS = { welcomeDelay: 0.3, iconDelay: 0.1, titleDelay: 0.2, subtitleDelay: 0.4, cardDelay: 0.3, statsDelay: 0.5, ctaDelay: 0.6 };
 
 // Props interfaces

@@ -98,7 +98,7 @@ export function SurveyScene({
   return (
     <FontWrapper>
       <main
-        className="flex flex-col items-center justify-center h-full px-4 sm:px-6"
+        className="flex flex-col items-center justify-center h-full sm:px-6"
         role="main"
         aria-label={config.texts?.mainLabel || config.ariaTexts?.mainLabel || "Survey form"}
         aria-describedby="survey-description"

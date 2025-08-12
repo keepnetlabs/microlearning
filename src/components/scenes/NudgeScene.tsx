@@ -40,7 +40,7 @@ export function NudgeScene({ config, onNextSlide, sceneId }: NudgeSceneProps & {
 
   return (
     <FontWrapper>
-      <div className="flex flex-col items-center justify-center h-full px-6" data-scene-type={(config as any)?.scene_type || 'nudge'} data-scene-id={sceneId as any}>
+      <div className="flex flex-col items-center justify-center h-full" data-scene-type={(config as any)?.scene_type || 'nudge'} data-scene-id={sceneId as any}>
         {!isMobile && <div className="mb-4 relative">
           <div className="relative p-3 glass-border-3">
             <IconComponent
