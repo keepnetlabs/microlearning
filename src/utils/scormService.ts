@@ -1,16 +1,7 @@
 // SCORM 1.2 Compliant Service - Enhanced Version
 // @ts-ignore
 import { SCORM } from 'pipwerks-scorm-api-wrapper';
-if (process.env.NODE_ENV === 'development') {
-    (window as any).API = {
-        LMSInitialize: () => 'true',
-        LMSGetValue: (param: string) => '',
-        LMSSetValue: (param: string, value: string) => 'true',
-        LMSCommit: () => 'true',
-        LMSFinish: () => 'true',
-        LMSGetLastError: () => '0'
-    };
-}
+
 interface SCORMData {
     lessonStatus: string;
     scoreRaw: number;
@@ -44,6 +35,9 @@ class SCORMService {
     private commitInProgress: boolean = false;
     private lastSessionUpdateMs: number = Date.now();
     private readonly MIN_COMMIT_INTERVAL_MS: number = 1500;
+    // Embed bridge
+    private isEmbedMode: boolean = false;
+    private parentOrigin: string = '*';
 
     private data: SCORMData = {
         lessonStatus: 'not attempted',
@@ -60,6 +54,24 @@ class SCORMService {
 
     constructor() {
         // Don't initialize in constructor for lazy loading
+        // Detect embed (iframe) mode and read optional parentOrigin
+        try {
+            const inBrowser = typeof window !== 'undefined';
+            const topDifferent = inBrowser ? ((): boolean => { try { return window.top !== window; } catch { return true; } })() : false;
+            this.isEmbedMode = topDifferent;
+            if (inBrowser) {
+                const sp = new URLSearchParams(window.location.search);
+                const po = sp.get('parentOrigin');
+                if (po && po.trim()) this.parentOrigin = po;
+            }
+        } catch { }
+    }
+
+    private postToParent(type: string, payload?: any): void {
+        if (!this.isEmbedMode) return;
+        try {
+            window.parent.postMessage({ type, payload }, this.parentOrigin || '*');
+        } catch { }
     }
 
     private async initialize(): Promise<void> {
@@ -199,6 +211,21 @@ class SCORMService {
     }
 
     public updateProgress(totalPoints: number, currentScene: number, totalScenes: number): boolean {
+        // If SCORM is not available, proxy to parent shell in embed mode
+        if (!this.scorm || !this.data.isAvailable) {
+            if (this.isEmbedMode) {
+                const scoreRaw = Math.min(100, Math.max(0, Math.round(totalPoints)));
+                const status = currentScene >= totalScenes - 1 ? (scoreRaw >= 80 ? 'passed' : 'completed') : 'incomplete';
+                this.postToParent('scorm:updateProgress', {
+                    sceneIndex: currentScene,
+                    totalPoints: scoreRaw,
+                    totalScenes,
+                    status
+                });
+                return true;
+            }
+        }
+
         if (!this.scorm || !this.data.isAvailable) return false;
 
         try {
@@ -255,7 +282,21 @@ class SCORMService {
     }
 
     public updateQuizResult(isCompleted: boolean, score: number, passingScore: number = 80): boolean {
-        if (!this.scorm || !this.data.isAvailable) return false;
+        // If SCORM not available, proxy to parent in embed mode
+        if (!this.scorm || !this.data.isAvailable) {
+            if (isCompleted && this.isEmbedMode) {
+                const normalizedScore = Math.min(100, Math.max(0, score));
+                const status = normalizedScore >= passingScore ? 'passed' : 'failed';
+                this.postToParent('scorm:updateProgress', {
+                    sceneIndex: undefined,
+                    totalPoints: normalizedScore,
+                    totalScenes: undefined,
+                    status
+                });
+                return true;
+            }
+            return false;
+        }
         try {
             if (isCompleted) {
                 const normalizedScore = Math.min(100, Math.max(0, score));
@@ -311,7 +352,7 @@ class SCORMService {
             const currentTotalSeconds = this.parseTimeToSeconds(this.data.totalTime);
             const newTotalSeconds = currentTotalSeconds + deltaSeconds;
             this.data.totalTime = this.formatSCORMTime(newTotalSeconds);
-            
+
             // Set total_time to SCORM
             this.scorm.set('cmi.core.total_time', this.data.totalTime);
 
@@ -467,7 +508,14 @@ class SCORMService {
     }
 
     public finish(): boolean {
-        if (!this.scorm || !this.data.isAvailable || !this.isInitialized) return false;
+        // If no SCORM, still notify parent shell in embed mode
+        if (!this.scorm || !this.data.isAvailable || !this.isInitialized) {
+            if (this.isEmbedMode) {
+                this.postToParent('scorm:finish');
+                return true;
+            }
+            return false;
+        }
 
         try {
             if (this.commitTimer) {
@@ -484,6 +532,11 @@ class SCORMService {
 
             console.log('[SCORM] SCORM terminated:', finishResult);
             this.isInitialized = false;
+
+            // Also notify parent shell (embed) for good measure
+            if (this.isEmbedMode) {
+                this.postToParent('scorm:finish');
+            }
 
             return finishResult;
         } catch (error) {
