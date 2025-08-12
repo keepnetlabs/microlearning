@@ -79,6 +79,15 @@ class SCORMService {
         this.isInitializing = true;
 
         try {
+            // In embed (cross-origin iframe) mode, DO NOT touch pipwerks API (will throw SecurityError)
+            if (this.isEmbedMode) {
+                this.data.isAvailable = false;
+                this.isInitialized = true;
+                // We can still use event listeners to flush any pending messages
+                this.setupEventListeners();
+                // No periodic commit needed in embed proxy mode
+                return;
+            }
             // SCORM global object - pipwerks API
             this.scorm = SCORM;
 
