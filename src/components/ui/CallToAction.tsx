@@ -36,6 +36,39 @@ export function CallToAction({
   const isMobile = useIsMobile();
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const [spacerHeight, setSpacerHeight] = useState<number>(72);
+  const [hasScroll, setHasScroll] = useState<boolean>(false);
+
+  // Check if page has scroll
+  useEffect(() => {
+    const checkScroll = () => {
+      const body = document.body;
+      const html = document.documentElement;
+      const documentHeight = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
+      const windowHeight = window.innerHeight;
+      const hasScrollbar = documentHeight > windowHeight;
+      
+      console.log('Document height:', documentHeight, 'Window height:', windowHeight, 'Has scroll:', hasScrollbar);
+      setHasScroll(hasScrollbar);
+    };
+    
+    // Multiple checks to ensure detection
+    checkScroll();
+    setTimeout(checkScroll, 100);
+    setTimeout(checkScroll, 500);
+    
+    window.addEventListener("resize", checkScroll);
+    window.addEventListener("load", checkScroll);
+    
+    // MutationObserver to detect DOM changes
+    const observer = new MutationObserver(checkScroll);
+    observer.observe(document.body, { childList: true, subtree: true });
+    
+    return () => {
+      window.removeEventListener("resize", checkScroll);
+      window.removeEventListener("load", checkScroll);
+      observer.disconnect();
+    };
+  }, []);
 
   // Platform-specific text logic
   const displayText = isMobile
@@ -44,13 +77,16 @@ export function CallToAction({
 
   const containerClasses = isMobile
     ? "fixed inset-x-0 bottom-0 z-[60] flex justify-center px-4 pointer-events-none"
-    : "mt-4 sm:mt-6 relative";
+    : hasScroll 
+      ? "fixed inset-x-0 bottom-0 z-[60] flex justify-center px-4"
+      : "mt-4 sm:mt-6 relative flex justify-center px-4";
 
   const buttonMobileClasses = isMobile ? "pointer-events-auto" : "";
 
-  // Measure button height to reserve space in content
+  // Measure button height to reserve space in content (only for sticky behavior)
   useEffect(() => {
-    if (!isMobile) return;
+    if (!isMobile && !hasScroll) return;
+    
     const updateHeight = () => {
       const height = buttonRef.current?.offsetHeight ?? 56;
       setSpacerHeight(height + 16); // add bottom padding equivalent
@@ -58,7 +94,7 @@ export function CallToAction({
     updateHeight();
     window.addEventListener("resize", updateHeight);
     return () => window.removeEventListener("resize", updateHeight);
-  }, [isMobile]);
+  }, [isMobile, hasScroll]);
   const content = (
     <motion.div
       id={isMobile ? "global-cta" : undefined}
@@ -73,11 +109,13 @@ export function CallToAction({
         stiffness: reducedMotion ? 0 : 200
       }}
       className={`${containerClasses} ${className}`}
-      style={
-        isMobile
-          ? { paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }
-          : undefined
-      }
+      style={{
+        paddingBottom: isMobile 
+          ? "max(1rem, env(safe-area-inset-bottom))" 
+          : hasScroll 
+            ? "2.5rem" 
+            : undefined
+      }}
       data-testid={dataTestId}
     >
       <motion.button
@@ -112,14 +150,20 @@ export function CallToAction({
     </motion.div>
   );
 
-  if (isMobile && typeof document !== "undefined") {
+  const shouldUsePortal = isMobile || (!isMobile && hasScroll);
+
+  if (shouldUsePortal && typeof document !== "undefined") {
     return (
       <>
-        {reserveSpace && (
+        {reserveSpace && (isMobile || hasScroll) && (
           <div
             aria-hidden
             className="w-full"
-            style={{ height: `calc(${spacerHeight}px + env(safe-area-inset-bottom))` }}
+            style={{ 
+              height: isMobile 
+                ? `calc(${spacerHeight}px + env(safe-area-inset-bottom))` 
+                : `${spacerHeight}px`
+            }}
           />
         )}
         {createPortal(content, portalContainer ?? document.body)}

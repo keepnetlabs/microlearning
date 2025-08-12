@@ -1654,18 +1654,28 @@ export default function App(props: AppProps = {}) {
                     <AnimatePresence>
                       {showScrollIndicator && !scrollPosition.bottom && currentScene !== 2 && !isMobile && (
                         <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 10 }}
-                          className="absolute bottom-4 left-0 right-0 mx-auto z-20 pointer-events-none flex justify-center"
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.9 }}
+                          className="absolute bottom-8 right-8 z-20 pointer-events-none"
                         >
-                          <div className="flex items-center space-x-2 px-4 py-2.5 transition-colors duration-300 backdrop-blur-xl glass-border-2 min-w-fit">
-                            <div className="corner-top-left"></div>
-                            <div className="corner-bottom-right"></div>
-                            <span className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] font-medium transition-colors duration-300 whitespace-nowrap">
-                              {themeConfig.texts?.scrollHint}
-                            </span>
-                            <ChevronDown size={14} className="text-[#1C1C1E] dark:text-[#F2F2F7] animate-bounce flex-shrink-0" style={{ animationDuration: '2s' }} />
+                          <div className="relative w-10 h-16 border-2 border-[#1C1C1E]/50 dark:border-[#F2F2F7]/50 rounded-full flex justify-center backdrop-blur-md bg-white/10 dark:bg-black/10 transition-colors duration-300">
+                            {/* Mouse wheel dot */}
+                            <motion.div
+                              className="w-1.5 h-2.5 bg-[#1C1C1E] dark:bg-[#F2F2F7] rounded-full mt-2 transition-colors duration-300"
+                              animate={{ y: [0, 8, 0] }}
+                              transition={{
+                                duration: 2,
+                                repeat: Infinity,
+                                ease: "easeInOut"
+                              }}
+                            />
+                            {/* Scroll hint text */}
+                            <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
+                              <span className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] font-medium transition-colors duration-300">
+                                Scroll
+                              </span>
+                            </div>
                           </div>
                         </motion.div>
                       )}
