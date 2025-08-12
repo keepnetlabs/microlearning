@@ -1,4 +1,4 @@
-// SCORM 1.2 Standartlarına Uygun Service - İyileştirilmiş Versiyon
+// SCORM 1.2 Compliant Service - Enhanced Version
 // @ts-ignore
 import { SCORM } from 'pipwerks-scorm-api-wrapper';
 if (process.env.NODE_ENV === 'development') {
@@ -59,7 +59,7 @@ class SCORMService {
     };
 
     constructor() {
-        // Lazy loading için constructor'da initialize etmeyin
+        // Don't initialize in constructor for lazy loading
     }
 
     private async initialize(): Promise<void> {
@@ -67,21 +67,21 @@ class SCORMService {
         this.isInitializing = true;
 
         try {
-            // SCORM global objesi - pipwerks API
+            // SCORM global object - pipwerks API
             this.scorm = SCORM;
 
-            // SCORM API'nin varlığını kontrol et
+            // Check SCORM API availability
             this.data.isAvailable = SCORM.isAvailable();
 
             if (this.data.isAvailable) {
-                console.log('[SCORM] API bulundu, başlatılıyor...');
+                console.log('[SCORM] API found, initializing...');
 
-                // SCORM API'yi initialize et
+                // Initialize SCORM API
                 const initSuccess = SCORM.init();
                 if (!initSuccess) {
                     const errorCode = SCORM.debug.getCode();
                     const errorInfo = SCORM.debug.getInfo();
-                    console.error('[SCORM] Initialize başarısız:', `${errorCode}: ${errorInfo}`);
+                    console.error('[SCORM] Initialize failed:', `${errorCode}: ${errorInfo}`);
                     this.data.isAvailable = false;
                     return;
                 }
@@ -90,16 +90,16 @@ class SCORMService {
                 this.setupEventListeners();
                 this.setupPeriodicCommit(30000);
                 this.isInitialized = true;
-                // Oturum sayaçlarını başlat
+                // Start session counters
                 this.sessionStartTime = Date.now();
                 this.lastSessionUpdateMs = this.sessionStartTime;
                 this.lastCommitTime = this.sessionStartTime;
 
             } else {
-                console.log('[SCORM] API bulunamadı - Standalone mod');
+                console.log('[SCORM] API not found - Standalone mode');
             }
         } catch (error) {
-            console.error('[SCORM] Başlatma hatası:', error);
+            console.error('[SCORM] Initialization error:', error);
             this.data.isAvailable = false;
         } finally {
             this.isInitializing = false;
@@ -110,7 +110,7 @@ class SCORMService {
         if (!this.scorm || !this.data.isAvailable) return;
 
         try {
-            // SCORM 1.2 standart data model elementi kullan
+            // Use SCORM 1.2 standard data model elements
             this.data.lessonStatus = this.scorm.get('cmi.core.lesson_status') || 'not attempted';
             this.data.scoreRaw = parseFloat(this.scorm.get('cmi.core.score.raw')) || 0;
             this.data.scoreMax = parseFloat(this.scorm.get('cmi.core.score.max')) || 100;
@@ -120,12 +120,12 @@ class SCORMService {
             this.data.studentId = this.scorm.get('cmi.core.student_id') || '';
             this.data.studentName = this.scorm.get('cmi.core.student_name') || '';
 
-            // Entry değerini set et - resume veya ab-initio
+            // Set entry value - resume or ab-initio
             const hasProgress = this.data.lessonStatus !== 'not attempted' || this.data.lessonLocation !== '';
             const entryValue = hasProgress ? 'resume' : 'ab-initio';
             this.scorm.set('cmi.core.entry', entryValue);
 
-            // Score max ve min'i set et (ilk kez açılıyorsa)
+            // Set score max and min (if opening for first time)
             if (!this.scorm.get('cmi.core.score.max')) {
                 this.scorm.set('cmi.core.score.max', '100');
             }
@@ -133,9 +133,9 @@ class SCORMService {
                 this.scorm.set('cmi.core.score.min', '0');
             }
 
-            console.log('[SCORM] Mevcut veriler yüklendi:', this.data);
+            console.log('[SCORM] Current data loaded:', this.data);
         } catch (error) {
-            console.error('[SCORM] Veri yükleme hatası:', error);
+            console.error('[SCORM] Data loading error:', error);
         }
     }
 
@@ -143,19 +143,19 @@ class SCORMService {
         if (this.listenersAttached) return;
         this.listenersAttached = true;
 
-        // Sayfa kapatılırken otomatik finish
+        // Auto finish on page close
         window.addEventListener('beforeunload', () => {
             this.updateSessionTime();
             this.commit();
         });
 
-        // Mobile Safari dahil bazı tarayıcılarda güvenilir kapanış
+        // Reliable closure in some browsers including Mobile Safari
         window.addEventListener('pagehide', () => {
             this.updateSessionTime();
             this.commit();
         });
 
-        // Visibility change - pause/resume için
+        // Visibility change - for pause/resume
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 this.updateSessionTime();
@@ -180,7 +180,7 @@ class SCORMService {
         }, intervalMs);
     }
 
-    // Public Methods - Lazy initialize eklenmiş
+    // Public Methods - Lazy initialize added
     private ensureInitialized(): void {
         if (!this.isInitialized) {
             this.initialize();
@@ -204,7 +204,7 @@ class SCORMService {
         try {
             let anyChanged = false;
 
-            // Score güncelle (0-100 arası normalize et)
+            // Update score (normalize between 0-100)
             const scoreRaw = Math.min(100, Math.max(0, Math.round(totalPoints)));
             if (scoreRaw !== this.data.scoreRaw) {
                 this.scorm.set('cmi.core.score.raw', scoreRaw.toString());
@@ -212,7 +212,7 @@ class SCORMService {
                 anyChanged = true;
             }
 
-            // Lesson status güncelle - SCORM 1.2 standart değerleri
+            // Update lesson status - SCORM 1.2 standard values
             let status = 'incomplete';
             if (currentScene >= totalScenes - 1) {
                 status = scoreRaw >= 80 ? 'passed' : 'completed';
@@ -223,7 +223,7 @@ class SCORMService {
                 anyChanged = true;
             }
 
-            // Lesson location güncelle
+            // Update lesson location
             const newLocation = currentScene.toString();
             if (newLocation !== this.data.lessonLocation) {
                 this.scorm.set('cmi.core.lesson_location', newLocation);
@@ -231,16 +231,16 @@ class SCORMService {
                 anyChanged = true;
             }
 
-            // Session time'ı güncelle
+            // Update session time
             const now = Date.now();
             const pendingDeltaSeconds = Math.floor((now - this.lastSessionUpdateMs) / 1000);
             this.updateSessionTime();
 
-            // Değişiklikleri commit et
+            // Commit changes
             const shouldCommit = anyChanged || pendingDeltaSeconds > 0;
             const commitResult = shouldCommit ? this.commit() : true;
 
-            console.log('[SCORM] Progress güncellendi:', {
+            console.log('[SCORM] Progress updated:', {
                 scoreRaw,
                 status,
                 scene: currentScene,
@@ -249,7 +249,7 @@ class SCORMService {
 
             return commitResult;
         } catch (error) {
-            console.error('[SCORM] Progress güncelleme hatası:', error);
+            console.error('[SCORM] Progress update error:', error);
             return false;
         }
     }
@@ -278,7 +278,7 @@ class SCORMService {
                 this.updateSessionTime();
                 const commitResult = (anyChanged || pendingDeltaSeconds > 0) ? this.commit() : true;
 
-                console.log('[SCORM] Quiz tamamlandı:', {
+                console.log('[SCORM] Quiz completed:', {
                     score: normalizedScore,
                     status,
                     committed: commitResult
@@ -288,7 +288,7 @@ class SCORMService {
             }
             return true;
         } catch (error) {
-            console.error('[SCORM] Quiz güncelleme hatası:', error);
+            console.error('[SCORM] Quiz update error:', error);
             return false;
         }
     }
@@ -299,26 +299,26 @@ class SCORMService {
             const deltaSeconds = Math.floor((now - this.lastSessionUpdateMs) / 1000);
             if (deltaSeconds <= 0) return;
 
-            // SCORM 1.2: session_time commit başına geçen süre (delta)
+            // SCORM 1.2: session_time elapsed time per commit (delta)
             const sessionTimeDelta = this.formatSCORMTime(deltaSeconds);
             this.scorm.set('cmi.core.session_time', sessionTimeDelta);
 
-            // Görsel raporlama için toplam oturum süresi
+            // Total session time for visual reporting
             const totalSessionSeconds = Math.floor((now - this.sessionStartTime) / 1000);
             this.data.sessionTime = this.formatSCORMTime(totalSessionSeconds);
 
-            // Total time'ı delta ile biriktir
+            // Accumulate total time with delta
             const currentTotalSeconds = this.parseTimeToSeconds(this.data.totalTime);
             const newTotalSeconds = currentTotalSeconds + deltaSeconds;
             this.data.totalTime = this.formatSCORMTime(newTotalSeconds);
             
-            // SCORM'a total_time'ı set et
+            // Set total_time to SCORM
             this.scorm.set('cmi.core.total_time', this.data.totalTime);
 
             this.lastSessionUpdateMs = now;
 
         } catch (error) {
-            console.error('[SCORM] Session time güncelleme hatası:', error);
+            console.error('[SCORM] Session time update error:', error);
         }
     }
 
@@ -351,7 +351,7 @@ class SCORMService {
             let suspendData = JSON.stringify(enhancedData);
 
             if (suspendData.length > 4096) {
-                console.warn('[SCORM] Suspend data çok büyük, kısaltılıyor...');
+                console.warn('[SCORM] Suspend data too large, truncating...');
 
                 const compactData = {
                     lastScene: data.lastScene,
@@ -368,7 +368,7 @@ class SCORMService {
                 }
             }
 
-            // Eğer veri değişmediyse set/commit yapma
+            // Don't set/commit if data hasn't changed
             const currentSuspendData = this.scorm.get('cmi.suspend_data') || '';
             if (currentSuspendData === suspendData) {
                 return true;
@@ -378,14 +378,14 @@ class SCORMService {
             console.log('suspendData', suspendData);
             const commitResult = this.commit();
 
-            console.log('[SCORM] Suspend data kaydedildi:', {
+            console.log('[SCORM] Suspend data saved:', {
                 size: suspendData.length,
                 committed: commitResult
             });
 
             return commitResult;
         } catch (error) {
-            console.error('[SCORM] Suspend data hatası:', error);
+            console.error('[SCORM] Suspend data error:', error);
             return false;
         }
     }
@@ -408,7 +408,7 @@ class SCORMService {
                 };
             }
         } catch (error) {
-            console.error('[SCORM] Suspend data yükleme hatası:', error);
+            console.error('[SCORM] Suspend data loading error:', error);
         }
 
         return null;
@@ -479,15 +479,15 @@ class SCORMService {
             this.scorm.set('cmi.core.exit', 'suspend');
             this.commit();
 
-            // pipwerks SCORM API'de quit() kullanılır
+            // Use quit() in pipwerks SCORM API
             const finishResult = this.scorm.quit();
 
-            console.log('[SCORM] SCORM sonlandırıldı:', finishResult);
+            console.log('[SCORM] SCORM terminated:', finishResult);
             this.isInitialized = false;
 
             return finishResult;
         } catch (error) {
-            console.error('[SCORM] Sonlandırma hatası:', error);
+            console.error('[SCORM] Termination error:', error);
             return false;
         }
     }
@@ -527,27 +527,27 @@ class SCORMService {
 
     public commit(): boolean {
         if (!this.scorm || !this.data.isAvailable) return false;
-        if (this.commitInProgress) return true; // Mevcut commit bitmeden yenisini başlatma
+        if (this.commitInProgress) return true; // Don't start new commit before current one finishes
         const now = Date.now();
-        if (now - this.lastCommitTime < this.MIN_COMMIT_INTERVAL_MS) return true; // Çok sık commit'i yumuşat
+        if (now - this.lastCommitTime < this.MIN_COMMIT_INTERVAL_MS) return true; // Throttle frequent commits
 
         try {
             this.commitInProgress = true;
-            // pipwerks SCORM API'de save() kullanılır
+            // Use save() in pipwerks SCORM API
             const result = this.scorm.save();
 
             if (result) {
                 this.lastCommitTime = Date.now();
-                console.log('[SCORM] Commit başarılı');
+                console.log('[SCORM] Commit successful');
             } else {
                 const errorCode = this.scorm.debug.getCode();
                 const errorInfo = this.scorm.debug.getInfo();
-                console.error('[SCORM] Commit başarısız:', `${errorCode}: ${errorInfo}`);
+                console.error('[SCORM] Commit failed:', `${errorCode}: ${errorInfo}`);
             }
 
             return result;
         } catch (error) {
-            console.error('[SCORM] Commit hatası:', error);
+            console.error('[SCORM] Commit error:', error);
             return false;
         } finally {
             this.commitInProgress = false;
@@ -591,7 +591,7 @@ export const destroySCORMService = (): void => {
     }
 };
 
-// TEK EXPORT - Lazy loading ile
+// SINGLE EXPORT - With lazy loading
 export const scormService = getSCORMService();
 
 // Type exports
