@@ -116,7 +116,7 @@ const GoalCard = memo(({ goal, index }: {
         {/* APPLE DESCRIPTION TEXT - Perfect readability */}
         <p
           id={`goal-description-${index}`}
-          className="text-sm text-left text-[#1C1C1E] dark:text-[#F2F2F7] leading-relaxed transition-colors duration-300 ease-out font-medium"
+          className="text-sm text-left text-[#1C1C1E] dark:text-[#F2F2F7] leading-relaxed transition-colors duration-300 ease-out"
         >
           {goal.description}
         </p>

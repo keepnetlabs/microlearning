@@ -758,7 +758,7 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
                         {action.timeframe}
                       </span>
                     </div>
-                    <p className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] leading-relaxed ml-8">
+                    <p className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] leading-relaxed ml-8">
                       {action.description}
                     </p>
                   </div>
@@ -809,7 +809,7 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
                     <ExternalLink size={12} className={`text-[#1C1C1E] dark:text-[#F2F2F7]`} />
                   </motion.div>
                   <div>
-                    <div className={`text-xs font-medium text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors`}>
+                    <div className={`text-sm font-medium text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors`}>
                       {resource.title}
                     </div>
                     <div className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7]">
@@ -846,7 +846,7 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
                 <Shield size={16} className={`mr-2 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
                 {config.texts?.motivationalTitle || ""}
               </h3>
-              <p className={`text-xs text-[#1C1C1E] dark:text-[#F2F2F7] leading-relaxed`}>
+              <p className={`text-sm text-[#1C1C1E] dark:text-[#F2F2F7] leading-relaxed`}>
                 {config.texts?.motivationalMessage || ""}
               </p>
             </div>

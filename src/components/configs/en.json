@@ -187,7 +187,7 @@
     "title": "Test Your Knowledge",
     "subtitle": "Make the right decision when it matters most",
     "callToActionText": "Answer to Continue",
-    "quizCompletionCallToActionText": "Great! Continue to Action Plan",
+    "quizCompletionCallToActionText": "Continue",
     "key_message": [
       "Answer the questions",
       "Check your knowledge",
@@ -247,7 +247,7 @@
       "retryQuestion": "Try again",
       "quizCompleted": "Quiz completed 🎉",
       "correctAnswer": "Correct — well done 🎉",
-      "wrongAnswer": "Not quite right",
+      "wrongAnswer": "✖ Not quite right",
       "attemptsLeft": "attempts left",
       "noAttemptsLeft": "no attempts left",
       "checkAnswer": "Check answer",

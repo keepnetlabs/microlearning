@@ -14,12 +14,11 @@ test.describe('ProgressBar progression', () => {
         // Advance via multiple strategies (desktop + mobile)
         const next = page.getByTestId('nav-next');
         const tryClick = async (locator: any) => {
-            try { await locator.click({ timeout: 800, trial: true }); await locator.click({ timeout: 800 }); return true; } catch { return false; }
+            try { await locator.waitFor({ state: 'visible', timeout: 1500 }); } catch { }
+            try { await locator.click({ timeout: 1200 }); return true; } catch { return false; }
         };
         let advanced = false;
-        if (await next.isVisible().catch(() => false)) {
-            advanced = await tryClick(next);
-        }
+        if (!advanced && await next.isVisible().catch(() => false)) advanced = await tryClick(next);
         if (!advanced) {
             const introBtn = page.getByTestId('cta-intro').locator('button');
             if (await introBtn.isVisible().catch(() => false)) advanced = await tryClick(introBtn);

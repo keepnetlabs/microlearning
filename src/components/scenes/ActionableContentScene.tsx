@@ -241,25 +241,25 @@ export function ActionableContentScene({
                         </h3>
                         <p
                           id={`${cardId}-description`}
-                          className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] mb-3 leading-relaxed"
+                          className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] mb-0 leading-relaxed"
                         >
                           {action.description}
                         </p>
-                        <div
-                          id={tipId}
-                          className={`relative p-3 glass-border-0`}
-                          role="note"
-                          aria-label={ariaTexts?.tipLabel || "Tip"}
-                        >
-                          <div className="relative z-10 flex items-start">
-                            <div className={`text-[#1C1C1E] dark:text-[#F2F2F7] mr-2 mt-[3px] flex-shrink-0`} aria-hidden="true">
-                              {tipIconComponent}
-                            </div>
-                            <span className={`text-sm text-[#1C1C1E] dark:text-[#F2F2F7] text-sm`}>
-                              {action.tip}
-                            </span>
-                          </div>
+                      </div>
+                    </div>
+                    <div
+                      id={tipId}
+                      className={`relative mt-3 p-3 glass-border-0 w-full`}
+                      role="note"
+                      aria-label={ariaTexts?.tipLabel || "Tip"}
+                    >
+                      <div className="relative z-10 flex items-start">
+                        <div className={`text-[#1C1C1E] dark:text-[#F2F2F7] mr-2 mt-1 flex-shrink-0`} aria-hidden="true">
+                          {tipIconComponent}
                         </div>
+                        <span className={`text-sm text-[#1C1C1E] dark:text-[#F2F2F7]`}>
+                          {action.tip}
+                        </span>
                       </div>
                     </div>
                   </div>

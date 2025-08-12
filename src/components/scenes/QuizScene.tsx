@@ -7,8 +7,8 @@ import {
   X,
   Undo2,
   ArrowRight,
-  RefreshCw,
-  ArrowUpRight
+  ArrowUpRight,
+  RefreshCw
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Slider } from "../ui/slider";
@@ -1958,6 +1958,8 @@ export const QuizScene = React.memo(function QuizScene({
                       {ariaTexts?.resultPanelDescription || "Feedback on your answer with explanation and tips"}
                     </div>
 
+
+
                     {/* Simple Explanation */}
                     <div className="mb-3">
                       <p className="text-sm text-muted-foreground leading-relaxed text-[#1C1C1E] dark:text-[#F2F2F7]">
@@ -1983,53 +1985,17 @@ export const QuizScene = React.memo(function QuizScene({
                     <div className="flex justify-between items-center pt-3 border-t">
                       {/* Status */}
                       <div className="text-sm">
-                        {isAnswerCorrect && (
-                          <span className="text-[#1C1C1E] dark:text-[#F2F2F7] font-medium">
-                            {currentQuestionIndex === questions.length - 1
+                        <span className="text-[#1C1C1E] dark:text-[#F2F2F7] font-medium">
+                          {isAnswerCorrect
+                            ? (currentQuestionIndex === questions.length - 1
                               ? (config.texts?.quizCompleted || "Tamamlandı! 🎉")
-                              : (config.texts?.correctAnswer || "Doğru! 🎉")
-                            }
-                          </span>
-                        )}
+                              : (config.texts?.correctAnswer || "Doğru! 🎉"))
+                            : (config.texts?.wrongAnswer || "Incorrect answer")}
+                        </span>
                       </div>
 
                       {/* Buttons */}
-                      <div className="flex gap-2">
-                        {!isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked && (
-                          <motion.button
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 0.8, delay: 0.2 }}
-                            whileHover={{
-                              scale: 1.05,
-                              boxShadow: "0 20px 40px rgba(239, 68, 68, 0.3)"
-                            }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={retryQuestion}
-                            disabled={isAnswerLocked}
-                            className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
-                            data-testid="btn-retry-question"
-                          >
-                            {/* Button shimmer effect */}
-                            <motion.div
-                              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                              animate={{ x: ['-100%', '200%'] }}
-                              transition={{
-                                duration: 2,
-                                repeat: Infinity,
-                                ease: "linear"
-                              }}
-                            />
-
-                            <RefreshCw size={16} className={`sm:w-5 sm:h-5 relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
-                            <span className={`text-sm sm:text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
-                              {config.texts?.retryQuestion || "Tekrar Dene"}
-                            </span>
-                          </motion.button>
-                        )}
-
-                        {/* Next buttons removed; CTA at bottom handles navigation */}
-                      </div>
+                      <div className="flex gap-2" />
                     </div>
                   </motion.div>
                 )}
@@ -2051,6 +2017,7 @@ export const QuizScene = React.memo(function QuizScene({
                 }
               >
                 <div className="space-y-4 glass-border-2 p-4">
+
                   {/* Simple Explanation */}
                   <div>
                     <p className="text-sm text-muted-foreground leading-relaxed text-[#1C1C1E] dark:text-[#F2F2F7]">
@@ -2075,43 +2042,6 @@ export const QuizScene = React.memo(function QuizScene({
                 </div>
                 {/* Action Buttons */}
                 <div className="flex flex-col gap-3 pt-3">
-                  {!lastAnswerResult?.wasCorrect && attempts < maxAttempts && !isAnswerLocked && (
-                    <motion.button
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.8, delay: 0.2 }}
-                      whileHover={{
-                        scale: 1.05,
-                        boxShadow: "0 20px 40px rgba(239, 68, 68, 0.3)"
-                      }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => {
-                        // BottomSheet kapandıktan sonra retry işlemini yap
-                        setTimeout(() => {
-                          retryQuestion()
-                        }, 300)
-                      }}
-                      disabled={isAnswerLocked}
-                      className={`relative flex items-center justify-center space-x-2 px-4 py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full`}
-                    >
-                      {/* Button shimmer effect */}
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                        animate={{ x: ['-100%', '200%'] }}
-                        transition={{
-                          duration: 2,
-                          repeat: Infinity,
-                          ease: "linear"
-                        }}
-                      />
-
-                      <RefreshCw size={18} className={`relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
-                      <span className={`text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
-                        {config.texts?.retryQuestion || "Tekrar Dene"}
-                      </span>
-                    </motion.button>
-                  )}
-
                   {(lastAnswerResult?.wasCorrect || (!lastAnswerResult?.wasCorrect && attempts >= maxAttempts) || isAnswerLocked) && (
                     <>
                       {/* Next Question button - shown when not on last question */}
@@ -2199,14 +2129,20 @@ export const QuizScene = React.memo(function QuizScene({
         <CallToAction
           text={
             showResult
-              ? (currentQuestionIndex === questions.length - 1
-                ? (resolveCTA(config.quizCompletionCallToActionText) || config.texts?.quizCompleted || "Continue")
-                : (config.texts?.nextQuestion || "Next Question"))
+              ? (!isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked
+                ? (config.texts?.retryQuestion || "Try Again")
+                : (currentQuestionIndex === questions.length - 1
+                  ? (resolveCTA(config.quizCompletionCallToActionText) || config.texts?.quizCompleted || "Continue")
+                  : (config.texts?.nextQuestion || "Next Question")))
               : (resolveCTA(config.callToActionText) || "Answer to Continue")
           }
           delay={0.8}
           onClick={() => {
             if (!showResult) return;
+            if (!isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked) {
+              retryQuestion();
+              return;
+            }
             if (currentQuestionIndex === questions.length - 1) {
               onNextSlide();
             } else {
@@ -2214,6 +2150,10 @@ export const QuizScene = React.memo(function QuizScene({
             }
           }}
           disabled={!showResult}
+          iconPosition={showResult && !isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked ? 'left' : 'right'}
+          icon={showResult && !isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked ? (
+            <RefreshCw size={16} className="transition-transform group-hover:-rotate-6 text-[#1C1C1E] dark:text-[#F2F2F7]" aria-hidden="true" />
+          ) : undefined}
           dataTestId="cta-quiz"
         />
 
