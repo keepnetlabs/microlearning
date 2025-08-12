@@ -15,7 +15,7 @@ import { NudgeScene } from "./components/scenes/NudgeScene";
 import { ChevronDown, Search, Loader2, X, Moon, Sun, Award, ChevronUp, Star } from "lucide-react";
 import ReactCountryFlag from "react-country-flag";
 import { getCountryCode, detectBrowserLanguage, useIsMobile, languages } from "./utils/languageUtils";
-import { loadAppConfig, createConfigChangeEvent } from "./components/configs/appConfigLoader";
+import { createConfigChangeEvent, loadAppConfigAsyncCombined } from "./components/configs/appConfigLoader";
 import { useFontFamily } from "./hooks/useFontFamily";
 import { FontFamilyProvider } from "./contexts/FontFamilyContext";
 import { scormService, destroySCORMService } from "./utils/scormService";
@@ -115,11 +115,59 @@ interface AppProps {
 
 export default function App(props: AppProps = {}) {
   const { initialScene, testOverrides } = props;
-  // Dinamik appConfig state'i - ileride API'den gelecek
-  const [appConfig, setAppConfig] = useState(() => {
+  // Dinamik appConfig state'i - sadece remote'tan yüklenecek
+  const [appConfig, setAppConfig] = useState<any>({ theme: {}, scenes: [] });
+  const [isConfigLoading, setIsConfigLoading] = useState(false);
+  
+  // Read remote URLs from query params (no env fallbacks), with defaults; store in refs for reuse
+  const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+  const normalizeUrlParam = (value?: string | null): string => {
+    if (!value) return '';
+    const trimmed = value.trim().replace(/^['"]|['"]$/g, '');
+    return trimmed.startsWith('@') ? trimmed.slice(1) : trimmed;
+  };
+  const DEFAULT_BASE_URL = "https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001";
+  const DEFAULT_LANG_URL = "https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001/lang/en";
+  const initialRemoteBaseUrl = normalizeUrlParam(urlParams?.get('baseUrl')) || DEFAULT_BASE_URL;
+  const initialRemoteLangUrl = normalizeUrlParam(urlParams?.get('langUrl')) || DEFAULT_LANG_URL;
+  const remoteBaseUrlRef = useRef<string>(initialRemoteBaseUrl);
+  const remoteLangUrlTemplateRef = useRef<string>(initialRemoteLangUrl);
+
+  // İlk mount'ta remote config'i yükle (sadece remote)
+  useEffect(() => {
     const detectedLanguage = testOverrides?.language ?? detectBrowserLanguage();
-    return loadAppConfig(detectedLanguage);
-  });
+    const remoteBaseUrl = remoteBaseUrlRef.current;
+    const remoteLangUrl = remoteLangUrlTemplateRef.current;
+    setIsConfigLoading(true);
+
+    // Eğer base+lang URL'si sağlanmışsa onları paralel indirip birleştir
+    if (remoteBaseUrl && remoteLangUrl) {
+      let isMounted = true;
+      setIsConfigLoading(true);
+
+      // During initial load: if template contains a concrete /lang/<code>, keep as-is;
+      // otherwise support {lang} placeholder.
+      const computeLangUrlInitial = (templateUrl: string, lang: string) => {
+        const normalized = lang.toLowerCase().split('-')[0];
+        if (templateUrl.includes('{lang}')) {
+          return templateUrl.replace('{lang}', normalized);
+        }
+        return templateUrl;
+      };
+
+      const resolvedLangUrl = computeLangUrlInitial(remoteLangUrl, detectedLanguage);
+
+      loadAppConfigAsyncCombined(detectedLanguage, remoteBaseUrl, resolvedLangUrl, { timeoutMs: 10000 })
+        .then(cfg => { if (isMounted && cfg) { setAppConfig(cfg); createConfigChangeEvent(detectedLanguage, cfg); } })
+        .catch(err => { console.warn('[App] Remote combined config yüklenemedi:', err); })
+        .finally(() => { if (isMounted) setIsConfigLoading(false); });
+
+      return () => { isMounted = false; };
+    }
+
+    // Base + Language URL yoksa yükleme durdurulur
+    setIsConfigLoading(false);
+  }, [testOverrides?.language]);
 
   // Backend'den gelecek tema config'i için state
   const [themeConfig, setThemeConfig] = useState(() => {
@@ -152,50 +200,9 @@ export default function App(props: AppProps = {}) {
 
   // Dynamic scenes array from appConfig.scenes
   const scenes = useMemo(() => {
-    if (!appConfig.scenes || !Array.isArray(appConfig.scenes)) {
-      // Fallback to original hardcoded scenes if appConfig.scenes is not available
-      return [
-        {
-          component: MemoizedIntroScene,
-          points: appConfig.introSceneConfig?.points,
-          config: appConfig.introSceneConfig
-        },
-        {
-          component: MemoizedGoalScene,
-          points: appConfig.goalSceneConfig?.points,
-          config: appConfig.goalSceneConfig
-        },
-        {
-          component: MemoizedScenarioScene,
-          points: appConfig.scenarioSceneConfig?.points,
-          config: appConfig.scenarioSceneConfig
-        },
-        {
-          component: MemoizedActionableContentScene,
-          points: appConfig.actionableContentSceneConfig?.points,
-          config: appConfig.actionableContentSceneConfig
-        },
-        {
-          component: MemoizedQuizScene,
-          points: appConfig.quizSceneConfig?.points,
-          config: appConfig.quizSceneConfig
-        },
-        {
-          component: MemoizedSurveyScene,
-          points: appConfig.surveySceneConfig?.points,
-          config: appConfig.surveySceneConfig
-        },
-        {
-          component: MemoizedSummaryScene,
-          points: appConfig.summarySceneConfig?.points,
-          config: appConfig.summarySceneConfig
-        },
-        {
-          component: MemoizedNudgeScene,
-          points: appConfig.nudgeSceneConfig?.points,
-          config: appConfig.nudgeSceneConfig
-        }
-      ];
+    if (!Array.isArray(appConfig.scenes) || appConfig.scenes.length === 0) {
+      // No scenes until remote config loads
+      return [] as Array<{ component: React.ComponentType<any>; points: number; config: any; sceneId?: string }>;
     }
 
     return appConfig.scenes.map((scene: any) => {
@@ -393,9 +400,33 @@ export default function App(props: AppProps = {}) {
   // Dil değişikliği handler'ı - appConfig'i günceller
   const handleLanguageChange = useCallback((newLanguage: string) => {
     setSelectedLanguage(newLanguage);
-    const newConfig = loadAppConfig(newLanguage);
-    setAppConfig(newConfig);
-    createConfigChangeEvent(newLanguage);
+
+    const remoteBaseUrl = remoteBaseUrlRef.current;
+    const remoteLangUrl = remoteLangUrlTemplateRef.current;
+
+    const computeLangUrl = (templateUrl: string, lang: string) => {
+      const normalized = lang.toLowerCase().split('-')[0];
+      if (templateUrl.includes('/lang/')) {
+        return templateUrl.replace(/\/lang\/[^/]+$/i, `/lang/${normalized}`);
+      }
+      return templateUrl.replace('{lang}', normalized);
+    };
+
+    (async () => {
+      if (remoteBaseUrl && remoteLangUrl) {
+        setIsConfigLoading(true);
+        try {
+          const resolvedLangUrl = computeLangUrl(remoteLangUrl, newLanguage);
+          const cfg = await loadAppConfigAsyncCombined(newLanguage, remoteBaseUrl, resolvedLangUrl, { timeoutMs: 10000 });
+          setAppConfig(cfg);
+          createConfigChangeEvent(newLanguage, cfg);
+        } catch (e) {
+          console.warn('[App] Dil değişiminde remote combined yüklenemedi:', e);
+        } finally {
+          setIsConfigLoading(false);
+        }
+      }
+    })();
 
     // LocalStorage'a kaydet
     localStorage.setItem('selected-language', newLanguage);
@@ -1027,9 +1058,16 @@ export default function App(props: AppProps = {}) {
     }
   }, [currentScene, previousScene, resetScrollPosition, isMobile]);
 
-  const CurrentSceneComponent = scenes[currentScene].component as React.ComponentType<any>;
+  const hasScenes = Array.isArray(scenes) && scenes.length > 0;
+  // If no scenes yet, force config loading overlay
+  useEffect(() => {
+    if (!hasScenes) {
+      setIsConfigLoading(true);
+    }
+  }, [hasScenes]);
+  const CurrentSceneComponent = (hasScenes ? scenes[currentScene].component : (() => null)) as React.ComponentType<any>;
   const currentLanguage = useMemo(() => languages.find(lang => lang.code === selectedLanguage), [selectedLanguage]);
-  const currentSceneConfig = scenes[currentScene].config;
+  const currentSceneConfig = hasScenes ? scenes[currentScene].config : undefined;
   const isFirstOrLastScene = currentScene === 0 || currentScene === scenes.length - 1;
 
   // Ultra-optimized slide variants for mobile performance - Static for better performance
@@ -1100,9 +1138,9 @@ export default function App(props: AppProps = {}) {
           <div id="app-description" className="sr-only">
             {appConfig.theme?.ariaTexts?.appDescription || "Interactive cyber security training application with multiple learning modules and progress tracking"}
           </div>
-          {/* Loading Overlay - Only show on desktop */}
+          {/* Loading Overlay - Show during config load (all devices), and during scene load (desktop only) */}
           <AnimatePresence>
-            {isLoading && !isMobile && (
+            {(isConfigLoading || (isLoading && !isMobile) || !hasScenes) && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -1530,24 +1568,24 @@ export default function App(props: AppProps = {}) {
                     }}
                   >
                     {/* Content Scroll Container - ANCHORED (doesn't move with parallax) */}
-                    <div
-                      ref={scrollContainerRef}
-                      className="relative z-10 h-full overflow-y-auto overflow-x-hidden scroll-smooth"
-                      onScroll={handleScroll}
-                      role="main"
-                      aria-label={appConfig.theme?.ariaTexts?.contentLabel || "Training content"}
-                      aria-describedby="content-description"
-                      style={{
-                        scrollbarWidth: 'thin',
-                        WebkitOverflowScrolling: 'touch',
-                        scrollbarColor: 'transparent transparent',
-                        touchAction: 'pan-y',
-                        overscrollBehavior: 'contain',
-                        // Hardware acceleration
-                        transform: 'translateZ(0)'
-                      }}
-                      data-testid="scene-scroll"
-                    >
+                     <div
+                       ref={scrollContainerRef}
+                       className="relative z-10 h-full overflow-y-auto overflow-x-hidden scroll-smooth"
+                       onScroll={handleScroll}
+                       role="main"
+                       aria-label={appConfig.theme?.ariaTexts?.contentLabel || "Training content"}
+                       aria-describedby="content-description"
+                       style={{
+                         scrollbarWidth: 'thin',
+                         WebkitOverflowScrolling: 'touch',
+                         scrollbarColor: 'transparent transparent',
+                         touchAction: 'pan-y',
+                         overscrollBehavior: 'contain',
+                         // Hardware acceleration
+                         transform: 'translateZ(0)'
+                       }}
+                       data-testid="scene-scroll"
+                     >
                       {/* Hidden description for screen readers */}
                       <div id="content-description" className="sr-only">
                         {appConfig.theme?.ariaTexts?.contentDescription || "Scrollable training content area with interactive learning modules"}
@@ -1564,42 +1602,44 @@ export default function App(props: AppProps = {}) {
                           }}
                           className="w-full"
                         >
-                          {/* Quiz Scene - Always mounted to preserve state */}
-                          <div style={{ display: currentScene === sceneIndices.quiz ? 'block' : 'none' }} data-scene-type={(currentSceneConfig as any)?.scene_type || 'quiz'} data-scene-id={(scenes[currentScene] as any)?.sceneId}>
-                            <MemoizedQuizScene
-                              config={currentSceneConfig}
-                              onQuizCompleted={handleQuizCompleted}
-                              onNextSlide={nextScene}
-                              isVisible={currentScene === sceneIndices.quiz}
-                              currentQuestionIndex={quizCurrentQuestionIndex}
-                              setCurrentQuestionIndex={setQuizCurrentQuestionIndex}
-                              answers={quizAnswers}
-                              setAnswers={setQuizAnswersStable}
-                              showResult={quizShowResult}
-                              setShowResult={setQuizShowResultStable}
-                              attempts={quizAttempts}
-                              setAttempts={setQuizAttemptsStable}
-                              isAnswerLocked={quizIsAnswerLocked}
-                              setIsAnswerLocked={setQuizIsAnswerLockedStable}
-                              isLoading={quizIsLoading}
-                              setIsLoading={setQuizIsLoadingStable}
-                              multiSelectAnswers={quizMultiSelectAnswers}
-                              setMultiSelectAnswers={setQuizMultiSelectAnswers}
-                              sliderValue={quizSliderValue}
-                              setSliderValue={setQuizSliderValue}
-                              draggedItems={quizDraggedItems}
-                              setDraggedItems={setQuizDraggedItems}
-                              selectedItem={quizSelectedItem}
-                              setSelectedItem={setQuizSelectedItem}
-                              questionLoadingText={themeConfig.texts?.questionLoading}
-                              isDarkMode={isDarkMode}
-                              reducedMotion={reducedMotionBool}
-                              disableDelays={disableDelaysBool}
-                            />
-                          </div>
+                          {/* Quiz Scene - Render only when active to avoid config mismatch */}
+                          {hasScenes && currentScene === sceneIndices.quiz && currentSceneConfig && (
+                            <div data-scene-type={(currentSceneConfig as any)?.scene_type || 'quiz'} data-scene-id={(scenes[currentScene] as any)?.sceneId}>
+                              <MemoizedQuizScene
+                                config={currentSceneConfig}
+                                onQuizCompleted={handleQuizCompleted}
+                                onNextSlide={nextScene}
+                                isVisible={true}
+                                currentQuestionIndex={quizCurrentQuestionIndex}
+                                setCurrentQuestionIndex={setQuizCurrentQuestionIndex}
+                                answers={quizAnswers}
+                                setAnswers={setQuizAnswersStable}
+                                showResult={quizShowResult}
+                                setShowResult={setQuizShowResultStable}
+                                attempts={quizAttempts}
+                                setAttempts={setQuizAttemptsStable}
+                                isAnswerLocked={quizIsAnswerLocked}
+                                setIsAnswerLocked={setQuizIsAnswerLockedStable}
+                                isLoading={quizIsLoading}
+                                setIsLoading={setQuizIsLoadingStable}
+                                multiSelectAnswers={quizMultiSelectAnswers}
+                                setMultiSelectAnswers={setQuizMultiSelectAnswers}
+                                sliderValue={quizSliderValue}
+                                setSliderValue={setQuizSliderValue}
+                                draggedItems={quizDraggedItems}
+                                setDraggedItems={setQuizDraggedItems}
+                                selectedItem={quizSelectedItem}
+                                setSelectedItem={setQuizSelectedItem}
+                                questionLoadingText={themeConfig.texts?.questionLoading}
+                                isDarkMode={isDarkMode}
+                                reducedMotion={reducedMotionBool}
+                                disableDelays={disableDelaysBool}
+                              />
+                            </div>
+                          )}
 
                           {/* Other scenes */}
-                          {currentScene !== sceneIndices.quiz && (
+                          {hasScenes && currentScene !== sceneIndices.quiz && currentSceneConfig && (
                             <CurrentSceneComponent config={currentSceneConfig}
                               sceneId={(scenes[currentScene] as any)?.sceneId}
                               onSurveySubmitted={handleSurveySubmitted}
