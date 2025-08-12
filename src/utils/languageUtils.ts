@@ -6,6 +6,7 @@ export const getCountryCode = (languageCode: string): string => {
         'tr': 'TR',
         'en': 'US',
         'en-gb': 'GB',
+        'gr': 'GR',
         'es': 'ES',
         'es-mx': 'MX',
         'fr': 'FR',

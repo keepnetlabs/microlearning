@@ -118,7 +118,7 @@ export default function App(props: AppProps = {}) {
   // Dinamik appConfig state'i - sadece remote'tan yüklenecek
   const [appConfig, setAppConfig] = useState<any>({ theme: {}, scenes: [] });
   const [isConfigLoading, setIsConfigLoading] = useState(false);
-  
+
   // Read remote URLs from query params (no env fallbacks), with defaults; store in refs for reuse
   const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
   const normalizeUrlParam = (value?: string | null): string => {
@@ -223,6 +223,35 @@ export default function App(props: AppProps = {}) {
     }).filter(Boolean); // Remove null entries
   }, [appConfig.scenes, sceneComponentMap]);
 
+  // Available languages derived from microlearning.json → microlearning_metadata.language_availability
+  const availableLanguages = useMemo(() => {
+    const codes = Array.isArray((appConfig as any)?.microlearning_metadata?.language_availability)
+      ? ((appConfig as any).microlearning_metadata.language_availability as string[]).map(c => c.toLowerCase())
+      : [] as string[];
+    if (codes.length === 0) return [] as Array<{ code: string; name: string; flag: string }>;
+
+    const mapAvailabilityToLanguageCode = (code: string): string => {
+      switch (code.toLowerCase()) {
+        case 'gr':
+          return 'el';
+        case 'en-uk':
+          return 'en-gb';
+        default:
+          return code.toLowerCase();
+      }
+    };
+
+    return codes.map(code => {
+      const metaCode = mapAvailabilityToLanguageCode(code);
+      const meta = languages.find(l => l.code.toLowerCase() === metaCode);
+      return {
+        code, // keep original availability code for selection and API
+        name: meta?.name || code.toUpperCase(),
+        flag: meta?.flag || '🏳️'
+      };
+    });
+  }, [appConfig]);
+
   // Helper function to get scene index by type
   const getSceneIndexByType = useCallback((sceneType: string): number => {
     return scenes.findIndex((scene: any) => {
@@ -298,6 +327,19 @@ export default function App(props: AppProps = {}) {
     ...STATIC_CSS_CLASSES,
     ...dynamicCssClasses
   }), [dynamicCssClasses]);
+
+  // App title from microlearning metadata
+  const appTitle = useMemo(() => {
+    const metaTitle = (appConfig as any)?.microlearning_metadata?.title;
+    const themeTitle = (themeConfig as any)?.texts?.appTitle;
+    return metaTitle || themeTitle || 'Microlearning';
+  }, [appConfig?.microlearning_metadata?.title, themeConfig?.texts?.appTitle]);
+
+  useEffect(() => {
+    if (typeof document !== 'undefined' && appTitle) {
+      document.title = appTitle;
+    }
+  }, [appTitle]);
 
   // ProgressBar Config - Ayrı memoize edildi çünkü sadece texts değiştiğinde güncellenmesi gerekiyor
   const progressBarConfig = useMemo(() => ({
@@ -399,6 +441,14 @@ export default function App(props: AppProps = {}) {
 
   // Dil değişikliği handler'ı - appConfig'i günceller
   const handleLanguageChange = useCallback((newLanguage: string) => {
+    // Guard: only allow languages present in availability list (if provided)
+    if (availableLanguages.length > 0) {
+      const allowed = new Set(availableLanguages.map(l => l.code.toLowerCase()));
+      if (!allowed.has(newLanguage.toLowerCase())) {
+        return;
+      }
+    }
+
     setSelectedLanguage(newLanguage);
 
     const remoteBaseUrl = remoteBaseUrlRef.current;
@@ -430,7 +480,7 @@ export default function App(props: AppProps = {}) {
 
     // LocalStorage'a kaydet
     localStorage.setItem('selected-language', newLanguage);
-  }, []);
+  }, [availableLanguages]);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [languageSearchTerm, setLanguageSearchTerm] = useState('');
   const [quizCompleted, setQuizCompleted] = useState(false);
@@ -772,16 +822,17 @@ export default function App(props: AppProps = {}) {
 
   // Ultra-optimized language filtering
   const filteredLanguages = useMemo(() => {
+    const source = availableLanguages.length > 0 ? availableLanguages : [] as typeof availableLanguages;
     if (!languageSearchTerm) {
-      return languages; // Return unsorted for better performance
+      return source; // Return unsorted when no search term
     }
 
     const searchTerm = languageSearchTerm.toLowerCase();
-    return languages.filter(lang =>
+    return source.filter(lang =>
       lang.name.toLowerCase().includes(searchTerm) ||
       lang.code.toLowerCase().includes(searchTerm)
     );
-  }, [languageSearchTerm]);
+  }, [languageSearchTerm, availableLanguages]);
 
   const canProceedNext = useCallback(() => {
     if (currentScene === sceneIndices.quiz) {
@@ -808,28 +859,25 @@ export default function App(props: AppProps = {}) {
 
   // Award points and achievements - only once per scene
   const awardPoints = useCallback((sceneIndex: number) => {
-    // Check if points have already been awarded for this scene
-    if (pointsAwardedScenes.has(sceneIndex)) {
-      return; // Exit early if points already awarded
-    }
+    // Skip if already awarded or scenes not ready
+    if (!Array.isArray(scenes) || scenes.length === 0) return;
+    if (sceneIndex < 0 || sceneIndex >= scenes.length) return;
+    if (pointsAwardedScenes.has(sceneIndex)) return;
 
-    const scenePoints = scenes[sceneIndex].points;
+    const sceneEntry = scenes[sceneIndex];
+    if (!sceneEntry) return;
+    const scenePoints = Number(sceneEntry.points) || 0;
+
     setTotalPoints(prev => prev + scenePoints);
     setPointsAwardedScenes(prev => new Set([...prev, sceneIndex]));
 
     const newAchievements: string[] = [];
-    if (sceneIndex === sceneIndices.quiz && quizCompleted) {
-      newAchievements.push('quiz-master');
-    }
-    if (visitedScenes.size === scenes.length) {
-      newAchievements.push('explorer');
-    }
-    if (totalPoints + scenePoints >= 100) {
-      newAchievements.push('centurion');
-    }
+    if (sceneIndex === sceneIndices.quiz && quizCompleted) newAchievements.push('quiz-master');
+    if (visitedScenes.size === scenes.length) newAchievements.push('explorer');
+    if (totalPoints + scenePoints >= 100) newAchievements.push('centurion');
 
     setAchievements(prev => [...prev, ...newAchievements.filter(a => !prev.includes(a))]);
-  }, [quizCompleted, visitedScenes.size, totalPoints, pointsAwardedScenes]);
+  }, [quizCompleted, visitedScenes.size, totalPoints, pointsAwardedScenes, scenes, sceneIndices.quiz]);
 
   // Ultra-optimized completion data calculation
   const completionData = useMemo(() => {
@@ -892,7 +940,17 @@ export default function App(props: AppProps = {}) {
       }
 
     }
-  }, [currentScene, quizCompleted, isMobile]);
+  }, [
+    currentScene,
+    quizCompleted,
+    isMobile,
+    scenes.length,
+    sceneIndices.quiz,
+    awardPoints,
+    trackSceneTime,
+    totalPoints,
+    testOverrides?.disableDelays
+  ]);
 
   const prevScene = useCallback(() => {
     if (currentScene > 0) {
@@ -915,7 +973,14 @@ export default function App(props: AppProps = {}) {
         scormService.saveMicrolearningProgress(newScene, { quizCompleted }, totalPoints || 0, scenes.length);
       }
     }
-  }, [currentScene, isMobile, quizCompleted, totalPoints]);
+  }, [
+    currentScene,
+    isMobile,
+    quizCompleted,
+    totalPoints,
+    scenes.length,
+    testOverrides?.disableDelays
+  ]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -1066,7 +1131,38 @@ export default function App(props: AppProps = {}) {
     }
   }, [hasScenes]);
   const CurrentSceneComponent = (hasScenes ? scenes[currentScene].component : (() => null)) as React.ComponentType<any>;
-  const currentLanguage = useMemo(() => languages.find(lang => lang.code === selectedLanguage), [selectedLanguage]);
+  const currentLanguage = useMemo(() => {
+    const source = availableLanguages.length > 0 ? availableLanguages : languages;
+    return source.find(lang => lang.code === selectedLanguage) || source[0];
+  }, [selectedLanguage, availableLanguages]);
+
+  // Ensure selectedLanguage is valid once availableLanguages come from config
+  useEffect(() => {
+    if (availableLanguages.length === 0) return;
+    const allowedCodes = new Set(availableLanguages.map(l => l.code.toLowerCase()));
+    const mapAvailabilityToLanguageCode = (code: string): string => {
+      switch (code.toLowerCase()) {
+        case 'gr':
+          return 'el';
+        case 'en-uk':
+          return 'en-gb';
+        default:
+          return code.toLowerCase();
+      }
+    };
+    // If current selectedLanguage isn't one of the availability codes, try to map by language equivalence
+    if (!allowedCodes.has(selectedLanguage.toLowerCase())) {
+      const selectedNormalized = selectedLanguage.toLowerCase();
+      const match = availableLanguages.find(av => mapAvailabilityToLanguageCode(av.code) === selectedNormalized);
+      if (match) {
+        setSelectedLanguage(match.code);
+        return;
+      }
+      // Fallback to the first available language
+      const fallback = availableLanguages[0]?.code;
+      if (fallback) setSelectedLanguage(fallback);
+    }
+  }, [availableLanguages, selectedLanguage]);
   const currentSceneConfig = hasScenes ? scenes[currentScene].config : undefined;
   const isFirstOrLastScene = currentScene === 0 || currentScene === scenes.length - 1;
 
@@ -1145,17 +1241,25 @@ export default function App(props: AppProps = {}) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className={cssClasses.loadingOverlay}
+                className={`${cssClasses.loadingOverlay} ${(!hasScenes) ? 'backdrop-blur-xl bg-white/55 dark:bg-gray-900/55' : ''}`}
                 role="status"
                 aria-live="polite"
                 aria-label={appConfig.theme?.ariaTexts?.loadingLabel || "Loading content"}
               >
-                <div className={cssClasses.loadingContainer}>
-                  <Loader2 size={20} className={cssClasses.loadingSpinner} aria-hidden="true" />
-                  <span className={cssClasses.loadingText}>
-                    {themeConfig.texts?.loading}
-                  </span>
-                </div>
+                {(!hasScenes) ? (
+                  <div className="flex items-center justify-center p-6">
+                    <Loader2 size={36} className={cssClasses.loadingSpinner} aria-hidden="true" />
+                  </div>
+                ) : (
+                  <div className={`${cssClasses.loadingContainer} ${!themeConfig.texts?.loading ? 'space-x-0 px-5 py-5' : ''}`}>
+                    <Loader2 size={20} className={cssClasses.loadingSpinner} aria-hidden="true" />
+                    {themeConfig.texts?.loading && (
+                      <span className={cssClasses.loadingText}>
+                        {themeConfig.texts?.loading}
+                      </span>
+                    )}
+                  </div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
@@ -1568,24 +1672,24 @@ export default function App(props: AppProps = {}) {
                     }}
                   >
                     {/* Content Scroll Container - ANCHORED (doesn't move with parallax) */}
-                     <div
-                       ref={scrollContainerRef}
-                       className="relative z-10 h-full overflow-y-auto overflow-x-hidden scroll-smooth"
-                       onScroll={handleScroll}
-                       role="main"
-                       aria-label={appConfig.theme?.ariaTexts?.contentLabel || "Training content"}
-                       aria-describedby="content-description"
-                       style={{
-                         scrollbarWidth: 'thin',
-                         WebkitOverflowScrolling: 'touch',
-                         scrollbarColor: 'transparent transparent',
-                         touchAction: 'pan-y',
-                         overscrollBehavior: 'contain',
-                         // Hardware acceleration
-                         transform: 'translateZ(0)'
-                       }}
-                       data-testid="scene-scroll"
-                     >
+                    <div
+                      ref={scrollContainerRef}
+                      className="relative z-10 h-full overflow-y-auto overflow-x-hidden scroll-smooth"
+                      onScroll={handleScroll}
+                      role="main"
+                      aria-label={appConfig.theme?.ariaTexts?.contentLabel || "Training content"}
+                      aria-describedby="content-description"
+                      style={{
+                        scrollbarWidth: 'thin',
+                        WebkitOverflowScrolling: 'touch',
+                        scrollbarColor: 'transparent transparent',
+                        touchAction: 'pan-y',
+                        overscrollBehavior: 'contain',
+                        // Hardware acceleration
+                        transform: 'translateZ(0)'
+                      }}
+                      data-testid="scene-scroll"
+                    >
                       {/* Hidden description for screen readers */}
                       <div id="content-description" className="sr-only">
                         {appConfig.theme?.ariaTexts?.contentDescription || "Scrollable training content area with interactive learning modules"}
