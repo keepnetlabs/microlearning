@@ -494,6 +494,35 @@ export const QuizScene = React.memo(function QuizScene({
       const wasLastQuestion = currentQuestionIndex === questions.length - 1;
       setLastAnswerResult({ wasCorrect: isCorrect, wasLastQuestion: wasLastQuestion }); // Store the result here
 
+      // Persist compact quiz summary to suspend_data when quiz completes
+      const persistQuizSummary = () => {
+        try {
+          const total = questions.length;
+          const details = questions.map((q:any) => {
+            const a = answers.get(q.id);
+            const ok = typeof a !== 'undefined' ? (q.type === QuestionType.TRUE_FALSE ? a === q.correctAnswer : validateAnswer(a)) : false;
+            return { id: q.id, ok };
+          });
+          const correctCount = details.filter(d => d.ok).length;
+          const score = Math.round((correctCount / Math.max(1, total)) * 100);
+          const existing: any = scormService.loadSuspendData() || {};
+          const updated = {
+            ...existing,
+            sceneData: {
+              ...(existing.sceneData || {}),
+              quizSummary: {
+                total,
+                correctCount,
+                score,
+                submittedAt: new Date().toISOString(),
+                details // compact: [{id, ok}]
+              }
+            }
+          };
+          scormService.saveSuspendData(updated);
+        } catch {}
+      };
+
       // SCORM interaction record
       try {
         const interactionType = (() => {
@@ -563,6 +592,7 @@ export const QuizScene = React.memo(function QuizScene({
 
         // For any question type on the last question, trigger quiz completion
         if (wasLastQuestion) {
+          persistQuizSummary();
           onQuizCompleted();
         }
       }

@@ -14,7 +14,7 @@ import { SummaryScene } from "./components/scenes/SummaryScene";
 import { NudgeScene } from "./components/scenes/NudgeScene";
 import { ChevronDown, Search, Loader2, X, Moon, Sun, Award, ChevronUp, Star } from "lucide-react";
 import ReactCountryFlag from "react-country-flag";
-import { getCountryCode, detectBrowserLanguage, useIsMobile, languages } from "./utils/languageUtils";
+import { getCountryCode, detectBrowserLanguage, useIsMobile, languages, resolveSupportedLanguage, normalizeBcp47Tag } from "./utils/languageUtils";
 import { createConfigChangeEvent, loadAppConfigAsyncCombined } from "./components/configs/appConfigLoader";
 import { useFontFamily } from "./hooks/useFontFamily";
 import { FontFamilyProvider } from "./contexts/FontFamilyContext";
@@ -437,7 +437,7 @@ export default function App(props: AppProps = {}) {
   }), [themeConfig.texts]);
   const [currentScene, setCurrentScene] = useState(initialScene ?? 0);
   const [direction, setDirection] = useState(0);
-  const [selectedLanguage, setSelectedLanguage] = useState(() => testOverrides?.language ?? detectBrowserLanguage());
+  const [selectedLanguage, setSelectedLanguage] = useState(() => normalizeBcp47Tag(testOverrides?.language ?? detectBrowserLanguage()));
 
   // Dil değişikliği handler'ı - appConfig'i günceller
   const handleLanguageChange = useCallback((newLanguage: string) => {
@@ -1134,34 +1134,22 @@ export default function App(props: AppProps = {}) {
   const CurrentSceneComponent = (hasScenes ? scenes[currentScene].component : (() => null)) as React.ComponentType<any>;
   const currentLanguage = useMemo(() => {
     const source = availableLanguages.length > 0 ? availableLanguages : languages;
-    return source.find(lang => lang.code === selectedLanguage) || source[0];
+    const exact = source.find(lang => lang.code === selectedLanguage);
+    if (exact) return exact;
+    const lower = source.find(lang => lang.code.toLowerCase() === selectedLanguage.toLowerCase());
+    if (lower) return lower;
+    const primary = selectedLanguage.split('-')[0].toLowerCase();
+    const primaryMatch = source.find(lang => lang.code.split('-')[0].toLowerCase() === primary);
+    return primaryMatch || source[0];
   }, [selectedLanguage, availableLanguages]);
 
   // Ensure selectedLanguage is valid once availableLanguages come from config
   useEffect(() => {
     if (availableLanguages.length === 0) return;
-    const allowedCodes = new Set(availableLanguages.map(l => l.code.toLowerCase()));
-    const mapAvailabilityToLanguageCode = (code: string): string => {
-      switch (code.toLowerCase()) {
-        case 'gr':
-          return 'el';
-        case 'en-uk':
-          return 'en-gb';
-        default:
-          return code.toLowerCase();
-      }
-    };
-    // If current selectedLanguage isn't one of the availability codes, try to map by language equivalence
-    if (!allowedCodes.has(selectedLanguage.toLowerCase())) {
-      const selectedNormalized = selectedLanguage.toLowerCase();
-      const match = availableLanguages.find(av => mapAvailabilityToLanguageCode(av.code) === selectedNormalized);
-      if (match) {
-        setSelectedLanguage(match.code);
-        return;
-      }
-      // Fallback to the first available language
-      const fallback = availableLanguages[0]?.code;
-      if (fallback) setSelectedLanguage(fallback);
+    const supported = availableLanguages.map(l => l.code);
+    const resolved = resolveSupportedLanguage(selectedLanguage, supported, availableLanguages[0]?.code);
+    if (resolved && resolved !== selectedLanguage) {
+      setSelectedLanguage(resolved);
     }
   }, [availableLanguages, selectedLanguage]);
   const currentSceneConfig = hasScenes ? scenes[currentScene].config : undefined;

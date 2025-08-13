@@ -1,7 +1,108 @@
 import React from "react";
 
+// Legacy → BCP47 mapping
+export const mapLegacyToBCP47 = (tag: string): string => {
+    if (!tag) return tag;
+    const t = String(tag).trim().replace(/_/g, "-").toLowerCase();
+    switch (t) {
+        case "iw": return "he";
+        case "in": return "id";
+        case "ji": return "yi";
+        case "gr": return "el";
+        case "en-uk": return "en-GB";
+        case "pt-br": return "pt-BR";
+        case "zh-cn": return "zh-CN";
+        case "zh-tw": return "zh-TW";
+        default: return tag.replace(/_/g, "-");
+    }
+};
+
+// BCP 47 helpers
+export const normalizeBcp47Tag = (input: string): string => {
+    if (!input) return "";
+    const pre = mapLegacyToBCP47(input);
+    const raw = String(pre).trim().replace(/_/g, "-");
+    try {
+        // @ts-ignore - not always typed in TS lib
+        if (typeof (Intl as any).getCanonicalLocales === "function") {
+            // @ts-ignore
+            const arr = (Intl as any).getCanonicalLocales(raw);
+            if (arr && arr.length > 0) return arr[0];
+        }
+    } catch {}
+    try {
+        // @ts-ignore
+        if (typeof (Intl as any).Locale === "function") {
+            // @ts-ignore
+            const loc = new (Intl as any).Locale(raw);
+            return loc.toString();
+        }
+    } catch {}
+    const parts = raw.split("-");
+    if (parts.length === 0) return raw.toLowerCase();
+    const [language, ...rest] = parts;
+    const normalized: string[] = [];
+    normalized.push(language.toLowerCase());
+    for (const part of rest) {
+        if (/^[A-Za-z]{4}$/.test(part)) {
+            normalized.push(part.charAt(0).toUpperCase() + part.slice(1).toLowerCase());
+        } else if (/^[A-Za-z]{2}$/.test(part) || /^\d{3}$/.test(part)) {
+            normalized.push(part.toUpperCase());
+        } else {
+            normalized.push(part.toLowerCase());
+        }
+    }
+    return normalized.join("-");
+};
+
+export const extractRegionFromTag = (tag: string): string | undefined => {
+    if (!tag) return undefined;
+    const normalized = normalizeBcp47Tag(tag);
+    const parts = normalized.split("-");
+    // language [ - script ] [ - region ] [ - variants ... ]
+    // Detect region: 2 alpha or 3 digits
+    for (let i = 1; i < parts.length; i++) {
+        const part = parts[i];
+        if (/^[A-Z]{2}$/.test(part) || /^\d{3}$/.test(part)) {
+            return part;
+        }
+    }
+    return undefined;
+};
+
+export const resolveSupportedLanguage = (tag: string, supportedCodes: string[], fallback?: string): string => {
+    if (!supportedCodes || supportedCodes.length === 0) return fallback || "en";
+    if (!tag) return supportedCodes[0];
+    const norm = normalizeBcp47Tag(tag);
+    const normalizedAvailable = supportedCodes.map(c => normalizeBcp47Tag(c));
+    const supportedSet = new Set(normalizedAvailable.map(c => c.toLowerCase()));
+    const candidates: string[] = [];
+    // Build RFC 4647 Lookup candidates by truncating from the right
+    const parts = norm.split("-");
+    for (let i = parts.length; i >= 1; i--) {
+        candidates.push(parts.slice(0, i).join("-"));
+    }
+    for (const c of candidates) {
+        const key = c.toLowerCase();
+        if (supportedSet.has(key)) {
+            const exact = normalizedAvailable.find(x => x.toLowerCase() === key)!;
+            return exact;
+        }
+    }
+    // Fallback to primary language match
+    const primary = parts[0].toLowerCase();
+    const primaryHit = normalizedAvailable.find(x => x.split("-")[0].toLowerCase() === primary);
+    if (primaryHit) return primaryHit;
+    return fallback ? normalizeBcp47Tag(fallback) : normalizedAvailable[0];
+};
+
 // Helper function to convert language codes to country codes
 export const getCountryCode = (languageCode: string): string => {
+    // If BCP 47 tag includes a region, prefer that
+    const region = extractRegionFromTag(languageCode);
+    if (region) return region;
+
+    // Otherwise, map primary language to a default country
     const languageToCountry: { [key: string]: string } = {
         'tr': 'TR',
         'en': 'US',
@@ -112,7 +213,8 @@ export const getCountryCode = (languageCode: string): string => {
         'zu': 'ZA'
     };
 
-    return languageToCountry[languageCode] || 'UN';
+    const primary = String(languageCode || "").toLowerCase().split('-')[0];
+    return languageToCountry[primary] || 'UN';
 };
 
 
@@ -120,7 +222,7 @@ export const getCountryCode = (languageCode: string): string => {
 export const detectBrowserLanguage = () => {
     if (typeof window !== 'undefined') {
         const browserLang = navigator.language || navigator.languages?.[0] || 'tr';
-        return browserLang.toLowerCase().split('-')[0];
+        return normalizeBcp47Tag(browserLang);
     }
     return 'en';
 };
@@ -148,7 +250,7 @@ export const useIsMobile = () => {
 export const languages = [
     // European Languages (Most Used)
     { code: 'en', name: 'English', flag: '🇺🇸' },
-    { code: 'en-gb', name: 'English (UK)', flag: '🇬🇧' },
+    { code: 'en-GB', name: 'English (UK)', flag: '🇬🇧' },
     { code: 'de', name: 'German', flag: '🇩🇪' },
     { code: 'fr', name: 'French', flag: '🇫🇷' },
     { code: 'es', name: 'Spanish', flag: '🇪🇸' },
@@ -198,7 +300,7 @@ export const languages = [
 
     // World's Most Spoken Languages
     { code: 'zh', name: 'Chinese (Simplified)', flag: '🇨🇳' },
-    { code: 'zh-tw', name: 'Chinese (Traditional)', flag: '🇹🇼' },
+    { code: 'zh-TW', name: 'Chinese (Traditional)', flag: '🇹🇼' },
     { code: 'hi', name: 'Hindi', flag: '🇮🇳' },
     { code: 'bn', name: 'Bengali', flag: '🇧🇩' },
     { code: 'ur', name: 'Urdu', flag: '🇵🇰' },

@@ -3,6 +3,7 @@ import * as LucideIcons from "lucide-react";
 import { motion } from "framer-motion";
 import { SurveySceneConfig } from "../configs/educationConfigs";
 import { FontWrapper } from "../common/FontWrapper";
+import { scormService } from "../../utils/scormService";
 import { useIsMobile } from "../ui/use-mobile";
 
 interface SurveyState {
@@ -91,6 +92,24 @@ export function SurveyScene({
       if (onSurveySubmitted) {
         onSurveySubmitted();
       }
+
+      // Persist survey result to SCORM suspend_data (merged under sceneData.survey)
+      try {
+        const existing: any = scormService.loadSuspendData() || {};
+        const updated = {
+          ...existing,
+          sceneData: {
+            ...(existing.sceneData || {}),
+            survey: {
+              rating,
+              feedback,
+              selectedTopics,
+              submittedAt: new Date().toISOString()
+            }
+          }
+        };
+        scormService.saveSuspendData(updated);
+      } catch {}
     }, disableDelays ? 0 : 1000);
   };
 
