@@ -18,6 +18,7 @@ import { FontWrapper } from "../common/FontWrapper";
 import { useIsMobile } from "../ui/use-mobile";
 import { CallToAction } from "../ui/CallToAction";
 import { BottomSheetComponent } from "../ui/bottom-sheet";
+import { scormService } from "../../utils/scormService";
 
 // Question Types
 enum QuestionType {
@@ -492,6 +493,66 @@ export const QuizScene = React.memo(function QuizScene({
       const isCorrect = validateAnswer(answer);
       const wasLastQuestion = currentQuestionIndex === questions.length - 1;
       setLastAnswerResult({ wasCorrect: isCorrect, wasLastQuestion: wasLastQuestion }); // Store the result here
+
+      // SCORM interaction record
+      try {
+        const interactionType = (() => {
+          switch (currentQuestion?.type) {
+            case QuestionType.TRUE_FALSE: return 'true-false' as const;
+            case QuestionType.MULTIPLE_CHOICE: return 'choice' as const;
+            case QuestionType.MULTI_SELECT: return 'choice' as const;
+            case QuestionType.SLIDER_SCALE: return 'numeric' as const;
+            case QuestionType.DRAG_DROP: return 'matching' as const;
+            default: return 'choice' as const;
+          }
+        })();
+
+        const correctPattern = (() => {
+          switch (currentQuestion?.type) {
+            case QuestionType.TRUE_FALSE:
+              return String((currentQuestion as any)?.correctAnswer);
+            case QuestionType.MULTIPLE_CHOICE:
+              const mc = currentQuestion as any;
+              return String(mc.options.find((o:any)=>o.isCorrect)?.id ?? '');
+            case QuestionType.MULTI_SELECT:
+              const ms = currentQuestion as any;
+              return (ms.options.filter((o:any)=>o.isCorrect).map((o:any)=>o.id)).join(",");
+            case QuestionType.SLIDER_SCALE:
+              const sl = currentQuestion as any;
+              return `${sl.correctRange.min}-${sl.correctRange.max}`;
+            case QuestionType.DRAG_DROP:
+              return ''; // pattern opsiyonel
+            default:
+              return '';
+          }
+        })();
+
+        const responseVal = (() => {
+          switch (currentQuestion?.type) {
+            case QuestionType.MULTI_SELECT:
+              return Array.isArray(answer) ? answer.join(',') : String(answer);
+            case QuestionType.DRAG_DROP:
+              if (answer instanceof Map) {
+                const pairs: string[] = [];
+                (answer as Map<string,string>).forEach((cat, item) => pairs.push(`${item}:${cat}`));
+                return pairs.join(',');
+              }
+              return String(answer);
+            default:
+              return String(answer);
+          }
+        })();
+
+        scormService.recordInteraction({
+          id: `q-${currentQuestionIndex + 1}`,
+          type: interactionType,
+          correctPattern,
+          response: responseVal,
+          result: isCorrect ? 'correct' : 'wrong',
+          weighting: 1,
+          time: Date.now()
+        });
+      } catch {}
 
       setShowResult(true);
       setAttempts((prev) => prev + 1);

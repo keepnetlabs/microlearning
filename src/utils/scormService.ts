@@ -24,6 +24,19 @@ interface MicrolearningProgress {
     timeSpent?: number;
 }
 
+// SCORM 1.2 Interaction payload
+interface SCORMInteraction {
+    id?: string;
+    type?: 'choice' | 'true-false' | 'fill-in' | 'matching' | 'performance' | 'sequencing' | 'likert' | 'numeric';
+    objectiveId?: string;
+    correctPattern?: string;
+    response?: string | number | boolean;
+    result?: 'correct' | 'wrong' | 'neutral' | 'unanticipated';
+    weighting?: number;
+    latencySeconds?: number; // HH:MM:SS equivalent
+    time?: number | Date;    // timestamp or Date (defaults: now)
+}
+
 class SCORMService {
     private scorm: any = null;
     private isInitialized: boolean = false;
@@ -553,6 +566,97 @@ class SCORMService {
         const saveResult = this.saveSuspendData(progressData);
         this.updateProgress(totalScore, sceneIndex, totalScenes);
         return saveResult;
+    }
+
+    // Record a single interaction (question attempt) to SCORM 1.2 cmi.interactions
+    public recordInteraction(interaction: SCORMInteraction): boolean {
+        // Normalize payload to SCORM 1.2 patterns
+        const normalize = (inp: SCORMInteraction): SCORMInteraction => {
+            const out: SCORMInteraction = { ...inp };
+            // type defaults
+            out.type = (out.type || 'choice') as any;
+            // result defaults
+            out.result = (out.result || 'neutral') as any;
+            // normalize true/false response/pattern → 't'|'f'
+            const toTF = (v: any): string => {
+                if (typeof v === 'boolean') return v ? 't' : 'f';
+                const s = String(v).toLowerCase();
+                if (s === 'true' || s === 't') return 't';
+                if (s === 'false' || s === 'f') return 'f';
+                return s;
+            };
+            if (out.type === 'true-false') {
+                if (typeof out.response !== 'undefined') out.response = toTF(out.response);
+                if (typeof out.correctPattern !== 'undefined') out.correctPattern = toTF(out.correctPattern);
+            }
+            // normalize matching pattern 'source.target' (not 'source:target')
+            if (out.type === 'matching') {
+                const fixPairs = (s: string): string => s.split(',').map(p => p.trim().replace(':', '.')).join(',');
+                if (typeof out.response === 'string') out.response = fixPairs(out.response as string);
+                if (typeof out.correctPattern === 'string') out.correctPattern = fixPairs(out.correctPattern as string);
+            }
+            // normalize numeric range pattern to 'min[:max]'
+            if (out.type === 'numeric') {
+                if (typeof out.correctPattern === 'string' && out.correctPattern.includes('-')) {
+                    const parts = (out.correctPattern as string).split('-');
+                    if (parts.length === 2) out.correctPattern = `${parts[0]}[:${parts[1]}]`;
+                }
+            }
+            // multi-select choice responses should be comma-separated ids (already the case)
+            return out;
+        };
+        const normalized = normalize(interaction);
+        // Embed proxy: forward to parent shell
+        if (!this.scorm || !this.data.isAvailable) {
+            if (this.isEmbedMode) {
+                try {
+                    this.postToParent('scorm:interaction', normalized);
+                    return true;
+                } catch (error) {
+                    console.error('[SCORM] Interaction postMessage error:', error);
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        try {
+            const countRaw = this.scorm.get('cmi.interactions._count');
+            const idx = parseInt(countRaw, 10) || 0;
+            const base = `cmi.interactions.${idx}.`;
+
+            // Type/result mapping (fallbacks)
+            const type = normalized.type || 'choice';
+            const result = normalized.result || 'neutral';
+
+            // Time formatting (HH:MM:SS)
+            const timeVal = normalized.time instanceof Date
+                ? normalized.time
+                : (typeof normalized.time === 'number' ? new Date(normalized.time) : new Date());
+            const pad2 = (n: number) => n.toString().padStart(2, '0');
+            const timeStr = `${pad2(timeVal.getHours())}:${pad2(timeVal.getMinutes())}:${pad2(timeVal.getSeconds())}`;
+
+            // Write required/available fields
+            this.scorm.set(base + 'id', (normalized.id || `int-${idx + 1}`));
+            if (normalized.objectiveId) this.scorm.set(base + 'objectives.0.id', String(normalized.objectiveId));
+            this.scorm.set(base + 'type', type);
+            if (typeof normalized.correctPattern !== 'undefined') this.scorm.set(base + 'correct_responses.0.pattern', String(normalized.correctPattern));
+            if (typeof normalized.response !== 'undefined') this.scorm.set(base + 'student_response', String(normalized.response));
+            this.scorm.set(base + 'result', result);
+            this.scorm.set(base + 'time', timeStr);
+            if (typeof normalized.weighting !== 'undefined') this.scorm.set(base + 'weighting', String(normalized.weighting));
+            if (typeof normalized.latencySeconds === 'number') {
+                const h = Math.floor(normalized.latencySeconds / 3600);
+                const m = Math.floor((normalized.latencySeconds % 3600) / 60);
+                const s = Math.floor(normalized.latencySeconds % 60);
+                this.scorm.set(base + 'latency', `${pad2(h)}:${pad2(m)}:${pad2(s)}`);
+            }
+
+            return this.commit();
+        } catch (error) {
+            console.error('[SCORM] Interaction record error:', error);
+            return false;
+        }
     }
 
     public finish(): boolean {
