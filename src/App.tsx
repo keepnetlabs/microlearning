@@ -935,9 +935,7 @@ export default function App(props: AppProps = {}) {
           setIsLoading(false);
         }, testOverrides?.disableDelays ? 0 : 100); // Reduced from 250ms to 100ms
       }
-      if (scormService.isAvailable()) {
-        scormService.saveMicrolearningProgress(currentScene + 1, { quizCompleted }, totalPoints || 0, scenes.length);
-      }
+      scormService.saveMicrolearningProgress(currentScene + 1, { quizCompleted }, totalPoints || 0, scenes.length);
 
     }
   }, [
@@ -969,9 +967,7 @@ export default function App(props: AppProps = {}) {
         }, testOverrides?.disableDelays ? 0 : 100); // Reduced from 250ms to 100ms
       }
       // Save SCORM progress on backward navigation as well
-      if (scormService.isAvailable()) {
-        scormService.saveMicrolearningProgress(newScene, { quizCompleted }, totalPoints || 0, scenes.length);
-      }
+      scormService.saveMicrolearningProgress(newScene, { quizCompleted }, totalPoints || 0, scenes.length);
     }
   }, [
     currentScene,
@@ -1036,9 +1032,7 @@ export default function App(props: AppProps = {}) {
     setQuizCompleted(true);
     setAchievements(prev => [...prev, 'quiz-completed'].filter((a, i, arr) => arr.indexOf(a) === i));
     // Write quiz result to SCORM immediately (do not wait for Summary)
-    if (scormService.isAvailable()) {
-      scormService.updateQuizResult(true, totalPoints || 0);
-    }
+    scormService.updateQuizResult(true, totalPoints || 0);
   }, [totalPoints]);
 
   // Survey feedback submission handler

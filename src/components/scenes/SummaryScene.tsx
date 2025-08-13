@@ -104,17 +104,12 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
     setFinishError(null);
     setIsFinishing(true);
     try {
-      if (scormService.isAvailable()) {
-        // Ensure pending time and data are committed before quitting
-        scormService.commit();
-        const ok = scormService.finish();
-        if (!ok) {
-          setFinishError(config.texts?.finishErrorText || 'Could not finish. Please close the window or try again.');
-        } else {
-          setIsFinished(true);
-        }
+      // Ensure pending time and data are committed before quitting (service will no-op or delegate in embed mode)
+      scormService.commit();
+      const ok = scormService.finish();
+      if (!ok) {
+        setFinishError(config.texts?.finishErrorText || 'Could not finish. Please close the window or try again.');
       } else {
-        // Standalone mode: show finished state anyway
         setIsFinished(true);
       }
     } catch (e) {
