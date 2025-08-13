@@ -438,6 +438,7 @@ export default function App(props: AppProps = {}) {
   const [currentScene, setCurrentScene] = useState(initialScene ?? 0);
   const [direction, setDirection] = useState(0);
   const [selectedLanguage, setSelectedLanguage] = useState(() => normalizeBcp47Tag(testOverrides?.language ?? detectBrowserLanguage()));
+  const [resumeApplied, setResumeApplied] = useState(false);
 
   // Dil değişikliği handler'ı - appConfig'i günceller
   const handleLanguageChange = useCallback((newLanguage: string) => {
@@ -1131,6 +1132,49 @@ export default function App(props: AppProps = {}) {
       setIsConfigLoading(true);
     }
   }, [hasScenes]);
+  // One-time resume from SCORM 1.2 (suspend_data or lesson_location)
+  useEffect(() => {
+    if (!hasScenes || resumeApplied) return;
+    let cancelled = false;
+    const start = Date.now();
+    const maxMs = 5000;
+    const step = 150;
+
+    const clampIndex = (idx: number) => Math.max(0, Math.min(idx, scenes.length - 1));
+
+    const tryApply = () => {
+      if (cancelled) return;
+      try {
+        const suspend = scormService.loadSuspendData();
+        let targetIndex = -1;
+        let savedScore: number | undefined = undefined;
+        if (suspend && typeof suspend.lastScene === 'number') {
+          targetIndex = clampIndex(suspend.lastScene);
+          savedScore = typeof suspend.totalScore === 'number' ? suspend.totalScore : undefined;
+        }
+        if (targetIndex < 0) {
+          const lessonLoc = scormService.getSCORMData?.().lessonLocation;
+          const parsed = parseInt(lessonLoc || '', 10);
+          if (!isNaN(parsed)) targetIndex = clampIndex(parsed);
+        }
+        if (targetIndex >= 0) {
+          setCurrentScene(targetIndex);
+          setVisitedScenes(new Set(Array.from({ length: targetIndex + 1 }, (_, i) => i)));
+          setPointsAwardedScenes(new Set(Array.from({ length: Math.max(0, targetIndex) }, (_, i) => i)));
+          if (typeof savedScore === 'number') setTotalPoints(savedScore);
+          setResumeApplied(true);
+          return;
+        }
+      } catch { }
+      if (Date.now() - start < maxMs) {
+        setTimeout(tryApply, step);
+      } else {
+        setResumeApplied(true);
+      }
+    };
+    tryApply();
+    return () => { cancelled = true; };
+  }, [hasScenes, scenes.length, resumeApplied]);
   const CurrentSceneComponent = (hasScenes ? scenes[currentScene].component : (() => null)) as React.ComponentType<any>;
   const currentLanguage = useMemo(() => {
     const source = availableLanguages.length > 0 ? availableLanguages : languages;
