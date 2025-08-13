@@ -1,6 +1,7 @@
 // SCORM 1.2 Compliant Service - Enhanced Version
 // @ts-ignore
 import { SCORM } from 'pipwerks-scorm-api-wrapper';
+import { logger } from './logger';
 
 interface SCORMData {
     lessonStatus: string;
@@ -132,6 +133,7 @@ class SCORMService {
                     const errorCode = SCORM.debug.getCode();
                     const errorInfo = SCORM.debug.getInfo();
                     console.error('[SCORM] Initialize failed:', `${errorCode}: ${errorInfo}`);
+                    logger.push({ level: 'error', code: 'INIT_FAILED', message: 'SCORM init failed', scormCode: String(errorCode), scormInfo: String(errorInfo) });
                     this.data.isAvailable = false;
                     return;
                 }
@@ -150,6 +152,7 @@ class SCORMService {
             }
         } catch (error) {
             console.error('[SCORM] Initialization error:', error);
+            logger.push({ level: 'error', code: 'INIT_ERROR', message: 'Initialization exception', detail: String(error) });
             this.data.isAvailable = false;
         } finally {
             this.isInitializing = false;
@@ -312,6 +315,7 @@ class SCORMService {
             return commitResult;
         } catch (error) {
             console.error('[SCORM] Progress update error:', error);
+            logger.push({ level: 'error', code: 'UPDATE_PROGRESS_ERROR', message: 'Progress update exception', detail: String(error) });
             return false;
         }
     }
@@ -362,6 +366,7 @@ class SCORMService {
             return true;
         } catch (error) {
             console.error('[SCORM] Quiz update error:', error);
+            logger.push({ level: 'error', code: 'QUIZ_UPDATE_ERROR', message: 'Quiz update exception', detail: String(error) });
             return false;
         }
     }
@@ -397,6 +402,7 @@ class SCORMService {
 
         } catch (error) {
             console.error('[SCORM] Session time update error:', error);
+            logger.push({ level: 'error', code: 'SESSION_TIME_ERROR', message: 'Session time update exception', detail: String(error) });
         }
     }
 
@@ -429,7 +435,8 @@ class SCORMService {
                     this.postToParent('scorm:setSuspendData', enhancedData);
                     return true;
                 } catch (error) {
-                    console.error('[SCORM] Suspend data postMessage error:', error);
+            console.error('[SCORM] Suspend data postMessage error:', error);
+            logger.push({ level: 'error', code: 'SUSPEND_POSTMSG_ERROR', message: 'Suspend data postMessage exception', detail: String(error) });
                     return false;
                 }
             }
@@ -482,6 +489,7 @@ class SCORMService {
             return commitResult;
         } catch (error) {
             console.error('[SCORM] Suspend data error:', error);
+            logger.push({ level: 'error', code: 'SUSPEND_SAVE_ERROR', message: 'Suspend data save exception', detail: String(error) });
             return false;
         }
     }
@@ -511,6 +519,7 @@ class SCORMService {
             }
         } catch (error) {
             console.error('[SCORM] Suspend data loading error:', error);
+            logger.push({ level: 'error', code: 'SUSPEND_LOAD_ERROR', message: 'Suspend data load exception', detail: String(error) });
         }
 
         return null;
@@ -699,6 +708,7 @@ class SCORMService {
             return finishResult;
         } catch (error) {
             console.error('[SCORM] Termination error:', error);
+            logger.push({ level: 'error', code: 'FINISH_ERROR', message: 'Finish/quit exception', detail: String(error) });
             return false;
         }
     }
@@ -754,11 +764,13 @@ class SCORMService {
                 const errorCode = this.scorm.debug.getCode();
                 const errorInfo = this.scorm.debug.getInfo();
                 console.error('[SCORM] Commit failed:', `${errorCode}: ${errorInfo}`);
+                logger.push({ level: 'error', code: 'COMMIT_FAILED', message: 'Commit failed', scormCode: String(errorCode), scormInfo: String(errorInfo) });
             }
 
             return result;
         } catch (error) {
             console.error('[SCORM] Commit error:', error);
+            logger.push({ level: 'error', code: 'COMMIT_ERROR', message: 'Commit exception', detail: String(error) });
             return false;
         } finally {
             this.commitInProgress = false;

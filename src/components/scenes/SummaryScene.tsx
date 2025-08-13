@@ -18,6 +18,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { SummarySceneConfig } from "../configs/educationConfigs";
 import { FontWrapper } from "../common/FontWrapper";
+import { logger } from "../../utils/logger";
 import { useIsMobile } from "../ui/use-mobile";
 import { scormService } from "../../utils/scormService";
 interface SummarySceneProps {
@@ -622,6 +623,30 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
                     : (config.texts?.downloadButton || 'Download certificate')}
               </span>
             </motion.button>
+
+            {/* Download diagnostics (only if errors recorded) */}
+            {logger.hasErrors() && (
+              <motion.button
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 1.2 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => {
+                  try {
+                    const snapshot = scormService.getSCORMData();
+                    logger.download(snapshot);
+                  } catch {}
+                }}
+                className={`inline-flex sm:text-base mt-2 items-center gap-2 text-xs underline opacity-90 hover:opacity-100 text-[#1C1C1E] dark:text-[#F2F2F7]`}
+                data-testid="btn-download-diagnostics"
+              >
+                <Download size={14} className="relative z-10" />
+                <span className={`relative z-10`}>
+                  {'Download diagnostics'}
+                </span>
+              </motion.button>
+            )}
           </div>
         </motion.div>
 
