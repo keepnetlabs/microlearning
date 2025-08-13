@@ -559,8 +559,8 @@ class SCORMService {
         // If no SCORM, still notify parent shell in embed mode
         if (!this.scorm || !this.data.isAvailable || !this.isInitialized) {
             if (this.isEmbedMode) {
-                // Send last known progress (if any) and enforce passed at finish
-                const payload = { ...(this.lastReportedProgress || {}), status: 'passed' };
+                // Send last known progress with guaranteed 100 score and passed status, then finish
+                const payload = { ...(this.lastReportedProgress || {}), totalPoints: 100, status: 'passed' };
                 this.postToParent('scorm:updateProgress', payload);
                 this.postToParent('scorm:finish');
                 return true;
