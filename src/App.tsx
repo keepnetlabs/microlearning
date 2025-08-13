@@ -950,6 +950,13 @@ export default function App(props: AppProps = {}) {
     testOverrides?.disableDelays
   ]);
 
+  // Ensure last scene (summary) also awards its points on arrival
+  useEffect(() => {
+    if (currentScene === sceneIndices.summary) {
+      awardPoints(currentScene);
+    }
+  }, [currentScene, sceneIndices.summary, awardPoints]);
+
   const prevScene = useCallback(() => {
     if (currentScene > 0) {
       const newScene = currentScene - 1;
