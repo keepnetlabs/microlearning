@@ -577,6 +577,9 @@ class SCORMService {
             }
 
             this.updateSessionTime();
+            // Ensure perfect score and success on finish for microlearning
+            try { this.scorm.set('cmi.core.score.raw', '100'); } catch {}
+            try { this.scorm.set('cmi.core.lesson_status', 'passed'); } catch {}
             this.scorm.set('cmi.core.exit', 'suspend');
             this.commit();
 
