@@ -1021,6 +1021,7 @@ export interface SummarySceneConfig {
         finishedText?: string;
         finishErrorText?: string;
         downloadedText?: string;
+        downloadTrainingLogsText?: string;
         urgentLabel?: string;
         pointsLabel?: string;
         timeLabel?: string;

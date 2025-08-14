@@ -598,9 +598,33 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
               {isFinishing ? (config.texts?.savingText || 'Saving…') : isFinished ? (config.texts?.finishedText || 'Saved. You can now close this window.') : ''}
             </div>
             {finishError && (
-              <div className="text-xs text-red-500 mt-2 text-center">
+              <div className="text-sm mt-2 text-center text-[#1C1C1E] dark:text-[#F2F2F7]">
                 {finishError}
               </div>
+            )}
+
+            {/* Download Training Logs - Only if errors exist */}
+            {logger.hasErrors() && (
+              <motion.button
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.9 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => {
+                  try {
+                    const snapshot = scormService.getSCORMData();
+                    logger.download(snapshot);
+                  } catch { }
+                }}
+                className={`relative inline-flex mt-4 items-center gap-2 px-4 py-2 glass-border-2 text-sm font-medium transition-all hover:shadow-lg text-emerald-600 dark:text-emerald-400`}
+                data-testid="btn-download-training-logs"
+              >
+                <Download size={16} className="relative z-10 text-emerald-600 dark:text-emerald-400" />
+                <span className={`relative z-10`}>
+                  {config.texts?.downloadTrainingLogsText || 'Download Training Logs'}
+                </span>
+              </motion.button>
             )}
 
             <motion.button
@@ -623,30 +647,6 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
                     : (config.texts?.downloadButton || 'Download certificate')}
               </span>
             </motion.button>
-
-            {/* Download diagnostics (only if errors recorded) */}
-            {logger.hasErrors() && (
-              <motion.button
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 1.2 }}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => {
-                  try {
-                    const snapshot = scormService.getSCORMData();
-                    logger.download(snapshot);
-                  } catch {}
-                }}
-                className={`inline-flex sm:text-base mt-2 items-center gap-2 text-xs underline opacity-90 hover:opacity-100 text-[#1C1C1E] dark:text-[#F2F2F7]`}
-                data-testid="btn-download-diagnostics"
-              >
-                <Download size={14} className="relative z-10" />
-                <span className={`relative z-10`}>
-                  {'Download diagnostics'}
-                </span>
-              </motion.button>
-            )}
           </div>
         </motion.div>
 
