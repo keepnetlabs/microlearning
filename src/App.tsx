@@ -19,6 +19,7 @@ import { createConfigChangeEvent, loadAppConfigAsyncCombined } from "./component
 import { useFontFamily } from "./hooks/useFontFamily";
 import { FontFamilyProvider } from "./contexts/FontFamilyContext";
 import { scormService, destroySCORMService } from "./utils/scormService";
+import { logger } from "./utils/logger";
 
 // Computes a clean, responsive className for the header logo
 export function getHeaderLogoClassName(isMobile: boolean, isFirstOrLastScene: boolean): string {
@@ -869,7 +870,7 @@ export default function App(props: AppProps = {}) {
     if (!sceneEntry) return;
     const scenePoints = Number(sceneEntry.points) || 0;
 
-    setTotalPoints(prev => prev + scenePoints);
+    setTotalPoints(prev => Math.min(100, prev + scenePoints));
     setPointsAwardedScenes(prev => new Set([...prev, sceneIndex]));
 
     const newAchievements: string[] = [];
@@ -914,6 +915,9 @@ export default function App(props: AppProps = {}) {
     }
 
     if (currentScene < scenes.length - 1) {
+      try {
+        logger.push({ level: 'info', code: 'NAV_NEXT', message: 'Next scene', detail: { from: currentScene, to: currentScene + 1 } });
+      } catch { }
       // Track time spent on current scene
       trackSceneTime(currentScene + 1);
 
@@ -961,6 +965,9 @@ export default function App(props: AppProps = {}) {
   const prevScene = useCallback(() => {
     if (currentScene > 0) {
       const newScene = currentScene - 1;
+      try {
+        logger.push({ level: 'info', code: 'NAV_PREV', message: 'Previous scene', detail: { from: currentScene, to: newScene } });
+      } catch { }
       // INSTANT transition on mobile - NO loading delay
       if (isMobile) {
         setDirection(-1);
@@ -1041,6 +1048,9 @@ export default function App(props: AppProps = {}) {
     setAchievements(prev => [...prev, 'quiz-completed'].filter((a, i, arr) => arr.indexOf(a) === i));
     // Write quiz result to SCORM immediately (do not wait for Summary)
     scormService.updateQuizResult(true, totalPoints || 0);
+    try {
+      logger.push({ level: 'info', code: 'QUIZ_COMPLETED', message: 'User completed quiz', detail: { totalPoints } });
+    } catch { }
   }, [totalPoints]);
 
   // Survey feedback submission handler
@@ -1048,6 +1058,9 @@ export default function App(props: AppProps = {}) {
     setSurveyState(prev => ({ ...prev, isSubmitted: true, isSubmitting: false }));
     setIsSurveySubmitted(true);
     setShowSurveySubmittedNotification(true);
+    try {
+      logger.push({ level: 'info', code: 'SURVEY_SUBMITTED', message: 'Survey submitted' });
+    } catch { }
     // Auto navigate after 2s
     if (surveyToastTimeoutRef.current) {
       clearTimeout(surveyToastTimeoutRef.current);
@@ -1161,7 +1174,7 @@ export default function App(props: AppProps = {}) {
           setCurrentScene(targetIndex);
           setVisitedScenes(new Set(Array.from({ length: targetIndex + 1 }, (_, i) => i)));
           setPointsAwardedScenes(new Set(Array.from({ length: Math.max(0, targetIndex) }, (_, i) => i)));
-          if (typeof savedScore === 'number') setTotalPoints(savedScore);
+          if (typeof savedScore === 'number') setTotalPoints(Math.max(0, Math.min(100, savedScore)));
           setResumeApplied(true);
           return;
         }
