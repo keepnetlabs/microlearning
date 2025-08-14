@@ -49,7 +49,7 @@ export function CallToAction({
       const html = document.documentElement;
       const documentHeight = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
       const windowHeight = window.innerHeight;
-      const hasScrollbar = documentHeight > windowHeight;
+      const hasScrollbar = documentHeight > windowHeight - 100; // Start sticky 100px before actual scroll needed
 
       console.log('Document height:', documentHeight, 'Window height:', windowHeight, 'Has scroll:', hasScrollbar);
       setHasScroll(hasScrollbar);

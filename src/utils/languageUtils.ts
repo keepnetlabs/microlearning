@@ -229,7 +229,7 @@ export const detectBrowserLanguage = () => {
 
 // Custom hook for mobile detection
 export const useIsMobile = () => {
-    const MOBILE_BREAKPOINT = 768;
+    const MOBILE_BREAKPOINT = 1024;
     const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined);
 
     React.useEffect(() => {

@@ -1,10 +1,12 @@
 import React, { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, AlertTriangle, Flag, ChevronRight, Reply, CornerUpRight, Archive, Delete, Folder, ArrowLeft, Eye, Star, FileText, EyeOff, Search, MailSearch } from "lucide-react";
+import { Mail, AlertTriangle, Flag, ChevronRight, Reply, CornerUpRight, Archive, Delete, ArrowLeft, Eye, Star, FileText, EyeOff, MailSearch, Check, X } from "lucide-react";
 import { FontWrapper } from "../common/FontWrapper";
 import { useIsMobile } from "../ui/use-mobile";
 import { CallToAction } from "../ui/CallToAction";
 import { PhishingReportButton } from "../ui/PhishingReportButton";
+import { PhishingReportModal } from "../ui/PhishingReportModal";
+import { PhishingResultModal } from "../ui/PhishingResultModal";
 import { InboxSceneConfig, EmailData } from "../../data/inboxConfig";
 
 interface InboxSceneProps {
@@ -16,9 +18,14 @@ interface InboxSceneProps {
 export function InboxScene({ config, onNextSlide, onEmailReport }: InboxSceneProps) {
   const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
   const [reportedEmails, setReportedEmails] = useState<Set<string>>(new Set());
+  const [reportResults, setReportResults] = useState<Map<string, boolean>>(new Map());
   const [accuracy, setAccuracy] = useState(0);
   const [totalReports, setTotalReports] = useState(0);
   const [showHeaders, setShowHeaders] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [showResultModal, setShowResultModal] = useState(false);
+  const [lastReportedEmail, setLastReportedEmail] = useState<EmailData | null>(null);
+  const [lastReportCorrect, setLastReportCorrect] = useState(false);
   const isMobile = useIsMobile();
 
   const selectedEmail = config.emails.find(email => email.id === selectedEmailId);
@@ -46,6 +53,10 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
     newReportedEmails.add(emailId);
     setReportedEmails(newReportedEmails);
 
+    const newReportResults = new Map(reportResults);
+    newReportResults.set(emailId, isCorrect);
+    setReportResults(newReportResults);
+
     const newTotalReports = totalReports + 1;
     setTotalReports(newTotalReports);
 
@@ -58,13 +69,33 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
     setAccuracy(newAccuracy);
 
     onEmailReport?.(emailId, isCorrect);
-  }, [config.emails, reportedEmails, totalReports, onEmailReport]);
+  }, [config.emails, reportedEmails, reportResults, totalReports, onEmailReport]);
+
+  const handlePhishingReportClick = useCallback(() => {
+    if (selectedEmail) {
+      setShowReportModal(true);
+    }
+  }, [selectedEmail]);
+
+  const handleModalReport = useCallback((selectedOptions: number[]) => {
+    if (selectedEmail) {
+      const isCorrect = selectedEmail.isPhishing;
+      setLastReportedEmail(selectedEmail);
+      setLastReportCorrect(isCorrect);
+      handleEmailReport(selectedEmail.id);
+      setShowReportModal(false);
+      // Show result modal after a brief delay
+      setTimeout(() => {
+        setShowResultModal(true);
+      }, 300);
+    }
+  }, [selectedEmail, handleEmailReport]);
 
   return (
     <div>
       <div>
         {/* Single Card with Header and Two-Column Layout */}
-        <div className="backdrop-blur-xl bg-white/10 dark:bg-black/10 rounded-lg border border-white/20 dark:border-white/10 overflow-hidden flex flex-col" style={{height: 'calc(100vh - 40px)', maxHeight: 'calc(100vh - 40px)'}}>
+        <div className="backdrop-blur-xl bg-white/10 dark:bg-black/10 rounded-lg border border-white/20 dark:border-white/10 overflow-hidden flex flex-col" style={{ height: 'calc(100vh - 40px)', maxHeight: 'calc(100vh - 40px)' }}>
           {/* Header - Desktop layout */}
           <div className="hidden lg:block p-6 border-b border-white/20 dark:border-white/10">
             <div className="flex items-center justify-between">
@@ -87,7 +118,7 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
               <div className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-[#1C1C1E] dark:text-[#F2F2F7]" />
                 <FontWrapper>
-                  <h1 className="text-sm font-semibold text-[#1C1C1E] dark:text-[#F2F2F7]">Phishing Training</h1>
+                  <h1 className="text-sm font-semibold text-[#1C1C1E] dark:text-[#F2F2F7]">{config.texts.mobileTitle}</h1>
                 </FontWrapper>
               </div>
               <div className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold">
@@ -98,7 +129,7 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
             <div className="pb-4 border-b border-white/20 dark:border-white/10 mx-4">
               <PhishingReportButton
                 text={config.texts.phishingReportLabel}
-                onClick={() => selectedEmail && handleEmailReport(selectedEmail.id)}
+                onClick={handlePhishingReportClick}
                 disabled={!selectedEmail}
                 icon={<PhishingIcon />}
               />
@@ -128,7 +159,7 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
               </div>
               <PhishingReportButton
                 text={config.texts.phishingReportLabel}
-                onClick={() => selectedEmail && handleEmailReport(selectedEmail.id)}
+                onClick={handlePhishingReportClick}
                 disabled={!selectedEmail}
                 icon={<PhishingIcon />}
               />
@@ -148,7 +179,7 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
                   >
                     <ArrowLeft className="w-4 h-4" />
                     <FontWrapper>
-                      <span>Back to Inbox</span>
+                      <span>{config.texts.backToInboxText}</span>
                     </FontWrapper>
                   </button>
                 </div>
@@ -178,12 +209,12 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
 
                       {/* Headers button */}
                       <div className="mb-4">
-                        <button 
+                        <button
                           onClick={() => setShowHeaders(!showHeaders)}
                           className="flex items-center gap-2 px-3 py-2 glass-border-4 text-sm font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors"
                         >
                           {showHeaders ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                          <FontWrapper>Headers</FontWrapper>
+                          <FontWrapper>{config.texts.headersButtonText}</FontWrapper>
                         </button>
                       </div>
 
@@ -204,7 +235,7 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
                       )}
 
                       {/* Email Content */}
-                      <div className="prose prose-sm max-w-none mb-6">
+                      <div className="prose prose-sm max-w-none mb-6 prose-p:text-[#1C1C1E] dark:prose-p:text-[#F2F2F7] prose-strong:text-[#1C1C1E] dark:prose-strong:text-[#F2F2F7] prose-li:text-[#1C1C1E] dark:prose-li:text-[#F2F2F7] prose-a:text-[#1C1C1E] dark:prose-a:text-[#F2F2F7]">
                         <FontWrapper>
                           <div dangerouslySetInnerHTML={{ __html: selectedEmail.content }} />
                         </FontWrapper>
@@ -229,34 +260,15 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
                         </div>
                       )}
 
-                      {/* Report Button */}
-                      {!reportedEmails.has(selectedEmail.id) && (
-                        <motion.button
-                          className="w-full bg-red-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-red-700 transition-colors"
-                          onClick={() => handleEmailReport(selectedEmail.id)}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                        >
-                          <FontWrapper>{config.texts.reportButtonText}</FontWrapper>
-                        </motion.button>
-                      )}
-
-                      {reportedEmails.has(selectedEmail.id) && (
-                        <div className="text-center py-3 px-4 bg-white/10 dark:bg-white/5 rounded-lg">
-                          <FontWrapper>
-                            <span className="text-[#1C1C1E] dark:text-[#F2F2F7]">{config.texts.emailReportedMessage}</span>
-                          </FontWrapper>
-                        </div>
-                      )}
                     </motion.div>
                   </AnimatePresence>
                 </div>
               ) : (
-                <div className="overflow-y-auto flex-1 min-h-0">
+                <div className="overflow-y-auto flex-1 min-h-0 scrollbar-hide">
                   {config.emails.map((email) => (
                     <motion.div
                       key={email.id}
-                      className={`p-4 border-b border-white/10 dark:border-white/5 cursor-pointer hover:bg-white/10 dark:hover:bg-white/5 transition-colors ${selectedEmailId === email.id ? 'bg-blue-500/10 lg:border-l-4 border-l-blue-500' : ''
+                      className={`p-4 border-b border-white/20 dark:border-white/10 cursor-pointer hover:bg-white/10 dark:hover:bg-white/5 transition-colors ${selectedEmailId === email.id ? 'lg:border-l-[7px] border-l-white/40 dark:border-l-white' : ''
                         } ${reportedEmails.has(email.id) ? 'opacity-60' : ''}`}
                       onClick={() => handleEmailSelect(email.id)}
                       whileHover={{ scale: 1.01 }}
@@ -269,12 +281,26 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
                               <p className="font-medium text-[#1C1C1E] dark:text-[#F2F2F7] truncate">{email.sender}</p>
                             </FontWrapper>
                             {reportedEmails.has(email.id) && (
-                              <Flag className="w-4 h-4 text-red-500" />
+                              <div className="w-5 h-5 glass-border-4 rounded-full flex items-center justify-center bg-white/10 dark:bg-white/5">
+                                {reportResults.get(email.id) ? (
+                                  <Check className="w-3 h-3 text-[#1C1C1E] dark:text-[#F2F2F7]" />
+                                ) : (
+                                  <X className="w-3 h-3 text-[#1C1C1E] dark:text-[#F2F2F7]" />
+                                )}
+                              </div>
                             )}
                           </div>
                           <FontWrapper>
                             <p className="text-sm font-medium text-[#1C1C1E] dark:text-[#F2F2F7] truncate mb-1">{email.subject}</p>
-                            <p className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] truncate">{email.preview}</p>
+                            {reportedEmails.has(email.id) ? (
+                              reportResults.get(email.id) ? (
+                                <p className="text-xs text-[#1C1C1E]/80 dark:text-[#F2F2F7]/70 truncate">{config.texts.correctReportMessage}</p>
+                              ) : (
+                                <p className="text-xs text-[#1C1C1E]/80 dark:text-[#F2F2F7]/70 truncate">{config.texts.cautiousReportMessage}</p>
+                              )
+                            ) : (
+                              <p className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] truncate">{email.preview}</p>
+                            )}
                           </FontWrapper>
                         </div>
                         <div className="flex items-center gap-2 ml-2">
@@ -290,101 +316,82 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
 
             {/* Right: Email Viewer - Desktop only */}
             <div className="hidden lg:block lg:col-span-2">
-              <div className="p-6 overflow-y-auto" style={{height: 'calc(-200px + 100vh)'}}>
+              <div className="p-6 overflow-y-auto scrollbar-hide" style={{ height: 'calc(-200px + 100vh)' }}>
                 {selectedEmail ? (
                   <div>
-                      {/* Email Header */}
-                      <div className="flex items-start justify-between pb-4 mb-6 border-b border-white/20 dark:border-white/10">
-                        <div className="flex-1">
-                          <FontWrapper>
-                            <h3 className="text-lg font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] mb-2">{selectedEmail.subject}</h3>
-                            <div className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] space-y-1">
-                              <p><span className="font-semibold">From:</span> {selectedEmail.sender}</p>
-                              <p><span className="font-semibold">Time:</span> {selectedEmail.timestamp}</p>
-                            </div>
-                          </FontWrapper>
-                        </div>
-                        <div className="flex items-center gap-2 ml-4">
-                          <button 
-                            onClick={() => setShowHeaders(!showHeaders)}
-                            className="flex items-center gap-2 px-3 py-2 glass-border-4 text-sm font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors"
-                          >
-                            {showHeaders ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                            <FontWrapper>Headers</FontWrapper>
-                          </button>
-                          <button className="p-2 glass-border-4 text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors">
-                            <Star className="w-4 h-4" />
-                          </button>
-                          <button className="p-2 glass-border-4 text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors">
-                            <FileText className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Email Headers */}
-                      {showHeaders && selectedEmail.headers && (
-                        <div className="mb-6 border-b border-white/20 dark:border-white/10 pb-4">
-                          <FontWrapper>
-                            <h4 className="text-sm font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] mb-3">{config.texts.emailHeadersTitle}</h4>
-                            <div className="bg-white/5 dark:bg-black/5 rounded-lg p-3 border border-white/20 dark:border-white/10">
-                              {selectedEmail.headers.map((header, index) => (
-                                <div key={index} className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] mb-1">
-                                  {header}
-                                </div>
-                              ))}
-                            </div>
-                          </FontWrapper>
-                        </div>
-                      )}
-
-                      {/* Email Content */}
-                      <div className="prose prose-sm max-w-none mb-6">
+                    {/* Email Header */}
+                    <div className="flex items-start justify-between pb-4 mb-6 border-b border-white/20 dark:border-white/10">
+                      <div className="flex-1">
                         <FontWrapper>
-                          <div dangerouslySetInnerHTML={{ __html: selectedEmail.content }} />
+                          <h3 className="text-lg font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] mb-2">{selectedEmail.subject}</h3>
+                          <div className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] space-y-1">
+                            <p><span className="font-semibold">From:</span> {selectedEmail.sender}</p>
+                            <p><span className="font-semibold">Time:</span> {selectedEmail.timestamp}</p>
+                          </div>
                         </FontWrapper>
                       </div>
+                      <div className="flex items-center gap-2 ml-4">
+                        <button
+                          onClick={() => setShowHeaders(!showHeaders)}
+                          className="flex items-center gap-2 px-3 py-2 glass-border-4 text-sm font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors"
+                        >
+                          {showHeaders ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          <FontWrapper>{config.texts.headersButtonText}</FontWrapper>
+                        </button>
+                        <button className="p-2 glass-border-4 text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors">
+                          <Star className="w-4 h-4" />
+                        </button>
+                        <button className="p-2 glass-border-4 text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors">
+                          <FileText className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
 
-                      {/* Phishing Indicators */}
-                      {selectedEmail.phishingIndicators && selectedEmail.phishingIndicators.length > 0 && (
-                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
-                          <div className="flex items-start gap-2">
-                            <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
-                            <div>
-                              <FontWrapper>
-                                <h4 className="text-sm font-medium text-amber-800 mb-2">{config.texts.phishingIndicatorsTitle}:</h4>
-                                <ul className="text-sm text-amber-700 space-y-1">
-                                  {selectedEmail.phishingIndicators.map((indicator, index) => (
-                                    <li key={index}>• {indicator}</li>
-                                  ))}
-                                </ul>
-                              </FontWrapper>
-                            </div>
+                    {/* Email Headers */}
+                    {showHeaders && selectedEmail.headers && (
+                      <div className="mb-6 border-b border-white/20 dark:border-white/10 pb-4">
+                        <FontWrapper>
+                          <h4 className="text-sm font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] mb-3">{config.texts.emailHeadersTitle}</h4>
+                          <div className="bg-white/5 dark:bg-black/5 rounded-lg p-3 border border-white/20 dark:border-white/10">
+                            {selectedEmail.headers.map((header, index) => (
+                              <div key={index} className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] mb-1">
+                                {header}
+                              </div>
+                            ))}
+                          </div>
+                        </FontWrapper>
+                      </div>
+                    )}
+
+                    {/* Email Content */}
+                    <div className="prose prose-sm max-w-none mb-6 prose-p:text-[#1C1C1E] dark:prose-p:text-[#F2F2F7] prose-strong:text-[#1C1C1E] dark:prose-strong:text-[#F2F2F7] prose-li:text-[#1C1C1E] dark:prose-li:text-[#F2F2F7] prose-a:text-[#1C1C1E] dark:prose-a:text-[#F2F2F7]">
+                      <FontWrapper>
+                        <div dangerouslySetInnerHTML={{ __html: selectedEmail.content }} />
+                      </FontWrapper>
+                    </div>
+
+                    {/* Phishing Indicators */}
+                    {selectedEmail.phishingIndicators && selectedEmail.phishingIndicators.length > 0 && (
+                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+                        <div className="flex items-start gap-2">
+                          <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <FontWrapper>
+                              <h4 className="text-sm font-medium text-amber-800 mb-2">{config.texts.phishingIndicatorsTitle}:</h4>
+                              <ul className="text-sm text-amber-700 space-y-1">
+                                {selectedEmail.phishingIndicators.map((indicator, index) => (
+                                  <li key={index}>• {indicator}</li>
+                                ))}
+                              </ul>
+                            </FontWrapper>
                           </div>
                         </div>
-                      )}
+                      </div>
+                    )}
 
-                      {/* Report Button */}
-                      {!reportedEmails.has(selectedEmail.id) && (
-                        <motion.button
-                          className="w-full bg-red-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-red-700 transition-colors"
-                          onClick={() => handleEmailReport(selectedEmail.id)}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                        >
-                          <FontWrapper>{config.texts.reportButtonText}</FontWrapper>
-                        </motion.button>
-                      )}
-
-                      {reportedEmails.has(selectedEmail.id) && (
-                        <div className="text-center py-3 px-4 bg-white/10 dark:bg-white/5 rounded-lg">
-                          <FontWrapper>
-                            <span className="text-[#1C1C1E] dark:text-[#F2F2F7]">{config.texts.emailReportedMessage}</span>
-                          </FontWrapper>
-                        </div>
-                      )}
                   </div>
                 ) : (
-                  <div className="text-center py-12">
+                  <div className="flex flex-col items-center justify-center h-full text-center py-12">
                     <Mail className="w-16 h-16 text-[#1C1C1E] dark:text-[#F2F2F7] mx-auto mb-4" />
                     <FontWrapper>
                       <h3 className="text-lg font-medium text-[#1C1C1E] dark:text-[#F2F2F7] mb-2">{config.texts.selectEmailMessage}</h3>
@@ -406,8 +413,28 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
               icon={<MailSearch className="w-4 h-4" />}
               iconPosition="left"
               className="!mt-0"
+              reserveSpace={false}
             />
           </div>
+        )}
+
+        {/* Phishing Report Modal */}
+        <PhishingReportModal
+          isOpen={showReportModal}
+          onClose={() => setShowReportModal(false)}
+          onReport={handleModalReport}
+          modalTexts={config.texts.phishingReportModal}
+        />
+
+        {/* Phishing Result Modal */}
+        {lastReportedEmail && (
+          <PhishingResultModal
+            isOpen={showResultModal}
+            onClose={() => setShowResultModal(false)}
+            modalTexts={config.texts.phishingResultModal}
+            email={lastReportedEmail}
+            isCorrect={lastReportCorrect}
+          />
         )}
       </div>
     </div>
