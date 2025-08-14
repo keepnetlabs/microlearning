@@ -19,6 +19,7 @@ import { useIsMobile } from "../ui/use-mobile";
 import { CallToAction } from "../ui/CallToAction";
 import { BottomSheetComponent } from "../ui/bottom-sheet";
 import { scormService } from "../../utils/scormService";
+import { logger } from "../../utils/logger";
 
 // Question Types
 enum QuestionType {
@@ -527,6 +528,28 @@ export const QuizScene = React.memo(function QuizScene({
       const wasLastQuestion = currentQuestionIndex === questions.length - 1;
       setLastAnswerResult({ wasCorrect: isCorrect, wasLastQuestion: wasLastQuestion }); // Store the result here
 
+      // Log quiz answer action
+      try {
+        let serializedAnswer: any = answer;
+        if (answer instanceof Map) {
+          const pairs: Array<{ item: string; category: string }> = [];
+          (answer as Map<string, string>).forEach((cat, item) => pairs.push({ item, category: cat }));
+          serializedAnswer = pairs;
+        }
+        logger.push({
+          level: 'info',
+          code: 'QUIZ_ANSWER',
+          message: 'User answered a quiz question',
+          detail: {
+            questionId: currentQuestion?.id,
+            questionType: currentQuestion?.type,
+            answer: serializedAnswer,
+            isCorrect,
+            index: currentQuestionIndex,
+          }
+        });
+      } catch { }
+
       // Persist compact quiz summary to suspend_data when quiz completes
       const persistQuizSummary = () => {
         try {
@@ -541,6 +564,14 @@ export const QuizScene = React.memo(function QuizScene({
           });
           const correctCount = details.filter(d => d.ok).length;
           const score = Math.round((correctCount / Math.max(1, total)) * 100);
+          try {
+            logger.push({
+              level: 'info',
+              code: 'QUIZ_SUMMARY',
+              message: 'Quiz summary computed',
+              detail: { total, correctCount, score, details }
+            });
+          } catch { }
           const existing: any = scormService.loadSuspendData() || {};
           const updated = {
             ...existing,
