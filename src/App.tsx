@@ -869,7 +869,7 @@ export default function App(props: AppProps = {}) {
     if (!sceneEntry) return;
     const scenePoints = Number(sceneEntry.points) || 0;
 
-    setTotalPoints(prev => prev + scenePoints);
+    setTotalPoints(prev => Math.min(100, prev + scenePoints));
     setPointsAwardedScenes(prev => new Set([...prev, sceneIndex]));
 
     const newAchievements: string[] = [];
@@ -1161,7 +1161,7 @@ export default function App(props: AppProps = {}) {
           setCurrentScene(targetIndex);
           setVisitedScenes(new Set(Array.from({ length: targetIndex + 1 }, (_, i) => i)));
           setPointsAwardedScenes(new Set(Array.from({ length: Math.max(0, targetIndex) }, (_, i) => i)));
-          if (typeof savedScore === 'number') setTotalPoints(savedScore);
+          if (typeof savedScore === 'number') setTotalPoints(Math.max(0, Math.min(100, savedScore)));
           setResumeApplied(true);
           return;
         }
