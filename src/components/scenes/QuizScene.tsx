@@ -451,6 +451,39 @@ export const QuizScene = React.memo(function QuizScene({
     [currentQuestion],
   );
 
+  // Question-agnostic validator to evaluate arbitrary question/answer pairs
+  const validateAnswerForQuestion = useCallback((q: Question, answer: any): boolean => {
+    switch (q?.type) {
+      case QuestionType.MULTIPLE_CHOICE: {
+        const mc = q as MultipleChoiceQuestion;
+        return Boolean(mc.options.find((opt) => opt.id === answer)?.isCorrect);
+      }
+      case QuestionType.TRUE_FALSE: {
+        const tf = q as TrueFalseQuestion;
+        return answer === tf.correctAnswer;
+      }
+      case QuestionType.MULTI_SELECT: {
+        const ms = q as MultiSelectQuestion;
+        const correctIds = ms.options.filter((opt) => opt.isCorrect).map((opt) => opt.id);
+        if (!Array.isArray(answer) || answer.length < ms.minCorrect) return false;
+        const allSelectedAreCorrect = answer.every((id: string) => correctIds.includes(id));
+        const selectedCorrectCount = answer.filter((id: string) => correctIds.includes(id)).length;
+        return allSelectedAreCorrect && selectedCorrectCount >= ms.minCorrect;
+      }
+      case QuestionType.SLIDER_SCALE: {
+        const sl = q as SliderScaleQuestion;
+        return typeof answer === 'number' && answer >= sl.correctRange.min && answer <= sl.correctRange.max;
+      }
+      case QuestionType.DRAG_DROP: {
+        const dd = q as DragDropQuestion;
+        if (!(answer instanceof Map)) return false;
+        return dd.items.every((item) => answer.get(item.id) === item.category);
+      }
+      default:
+        return false;
+    }
+  }, []);
+
   // Reconstruct lastAnswerResult when coming back if showResult is true but lastAnswerResult is missing
   useEffect(() => {
     if (!showResult || lastAnswerResult) return;
@@ -498,9 +531,12 @@ export const QuizScene = React.memo(function QuizScene({
       const persistQuizSummary = () => {
         try {
           const total = questions.length;
-          const details = questions.map((q:any) => {
-            const a = answers.get(q.id);
-            const ok = typeof a !== 'undefined' ? (q.type === QuestionType.TRUE_FALSE ? a === q.correctAnswer : validateAnswer(a)) : false;
+          // Snapshot answers including the most recent answer just given
+          const snapshot = new Map(answers);
+          if (currentQuestion?.id) snapshot.set(currentQuestion.id, answer);
+          const details = questions.map((q: any) => {
+            const a = snapshot.get(q.id);
+            const ok = typeof a !== 'undefined' ? validateAnswerForQuestion(q as Question, a) : false;
             return { id: q.id, ok };
           });
           const correctCount = details.filter(d => d.ok).length;
@@ -520,7 +556,7 @@ export const QuizScene = React.memo(function QuizScene({
             }
           };
           scormService.saveSuspendData(updated);
-        } catch {}
+        } catch { }
       };
 
       // SCORM interaction record
@@ -542,10 +578,10 @@ export const QuizScene = React.memo(function QuizScene({
               return String((currentQuestion as any)?.correctAnswer);
             case QuestionType.MULTIPLE_CHOICE:
               const mc = currentQuestion as any;
-              return String(mc.options.find((o:any)=>o.isCorrect)?.id ?? '');
+              return String(mc.options.find((o: any) => o.isCorrect)?.id ?? '');
             case QuestionType.MULTI_SELECT:
               const ms = currentQuestion as any;
-              return (ms.options.filter((o:any)=>o.isCorrect).map((o:any)=>o.id)).join(",");
+              return (ms.options.filter((o: any) => o.isCorrect).map((o: any) => o.id)).join(",");
             case QuestionType.SLIDER_SCALE:
               const sl = currentQuestion as any;
               return `${sl.correctRange.min}-${sl.correctRange.max}`;
@@ -563,7 +599,7 @@ export const QuizScene = React.memo(function QuizScene({
             case QuestionType.DRAG_DROP:
               if (answer instanceof Map) {
                 const pairs: string[] = [];
-                (answer as Map<string,string>).forEach((cat, item) => pairs.push(`${item}:${cat}`));
+                (answer as Map<string, string>).forEach((cat, item) => pairs.push(`${item}:${cat}`));
                 return pairs.join(',');
               }
               return String(answer);
@@ -581,7 +617,7 @@ export const QuizScene = React.memo(function QuizScene({
           weighting: 1,
           time: Date.now()
         });
-      } catch {}
+      } catch { }
 
       setShowResult(true);
       setAttempts((prev) => prev + 1);
@@ -608,8 +644,12 @@ export const QuizScene = React.memo(function QuizScene({
     [
       showResult,
       isAnswerLocked,
-      currentQuestion?.id,
+
+      currentQuestion,
+      questions,
+      answers,
       validateAnswer,
+      validateAnswerForQuestion,
       isMobile,
       setAnswers,
       setShowResult,
@@ -617,7 +657,6 @@ export const QuizScene = React.memo(function QuizScene({
       setIsAnswerLocked,
       setIsLoading,
       currentQuestionIndex,
-      questions.length,
       onQuizCompleted,
     ],
   );
