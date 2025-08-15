@@ -99,18 +99,10 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
                   </p>
                   <p className="text-xs text-[#1C1C1E]/70 dark:text-[#F2F2F7]/70">
                     {attachment.size}
-                    {attachment.isPhishing && attachment.phishingReason && (
-                      <span className="text-[#1C1C1E] dark:text-[#F2F2F7] ml-2">
-                        • {attachment.phishingReason}
-                      </span>
-                    )}
                   </p>
                 </FontWrapper>
               </div>
             </div>
-            {attachment.isPhishing && (
-              <AlertTriangle size={14} className="text-[#1C1C1E] dark:text-[#F2F2F7] flex-shrink-0" />
-            )}
           </motion.div>
         ))}
       </div>

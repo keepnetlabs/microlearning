@@ -50,8 +50,6 @@ export interface EmailAttachment {
   name: string;
   size: string;
   type: 'pdf' | 'doc' | 'xls' | 'zip' | 'img' | 'exe' | 'txt' | 'unknown';
-  isPhishing?: boolean;
-  phishingReason?: string;
 }
 
 export interface EmailData {
@@ -158,9 +156,7 @@ export const defaultInboxConfig: InboxSceneConfig = {
           id: "att-1-1",
           name: "security_verification.exe",
           size: "2.3 MB",
-          type: "exe",
-          isPhishing: true,
-          phishingReason: "Executable files are suspicious in security emails"
+          type: "exe"
         }
       ]
     },
@@ -207,16 +203,13 @@ export const defaultInboxConfig: InboxSceneConfig = {
           id: "att-2-1",
           name: "WhatsApp_Security_Tool.zip",
           size: "1.8 MB",
-          type: "zip",
-          isPhishing: true,
-          phishingReason: "Suspicious tool download from unofficial source"
+          type: "zip"
         },
         {
           id: "att-2-2",
           name: "readme.txt",
           size: "1.2 KB",
-          type: "txt",
-          isPhishing: false
+          type: "txt"
         }
       ]
     },
@@ -261,9 +254,7 @@ export const defaultInboxConfig: InboxSceneConfig = {
           id: "att-3-1",
           name: "device_verification.pdf.exe",
           size: "892 KB",
-          type: "exe",
-          isPhishing: true,
-          phishingReason: "Double extension - pretending to be PDF but actually executable"
+          type: "exe"
         }
       ]
     },
@@ -414,15 +405,13 @@ export const defaultInboxConfig: InboxSceneConfig = {
           id: "att-7-1",
           name: "January_2024_Report.pdf",
           size: "456 KB",
-          type: "pdf",
-          isPhishing: false
+          type: "pdf"
         },
         {
           id: "att-7-2",
           name: "Business_Insights.xls",
           size: "89 KB",
-          type: "xls",
-          isPhishing: false
+          type: "xls"
         }
       ]
     }
