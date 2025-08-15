@@ -163,7 +163,7 @@ export function CallToAction({
         onClick={(e) => { if (!disabled && !isEditMode) onClick?.(); e.currentTarget.blur(); }}
         disabled={disabled}
         aria-disabled={disabled}
-        className={`group relative inline-flex items-center ${iconPosition === 'left' ? 'space-x-2' : 'space-x-2'} px-4 py-2 sm:px-6 sm:py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] ${buttonMobileClasses} ${disabled ? 'opacity-60 pointer-events-none' : ''} ${isEditMode ? 'cursor-default' : ''}`}
+        className={`group relative inline-flex items-center ${iconPosition === 'left' ? 'space-x-2' : 'space-x-2'} px-4 py-2 sm:px-6 sm:py-3 ${isEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all shadow-lg hover:shadow-xl focus:outline-none text-[#1C1C1E] dark:text-[#F2F2F7] ${buttonMobileClasses} ${disabled ? 'opacity-60 pointer-events-none' : ''} ${isEditMode ? 'cursor-default' : ''}`}
       >
         {/* Button shimmer effect */}
         <motion.div

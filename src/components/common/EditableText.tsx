@@ -29,12 +29,25 @@ export const EditableText: React.FC<EditableTextProps> = ({
     onValidationError,
     as: Component = 'span'
 }) => {
-    const {
-        isEditMode,
-        setEditingField,
-        updateTempConfig,
-        tempConfig
-    } = useEditMode();
+    // Optional edit mode - only use if EditModeProvider is available
+    let isEditMode = false;
+    let setEditingField: (field: string | null) => void = () => {};
+    let updateTempConfig: (path: string, value: any) => void = () => {};
+    let tempConfig: any = {};
+    
+    try {
+        const editModeContext = useEditMode();
+        isEditMode = editModeContext.isEditMode;
+        setEditingField = editModeContext.setEditingField;
+        updateTempConfig = editModeContext.updateTempConfig;
+        tempConfig = editModeContext.tempConfig;
+    } catch (error) {
+        // EditModeProvider not available, use defaults
+        isEditMode = false;
+        setEditingField = () => {};
+        updateTempConfig = () => {};
+        tempConfig = {};
+    }
 
     const [localValue, setLocalValue] = useState('');
     const [isEditing, setIsEditing] = useState(false);

@@ -8,6 +8,7 @@ import { PhishingReportButton } from "../ui/PhishingReportButton";
 import { PhishingReportModal } from "../ui/PhishingReportModal";
 import { PhishingResultModal } from "../ui/PhishingResultModal";
 import { InboxSceneConfig, EmailData, EmailAttachment } from "../../data/inboxConfig";
+import { useEditMode } from "../../contexts/EditModeContext";
 
 interface InboxSceneProps {
   config: InboxSceneConfig;
@@ -27,6 +28,16 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
   const [lastReportedEmail, setLastReportedEmail] = useState<EmailData | null>(null);
   const [lastReportCorrect, setLastReportCorrect] = useState(false);
   const isMobile = useIsMobile();
+
+  // Optional edit mode - only use if EditModeProvider is available
+  let isEditMode = false;
+  try {
+    const editModeContext = useEditMode();
+    isEditMode = editModeContext.isEditMode;
+  } catch (error) {
+    // EditModeProvider not available, default to false
+    isEditMode = false;
+  }
 
   const selectedEmail = config.emails.find(email => email.id === selectedEmailId);
 
@@ -315,7 +326,7 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
                   </AnimatePresence>
                 </div>
               ) : (
-                <div className="overflow-y-auto flex-1 min-h-0 scrollbar-hide">
+                <div className="overflow-y-auto flex-1 min-h-0 scrollbar-hide relative">
                   {config.emails.map((email) => (
                     <motion.div
                       key={email.id}
@@ -328,11 +339,11 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <FontWrapper>
-                              <p className="font-medium text-[#1C1C1E] dark:text-[#F2F2F7] truncate">{email.sender}</p>
+                            <FontWrapper className="truncate">
+                              <p className="font-medium text-[#1C1C1E] dark:text-[#F2F2F7] truncate lg:mt-3 xl:mt-0">{email.sender}</p>
                             </FontWrapper>
                             {reportedEmails.has(email.id) && (
-                              <div className="w-5 h-5 glass-border-4 rounded-full flex items-center justify-center bg-white/10 dark:bg-white/5">
+                              <div className={`w-5 h-5 rounded-full flex items-center justify-center bg-white/10 dark:bg-white/5 flex-shrink-0 ml-2 ${isEditMode ? 'glass-border-4-no-overflow' : 'glass-border-4'}`}>
                                 {reportResults.get(email.id) ? (
                                   <Check className="w-3 h-3 text-[#1C1C1E] dark:text-[#F2F2F7]" />
                                 ) : (

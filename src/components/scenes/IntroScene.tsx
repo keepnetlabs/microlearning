@@ -4,7 +4,7 @@ import React, { ReactNode, useMemo, useCallback, useState, useEffect } from "rea
 import { LucideIcon, ClockIcon, ChartBarIcon } from "lucide-react"
 import { FontWrapper } from "../common/FontWrapper";
 import { EditableText } from "../common/EditableText";
-import { EditModeProvider } from "../../contexts/EditModeContext";
+import { EditModeProvider, useEditMode } from "../../contexts/EditModeContext";
 import { EditModePanel } from "../common/EditModePanel";
 import { useIsMobile } from "../ui/use-mobile";
 import { CallToAction } from "../ui/CallToAction";
@@ -275,15 +275,17 @@ const Particle = React.memo(({
   );
 });
 
-// Memoized highlight item component
+// Memoized highlight item component with performance optimization
 const HighlightItemComponent = React.memo(({
   item,
   index,
-  delays
+  delays,
+  isEditMode
 }: {
   item: HighlightItemData & { Icon: LucideIcon; index: number };
   index: number;
   delays: Record<string, number>;
+  isEditMode: boolean;
 }) => {
   return (
     <motion.div
@@ -303,7 +305,7 @@ const HighlightItemComponent = React.memo(({
     >
       <div className="flex-shrink-0 mr-3 sm:mr-4">
         <motion.div
-          className="relative p-2 sm:p-3 rounded-[10px] overflow-hidden transition-all duration-500 ease-out group-item glass-border-4"
+          className={`relative p-2 sm:p-3 rounded-[10px] transition-all duration-500 ease-out group-item ${isEditMode ? 'glass-border-4-no-overflow' : 'glass-border-4'}`}
           whileHover={{
             scale: 1.1,
             rotate: 5,
@@ -336,16 +338,18 @@ const StatsItem = React.memo(({
   icon: Icon,
   text,
   statsStyles,
-  configPath
+  configPath,
+  isEditMode
 }: {
   icon: LucideIcon;
   text: string;
   statsStyles: React.CSSProperties;
   configPath: string;
+  isEditMode: boolean;
 }) => {
   return (
     <motion.div
-      className="relative flex items-center space-x-2 max-h-[24px] px-2 py-1 rounded-lg overflow-hidden transition-all duration-500 ease-out group glass-border-4"
+      className={`relative flex items-center space-x-2 max-h-[24px] px-2 py-1 rounded-lg transition-all duration-500 ease-out group ${isEditMode ? 'glass-border-4-no-overflow' : 'glass-border-4'}`}
       whileHover={{ scale: 1.05 }}
       style={statsStyles}
     >
@@ -396,6 +400,16 @@ export const IntroScene = React.memo(({
   const [editChanges, setEditChanges] = useState<Partial<IntroSceneConfig>>({});
   const [isInEditMode, setIsInEditMode] = useState(false);
   const [configKey, setConfigKey] = useState(0);
+
+  // Optional edit mode - only use if EditModeProvider is available (performance optimized)
+  let currentEditMode = false;
+  try {
+    const editModeContext = useEditMode();
+    currentEditMode = editModeContext.isEditMode;
+  } catch (error) {
+    // EditModeProvider not available, default to false
+    currentEditMode = false;
+  }
 
   // Detect language changes and force re-render
   useEffect(() => {
@@ -750,7 +764,10 @@ export const IntroScene = React.memo(({
             scale: 1.02,
             transition: { type: "spring", stiffness: 400 }
           }}
-          className={`relative p-4 sm:p-6 md:p-8 max-w-xs sm:max-w-md w-full mx-2 ${!isMobile ? 'glass-border-1' : 'glass-border-2'}`}
+          className={`relative p-4 sm:p-6 md:p-8 max-w-xs sm:max-w-md w-full mx-2 ${!isMobile ?
+            (currentEditMode ? 'glass-border-1-no-overflow' : 'glass-border-1') :
+            (currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2')
+            }`}
         >
           <div className="corner-top-left"></div>
           <div className="corner-bottom-right"></div>
@@ -774,7 +791,7 @@ export const IntroScene = React.memo(({
 
             <div className="space-y-3 sm:space-y-4">
               {memoizedHighlights.map((item, index) => (
-                <HighlightItemComponent key={index} item={item} index={index} delays={delays} />
+                <HighlightItemComponent key={index} item={item} index={index} delays={delays} isEditMode={currentEditMode} />
               ))}
             </div>
 
@@ -786,8 +803,8 @@ export const IntroScene = React.memo(({
               className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200/50 dark:border-gray-600/50"
             >
               <div className="flex justify-between items-center">
-                <StatsItem icon={ClockIcon} text={duration || ''} statsStyles={statsStyles} configPath="duration" />
-                <StatsItem icon={ChartBarIcon} text={level || ''} statsStyles={statsStyles} configPath="level" />
+                <StatsItem icon={ClockIcon} text={duration || ''} statsStyles={statsStyles} configPath="duration" isEditMode={currentEditMode} />
+                <StatsItem icon={ChartBarIcon} text={level || ''} statsStyles={statsStyles} configPath="level" isEditMode={currentEditMode} />
               </div>
             </motion.div>
           </div>

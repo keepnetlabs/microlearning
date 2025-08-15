@@ -16,7 +16,7 @@ export const EditModePanel: React.FC = () => {
         <motion.div
             initial={{ opacity: 0, scale: 0.8, y: 100 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            className="fixed bottom-6 right-6 z-50"
+            className="fixed bottom-6 right-6 z-40"
         >
             <div className="glass-border-2 p-4 backdrop-blur-xl">
                 <div className="flex items-center gap-3">
