@@ -158,6 +158,7 @@
 .glass-border-2::after,
 .glass-border-2-no-overflow::after,
 .glass-border-3::after,
+.glass-border-3-no-overflow::after,
 .glass-border-4::after,
 .bottom-sheet-glass div[role="dialog"]::after {
   content: "";
@@ -422,7 +423,21 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
-.glass-border-3::before {
+
+/* Edit mode için overflow olmadan glass-border-3 */
+.glass-border-3-no-overflow {
+  position: relative;
+  /*background: rgba(255, 255, 255, 0.1);*/
+  backdrop-filter: blur(15px);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  /* overflow: hidden; kaldırıldı */
+  box-shadow: 4px 0 4px 0 rgba(255, 255, 255, 0.15) inset,
+    0 4px 4px 0 rgba(255, 255, 255, 0.15) inset;
+  background: rgba(242, 242, 247, 0.06);
+}
+.glass-border-3::before,
+.glass-border-3-no-overflow::before {
   content: "";
   position: absolute;
   top: 0;
@@ -445,7 +460,8 @@
   -webkit-mask-composite: xor;
 }
 
-.glass-border-3 .corner-top-left {
+.glass-border-3 .corner-top-left,
+.glass-border-3-no-overflow .corner-top-left {
   position: absolute;
   top: 0;
   left: 0;
@@ -459,7 +475,8 @@
   backdrop-filter: blur(5px);
 }
 
-.glass-border-3 .corner-bottom-right {
+.glass-border-3 .corner-bottom-right,
+.glass-border-3-no-overflow .corner-bottom-right {
   position: absolute;
   bottom: 0;
   right: 0;
