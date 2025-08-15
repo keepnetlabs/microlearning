@@ -9,6 +9,7 @@ import { PhishingReportModal } from "../ui/PhishingReportModal";
 import { PhishingResultModal } from "../ui/PhishingResultModal";
 import { InboxSceneConfig, EmailData, EmailAttachment } from "../../data/inboxConfig";
 import { useEditMode } from "../../contexts/EditModeContext";
+import { enhanceLinkTooltips } from "../../utils/linkTooltip";
 
 interface InboxSceneProps {
   config: InboxSceneConfig;
@@ -311,9 +312,9 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
                       )}
 
                       {/* Email Content */}
-                      <div className="prose prose-sm max-w-none mb-6 prose-p:text-[#1C1C1E] dark:prose-p:text-[#F2F2F7] prose-strong:text-[#1C1C1E] dark:prose-strong:text-[#F2F2F7] prose-li:text-[#1C1C1E] dark:prose-li:text-[#F2F2F7] prose-a:text-[#1C1C1E] dark:prose-a:text-[#F2F2F7]">
+                      <div className="prose prose-sm max-w-none mb-6 prose-p:text-[#1C1C1E] dark:prose-p:text-[#F2F2F7] prose-strong:text-[#1C1C1E] dark:prose-strong:text-[#F2F2F7] prose-li:text-[#1C1C1E] dark:prose-li:text-[#F2F2F7] prose-a:text-[#1C1C1E] dark:prose-a:text-[#F2F2F7] email-content-container">
                         <FontWrapper>
-                          <div dangerouslySetInnerHTML={{ __html: selectedEmail.content }} />
+                          <div dangerouslySetInnerHTML={{ __html: enhanceLinkTooltips(selectedEmail.content) }} />
                         </FontWrapper>
                       </div>
 
@@ -326,11 +327,11 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
                   </AnimatePresence>
                 </div>
               ) : (
-                <div className="overflow-y-auto flex-1 min-h-0 scrollbar-hide relative">
+                <div className="overflow-y-auto flex-1 min-h-0 relative" style={{ scrollbarWidth: 'none' }}>
                   {config.emails.map((email) => (
                     <motion.div
                       key={email.id}
-                      className={`p-4 border-b border-white/20 dark:border-white/10 cursor-pointer hover:bg-white/10 dark:hover:bg-white/5 transition-colors ${selectedEmailId === email.id ? 'lg:border-l-[7px] border-l-white/40 dark:border-l-white' : ''
+                      className={`p-4 border-b border-white/20 dark:border-white/10 cursor-pointer hover:bg-white/10 dark:hover:bg-white/5 glass-border-no-radius transition-colors ${selectedEmailId === email.id ? 'lg:border-l-[7px] border-l-white/40 dark:border-l-white' : ''
                         } ${reportedEmails.has(email.id) ? 'opacity-60' : ''}`}
                       onClick={() => handleEmailSelect(email.id)}
                       whileHover={{ scale: 1.01 }}
@@ -426,9 +427,9 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
                     )}
 
                     {/* Email Content */}
-                    <div className="prose prose-sm max-w-none mb-6 prose-p:text-[#1C1C1E] dark:prose-p:text-[#F2F2F7] prose-strong:text-[#1C1C1E] dark:prose-strong:text-[#F2F2F7] prose-li:text-[#1C1C1E] dark:prose-li:text-[#F2F2F7] prose-a:text-[#1C1C1E] dark:prose-a:text-[#F2F2F7]">
+                    <div className="prose prose-sm max-w-none mb-6 prose-p:text-[#1C1C1E] dark:prose-p:text-[#F2F2F7] prose-strong:text-[#1C1C1E] dark:prose-strong:text-[#F2F2F7] prose-li:text-[#1C1C1E] dark:prose-li:text-[#F2F2F7] prose-a:text-[#1C1C1E] dark:prose-a:text-[#F2F2F7] email-content-container">
                       <FontWrapper>
-                        <div dangerouslySetInnerHTML={{ __html: selectedEmail.content }} />
+                        <div dangerouslySetInnerHTML={{ __html: enhanceLinkTooltips(selectedEmail.content) }} />
                       </FontWrapper>
                     </div>
 

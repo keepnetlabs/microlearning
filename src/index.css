@@ -588,6 +588,92 @@
 .glass-border-no-radius-no-overflow .corner-bottom-right {
   display: none;
 }
+
+/* Email content container - proper word breaking for links */
+.email-content-container {
+  /* Allow normal text wrapping */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  /* But preserve link integrity */
+}
+
+.email-content-container a {
+  /* Links should not break in the middle */
+  word-break: keep-all;
+  white-space: nowrap;
+  /* If link is too long, allow break before/after */
+  display: inline-block;
+}
+
+/* Link tooltip styles - standart glass border tooltips */
+.link-with-tooltip {
+  position: relative;
+  cursor: pointer;
+  /* Prevent link breaking in the middle - keep links intact */
+  display: inline-block;
+  word-break: keep-all;
+  white-space: nowrap;
+  /* Allow line break before/after the link but not inside */
+  break-inside: avoid;
+}
+
+.link-with-tooltip:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 1000;
+  pointer-events: none;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  animation: tooltip-show 0.2s ease-out forwards;
+}
+
+.link-with-tooltip:hover::before {
+  content: '';
+  position: absolute;
+  bottom: 115%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.9);
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0;
+  animation: tooltip-show 0.2s ease-out forwards;
+}
+
+@keyframes tooltip-show {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Dark mode tooltip adjustments */
+@media (prefers-color-scheme: dark) {
+  .link-with-tooltip:hover::after {
+    background: rgba(40, 40, 40, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  
+  .link-with-tooltip:hover::before {
+    border-top-color: rgba(40, 40, 40, 0.95);
+  }
+}
 .plyr__controls__item.plyr__control {
   padding: 8px !important;
 }
