@@ -16,21 +16,45 @@ const EditModeContext = createContext<EditModeContextType | undefined>(undefined
 
 // Nested object update helper
 const setNestedValue = (obj: any, path: string, value: any) => {
+    console.log('=== SET NESTED VALUE ===');
+    console.log('Object:', obj);
+    console.log('Path:', path);
+    console.log('Value:', value);
+    
     const keys = path.split('.');
     const result = { ...obj };
     let current = result;
 
     for (let i = 0; i < keys.length - 1; i++) {
         const key = keys[i];
+        console.log(`Processing key [${i}]: ${key}`);
+        
         if (!(key in current) || typeof current[key] !== 'object') {
-            current[key] = {};
+            console.log(`Creating new object for key: ${key}`);
+            // Check if the key is a number and we should create an array
+            if (!isNaN(Number(key)) && i === 0) {
+                current[key] = [];
+            } else {
+                current[key] = {};
+            }
         } else {
-            current[key] = { ...current[key] };
+            console.log(`Spreading existing object for key: ${key}`);
+            // Preserve array type when spreading
+            if (Array.isArray(current[key])) {
+                current[key] = [...current[key]];
+            } else {
+                current[key] = { ...current[key] };
+            }
         }
         current = current[key];
+        console.log(`Current after processing ${key}:`, current);
     }
 
-    current[keys[keys.length - 1]] = value;
+    const finalKey = keys[keys.length - 1];
+    console.log(`Setting final key: ${finalKey} = ${value}`);
+    current[finalKey] = value;
+    
+    console.log('Final result:', result);
     return result;
 };
 
@@ -70,16 +94,29 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
     }, [isEditMode, hasUnsavedChanges, initialConfig, onEditModeChange]);
 
     const updateTempConfig = useCallback((path: string, value: any) => {
-        setTempConfig((prev: any) => setNestedValue(prev, path, value));
+        console.log('=== UPDATE TEMP CONFIG ===');
+        console.log('Updating path:', path);
+        console.log('New value:', value);
+        setTempConfig((prev: any) => {
+            console.log('Previous tempConfig:', prev);
+            console.log('Previous highlights:', prev.highlights);
+            const updated = setNestedValue(prev, path, value);
+            console.log('Updated tempConfig:', updated);
+            console.log('Updated highlights:', updated.highlights);
+            return updated;
+        });
         setHasUnsavedChanges(true);
     }, []);
 
     const saveChanges = useCallback(() => {
+        console.log('=== SAVE CHANGES CALLED ===');
+        console.log('tempConfig being saved:', tempConfig);
+        console.log('tempConfig.highlights:', tempConfig.highlights);
         if (onSave) {
             onSave(tempConfig);
         }
         setHasUnsavedChanges(false);
-        console.log('Configuration saved:', tempConfig);
+        console.log('=== SAVE CHANGES COMPLETED ===');
     }, [tempConfig, onSave]);
 
     const discardChanges = useCallback(() => {

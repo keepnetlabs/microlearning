@@ -8,6 +8,8 @@ import { EditModeProvider, useEditMode } from "../../contexts/EditModeContext";
 import { EditModePanel } from "../common/EditModePanel";
 import { useIsMobile } from "../ui/use-mobile";
 import { CallToAction } from "../ui/CallToAction";
+import { deepMerge } from "../../utils/deepMerge";
+
 // İkon mapping fonksiyonu - useCallback ile optimize edildi
 const getIconComponent = (iconName: string): LucideIcon => {
   // İkon adını camelCase'e çevir (örn: "book-open" -> "BookOpen")
@@ -401,15 +403,8 @@ export const IntroScene = React.memo(({
   const [isInEditMode, setIsInEditMode] = useState(false);
   const [configKey, setConfigKey] = useState(0);
 
-  // Optional edit mode - only use if EditModeProvider is available (performance optimized)
-  let currentEditMode = false;
-  try {
-    const editModeContext = useEditMode();
-    currentEditMode = editModeContext.isEditMode;
-  } catch (error) {
-    // EditModeProvider not available, default to false
-    currentEditMode = false;
-  }
+  // Use isInEditMode state instead of nested useEditMode hook
+  const currentEditMode = isInEditMode;
 
   // Detect language changes and force re-render
   useEffect(() => {
@@ -419,12 +414,8 @@ export const IntroScene = React.memo(({
 
   // Compute current config (memoized to prevent infinite loops)
   const currentConfig = useMemo(() => {
-    console.log('Computing currentConfig:', { config, editChanges, isInEditMode });
-    return {
-      ...config,      // Base config (language-specific)
-      ...editChanges  // Apply edit changes on top
-    };
-  }, [config, editChanges, isInEditMode]);
+    return deepMerge(config, editChanges);
+  }, [config, editChanges]);
 
   // Clear edit changes when exiting edit mode
   useEffect(() => {
@@ -436,13 +427,17 @@ export const IntroScene = React.memo(({
   // 🎯 OPTİMİZE EDİLDİ - Daha erken animasyon başlangıcı
   const [isVisible, setIsVisible] = useState(false);
   const isMobile = useIsMobile();
+  
+  // Memoize animation trigger delay
+  const animationDelay = useMemo(() => disableDelays ? 0 : 10, [disableDelays]);
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(true);
-    }, disableDelays ? 0 : 10); // 10ms delay ile animasyonlar daha erken başlar
+    }, animationDelay);
 
     return () => clearTimeout(timer);
-  }, [disableDelays]);
+  }, [animationDelay]);
 
   const {
     title,
@@ -483,7 +478,11 @@ export const IntroScene = React.memo(({
 
   // Memoize highlight items to prevent unnecessary re-renders
   const memoizedHighlights = useMemo(() => {
-    return highlights?.map((item, index) => {
+    if (!highlights || !Array.isArray(highlights)) {
+      console.warn('Highlights is not an array:', highlights);
+      return [];
+    }
+    return highlights.map((item, index) => {
       const Icon = memoizedGetIconComponent(item.iconName);
       const textColor = item.textColor
 
@@ -507,38 +506,29 @@ export const IntroScene = React.memo(({
         innerDepthGradient,
         index
       };
-    }) || [];
+    });
   }, [highlights, memoizedGetIconComponent]);
 
-  // Memoize sparkles arrays to prevent unnecessary re-renders
-  const ambientSparkles = useMemo(() =>
-    [...Array(sparkles?.ambient?.count || 4)], [sparkles?.ambient?.count]
-  );
-
-  const floatingSparkles = useMemo(() =>
-    [...Array(sparkles?.floating?.count || 6)], [sparkles?.floating?.count]
-  );
-
-  const twinklingSparkles = useMemo(() =>
-    [...Array(sparkles?.twinkling?.count || 8)], [sparkles?.twinkling?.count]
-  );
-
-  const gradientSparkles = useMemo(() =>
-    [...Array(sparkles?.gradient?.count || 3)], [sparkles?.gradient?.count]
-  );
-
-  const driftingSparkles = useMemo(() =>
-    [...Array(sparkles?.drifting?.count || 4)], [sparkles?.drifting?.count]
-  );
-
-  const breathingSparkles = useMemo(() =>
-    [...Array(sparkles?.breathing?.count || 5)], [sparkles?.breathing?.count]
-  );
-
-  // Memoize particles array
-  const particlesArray = useMemo(() =>
-    [...Array(particles?.count || 12)], [particles?.count]
-  );
+  // Memoize sparkles arrays to prevent unnecessary re-renders (optimized)
+  const sparkleArrays = useMemo(() => ({
+    ambient: [...Array(sparkles?.ambient?.count || 4)],
+    floating: [...Array(sparkles?.floating?.count || 6)],
+    twinkling: [...Array(sparkles?.twinkling?.count || 8)],
+    gradient: [...Array(sparkles?.gradient?.count || 3)],
+    drifting: [...Array(sparkles?.drifting?.count || 4)],
+    breathing: [...Array(sparkles?.breathing?.count || 5)],
+    particles: [...Array(particles?.count || 12)],
+    iconSparkles: [...Array(icon?.sparkleCount || 6)]
+  }), [
+    sparkles?.ambient?.count,
+    sparkles?.floating?.count,
+    sparkles?.twinkling?.count,
+    sparkles?.gradient?.count,
+    sparkles?.drifting?.count,
+    sparkles?.breathing?.count,
+    particles?.count,
+    icon?.sparkleCount
+  ]);
 
   // Memoize animation delays to prevent recalculation - OPTİMİZE EDİLDİ
   const delays = useMemo(() => ({
@@ -575,53 +565,50 @@ export const IntroScene = React.memo(({
       key={configKey}
       initialConfig={currentConfig}
       onSave={(newConfig) => {
-        console.log('IntroScene config saved:', newConfig);
-        // Extract only the changed fields from the original config
-        const changes: Partial<IntroSceneConfig> = {};
-        (Object.keys(newConfig) as Array<keyof IntroSceneConfig>).forEach((key) => {
-          if (newConfig[key] !== config[key]) {
-            changes[key] = newConfig[key];
-          }
-        });
-        setEditChanges(changes);
+        console.log('IntroScene onSave - newConfig:', newConfig);
+        console.log('IntroScene onSave - original config:', config);
+        
+        // Apply the entire newConfig as changes
+        setEditChanges(newConfig);
+        console.log('IntroScene onSave - applied config:', newConfig);
       }}
       onEditModeChange={(editMode) => {
         console.log('Edit mode changed:', editMode);
         setIsInEditMode(editMode);
       }}
     >
-      {false && <EditModePanel />}
+      <EditModePanel />
       <FontWrapper variant="primary" className={containerClassName} data-scene-type={(config as any)?.scene_type || 'intro'} data-scene-id={sceneId as any} data-testid="scene-intro">
         {/* Apple-style Background Sparkles - Balanced */}
         {sparkles?.enabled && (
           <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
             {/* Subtle ambient sparkles */}
-            {ambientSparkles.map((_, i) => (
+            {sparkleArrays.ambient.map((_, i) => (
               <Sparkle key={`ambient-${i}`} type="ambient" config={sparkleConfigs.ambient} />
             ))}
 
             {/* Gentle floating sparkles */}
-            {floatingSparkles.map((_, i) => (
+            {sparkleArrays.floating.map((_, i) => (
               <Sparkle key={`floating-${i}`} type="floating" config={sparkleConfigs.floating} />
             ))}
 
             {/* Soft twinkling sparkles */}
-            {twinklingSparkles.map((_, i) => (
+            {sparkleArrays.twinkling.map((_, i) => (
               <Sparkle key={`twinkle-${i}`} type="twinkling" config={sparkleConfigs.twinkling} />
             ))}
 
             {/* Delicate gradient sparkles */}
-            {gradientSparkles.map((_, i) => (
+            {sparkleArrays.gradient.map((_, i) => (
               <GradientSparkle key={`gradient-${i}`} config={sparkleConfigs.gradient} />
             ))}
 
             {/* Gentle drifting sparkles */}
-            {driftingSparkles.map((_, i) => (
+            {sparkleArrays.drifting.map((_, i) => (
               <Sparkle key={`drift-${i}`} type="drifting" config={sparkleConfigs.drifting} />
             ))}
 
             {/* Subtle breathing sparkles */}
-            {breathingSparkles.map((_, i) => (
+            {sparkleArrays.breathing.map((_, i) => (
               <Sparkle key={`breathing-${i}`} type="breathing" config={sparkleConfigs.breathing} />
             ))}
           </div>
@@ -630,7 +617,7 @@ export const IntroScene = React.memo(({
         {/* Floating Light Particles */}
         {particles?.enabled && (
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            {particlesArray.map((_, i) => (
+            {sparkleArrays.particles.map((_, i) => (
               <Particle key={i} config={particles} />
             ))}
           </div>
@@ -669,9 +656,9 @@ export const IntroScene = React.memo(({
             )}
 
             {/* Sparkle effects */}
-            {icon?.sparkleEnabled && [...Array(icon.sparkleCount || 6)].map((_, i) => (
+            {icon?.sparkleEnabled && sparkleArrays.iconSparkles?.map((_, i) => (
               <motion.div
-                key={i}
+                key={`icon-sparkle-${i}`}
                 className="absolute"
                 style={{
                   top: '50%',
@@ -790,8 +777,8 @@ export const IntroScene = React.memo(({
             </motion.h3>
 
             <div className="space-y-3 sm:space-y-4">
-              {memoizedHighlights.map((item, index) => (
-                <HighlightItemComponent key={index} item={item} index={index} delays={delays} isEditMode={currentEditMode} />
+              {Array.isArray(memoizedHighlights) && memoizedHighlights.map((item, index) => (
+                <HighlightItemComponent key={`highlight-${item.iconName}-${index}`} item={item} index={index} delays={delays} isEditMode={currentEditMode} />
               ))}
             </div>
 
