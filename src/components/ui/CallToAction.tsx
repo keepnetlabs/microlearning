@@ -1,8 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useIsMobile } from "./use-mobile";
 import { createPortal } from "react-dom";
+import { EditableText } from "../common/EditableText";
+import { useEditMode } from "../../contexts/EditModeContext";
 
 interface CallToActionProps {
   text?: string;
@@ -38,6 +40,20 @@ export function CallToAction({
   iconPosition = 'right'
 }: CallToActionProps) {
   const isMobile = useIsMobile();
+
+  // Optional edit mode - only use if EditModeProvider is available
+  let isEditMode = false;
+  let tempConfig: any = null;
+  try {
+    const editModeContext = useEditMode();
+    isEditMode = editModeContext.isEditMode;
+    tempConfig = editModeContext.tempConfig;
+  } catch (error) {
+    // EditModeProvider not available, use default values
+    isEditMode = false;
+    tempConfig = null;
+  }
+
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const [spacerHeight, setSpacerHeight] = useState<number>(72);
   const [hasScroll, setHasScroll] = useState<boolean>(false);
@@ -74,10 +90,25 @@ export function CallToAction({
     };
   }, []);
 
-  // Platform-specific text logic
-  const displayText = isMobile
-    ? (mobileText || text || "Continue")
-    : (desktopText || text || "Continue");
+  // Get text from tempConfig if in edit mode, otherwise use props
+  const getCallToActionText = useCallback(() => {
+    if (isEditMode && tempConfig?.callToActionText) {
+      const ctaConfig = tempConfig.callToActionText;
+      if (typeof ctaConfig === 'object') {
+        return isMobile ? ctaConfig.mobile : ctaConfig.desktop;
+      }
+      return ctaConfig;
+    }
+    // Fallback to props
+    return isMobile
+      ? (mobileText || text || "Continue")
+      : (desktopText || text || "Continue");
+  }, [isEditMode, tempConfig, isMobile, text, mobileText, desktopText]);
+
+  const displayText = useMemo(() => getCallToActionText(), [getCallToActionText]);
+
+  // For EditableText, ensure we have a proper string value
+  const editableTextValue = useMemo(() => String(displayText || "Continue"), [displayText]);
 
   const containerClasses = isMobile
     ? "fixed inset-x-0 bottom-0 z-[60] flex justify-center px-4 pointer-events-none"
@@ -124,20 +155,20 @@ export function CallToAction({
     >
       <motion.button
         ref={buttonRef}
-        whileHover={reducedMotion ? undefined : {
+        whileHover={reducedMotion || isEditMode ? undefined : {
           scale: 1.05,
           boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
         }}
-        whileTap={reducedMotion ? undefined : { scale: 0.95 }}
-        onClick={(e) => { if (!disabled) onClick?.(); e.currentTarget.blur(); }}
+        whileTap={reducedMotion || isEditMode ? undefined : { scale: 0.95 }}
+        onClick={(e) => { if (!disabled && !isEditMode) onClick?.(); e.currentTarget.blur(); }}
         disabled={disabled}
         aria-disabled={disabled}
-        className={`group relative inline-flex items-center ${iconPosition === 'left' ? 'space-x-2' : 'space-x-2'} px-4 py-2 sm:px-6 sm:py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] ${buttonMobileClasses} ${disabled ? 'opacity-60 pointer-events-none' : ''}`}
+        className={`group relative inline-flex items-center ${iconPosition === 'left' ? 'space-x-2' : 'space-x-2'} px-4 py-2 sm:px-6 sm:py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] ${buttonMobileClasses} ${disabled ? 'opacity-60 pointer-events-none' : ''} ${isEditMode ? 'cursor-default' : ''}`}
       >
         {/* Button shimmer effect */}
         <motion.div
           className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-          animate={disabled || reducedMotion ? undefined : { x: ['-100%', '200%'] }}
+          animate={disabled || isEditMode || reducedMotion ? undefined : { x: ['-100%', '200%'] }}
           transition={reducedMotion ? undefined : {
             duration: 2,
             repeat: Infinity,
@@ -151,7 +182,20 @@ export function CallToAction({
             )}
           </span>
         )}
-        <span className="relative z-10 font-medium">{displayText}</span>
+        <span className="relative z-10 font-medium">
+          {isEditMode ? (
+            <EditableText
+              configPath={isMobile ? "callToActionText.mobile" : "callToActionText.desktop"}
+              placeholder="Enter button text..."
+              maxLength={50}
+              as="span"
+            >
+              {editableTextValue}
+            </EditableText>
+          ) : (
+            displayText
+          )}
+        </span>
         {iconPosition === 'right' && (
           <span className="relative z-10 flex items-center">
             {icon !== undefined ? icon : (
@@ -163,7 +207,7 @@ export function CallToAction({
     </motion.div>
   );
 
-  const shouldUsePortal = isMobile || (!isMobile && hasScroll);
+  const shouldUsePortal = !isEditMode && (isMobile || (!isMobile && hasScroll));
 
   if (shouldUsePortal && typeof document !== "undefined") {
     return (

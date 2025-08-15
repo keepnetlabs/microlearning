@@ -382,7 +382,7 @@
       "saveAndFinish": "Save and Finish",
       "savingText": "Saving…",
       "finishedText": "Saved. You can now close this window.",
-      "finishErrorText": "Could not finish. Please close the window or try again.",
+      "finishErrorText": "LMS connection failed. Share the logs with your IT team.",
       "downloadButton": "Download certificate",
       "downloadingText": "Downloading…",
       "downloadedText": "Downloaded",

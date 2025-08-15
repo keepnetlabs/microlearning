@@ -3,6 +3,9 @@ import { motion } from "framer-motion";
 import React, { ReactNode, useMemo, useCallback, useState, useEffect } from "react";
 import { LucideIcon, ClockIcon, ChartBarIcon } from "lucide-react"
 import { FontWrapper } from "../common/FontWrapper";
+import { EditableText } from "../common/EditableText";
+import { EditModeProvider } from "../../contexts/EditModeContext";
+import { EditModePanel } from "../common/EditModePanel";
 import { useIsMobile } from "../ui/use-mobile";
 import { CallToAction } from "../ui/CallToAction";
 // İkon mapping fonksiyonu - useCallback ile optimize edildi
@@ -315,7 +318,14 @@ const HighlightItemComponent = React.memo(({
         </motion.div>
       </div>
       <span className="text-sm max-h-[24px] text-[#1C1C1E] dark:text-[#F2F2F7] font-medium leading-relaxed group-hover:text-[#1C1C1E] dark:group-hover:text-white transition-colors">
-        {item.text}
+        <EditableText
+          configPath={`highlights.${index}.text`}
+          placeholder="Enter highlight text..."
+          maxLength={100}
+          as="span"
+        >
+          {item.text}
+        </EditableText>
       </span>
     </motion.div>
   );
@@ -325,11 +335,13 @@ const HighlightItemComponent = React.memo(({
 const StatsItem = React.memo(({
   icon: Icon,
   text,
-  statsStyles
+  statsStyles,
+  configPath
 }: {
   icon: LucideIcon;
   text: string;
   statsStyles: React.CSSProperties;
+  configPath: string;
 }) => {
   return (
     <motion.div
@@ -339,7 +351,7 @@ const StatsItem = React.memo(({
     >
       {/* Ultra-fine noise texture */}
       <div
-        className="absolute inset-0 opacity-[0.010] dark:opacity-[0.005] rounded-lg mix-blend-overlay pointer-events-none"
+        className="absolute inset-0 opacity-[0.010] dark:opacity-[0.005] rounded-lg mix-blend-overlay pointer-events-none z-0"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='statsNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23statsNoise)'/%3E%3C/svg%3E")`,
           backgroundSize: '64px 64px'
@@ -348,7 +360,7 @@ const StatsItem = React.memo(({
 
       {/* Apple-style highlight */}
       <div
-        className="absolute inset-0 rounded-lg pointer-events-none dark:border-white dark:border-1"
+        className="absolute inset-0 rounded-lg pointer-events-none dark:border-white dark:border-1 z-0"
         style={{
           background: `radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 30%, transparent 70%)`,
           mixBlendMode: 'overlay'
@@ -357,7 +369,16 @@ const StatsItem = React.memo(({
 
       <span className="relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7] text-[12px] max-h-[24px] flex items-center gap-1 font-medium">
         <Icon size={14} className="text-[#1C1C1E] dark:text-[#F2F2F7] relative z-10 sm:w-4 sm:h-4" strokeWidth={2} />
-        {text}
+        <div className="relative z-20">
+          <EditableText
+            configPath={configPath}
+            placeholder={configPath === "duration" ? "Enter duration..." : "Enter level..."}
+            maxLength={50}
+            as="span"
+          >
+            {text}
+          </EditableText>
+        </div>
       </span>
     </motion.div>
   );
@@ -370,6 +391,33 @@ export const IntroScene = React.memo(({
   reducedMotion,
   disableDelays
 }: { config: IntroSceneConfig; onNextSlide?: () => void; sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean; }) => {
+
+  // State for edit changes and edit mode tracking
+  const [editChanges, setEditChanges] = useState<Partial<IntroSceneConfig>>({});
+  const [isInEditMode, setIsInEditMode] = useState(false);
+  const [configKey, setConfigKey] = useState(0);
+
+  // Detect language changes and force re-render
+  useEffect(() => {
+    setConfigKey(prev => prev + 1);
+    setEditChanges({}); // Clear edit changes on language switch
+  }, [config.title, config.subtitle]); // Use specific fields to detect language change
+
+  // Compute current config (memoized to prevent infinite loops)
+  const currentConfig = useMemo(() => {
+    console.log('Computing currentConfig:', { config, editChanges, isInEditMode });
+    return {
+      ...config,      // Base config (language-specific)
+      ...editChanges  // Apply edit changes on top
+    };
+  }, [config, editChanges, isInEditMode]);
+
+  // Clear edit changes when exiting edit mode
+  useEffect(() => {
+    if (!isInEditMode) {
+      setEditChanges({});
+    }
+  }, [isInEditMode]);
 
   // 🎯 OPTİMİZE EDİLDİ - Daha erken animasyon başlangıcı
   const [isVisible, setIsVisible] = useState(false);
@@ -391,7 +439,7 @@ export const IntroScene = React.memo(({
     level,
     callToActionText,
     icon
-  } = config;
+  } = currentConfig;
 
   // Use default values for removed properties - artık component dışından geliyor
   const particles = DEFAULT_PARTICLES;
@@ -509,213 +557,256 @@ export const IntroScene = React.memo(({
   }), [sparkles]);
 
   return (
-    <FontWrapper variant="primary" className={containerClassName} data-scene-type={(config as any)?.scene_type || 'intro'} data-scene-id={sceneId as any} data-testid="scene-intro">
-      {/* Apple-style Background Sparkles - Balanced */}
-      {sparkles?.enabled && (
-        <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
-          {/* Subtle ambient sparkles */}
-          {ambientSparkles.map((_, i) => (
-            <Sparkle key={`ambient-${i}`} type="ambient" config={sparkleConfigs.ambient} />
-          ))}
+    <EditModeProvider
+      key={configKey}
+      initialConfig={currentConfig}
+      onSave={(newConfig) => {
+        console.log('IntroScene config saved:', newConfig);
+        // Extract only the changed fields from the original config
+        const changes: Partial<IntroSceneConfig> = {};
+        (Object.keys(newConfig) as Array<keyof IntroSceneConfig>).forEach((key) => {
+          if (newConfig[key] !== config[key]) {
+            changes[key] = newConfig[key];
+          }
+        });
+        setEditChanges(changes);
+      }}
+      onEditModeChange={(editMode) => {
+        console.log('Edit mode changed:', editMode);
+        setIsInEditMode(editMode);
+      }}
+    >
+      {false && <EditModePanel />}
+      <FontWrapper variant="primary" className={containerClassName} data-scene-type={(config as any)?.scene_type || 'intro'} data-scene-id={sceneId as any} data-testid="scene-intro">
+        {/* Apple-style Background Sparkles - Balanced */}
+        {sparkles?.enabled && (
+          <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
+            {/* Subtle ambient sparkles */}
+            {ambientSparkles.map((_, i) => (
+              <Sparkle key={`ambient-${i}`} type="ambient" config={sparkleConfigs.ambient} />
+            ))}
 
-          {/* Gentle floating sparkles */}
-          {floatingSparkles.map((_, i) => (
-            <Sparkle key={`floating-${i}`} type="floating" config={sparkleConfigs.floating} />
-          ))}
+            {/* Gentle floating sparkles */}
+            {floatingSparkles.map((_, i) => (
+              <Sparkle key={`floating-${i}`} type="floating" config={sparkleConfigs.floating} />
+            ))}
 
-          {/* Soft twinkling sparkles */}
-          {twinklingSparkles.map((_, i) => (
-            <Sparkle key={`twinkle-${i}`} type="twinkling" config={sparkleConfigs.twinkling} />
-          ))}
+            {/* Soft twinkling sparkles */}
+            {twinklingSparkles.map((_, i) => (
+              <Sparkle key={`twinkle-${i}`} type="twinkling" config={sparkleConfigs.twinkling} />
+            ))}
 
-          {/* Delicate gradient sparkles */}
-          {gradientSparkles.map((_, i) => (
-            <GradientSparkle key={`gradient-${i}`} config={sparkleConfigs.gradient} />
-          ))}
+            {/* Delicate gradient sparkles */}
+            {gradientSparkles.map((_, i) => (
+              <GradientSparkle key={`gradient-${i}`} config={sparkleConfigs.gradient} />
+            ))}
 
-          {/* Gentle drifting sparkles */}
-          {driftingSparkles.map((_, i) => (
-            <Sparkle key={`drift-${i}`} type="drifting" config={sparkleConfigs.drifting} />
-          ))}
+            {/* Gentle drifting sparkles */}
+            {driftingSparkles.map((_, i) => (
+              <Sparkle key={`drift-${i}`} type="drifting" config={sparkleConfigs.drifting} />
+            ))}
 
-          {/* Subtle breathing sparkles */}
-          {breathingSparkles.map((_, i) => (
-            <Sparkle key={`breathing-${i}`} type="breathing" config={sparkleConfigs.breathing} />
-          ))}
-        </div>
-      )}
-
-      {/* Floating Light Particles */}
-      {particles?.enabled && (
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {particlesArray.map((_, i) => (
-            <Particle key={i} config={particles} />
-          ))}
-        </div>
-      )}
-
-      {/* Welcome Animation with Scene Icon */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 30 }}
-        transition={{ duration: reducedMotion ? 0 : 0.6, ease: "easeOut", delay: reducedMotion ? 0 : delays.welcome }}
-        className="relative"
-      >
-        {/* Scene Icon with Enhanced Effects */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.5, rotateY: 180 }}
-          animate={{
-            opacity: isVisible ? 1 : 0,
-            scale: isVisible ? 1 : 0.5,
-            rotateY: isVisible ? 0 : 180
-          }}
-          transition={{
-            duration: reducedMotion ? 0 : 0.8,
-            delay: reducedMotion ? 0 : delays.icon,
-            type: reducedMotion ? undefined : "spring",
-            stiffness: reducedMotion ? 0 : 200
-          }}
-          className="flex justify-center mb-1 sm:mb-2 relative"
-        >
-          {/* Icon glow effect */}
-          <div className="absolute inset-0 from-blue-400/30 to-transparent rounded-full animate-pulse scale-150"></div>
-
-          {!isMobile && (
-            <div className="relative z-10 p-3 glass-border-3">
-              {icon?.component || sceneIconComponent}
-            </div>
-          )}
-
-          {/* Sparkle effects */}
-          {icon?.sparkleEnabled && [...Array(icon.sparkleCount || 6)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute"
-              style={{
-                top: '50%',
-                left: '50%',
-                transformOrigin: 'center'
-              }}
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{
-                opacity: [0, 1, 0],
-                scale: [0, 1, 0],
-                x: Math.cos((i * 60) * Math.PI / 180) * 40,
-                y: Math.sin((i * 60) * Math.PI / 180) * 40
-              }}
-              transition={{
-                duration: 2,
-                delay: 2 + i * 0.1,
-                repeat: Infinity,
-                repeatDelay: 3
-              }}
-            >
-              {/* Sparkles ikonunu dinamik hale getir */}
-              {sparklesIconComponent}
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Title and Subtitle with Stagger Animation */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
-          transition={{ duration: reducedMotion ? 0 : 0.6, delay: reducedMotion ? 0 : delays.title }}
-        >
-          <motion.h1
-            className="project-title"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: isVisible ? 1 : 0 }}
-            transition={{ duration: reducedMotion ? 0 : 0.7, delay: reducedMotion ? 0 : delays.titleWords }}
-          >
-            <motion.span
-              initial={{ display: "inline-block", opacity: 0, y: 20 }}
-              animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
-              transition={{ delay: reducedMotion ? 0 : delays.titleWordStagger }}
-            >
-              {title}
-            </motion.span>
-          </motion.h1>
-
-          <motion.p
-            className="project-subtitle"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
-            transition={{ duration: reducedMotion ? 0 : 0.6, delay: reducedMotion ? 0 : delays.subtitle }}
-          >
-            {subtitle}
-          </motion.p>
-        </motion.div>
-      </motion.div>
-
-      {/* Enhanced Learning Points Card with Parallax Effect */}
-      <motion.div
-        initial={{ opacity: 0, y: 40, scale: 0.95 }}
-        animate={{
-          opacity: isVisible ? 1 : 0,
-          y: isVisible ? 0 : 40,
-          scale: isVisible ? 1 : 0.95
-        }}
-        transition={{
-          duration: reducedMotion ? 0 : 0.6,
-          delay: reducedMotion ? 0 : delays.card,
-          type: reducedMotion ? undefined : "spring",
-          stiffness: reducedMotion ? 0 : 120
-        }}
-        whileHover={{
-          y: -5,
-          scale: 1.02,
-          transition: { type: "spring", stiffness: 400 }
-        }}
-        className={`relative p-4 sm:p-6 md:p-8 max-w-xs sm:max-w-md w-full mx-2 ${!isMobile ? 'glass-border-1' : 'glass-border-2'}`}
-      >
-        <div className="corner-top-left"></div>
-        <div className="corner-bottom-right"></div>
-
-        <div className="relative z-10">
-          <motion.h3
-            initial={{ opacity: 0 }}
-            animate={{ opacity: isVisible ? 1 : 0 }}
-            transition={{ delay: delays.cardTitle }}
-            className="mb-3 sm:mb-4 text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold text-center text-sm sm:text-base"
-          >
-            {sectionTitle}
-          </motion.h3>
-
-          <div className="space-y-3 sm:space-y-4">
-            {memoizedHighlights.map((item, index) => (
-              <HighlightItemComponent key={index} item={item} index={index} delays={delays} />
+            {/* Subtle breathing sparkles */}
+            {breathingSparkles.map((_, i) => (
+              <Sparkle key={`breathing-${i}`} type="breathing" config={sparkleConfigs.breathing} />
             ))}
           </div>
+        )}
 
-          {/* Enhanced Stats */}
+        {/* Floating Light Particles */}
+        {particles?.enabled && (
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            {particlesArray.map((_, i) => (
+              <Particle key={i} config={particles} />
+            ))}
+          </div>
+        )}
+
+        {/* Welcome Animation with Scene Icon */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 30 }}
+          transition={{ duration: reducedMotion ? 0 : 0.6, ease: "easeOut", delay: reducedMotion ? 0 : delays.welcome }}
+          className="relative"
+        >
+          {/* Scene Icon with Enhanced Effects */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5, rotateY: 180 }}
+            animate={{
+              opacity: isVisible ? 1 : 0,
+              scale: isVisible ? 1 : 0.5,
+              rotateY: isVisible ? 0 : 180
+            }}
+            transition={{
+              duration: reducedMotion ? 0 : 0.8,
+              delay: reducedMotion ? 0 : delays.icon,
+              type: reducedMotion ? undefined : "spring",
+              stiffness: reducedMotion ? 0 : 200
+            }}
+            className="flex justify-center mb-1 sm:mb-2 relative"
+          >
+            {/* Icon glow effect */}
+            <div className="absolute inset-0 from-blue-400/30 to-transparent rounded-full animate-pulse scale-150"></div>
+
+            {!isMobile && (
+              <div className="relative z-10 p-3 glass-border-3">
+                {icon?.component || sceneIconComponent}
+              </div>
+            )}
+
+            {/* Sparkle effects */}
+            {icon?.sparkleEnabled && [...Array(icon.sparkleCount || 6)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute"
+                style={{
+                  top: '50%',
+                  left: '50%',
+                  transformOrigin: 'center'
+                }}
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{
+                  opacity: [0, 1, 0],
+                  scale: [0, 1, 0],
+                  x: Math.cos((i * 60) * Math.PI / 180) * 40,
+                  y: Math.sin((i * 60) * Math.PI / 180) * 40
+                }}
+                transition={{
+                  duration: 2,
+                  delay: 2 + i * 0.1,
+                  repeat: Infinity,
+                  repeatDelay: 3
+                }}
+              >
+                {/* Sparkles ikonunu dinamik hale getir */}
+                {sparklesIconComponent}
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Title and Subtitle with Stagger Animation */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
-            transition={{ delay: delays.stats }}
-            className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200/50 dark:border-gray-600/50"
+            transition={{ duration: reducedMotion ? 0 : 0.6, delay: reducedMotion ? 0 : delays.title }}
           >
-            <div className="flex justify-between items-center">
-              <StatsItem icon={ClockIcon} text={duration || ''} statsStyles={statsStyles} />
-              <StatsItem icon={ChartBarIcon} text={level || ''} statsStyles={statsStyles} />
-            </div>
+            <motion.h1
+              className="project-title"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: isVisible ? 1 : 0 }}
+              transition={{ duration: reducedMotion ? 0 : 0.7, delay: reducedMotion ? 0 : delays.titleWords }}
+            >
+              <motion.span
+                initial={{ display: "inline-block", opacity: 0, y: 20 }}
+                animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
+                transition={{ delay: reducedMotion ? 0 : delays.titleWordStagger }}
+              >
+                <EditableText
+                  configPath="title"
+                  placeholder="Enter title..."
+                  maxLength={100}
+                  as="span"
+                >
+                  {title}
+                </EditableText>
+              </motion.span>
+            </motion.h1>
+
+            <motion.p
+              className="project-subtitle"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
+              transition={{ duration: reducedMotion ? 0 : 0.6, delay: reducedMotion ? 0 : delays.subtitle }}
+            >
+              <EditableText
+                configPath="subtitle"
+                placeholder="Enter subtitle..."
+                maxLength={200}
+                multiline={true}
+                as="span"
+              >
+                {subtitle}
+              </EditableText>
+            </motion.p>
           </motion.div>
-        </div>
+        </motion.div>
 
-      </motion.div>
+        {/* Enhanced Learning Points Card with Parallax Effect */}
+        <motion.div
+          initial={{ opacity: 0, y: 40, scale: 0.95 }}
+          animate={{
+            opacity: isVisible ? 1 : 0,
+            y: isVisible ? 0 : 40,
+            scale: isVisible ? 1 : 0.95
+          }}
+          transition={{
+            duration: reducedMotion ? 0 : 0.6,
+            delay: reducedMotion ? 0 : delays.card,
+            type: reducedMotion ? undefined : "spring",
+            stiffness: reducedMotion ? 0 : 120
+          }}
+          whileHover={{
+            y: -5,
+            scale: 1.02,
+            transition: { type: "spring", stiffness: 400 }
+          }}
+          className={`relative p-4 sm:p-6 md:p-8 max-w-xs sm:max-w-md w-full mx-2 ${!isMobile ? 'glass-border-1' : 'glass-border-2'}`}
+        >
+          <div className="corner-top-left"></div>
+          <div className="corner-bottom-right"></div>
 
-      {/* Enhanced Call to Action */}
-      {callToActionText && (
-        <CallToAction
-          text={typeof callToActionText === 'string' ? callToActionText : undefined}
-          mobileText={typeof callToActionText === 'object' ? callToActionText.mobile : undefined}
-          desktopText={typeof callToActionText === 'object' ? callToActionText.desktop : undefined}
-          isVisible={isVisible}
-          delay={delays.cta}
-          onClick={onNextSlide}
-          dataTestId="cta-intro"
-        />
-      )}
-    </FontWrapper>
+          <div className="relative z-10">
+            <motion.h3
+              initial={{ opacity: 0 }}
+              animate={{ opacity: isVisible ? 1 : 0 }}
+              transition={{ delay: delays.cardTitle }}
+              className="mb-3 sm:mb-4 text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold text-center text-sm sm:text-base"
+            >
+              <EditableText
+                configPath="sectionTitle"
+                placeholder="Enter section title..."
+                maxLength={100}
+                as="span"
+              >
+                {sectionTitle}
+              </EditableText>
+            </motion.h3>
+
+            <div className="space-y-3 sm:space-y-4">
+              {memoizedHighlights.map((item, index) => (
+                <HighlightItemComponent key={index} item={item} index={index} delays={delays} />
+              ))}
+            </div>
+
+            {/* Enhanced Stats */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
+              transition={{ delay: delays.stats }}
+              className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200/50 dark:border-gray-600/50"
+            >
+              <div className="flex justify-between items-center">
+                <StatsItem icon={ClockIcon} text={duration || ''} statsStyles={statsStyles} configPath="duration" />
+                <StatsItem icon={ChartBarIcon} text={level || ''} statsStyles={statsStyles} configPath="level" />
+              </div>
+            </motion.div>
+          </div>
+
+        </motion.div>
+
+        {/* Enhanced Call to Action */}
+        {callToActionText && (
+          <CallToAction
+            text={typeof callToActionText === 'string' ? callToActionText : undefined}
+            mobileText={typeof callToActionText === 'object' ? callToActionText.mobile : undefined}
+            desktopText={typeof callToActionText === 'object' ? callToActionText.desktop : undefined}
+            isVisible={isVisible}
+            delay={delays.cta}
+            onClick={onNextSlide}
+            dataTestId="cta-intro"
+          />
+        )}
+      </FontWrapper>
+    </EditModeProvider>
   );
 });

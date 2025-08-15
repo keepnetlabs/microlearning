@@ -1,13 +1,13 @@
 import React, { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, AlertTriangle, Flag, ChevronRight, Reply, CornerUpRight, Archive, Delete, ArrowLeft, Eye, Star, FileText, EyeOff, MailSearch, Check, X } from "lucide-react";
+import { Mail, AlertTriangle, Flag, ChevronRight, Reply, CornerUpRight, Archive, Delete, ArrowLeft, Eye, Star, FileText, EyeOff, MailSearch, Check, X, FileSpreadsheet, Image, Download } from "lucide-react";
 import { FontWrapper } from "../common/FontWrapper";
 import { useIsMobile } from "../ui/use-mobile";
 import { CallToAction } from "../ui/CallToAction";
 import { PhishingReportButton } from "../ui/PhishingReportButton";
 import { PhishingReportModal } from "../ui/PhishingReportModal";
 import { PhishingResultModal } from "../ui/PhishingResultModal";
-import { InboxSceneConfig, EmailData } from "../../data/inboxConfig";
+import { InboxSceneConfig, EmailData, EmailAttachment } from "../../data/inboxConfig";
 
 interface InboxSceneProps {
   config: InboxSceneConfig;
@@ -38,6 +38,71 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
       <path d="M1.72279 15.8465C3.80829 16.1604 11.4023 16.7387 13.1542 8.90568C13.2065 8.67521 12.9138 8.52534 12.7568 8.70349C11.3104 10.3535 7.85486 14.2728 5.23208 13.7073C5.23208 13.7073 5.62797 13.5291 5.58414 11.9569C5.5799 11.824 5.40882 11.7716 5.33247 11.8805C5.04403 12.2905 4.41202 13.3411 3.48026 13.5489C2.1512 13.8472 0.0713525 14.0692 0.728815 15.206C0.938072 15.5623 1.31558 15.7843 1.72279 15.8465Z" fill="currentColor" />
       <path d="M2.742 12.9313C3.26128 12.9313 3.68224 12.5103 3.68224 11.991C3.68224 11.4717 3.26128 11.0508 2.742 11.0508C2.22272 11.0508 1.80176 11.4717 1.80176 11.991C1.80176 12.5103 2.22272 12.9313 2.742 12.9313Z" fill="currentColor" />
     </svg>
+  );
+
+  // Attachment component with proper icons
+  const AttachmentIcon = ({ type }: { type: EmailAttachment['type'] }) => {
+    switch (type) {
+      case 'pdf':
+      case 'doc':
+        return <FileText size={16} className="text-[#1C1C1E] dark:text-[#F2F2F7]" />;
+      case 'xls':
+        return <FileSpreadsheet size={16} className="text-[#1C1C1E] dark:text-[#F2F2F7]" />;
+      case 'img':
+        return <Image size={16} className="text-[#1C1C1E] dark:text-[#F2F2F7]" />;
+      case 'zip':
+        return <Archive size={16} className="text-[#1C1C1E] dark:text-[#F2F2F7]" />;
+      case 'exe':
+        return <AlertTriangle size={16} className="text-[#1C1C1E] dark:text-[#F2F2F7]" />;
+      case 'txt':
+        return <FileText size={16} className="text-[#1C1C1E] dark:text-[#F2F2F7]" />;
+      default:
+        return <FileText size={16} className="text-[#1C1C1E] dark:text-[#F2F2F7]" />;
+    }
+  };
+
+  const AttachmentComponent = ({ attachments }: { attachments: EmailAttachment[] }) => (
+    <div className="border-t border-white/20 dark:border-white/10 pt-4 mt-6">
+      <div className="flex items-center gap-2 mb-3">
+        <Download size={14} className="text-[#1C1C1E] dark:text-[#F2F2F7]" />
+        <FontWrapper>
+          <span className="text-sm font-medium text-[#1C1C1E] dark:text-[#F2F2F7]">
+            Attachments ({attachments.length})
+          </span>
+        </FontWrapper>
+      </div>
+      <div className="space-y-2">
+        {attachments.map((attachment) => (
+          <motion.div
+            key={attachment.id}
+            whileHover={{ x: 2 }}
+            className={`flex items-center justify-between p-3 glass-border-2 cursor-pointer transition-all`}
+          >
+            <div className="flex items-center gap-3">
+              <AttachmentIcon type={attachment.type} />
+              <div>
+                <FontWrapper>
+                  <p className="text-sm font-medium text-[#1C1C1E] dark:text-[#F2F2F7]">
+                    {attachment.name}
+                  </p>
+                  <p className="text-xs text-[#1C1C1E]/70 dark:text-[#F2F2F7]/70">
+                    {attachment.size}
+                    {attachment.isPhishing && attachment.phishingReason && (
+                      <span className="text-[#1C1C1E] dark:text-[#F2F2F7] ml-2">
+                        • {attachment.phishingReason}
+                      </span>
+                    )}
+                  </p>
+                </FontWrapper>
+              </div>
+            </div>
+            {attachment.isPhishing && (
+              <AlertTriangle size={14} className="text-[#1C1C1E] dark:text-[#F2F2F7] flex-shrink-0" />
+            )}
+          </motion.div>
+        ))}
+      </div>
+    </div>
   );
 
   const handleEmailSelect = useCallback((emailId: string) => {
@@ -241,23 +306,9 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
                         </FontWrapper>
                       </div>
 
-                      {/* Phishing Indicators */}
-                      {selectedEmail.phishingIndicators && selectedEmail.phishingIndicators.length > 0 && (
-                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
-                          <div className="flex items-start gap-2">
-                            <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
-                            <div>
-                              <FontWrapper>
-                                <h4 className="text-sm font-medium text-amber-800 mb-2">{config.texts.phishingIndicatorsTitle}:</h4>
-                                <ul className="text-sm text-amber-700 space-y-1">
-                                  {selectedEmail.phishingIndicators.map((indicator, index) => (
-                                    <li key={index}>• {indicator}</li>
-                                  ))}
-                                </ul>
-                              </FontWrapper>
-                            </div>
-                          </div>
-                        </div>
+                      {/* Email Attachments - Mobile */}
+                      {selectedEmail.attachments && selectedEmail.attachments.length > 0 && (
+                        <AttachmentComponent attachments={selectedEmail.attachments} />
                       )}
 
                     </motion.div>
@@ -370,23 +421,9 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
                       </FontWrapper>
                     </div>
 
-                    {/* Phishing Indicators */}
-                    {selectedEmail.phishingIndicators && selectedEmail.phishingIndicators.length > 0 && (
-                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
-                        <div className="flex items-start gap-2">
-                          <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
-                          <div>
-                            <FontWrapper>
-                              <h4 className="text-sm font-medium text-amber-800 mb-2">{config.texts.phishingIndicatorsTitle}:</h4>
-                              <ul className="text-sm text-amber-700 space-y-1">
-                                {selectedEmail.phishingIndicators.map((indicator, index) => (
-                                  <li key={index}>• {indicator}</li>
-                                ))}
-                              </ul>
-                            </FontWrapper>
-                          </div>
-                        </div>
-                      </div>
+                    {/* Email Attachments - Desktop */}
+                    {selectedEmail.attachments && selectedEmail.attachments.length > 0 && (
+                      <AttachmentComponent attachments={selectedEmail.attachments} />
                     )}
 
                   </div>

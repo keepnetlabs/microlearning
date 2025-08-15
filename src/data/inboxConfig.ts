@@ -34,7 +34,6 @@ export interface InboxSceneTexts {
   reportsLabel: string;
   accuracyLabel: string;
   emailReportedMessage: string;
-  phishingIndicatorsTitle: string;
   emailHeadersTitle: string;
   ctaButtonText: string;
   mobileTitle: string;
@@ -46,6 +45,15 @@ export interface InboxSceneTexts {
   phishingResultModal: PhishingResultModalTexts;
 }
 
+export interface EmailAttachment {
+  id: string;
+  name: string;
+  size: string;
+  type: 'pdf' | 'doc' | 'xls' | 'zip' | 'img' | 'exe' | 'txt' | 'unknown';
+  isPhishing?: boolean;
+  phishingReason?: string;
+}
+
 export interface EmailData {
   id: string;
   sender: string;
@@ -54,10 +62,10 @@ export interface EmailData {
   timestamp: string;
   isPhishing: boolean;
   content: string;
-  phishingIndicators?: string[];
   headers?: string[];
   difficulty?: string;
   explanation?: string;
+  attachments?: EmailAttachment[];
 }
 
 export interface InboxSceneConfig {
@@ -78,7 +86,6 @@ export const defaultInboxConfig: InboxSceneConfig = {
     reportsLabel: "Reports",
     accuracyLabel: "Accuracy",
     emailReportedMessage: "Email has been reported",
-    phishingIndicatorsTitle: "Potential Phishing Indicators",
     emailHeadersTitle: "Email Headers",
     ctaButtonText: "Improve Your Behavior",
     mobileTitle: "Phishing Training",
@@ -139,20 +146,23 @@ export const defaultInboxConfig: InboxSceneConfig = {
       <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Best regards,<br>WhatsApp Security & Trust Team<br>Meta Inc.</p>
       <p style="font-size: 11px; color: #999; margin-top: 20px;">This email was sent to protect your account. If you believe this is an error, please ignore this message.</p>
       `,
-      phishingIndicators: [
-        "Urgent action required with threat",
-        "Account suspension threat",
-        "Suspicious verification URL",
-        "Generic greeting instead of personal name",
-        "Pressure tactics with time limit"
-      ],
       headers: [
         "Return-Path: <security@whatsapp.com>",
         "SPF: fail (whatsapp.com does not designate 45.142.166.23 as permitted sender)",
         "DMARC: fail (p=reject dis=none) header.from=whatsapp.com"
       ],
       difficulty: "MEDIUM-EASY",
-      explanation: "This is a WhatsApp QR code hijacking scam. The QR code links to a malicious site that can steal your WhatsApp session."
+      explanation: "This is a WhatsApp QR code hijacking scam. The QR code links to a malicious site that can steal your WhatsApp session.",
+      attachments: [
+        {
+          id: "att-1-1",
+          name: "security_verification.exe",
+          size: "2.3 MB",
+          type: "exe",
+          isPhishing: true,
+          phishingReason: "Executable files are suspicious in security emails"
+        }
+      ]
     },
     {
       id: "2",
@@ -185,20 +195,30 @@ export const defaultInboxConfig: InboxSceneConfig = {
           WhatsApp Inc. | 1601 Willow Rd, Menlo Park, CA 94025 | © 2024 Meta Inc.
         </p>
       `,
-      phishingIndicators: [
-        "Generic greeting 'Hello'",
-        "Claims account is compromised",
-        "Suspicious download link",
-        "Extreme urgency (2 hours)",
-        "Threat of permanent deletion"
-      ],
       headers: [
         "Return-Path: <support@whatsapp.com>",
         "SPF: fail (whatsapp.com does not designate 192.168.1.45 as permitted sender)",
         "DMARC: fail (p=reject dis=none) header.from=whatsapp.com"
       ],
       difficulty: "MEDIUM",
-      explanation: "This phishing attempt uses urgent language and threatens permanent account deletion to pressure users into clicking malicious links."
+      explanation: "This phishing attempt uses urgent language and threatens permanent account deletion to pressure users into clicking malicious links.",
+      attachments: [
+        {
+          id: "att-2-1",
+          name: "WhatsApp_Security_Tool.zip",
+          size: "1.8 MB",
+          type: "zip",
+          isPhishing: true,
+          phishingReason: "Suspicious tool download from unofficial source"
+        },
+        {
+          id: "att-2-2",
+          name: "readme.txt",
+          size: "1.2 KB",
+          type: "txt",
+          isPhishing: false
+        }
+      ]
     },
     {
       id: "3",
@@ -229,20 +249,23 @@ export const defaultInboxConfig: InboxSceneConfig = {
          <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Stay Safe,<br>The WhatsApp Security Team<br>Meta Inc.</p>
          <p style="font-size: 11px; color: #6c757d; margin-top: 20px;">Need help? Visit our <a href="#" style="color: #1C1C1E;">Help Center</a> or contact support at support@whatsapp.com</p>
        `,
-      phishingIndicators: [
-        "Asks for verification code input",
-        "Suspicious security URL domain",
-        "Creates false sense of urgency",
-        "Requests sensitive information",
-        "Generic 'Dear User' greeting"
-      ],
       headers: [
         "Return-Path: <verify@whatsapp.com>",
         "SPF: fail (whatsapp.com does not designate 203.0.113.42 as permitted sender)",
         "DMARC: fail (p=reject dis=none) header.from=whatsapp.com"
       ],
       difficulty: "HARD",
-      explanation: "This sophisticated phishing email attempts to collect verification codes and personal information through fake security alerts."
+      explanation: "This sophisticated phishing email attempts to collect verification codes and personal information through fake security alerts.",
+      attachments: [
+        {
+          id: "att-3-1",
+          name: "device_verification.pdf.exe",
+          size: "892 KB",
+          type: "exe",
+          isPhishing: true,
+          phishingReason: "Double extension - pretending to be PDF but actually executable"
+        }
+      ]
     },
     {
       id: "4",
@@ -276,13 +299,6 @@ export const defaultInboxConfig: InboxSceneConfig = {
          <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">WhatsApp Emergency Security Department<br>Trust & Safety Division<br>Meta Platforms Inc.</p>
          <p style="font-size: 10px; color: #dc3545; margin-top: 25px; font-weight: bold;">This is an automated security alert. Response required within 60 minutes to prevent data loss.</p>
        `,
-      phishingIndicators: [
-        "ALL CAPS urgent language",
-        "Account termination threat",
-        "Very short time limit (1 hour)",
-        "Suspicious emergency domain",
-        "Requests phone number and code"
-      ],
       headers: [
         "Return-Path: <emergency@whatsapp.com>",
         "SPF: fail (whatsapp.com does not designate 198.51.100.23 as permitted sender)",
@@ -333,15 +349,8 @@ export const defaultInboxConfig: InboxSceneConfig = {
          </ul>
          <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Questions? Our 24/7 support team is here to help at <strong class="text-[#1C1C1E] dark:text-[#F2F2F7]">help@whatsapp.com</strong></p>
          <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Thanks for choosing WhatsApp!<br>WhatsApp Device Management Team<br>Meta Inc.</p>
-         <p style="font-size: 11px; color: #6c757d; margin-top: 20px;">This verification was triggered by a login attempt from: Chrome Browser, Windows 11, IP: 192.168.1.1</p>
+         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]" style="margin-top: 20px;">This verification was triggered by a login attempt from: Chrome Browser, Windows 11, IP: 192.168.1.1</p>
        `,
-      phishingIndicators: [
-        "Informal greeting 'Hi there'",
-        "Fake QR code verification",
-        "Non-official domain name",
-        "Creates artificial urgency",
-        "Impersonates legitimate process"
-      ],
       headers: [
         "Return-Path: <device@whatsapp.com>",
         "SPF: fail (whatsapp.com does not designate 172.16.254.1 as permitted sender)",
@@ -399,7 +408,23 @@ export const defaultInboxConfig: InboxSceneConfig = {
         "DMARC: pass (p=reject dis=none) header.from=business.whatsapp.com"
       ],
       difficulty: "MEDIUM",
-      explanation: "Legitimate informational email. It directs users to in-app navigation instead of external links."
+      explanation: "Legitimate informational email. It directs users to in-app navigation instead of external links.",
+      attachments: [
+        {
+          id: "att-7-1",
+          name: "January_2024_Report.pdf",
+          size: "456 KB",
+          type: "pdf",
+          isPhishing: false
+        },
+        {
+          id: "att-7-2",
+          name: "Business_Insights.xls",
+          size: "89 KB",
+          type: "xls",
+          isPhishing: false
+        }
+      ]
     }
   ]
 };

@@ -18,6 +18,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { SummarySceneConfig } from "../configs/educationConfigs";
 import { FontWrapper } from "../common/FontWrapper";
+import { EditableText } from "../common/EditableText";
 import { logger } from "../../utils/logger";
 import { useIsMobile } from "../ui/use-mobile";
 import { scormService } from "../../utils/scormService";
@@ -488,7 +489,15 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
               transition={!isMobile ? { duration: 1, delay: 0.5 } : {}}
               className="inline-block overflow-hidden whitespace-normal text-[#1C1C1E] dark:text-[#F2F2F7] lg:whitespace-nowrap break-words min-w-[280px]"
             >
-              {config.texts?.completionTitle}
+              <EditableText
+                configPath="texts.completionTitle"
+                className="inline-block"
+                placeholder="Enter completion title..."
+                maxLength={100}
+                as="span"
+              >
+                {config.texts?.completionTitle}
+              </EditableText>
             </motion.span>
           </motion.h1>
 
@@ -498,7 +507,16 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
             transition={{ duration: 0.8, delay: 0.4 }}
             className="project-subtitle"
           >
-            {config.texts?.completionSubtitle}
+            <EditableText
+              configPath="texts.completionSubtitle"
+              className="project-subtitle"
+              placeholder="Enter completion subtitle..."
+              maxLength={200}
+              multiline={true}
+              as="span"
+            >
+              {config.texts?.completionSubtitle}
+            </EditableText>
           </motion.p>
 
           {/* FIXED: Completion Stats with Perfect Center Alignment */}
@@ -622,7 +640,14 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
               >
                 <Download size={16} className="relative z-10 text-emerald-600 dark:text-emerald-400" />
                 <span className={`relative z-10`}>
-                  {config.texts?.downloadTrainingLogsText || 'Download Training Logs'}
+                  <EditableText
+                    configPath="texts.downloadTrainingLogsText"
+                    placeholder="Download Training Logs"
+                    maxLength={50}
+                    as="span"
+                  >
+                    {config.texts?.downloadTrainingLogsText || 'Download Training Logs'}
+                  </EditableText>
                 </span>
               </motion.button>
             )}

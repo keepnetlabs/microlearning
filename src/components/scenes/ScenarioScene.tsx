@@ -293,8 +293,8 @@ export function ScenarioScene({
             aria-live="assertive"
             aria-label={config.ariaTexts?.errorLabel || "Transcript loading error"}
           >
-            <div className="inline-flex items-center space-x-2 text-red-600 dark:text-red-400">
-              <span>⚠️ {transcriptError}</span>
+            <div className="inline-flex items-center space-x-2 text-[#1C1C1E] dark:text-[#F2F2F7]">
+              <span>{transcriptError}</span>
             </div>
           </motion.div>
         )}
