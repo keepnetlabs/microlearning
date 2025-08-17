@@ -11,14 +11,18 @@ import {
   Star,
   Heart,
   CheckCircle,
+  RotateCcw,
   LucideIcon
 } from "lucide-react";
 import * as LucideIcons from "lucide-react";
+import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { SummarySceneConfig } from "../configs/educationConfigs";
 import { FontWrapper } from "../common/FontWrapper";
 import { EditableText } from "../common/EditableText";
+import { EditModeProvider, useEditMode } from "../../contexts/EditModeContext";
+import { EditModePanel } from "../common/EditModePanel";
 import { logger } from "../../utils/logger";
 import { useIsMobile } from "../ui/use-mobile";
 import { scormService } from "../../utils/scormService";
@@ -31,7 +35,8 @@ interface SummarySceneProps {
   };
 }
 
-export function SummaryScene({ config, completionData, sceneId, reducedMotion, disableDelays }: SummarySceneProps & { sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean }) {
+// Inner component that uses the EditModeContext - Optimized with React.memo
+const SummarySceneContent = React.memo(function SummarySceneContent({ config, completionData, sceneId, reducedMotion, disableDelays }: SummarySceneProps & { sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean }) {
   const [showCertificate, setShowCertificate] = useState(false);
   const [hasDownloadedCertificate, setHasDownloadedCertificate] = useState(false);
   const [showConfetti, setShowConfetti] = useState(true);
@@ -40,7 +45,26 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
   const [isFinished, setIsFinished] = useState(false);
   const [finishError, setFinishError] = useState<string | null>(null);
   const isMobile = useIsMobile();
-  // Start celebration sequence
+
+  // Get edit mode context
+  const { isEditMode: currentEditMode, tempConfig } = useEditMode();
+
+  // Use tempConfig when in edit mode, otherwise use the original config
+  const currentConfig = currentEditMode ? tempConfig : config;
+
+  // Animation optimization helper - memoized
+  const animationProps = useMemo(() => ({
+    // Duration optimization based on reduced motion
+    duration: (base: number) => reducedMotion ? 0 : base,
+    // Delay optimization
+    delay: (base: number) => disableDelays ? 0 : reducedMotion ? 0 : base,
+    // Transition helper
+    transition: (duration: number, delay: number = 0) => ({
+      duration: reducedMotion ? 0 : duration,
+      delay: disableDelays ? 0 : reducedMotion ? 0 : delay
+    })
+  }), [reducedMotion, disableDelays]);
+  // Start celebration sequence - optimized
   useEffect(() => {
     const celebrations = [
       () => setCelebrationPhase(1), // Initial burst
@@ -49,17 +73,17 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
       () => setShowConfetti(false)  // End confetti
     ];
 
-    if (disableDelays) {
+    if (disableDelays || reducedMotion) {
       celebrations.forEach((c) => c());
       return;
     }
     celebrations.forEach((celebration, index) => {
       setTimeout(celebration, index * 1000);
     });
-  }, [disableDelays]);
+  }, [disableDelays, reducedMotion]);
 
-  // Dinamik icon mapping function (diğer componentlerle aynı)
-  const getIconComponent = (iconName?: string): LucideIcon => {
+  // Dinamik icon mapping function (diğer componentlerle aynı) - Memoized
+  const getIconComponent = useMemo(() => (iconName?: string): LucideIcon => {
     if (!iconName) {
       return LucideIcons.CheckCircle;
     }
@@ -78,19 +102,19 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
     // Fallback ikon
     console.warn(`Icon "${iconName}" not found, using default icon`);
     return LucideIcons.CheckCircle;
-  };
+  }, []);
 
-  const finalCompletionData = completionData || {
+  const finalCompletionData = useMemo(() => completionData || {
     totalPoints: 210,
     timeSpent: "8 dakika",
     completionDate: "2024-01-15"
-  }
+  }, [completionData]);
 
-  const immediateActions = config.immediateActions || []
+  const immediateActions = useMemo(() => currentConfig.immediateActions || [], [currentConfig.immediateActions]);
 
-  const resources = config.resources || []
+  const resources = useMemo(() => currentConfig.resources || [], [currentConfig.resources]);
 
-  const tryCloseWindow = () => {
+  const tryCloseWindow = useCallback(() => {
     try { window.top && (window.top as Window).close && (window.top as Window).close(); } catch { }
     try { window.opener && window.close(); } catch { }
     try {
@@ -99,9 +123,9 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
       if (newWindow) newWindow.close();
       else window.close();
     } catch { }
-  };
+  }, []);
 
-  const handleSaveAndFinish = () => {
+  const handleSaveAndFinish = useCallback(() => {
     if (isFinishing || isFinished) return;
     setFinishError(null);
     setIsFinishing(true);
@@ -111,13 +135,13 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
       scormService.commit();
       const ok = scormService.finish();
       if (!ok) {
-        setFinishError(config.texts?.finishErrorText || 'Could not finish. Please close the window or try again.');
+        setFinishError(currentConfig.texts?.finishErrorText || 'Could not finish. Please close the window or try again.');
       } else {
         setIsFinished(true);
         success = true;
       }
     } catch (e) {
-      setFinishError(config.texts?.finishErrorText || 'Could not finish. Please close the window or try again.');
+      setFinishError(currentConfig.texts?.finishErrorText || 'Could not finish. Please close the window or try again.');
     } finally {
       setIsFinishing(false);
       // Only attempt to close the window if successful
@@ -125,9 +149,9 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
         setTimeout(tryCloseWindow, 300);
       }
     }
-  }
+  }, [isFinishing, isFinished, currentConfig.texts?.finishErrorText, tryCloseWindow]);
 
-  const handleDownloadCertificate = () => {
+  const handleDownloadCertificate = useCallback(() => {
     if (hasDownloadedCertificate) return;
     setShowCertificate(true);
 
@@ -267,7 +291,7 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
     URL.revokeObjectURL(url);
     setShowCertificate(false);
     setHasDownloadedCertificate(true);
-  };
+  }, [hasDownloadedCertificate]);
 
   // Confetti component
   const ConfettiPiece = ({ delay = 0, color = "blue" }) => (
@@ -305,7 +329,7 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
 
   return (
     <FontWrapper>
-      <div className={`flex flex-col items-center justify-start h-full px-1.5 py-2 sm:px-6 overflow-y-auto relative`} data-scene-type={(config as any)?.scene_type || 'summary'} data-scene-id={sceneId as any} data-testid="scene-summary">
+      <div className={`flex flex-col items-center justify-start h-full px-1.5 py-2 sm:px-6 overflow-y-auto relative`} data-scene-type={(currentConfig as any)?.scene_type || 'summary'} data-scene-id={sceneId as any} data-testid="scene-summary">
         {/* Confetti Animation */}
         <AnimatePresence>
           {showConfetti && (
@@ -364,7 +388,7 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
             opacity: celebrationPhase >= 3 ? [0, 0.3, 0] : 0
           }}
           transition={{
-            duration: 3,
+            duration: animationProps.duration(3),
             repeat: celebrationPhase >= 3 ? 2 : 0
           }}
         >
@@ -382,7 +406,7 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
           {!isMobile && <div className="relative mb-4">
 
             <motion.div
-              className="relative w-16 h-16 sm:w-20 sm:h-20 glass-border-2 flex items-center justify-center mx-auto"
+              className={`relative w-16 h-16 sm:w-20 sm:h-20 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} flex items-center justify-center mx-auto`}
               animate={{
                 scale: celebrationPhase >= 1 ? [1, 1.2, 1.05, 1] : [1, 1.05, 1],
               }}
@@ -433,10 +457,10 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
                 transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
               >
                 {(() => {
-                  const IconComponent = getIconComponent(config.icon?.name);
+                  const IconComponent = getIconComponent(currentConfig.icon?.name);
                   return (
                     <IconComponent
-                      size={config.icon?.size || 28}
+                      size={currentConfig.icon?.size || 28}
                       className={`text-[#1C1C1E] dark:text-[#F2F2F7] relative z-10 sm:w-8 sm:h-8`}
                       strokeWidth={2.5}
                     />
@@ -491,7 +515,7 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
               initial={!isMobile ? { width: 0 } : {}}
               animate={!isMobile ? { width: "auto" } : {}}
               transition={!isMobile ? { duration: 1, delay: 0.5 } : {}}
-              className="inline-block overflow-hidden whitespace-normal text-[#1C1C1E] dark:text-[#F2F2F7] lg:whitespace-nowrap break-words min-w-[280px]"
+              className={`inline-block ${currentEditMode ? '' : 'overflow-hidden'} whitespace-normal text-[#1C1C1E] dark:text-[#F2F2F7] lg:whitespace-nowrap break-words min-w-[280px]`}
             >
               <EditableText
                 configPath="texts.completionTitle"
@@ -500,12 +524,12 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
                 maxLength={100}
                 as="span"
               >
-                {config.texts?.completionTitle}
+                {currentConfig.texts?.completionTitle}
               </EditableText>
             </motion.span>
           </motion.h1>
 
-          <motion.p
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -519,9 +543,9 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
               multiline={true}
               as="span"
             >
-              {config.texts?.completionSubtitle}
+              {currentConfig.texts?.completionSubtitle}
             </EditableText>
-          </motion.p>
+          </motion.div>
 
           {/* FIXED: Completion Stats with Perfect Center Alignment */}
           {false && <motion.div
@@ -531,9 +555,9 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
             className="flex items-center justify-center gap-4 sm:gap-6 mb-3"
           >
             {[
-              { icon: Award, value: finalCompletionData.totalPoints, label: config.texts?.pointsLabel, gradient: "from-blue-100 to-indigo-100", darkGradient: "from-blue-900/40 to-indigo-900/40", color: "text-blue-600 dark:text-blue-300", bgColor: "bg-white/80 dark:bg-gray-800/90", borderColor: "border-blue-200/60 dark:border-blue-600/40" },
-              { icon: Clock, value: finalCompletionData.timeSpent, label: config.texts?.timeLabel, gradient: "from-green-100 to-emerald-100", darkGradient: "from-green-900/40 to-emerald-900/40", color: "text-green-600 dark:text-green-300", bgColor: "bg-white/80 dark:bg-gray-800/90", borderColor: "border-green-200/60 dark:border-green-600/40" },
-              { icon: Target, value: "100%", label: config.texts?.completionLabel, gradient: "from-purple-100 to-pink-100", darkGradient: "from-purple-900/40 to-pink-900/40", color: "text-purple-600 dark:text-purple-300", bgColor: "bg-white/80 dark:bg-gray-800/90", borderColor: "border-purple-200/60 dark:border-purple-600/40" }
+              { icon: Award, value: finalCompletionData.totalPoints, label: currentConfig.texts?.pointsLabel, gradient: "from-blue-100 to-indigo-100", darkGradient: "from-blue-900/40 to-indigo-900/40", color: "text-blue-600 dark:text-blue-300", bgColor: "bg-white/80 dark:bg-gray-800/90", borderColor: "border-blue-200/60 dark:border-blue-600/40" },
+              { icon: Clock, value: finalCompletionData.timeSpent, label: currentConfig.texts?.timeLabel, gradient: "from-green-100 to-emerald-100", darkGradient: "from-green-900/40 to-emerald-900/40", color: "text-green-600 dark:text-green-300", bgColor: "bg-white/80 dark:bg-gray-800/90", borderColor: "border-green-200/60 dark:border-green-600/40" },
+              { icon: Target, value: "100%", label: currentConfig.texts?.completionLabel, gradient: "from-purple-100 to-pink-100", darkGradient: "from-purple-900/40 to-pink-900/40", color: "text-purple-600 dark:text-purple-300", bgColor: "bg-white/80 dark:bg-gray-800/90", borderColor: "border-purple-200/60 dark:border-purple-600/40" }
             ].map((stat, index) => (
               <motion.div
                 key={index}
@@ -545,7 +569,7 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
                 transition={{ type: "spring", stiffness: 400 }}
               >
                 <motion.div
-                  className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 glass-border-2 rounded-xl mb-2 relative overflow-hidden `}
+                  className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} rounded-xl mb-2 relative overflow-hidden `}
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.8 + index * 0.1, type: "spring", stiffness: 200 }}
@@ -584,15 +608,21 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
             <motion.button
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.8 }}
+              transition={animationProps.transition(0.8, 0.8)}
               whileHover={!(isFinishing || isFinished) ? {
                 scale: 1.05,
                 boxShadow: "0 20px 40px rgba(59, 130, 246, 0.3)"
               } : {}}
               whileTap={!(isFinishing || isFinished) ? { scale: 0.95 } : {}}
-              onClick={handleSaveAndFinish}
+              onClick={currentEditMode ? (e: any) => {
+                // Edit mode'da sadece EditableText componentlerin tıklanmasına izin ver
+                if (e.target.closest('[data-editable]')) {
+                  return; // EditableText tıklanmışsa, normal davranışına devam et
+                }
+                e.preventDefault(); // Diğer durumlarda buton aksiyonunu engelle
+              } : handleSaveAndFinish}
               disabled={isFinishing || isFinished}
-              className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 glass-border-2  transition-all text-[#1C1C1E] dark:text-[#F2F2F7] disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden`}
+              className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all text-[#1C1C1E] dark:text-[#F2F2F7] disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none ${currentEditMode ? '' : 'overflow-hidden'}`}
               data-testid="btn-save-finish"
             >
               <motion.div
@@ -605,21 +635,65 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
                 }}
               />
               <span className={`text-sm sm:text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7] inline-flex items-center gap-2`}>
-                <CheckCircle size={16} className={`relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
+                {finishError ? (
+                  <RotateCcw size={16} className={`relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
+                ) : (
+                  <CheckCircle size={16} className={`relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
+                )}
                 <span>
                   {isFinishing
-                    ? (config.texts?.savingText || 'Saving…')
+                    ? (
+                      <EditableText
+                        configPath="texts.savingText"
+                        placeholder="Saving…"
+                        maxLength={50}
+                        as="span"
+                        data-editable="true"
+                      >
+                        {currentConfig.texts?.savingText || 'Saving…'}
+                      </EditableText>
+                    )
                     : isFinished
-                      ? (config.texts?.finishedText || 'Saved. You can now close this window.')
+                      ? (
+                        <EditableText
+                          configPath="texts.finishedText"
+                          placeholder="Saved. You can now close this window."
+                          maxLength={100}
+                          as="span"
+                          data-editable="true"
+                        >
+                          {currentConfig.texts?.finishedText || 'Saved. You can now close this window.'}
+                        </EditableText>
+                      )
                       : finishError
-                        ? (config.texts?.retryText || 'Retry')
-                        : (config.texts?.saveAndFinish || 'Save and Finish')}
+                        ? (
+                          <EditableText
+                            configPath="texts.retryText"
+                            placeholder="Retry"
+                            maxLength={30}
+                            as="span"
+                            data-editable="true"
+                          >
+                            {currentConfig.texts?.retryText || 'Retry'}
+                          </EditableText>
+                        )
+                        : (
+                          <EditableText
+                            configPath="texts.saveAndFinish"
+                            placeholder="Save and Finish"
+                            maxLength={50}
+                            as="span"
+                            data-editable="true"
+                          >
+                            {currentConfig.texts?.saveAndFinish || 'Save and Finish'}
+                          </EditableText>
+                        )}
                 </span>
               </span>
             </motion.button>
             {/* Accessible status for screen readers */}
             <div aria-live="polite" className="sr-only">
-              {isFinishing ? (config.texts?.savingText || 'Saving…') : isFinished ? (config.texts?.finishedText || 'Saved. You can now close this window.') : ''}
+              {isFinishing ? (currentConfig.texts?.savingText || 'Saving…') : isFinished ? (currentConfig.texts?.finishedText || 'Saved. You can now close this window.') : ''}
             </div>
             {finishError && (
               <div className="text-sm mt-2 text-center text-[#1C1C1E] dark:text-[#F2F2F7]">
@@ -635,13 +709,18 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
                 transition={{ duration: 0.6, delay: 0.9 }}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => {
+                onClick={currentEditMode ? (e: any) => {
+                  if (e.target.closest('[data-editable]')) {
+                    return;
+                  }
+                  e.preventDefault();
+                } : () => {
                   try {
                     const snapshot = scormService.getSCORMData();
                     logger.download(snapshot);
                   } catch { }
                 }}
-                className={`relative inline-flex mt-4 items-center gap-2 px-4 py-2 glass-border-2 text-sm font-medium transition-all hover:shadow-lg text-[#1C1C1E] dark:text-[#F2F2F7]`}
+                className={`relative inline-flex mt-4 items-center gap-2 px-4 py-2 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} text-sm font-medium transition-all hover:shadow-lg text-[#1C1C1E] dark:text-[#F2F2F7]`}
                 data-testid="btn-download-training-logs"
               >
                 <Download size={16} className="relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]" />
@@ -652,7 +731,7 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
                     maxLength={50}
                     as="span"
                   >
-                    {config.texts?.downloadTrainingLogsText || 'Download Training Logs'}
+                    {currentConfig.texts?.downloadTrainingLogsText || 'Download Training Logs'}
                   </EditableText>
                 </span>
               </motion.button>
@@ -661,10 +740,15 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
             <motion.button
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1.0 }}
+              transition={animationProps.transition(0.6, 1.0)}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={handleDownloadCertificate}
+              onClick={currentEditMode ? (e: any) => {
+                if (e.target.closest('[data-editable]')) {
+                  return;
+                }
+                e.preventDefault();
+              } : handleDownloadCertificate}
               disabled={showCertificate || hasDownloadedCertificate}
               className={`inline-flex mt-6 sm:text-base items-center gap-2 text-sm underline disabled:opacity-70 disabled:cursor-not-allowed text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold`}
               data-testid="btn-download-certificate"
@@ -672,28 +756,65 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
               <Download size={16} className={`relative font-semibold z-10 ${hasDownloadedCertificate ? 'opacity-60' : ''} text-[#1C1C1E] dark:text-[#F2F2F7]`} />
               <span className={`relative z-10`}>
                 {showCertificate
-                  ? (config.texts?.downloadingText || 'Downloading…')
+                  ? (
+                    <EditableText
+                      configPath="texts.downloadingText"
+                      placeholder="Downloading…"
+                      maxLength={50}
+                      as="span"
+                      data-editable="true"
+                    >
+                      {currentConfig.texts?.downloadingText || 'Downloading…'}
+                    </EditableText>
+                  )
                   : hasDownloadedCertificate
-                    ? (config.texts?.downloadedText || 'Downloaded')
-                    : (config.texts?.downloadButton || 'Download certificate')}
+                    ? (
+                      <EditableText
+                        configPath="texts.downloadedText"
+                        placeholder="Downloaded"
+                        maxLength={50}
+                        as="span"
+                        data-editable="true"
+                      >
+                        {currentConfig.texts?.downloadedText || 'Downloaded'}
+                      </EditableText>
+                    )
+                    : (
+                      <EditableText
+                        configPath="texts.downloadButton"
+                        placeholder="Download certificate"
+                        maxLength={100}
+                        as="span"
+                        data-editable="true"
+                      >
+                        {currentConfig.texts?.downloadButton || 'Download certificate'}
+                      </EditableText>
+                    )}
               </span>
             </motion.button>
           </div>
         </motion.div>
 
         {/* Enhanced Achievements */}
-        {config.achievements && config.achievements.length > 0 && <motion.div
+        {currentConfig.achievements && currentConfig.achievements.length > 0 && <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1.0 }}
+          transition={animationProps.transition(0.8, 1.0)}
           className="w-full max-w-sm sm:max-w-md mb-3"
         >
           <h2 className="text-sm sm:text-base font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] mb-3 flex items-center">
             <Award size={16} className="mr-2 text-[#1C1C1E] dark:text-[#F2F2F7]" />
-            {config.texts?.achievementsTitle || ""}
+            <EditableText
+              configPath="texts.achievementsTitle"
+              placeholder="Achievements"
+              maxLength={100}
+              as="span"
+            >
+              {currentConfig.texts?.achievementsTitle || ""}
+            </EditableText>
           </h2>
           <div className="grid grid-cols-3 gap-2 sm:gap-3">
-            {(config.achievements || []).map((achievement, index) => {
+            {(currentConfig.achievements || []).map((achievement: any, index: number) => {
               const IconComponent = getIconComponent(achievement.iconName);
               return (
                 <motion.div
@@ -711,7 +832,7 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
                     y: -5,
                     transition: { type: "spring", stiffness: 400 }
                   }}
-                  className={`relative flex flex-col items-center p-3 glass-border-2 overflow-hidden group`}
+                  className={`relative flex flex-col items-center p-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} ${currentEditMode ? '' : 'overflow-hidden'} group`}
                 >
                   {/* Achievement glow */}
                   <motion.div
@@ -720,12 +841,19 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
                     transition={{ duration: 0.3 }}
                   />
                   <motion.div
-                    className="w-8 h-8 glass-border-0 flex items-center justify-center mb-2 relative overflow-hidden"
+                    className={`w-8 h-8 ${currentEditMode ? 'glass-border-0-no-overflow' : 'glass-border-0'} flex items-center justify-center mb-2 relative ${currentEditMode ? '' : 'overflow-hidden'}`}
                   >
                     <IconComponent size={14} className={`text-[#1C1C1E] dark:text-[#F2F2F7] relative z-10`} />
                   </motion.div>
                   <span className={`text-xs text-center text-[#1C1C1E] dark:text-[#F2F2F7] leading-tight relative z-10 transition-colors`}>
-                    {achievement.name}
+                    <EditableText
+                      configPath={`achievements.${index}.name`}
+                      placeholder="Achievement name..."
+                      maxLength={50}
+                      as="span"
+                    >
+                      {achievement.name}
+                    </EditableText>
                   </span>
                 </motion.div>
               );
@@ -737,16 +865,23 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1.4 }}
+          transition={animationProps.transition(0.8, 1.4)}
           className="w-full max-w-sm sm:max-w-md mb-3"
         >
           <h2 className="text-sm sm:text-base font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] mb-2 flex items-center">
             <ArrowRight size={16} className="mr-2 text-[#1C1C1E] dark:text-[#F2F2F7]" />
-            {config.texts?.actionPlanTitle || ""}
+            <EditableText
+              configPath="texts.actionPlanTitle"
+              placeholder="Next Steps"
+              maxLength={100}
+              as="span"
+            >
+              {currentConfig.texts?.actionPlanTitle || ""}
+            </EditableText>
           </h2>
 
           <div className="space-y-2">
-            {immediateActions.map((action, index) => {
+            {immediateActions.map((action: any, index: number) => {
               const IconComponent = getIconComponent(action.iconName);
               return (
                 <motion.div
@@ -763,14 +898,14 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
                     scale: 1.02,
                     transition: { type: "spring", stiffness: 400 }
                   }}
-                  className={`relative p-3 glass-border-2 transition-all duration-300 group cursor-pointer overflow-hidden`}
+                  className={`relative p-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all duration-300 group cursor-pointer ${currentEditMode ? '' : 'overflow-hidden'}`}
                 >
 
                   <div className="relative z-10">
                     <div className="flex items-start justify-between mb-1">
                       <div className="flex items-center">
                         <motion.div
-                          className="p-1.5 rounded-lg glass-border-0 mr-2 group-hover:scale-110 transition-transform overflow-hidden"
+                          className={`p-1.5 rounded-lg ${currentEditMode ? 'glass-border-0-no-overflow' : 'glass-border-0'} mr-2 group-hover:scale-110 transition-transform ${currentEditMode ? '' : 'overflow-hidden'}`}
                           whileHover={{
                             rotate: 5,
                             transition: { type: "spring", stiffness: 400 }
@@ -780,10 +915,17 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
                         </motion.div>
                         <div>
                           <h3 className="text-sm font-semibold text-[#1C1C1E] dark:text-white flex items-center">
-                            {action.title}
+                            <EditableText
+                              configPath={`immediateActions.${index}.title`}
+                              placeholder="Action title..."
+                              maxLength={100}
+                              as="span"
+                            >
+                              {action.title}
+                            </EditableText>
                             {action.priority === 'critical' && (
                               <motion.span
-                                className="ml-2 px-2 py-0.5 text-xs text-[#1C1C1E] dark:text-[#F2F2F7] glass-border-0  rounded-full"
+                                className={`ml-2 px-2 py-0.5 text-xs text-[#1C1C1E] dark:text-[#F2F2F7] ${currentEditMode ? 'glass-border-0-no-overflow' : 'glass-border-0'} rounded-full`}
                                 animate={{
                                   scale: [1, 1.05, 1],
                                 }}
@@ -793,19 +935,41 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
                                   ease: "easeInOut"
                                 }}
                               >
-                                {config.texts?.urgentLabel || ""}
+                                <EditableText
+                                  configPath="texts.urgentLabel"
+                                  placeholder="Urgent"
+                                  maxLength={20}
+                                  as="span"
+                                >
+                                  {currentConfig.texts?.urgentLabel || ""}
+                                </EditableText>
                               </motion.span>
                             )}
                           </h3>
                         </div>
                       </div>
                       <span className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] px-2 py-1 rounded-full">
-                        {action.timeframe}
+                        <EditableText
+                          configPath={`immediateActions.${index}.timeframe`}
+                          placeholder="Timeframe..."
+                          maxLength={50}
+                          as="span"
+                        >
+                          {action.timeframe}
+                        </EditableText>
                       </span>
                     </div>
-                    <p className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] leading-relaxed ml-8">
-                      {action.description}
-                    </p>
+                    <div className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] leading-relaxed ml-8">
+                      <EditableText
+                        configPath={`immediateActions.${index}.description`}
+                        placeholder="Action description..."
+                        maxLength={300}
+                        multiline={true}
+                        as="span"
+                      >
+                        {action.description}
+                      </EditableText>
+                    </div>
                   </div>
                 </motion.div>
               );
@@ -817,16 +981,23 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 2.0 }}
+          transition={animationProps.transition(0.8, 2.0)}
           className="w-full max-w-sm sm:max-w-md mb-3"
         >
           <h2 className="text-sm sm:text-base font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] mb-2 flex items-center">
             <BookOpen size={16} className="mr-2 text-[#1C1C1E] dark:text-[#F2F2F7]" />
-            {config.texts?.resourcesTitle || ""}
+            <EditableText
+              configPath="texts.resourcesTitle"
+              placeholder="Resources"
+              maxLength={100}
+              as="span"
+            >
+              {currentConfig.texts?.resourcesTitle || ""}
+            </EditableText>
           </h2>
 
           <div className="space-y-2">
-            {resources.map((resource, index) => (
+            {resources.map((resource: any, index: number) => (
               <motion.a
                 key={index}
                 initial={{ opacity: 0, x: -20 }}
@@ -843,27 +1014,54 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
                 target="_blank"
                 rel="noopener noreferrer"
                 href={resource.url}
-                className={`relative flex items-center justify-between p-3 glass-border-2 transition-all group overflow-hidden`}
+                onClick={currentEditMode ? (e: any) => {
+                  if (e.target.closest('[data-editable]')) {
+                    return;
+                  }
+                  e.preventDefault();
+                } : undefined}
+                className={`relative flex items-center justify-between p-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all group ${currentEditMode ? '' : 'overflow-hidden'}`}
               >
 
                 <div className="flex items-center space-x-3 relative z-10">
                   <motion.div
-                    className="p-1.5 rounded-lg glass-border-1 transition-all"
+                    className={`p-1.5 rounded-lg ${currentEditMode ? 'glass-border-1-no-overflow' : 'glass-border-1'} transition-all`}
                     whileHover={{ scale: 1.1 }}
                   >
                     <ExternalLink size={12} className={`text-[#1C1C1E] dark:text-[#F2F2F7]`} />
                   </motion.div>
                   <div>
                     <div className={`text-sm font-medium text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors`}>
-                      {resource.title}
+                      <EditableText
+                        configPath={`resources.${index}.title`}
+                        placeholder="Resource title..."
+                        maxLength={100}
+                        as="span"
+                      >
+                        {resource.title}
+                      </EditableText>
                     </div>
                     <div className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7]">
-                      {resource.description}
+                      <EditableText
+                        configPath={`resources.${index}.description`}
+                        placeholder="Resource description..."
+                        maxLength={200}
+                        as="span"
+                      >
+                        {resource.description}
+                      </EditableText>
                     </div>
                   </div>
                 </div>
-                <span className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] glass-border-0 px-2 py-1 rounded-full relative z-10">
-                  {resource.type}
+                <span className={`text-xs text-[#1C1C1E] dark:text-[#F2F2F7] ${currentEditMode ? 'glass-border-0-no-overflow' : 'glass-border-0'} px-2 py-1 rounded-full relative z-10`}>
+                  <EditableText
+                    configPath={`resources.${index}.type`}
+                    placeholder="Type..."
+                    maxLength={30}
+                    as="span"
+                  >
+                    {resource.type}
+                  </EditableText>
                 </span>
               </motion.a>
             ))}
@@ -874,11 +1072,11 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 2.4 }}
+          transition={animationProps.transition(0.8, 2.4)}
           className="text-center pb-4"
         >
           <motion.div
-            className={`relative p-3 glass-border-2 overflow-hidden max-w-sm  w-full sm:max-w-md `}
+            className={`relative p-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} ${currentEditMode ? '' : 'overflow-hidden'} max-w-sm w-full sm:max-w-md`}
             whileHover={{ scale: 1.02 }}
           >
             {/* Background pattern */}
@@ -889,15 +1087,59 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
             <div className="relative z-10">
               <h3 className={`text-sm font-semibold mb-2 flex items-center justify-center text-[#1C1C1E] dark:text-[#F2F2F7]`}>
                 <Shield size={16} className={`mr-2 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
-                {config.texts?.motivationalTitle || ""}
+                <EditableText
+                  configPath="texts.motivationalTitle"
+                  placeholder="Motivational Title"
+                  maxLength={100}
+                  as="span"
+                >
+                  {currentConfig.texts?.motivationalTitle || ""}
+                </EditableText>
               </h3>
-              <p className={`text-sm text-[#1C1C1E] dark:text-[#F2F2F7] leading-relaxed`}>
-                {config.texts?.motivationalMessage || ""}
-              </p>
+              <div className={`text-sm text-[#1C1C1E] dark:text-[#F2F2F7] leading-relaxed`}>
+                <EditableText
+                  configPath="texts.motivationalMessage"
+                  placeholder="Motivational message..."
+                  maxLength={500}
+                  multiline={true}
+                  as="span"
+                >
+                  {currentConfig.texts?.motivationalMessage || ""}
+                </EditableText>
+              </div>
             </div>
           </motion.div>
         </motion.div>
       </div>
+
+      {/* Edit Mode Panel */}
+      <EditModePanel />
     </FontWrapper>
+  );
+}, (prevProps, nextProps) => {
+  // Custom comparison for better performance
+  return (
+    prevProps.config === nextProps.config &&
+    prevProps.completionData === nextProps.completionData &&
+    prevProps.sceneId === nextProps.sceneId &&
+    prevProps.reducedMotion === nextProps.reducedMotion &&
+    prevProps.disableDelays === nextProps.disableDelays
+  );
+});
+
+// Main export component with EditModeProvider
+export function SummaryScene(props: SummarySceneProps & { sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean }) {
+  return (
+    <EditModeProvider
+      initialConfig={props.config}
+      onSave={(updatedConfig) => {
+        console.log('Config saved:', updatedConfig);
+      }}
+      onEditModeChange={(editMode) => {
+        console.log('Edit mode changed:', editMode);
+      }}
+    >
+      <SummarySceneContent {...props} />
+    </EditModeProvider>
   );
 }

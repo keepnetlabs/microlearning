@@ -31,7 +31,7 @@ export const EditModePanel: React.FC = () => {
                             }`}
                     >
                         <Edit3 size={16} />
-                        {isEditMode ? 'Exit Edit Mode' : 'Enter Edit Mode'}
+                        {isEditMode ? 'Exit Edit' : 'Enter Edit'}
                     </motion.button>
 
                     {/* Edit Mode Controls */}
@@ -56,7 +56,6 @@ export const EditModePanel: React.FC = () => {
                                     title="Save Changes"
                                 >
                                     <Save size={14} />
-                                    Save
                                     {hasUnsavedChanges && (
                                         <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
                                     )}
@@ -75,7 +74,6 @@ export const EditModePanel: React.FC = () => {
                                     title="Discard Changes"
                                 >
                                     <RotateCcw size={14} />
-                                    Discard
                                 </motion.button>
 
                                 {/* Status Indicator */}

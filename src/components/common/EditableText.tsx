@@ -31,10 +31,10 @@ export const EditableText: React.FC<EditableTextProps> = ({
 }) => {
     // Optional edit mode - only use if EditModeProvider is available
     let isEditMode = false;
-    let setEditingField: (field: string | null) => void = () => {};
-    let updateTempConfig: (path: string, value: any) => void = () => {};
+    let setEditingField: (field: string | null) => void = () => { };
+    let updateTempConfig: (path: string, value: any) => void = () => { };
     let tempConfig: any = {};
-    
+
     try {
         const editModeContext = useEditMode();
         isEditMode = editModeContext.isEditMode;
@@ -44,8 +44,8 @@ export const EditableText: React.FC<EditableTextProps> = ({
     } catch (error) {
         // EditModeProvider not available, use defaults
         isEditMode = false;
-        setEditingField = () => {};
-        updateTempConfig = () => {};
+        setEditingField = () => { };
+        updateTempConfig = () => { };
         tempConfig = {};
     }
 
@@ -213,24 +213,24 @@ export const EditableText: React.FC<EditableTextProps> = ({
 
                     {/* Action buttons - Positioned to the right of the input field */}
                     <div className="absolute -right-16 top-1/2 transform -translate-y-1/2 flex gap-1 z-20">
-                        <motion.button
+                        <motion.div
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={handleSave}
-                            className="w-6 h-6 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center shadow-md text-xs"
+                            className="w-6 h-6 text-[#1C1C1E] dark:text-[#F2F2F7] glass-border-1 rounded-full flex items-center justify-center text-xs cursor-pointer"
                             title="Save (Enter)"
                         >
                             <Check size={10} strokeWidth={3} />
-                        </motion.button>
-                        <motion.button
+                        </motion.div>
+                        <motion.div
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={handleCancel}
-                            className="w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-md text-xs"
+                            className="w-6 h-6 text-[#1C1C1E] dark:text-[#F2F2F7] glass-border-1 rounded-full flex items-center justify-center text-xs cursor-pointer"
                             title="Cancel (Esc)"
                         >
                             <X size={10} strokeWidth={3} />
-                        </motion.button>
+                        </motion.div>
                     </div>
 
                     {/* Character count */}

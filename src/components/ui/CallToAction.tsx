@@ -175,7 +175,7 @@ export function CallToAction({
             ease: "linear"
           }}
         />
-        {iconPosition === 'left' && (
+        {iconPosition === 'left' && !isEditMode && (
           <span className="relative z-10 flex items-center">
             {icon !== undefined ? icon : (
               <ArrowRight size={16} className="transition-transform group-hover:-translate-x-1" aria-hidden="true" />
@@ -196,7 +196,7 @@ export function CallToAction({
             displayText
           )}
         </span>
-        {iconPosition === 'right' && (
+        {iconPosition === 'right' && !isEditMode && (
           <span className="relative z-10 flex items-center">
             {icon !== undefined ? icon : (
               <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" aria-hidden="true" />
