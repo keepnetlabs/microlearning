@@ -3,7 +3,7 @@ import { ReactNode, useMemo, memo, useState, useEffect, useCallback } from "reac
 import { LucideIcon } from "lucide-react";
 import { FontWrapper } from "../common/FontWrapper";
 import { EditableText } from "../common/EditableText";
-import { EditModeProvider, useEditMode } from "../../contexts/EditModeContext";
+import { EditModeProvider } from "../../contexts/EditModeContext";
 import { EditModePanel } from "../common/EditModePanel";
 import { useIsMobile } from "../ui/use-mobile";
 import { motion } from "framer-motion";

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   CheckCircle,
   XCircle,
@@ -15,11 +15,129 @@ import { Slider } from "../ui/slider";
 import * as LucideIcons from "lucide-react";
 import { LucideIcon } from "lucide-react";
 import { FontWrapper } from "../common/FontWrapper";
+import { EditableText } from "../common/EditableText";
+import { EditModeProvider } from "../../contexts/EditModeContext";
+import { EditModePanel } from "../common/EditModePanel";
 import { useIsMobile } from "../ui/use-mobile";
 import { CallToAction } from "../ui/CallToAction";
 import { BottomSheetComponent } from "../ui/bottom-sheet";
 import { scormService } from "../../utils/scormService";
 import { logger } from "../../utils/logger";
+import { deepMerge } from "../../utils/deepMerge";
+
+// Performance optimization - Move constants outside component to prevent recreation
+
+const DEFAULT_HOVER_ANIMATION = {
+  scale: 1.02,
+  transition: { duration: 0.2 }
+} as const;
+
+const DEFAULT_TAP_ANIMATION = {
+  scale: 0.98
+} as const;
+
+
+// Icon caching system for performance
+const iconCache = new Map<string, LucideIcon>();
+
+const getIconComponent = (iconName?: string): LucideIcon => {
+  if (!iconName) return LucideIcons.HelpCircle;
+  
+  if (iconCache.has(iconName)) {
+    return iconCache.get(iconName)!;
+  }
+  
+  // Convert kebab-case to PascalCase (e.g., "book-open" -> "BookOpen")
+  const pascalCaseName = iconName
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join('');
+
+  let IconComponent: LucideIcon;
+  if (pascalCaseName in LucideIcons) {
+    IconComponent = LucideIcons[pascalCaseName as keyof typeof LucideIcons] as LucideIcon;
+  } else {
+    console.warn(`Icon "${iconName}" not found, using fallback`);
+    IconComponent = LucideIcons.HelpCircle;
+  }
+
+  iconCache.set(iconName, IconComponent);
+  return IconComponent;
+};
+
+// Memoized option component for better performance  
+const MemoizedQuestionOption = React.memo(({ 
+  children, 
+  onClick, 
+  disabled, 
+  className, 
+  isSelected,
+  currentEditMode,
+  ...props 
+}: {
+  children: React.ReactNode;
+  onClick?: () => void;
+  disabled?: boolean;
+  className?: string;
+  isSelected?: boolean;
+  currentEditMode?: boolean;
+  [key: string]: any;
+}) => {
+  const ButtonComponent = currentEditMode ? motion.div : motion.button;
+  
+  return (
+    <ButtonComponent
+      onClick={currentEditMode ? undefined : onClick}
+      disabled={currentEditMode ? undefined : disabled}
+      className={className}
+      whileHover={!currentEditMode && !disabled ? DEFAULT_HOVER_ANIMATION : {}}
+      whileTap={!currentEditMode && !disabled ? DEFAULT_TAP_ANIMATION : {}}
+      {...props}
+    >
+      {children}
+    </ButtonComponent>
+  );
+});
+
+MemoizedQuestionOption.displayName = 'MemoizedQuestionOption';
+
+// Memoized navigation controls
+const MemoizedNavigationControls = React.memo(({
+  currentEditMode,
+  questionsLength,
+  onPrev,
+  onNext
+}: {
+  currentEditMode: boolean;
+  questionsLength: number;
+  onPrev: () => void;
+  onNext: () => void;
+}) => {
+  if (!currentEditMode || questionsLength <= 1) return null;
+  
+  return (
+    <div className="fixed top-20 right-4 z-50 flex flex-col gap-2">
+      <div className="flex gap-2">
+        <button
+          onClick={onPrev}
+          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-gray-500 hover:bg-gray-600 text-white ${currentEditMode ? 'glass-border-1-no-overflow' : 'glass-border-1'}`}
+          title="Previous Question"
+        >
+          ◀️ Prev
+        </button>
+        <button
+          onClick={onNext}
+          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-blue-500 hover:bg-blue-600 text-white ${currentEditMode ? 'glass-border-1-no-overflow' : 'glass-border-1'}`}
+          title="Next Question"
+        >
+          Next ▶️
+        </button>
+      </div>
+    </div>
+  );
+});
+
+MemoizedNavigationControls.displayName = 'MemoizedNavigationControls';
 
 // Question Types
 enum QuestionType {
@@ -343,6 +461,33 @@ export const QuizScene = React.memo(function QuizScene({
 }: QuizSceneProps) {
   // Destructure ariaTexts from config for accessibility
   const { ariaTexts } = config || {};
+  
+  // Edit mode states
+  const [editChanges, setEditChanges] = useState<Partial<QuizSceneConfig>>({});
+  const [isInEditMode, setIsInEditMode] = useState(false);
+  const [configKey, setConfigKey] = useState(0);
+
+  // Use isInEditMode state instead of nested useEditMode hook
+  const currentEditMode = isInEditMode;
+
+  // Detect language changes and force re-render
+  useEffect(() => {
+    setConfigKey(prev => prev + 1);
+    setEditChanges({}); // Clear edit changes on language switch
+  }, [config.title, config.subtitle]); // Use specific fields to detect language change
+
+  // Compute current config (memoized to prevent infinite loops)
+  const currentConfig = useMemo(() => {
+    return deepMerge(config, editChanges);
+  }, [config, editChanges]);
+
+  // Clear edit changes when exiting edit mode
+  useEffect(() => {
+    if (!isInEditMode) {
+      setEditChanges({});
+    }
+  }, [isInEditMode]);
+  
   // Theme state for forcing re-renders when theme changes
   const [/* themeState */, setThemeState] = React.useState(0);
 
@@ -379,15 +524,92 @@ export const QuizScene = React.memo(function QuizScene({
   // Check if device is mobile
   const isMobile = useIsMobile();
 
+  // Consolidated computed values for better performance
+  const computedValues = useMemo(() => {
+    const questions = currentConfig?.questions?.list || [];
+    const maxAttempts = currentConfig?.questions?.maxAttempts || 2;
+    const currentQuestion = questions[currentQuestionIndex];
+    const currentAnswer = answers.get(currentQuestion?.id);
+    
+    // In edit mode, always show results to display all options and explanations
+    const effectiveShowResult = currentEditMode ? true : showResult;
+    
+    // Edit mode dummy answers
+    let editModeAnswer;
+    if (currentEditMode && currentQuestion) {
+      switch (currentQuestion.type) {
+        case QuestionType.MULTIPLE_CHOICE:
+          const mcOptions = (currentQuestion as MultipleChoiceQuestion).options;
+          editModeAnswer = mcOptions?.[0]?.id;
+          break;
+        case QuestionType.TRUE_FALSE:
+          editModeAnswer = true;
+          break;
+        case QuestionType.MULTI_SELECT:
+          const msOptions = (currentQuestion as MultiSelectQuestion).options;
+          editModeAnswer = msOptions?.slice(0, 1).map(opt => opt.id) || [];
+          break;
+        case QuestionType.SLIDER_SCALE:
+          const sliderQ = currentQuestion as SliderScaleQuestion;
+          editModeAnswer = Math.round((sliderQ.min + sliderQ.max) / 2);
+          break;
+        case QuestionType.DRAG_DROP:
+          const ddOptions = (currentQuestion as DragDropQuestion).items;
+          editModeAnswer = ddOptions?.reduce((acc: Record<string, string[]>, item) => {
+            acc[item.category] = acc[item.category] || [];
+            acc[item.category].push(item.id);
+            return acc;
+          }, {}) || {};
+          break;
+        default:
+          editModeAnswer = currentAnswer;
+      }
+    } else {
+      editModeAnswer = currentAnswer;
+    }
+
+    return {
+      questions,
+      maxAttempts,
+      currentQuestion,
+      currentAnswer,
+      effectiveShowResult,
+      editModeAnswer
+    };
+  }, [currentConfig, currentQuestionIndex, answers, currentEditMode, showResult]);
+
+  // Destructure computed values
+  const { 
+    questions, 
+    maxAttempts, 
+    currentQuestion, 
+    currentAnswer, 
+    effectiveShowResult, 
+    editModeAnswer 
+  } = computedValues;
+
   // BottomSheet hook for mobile result panel
   // BottomSheet is controlled via props to BottomSheetComponent; internal hook not used here
+  
+  // Edit mode navigation functions
+  const goToNextQuestion = useCallback(() => {
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    } else {
+      setCurrentQuestionIndex(0); // Loop back to first question
+    }
+  }, [currentQuestionIndex, questions.length, setCurrentQuestionIndex]);
 
-  // Get questions from config
-  const questions = useMemo(() => config?.questions?.list || [], [config?.questions?.list]);
-  // Memoized constants
-  const maxAttempts = useMemo(() => config?.questions?.maxAttempts || 2, [config?.questions?.maxAttempts]);
-  const currentQuestion = useMemo(() => questions[currentQuestionIndex], [questions, currentQuestionIndex]);
-  const currentAnswer = useMemo(() => answers.get(currentQuestion?.id), [answers, currentQuestion?.id]);
+  const goToPrevQuestion = useCallback(() => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+    } else {
+      setCurrentQuestionIndex(questions.length - 1); // Loop back to last question
+    }
+  }, [currentQuestionIndex, questions.length, setCurrentQuestionIndex]);
+  
+
+
 
   // Answer Validation
   const validateAnswer = useCallback(
@@ -562,7 +784,7 @@ export const QuizScene = React.memo(function QuizScene({
             const ok = typeof a !== 'undefined' ? validateAnswerForQuestion(q as Question, a) : false;
             return { id: q.id, ok };
           });
-          const correctCount = details.filter(d => d.ok).length;
+          const correctCount = details.filter((d: any) => d.ok).length;
           const score = Math.round((correctCount / Math.max(1, total)) * 100);
           try {
             logger.push({
@@ -835,7 +1057,7 @@ export const QuizScene = React.memo(function QuizScene({
   // Render Functions
   const renderMultipleChoice = useCallback(() => {
     const question = currentQuestion as MultipleChoiceQuestion;
-    const userAnswer = currentAnswer;
+    const userAnswer = editModeAnswer;
 
     return (
       <div className="space-y-2 sm:space-y-3" role="radiogroup" aria-label={ariaTexts?.multipleChoiceLabel || "Multiple choice options"} aria-describedby="multiple-choice-description">
@@ -849,10 +1071,12 @@ export const QuizScene = React.memo(function QuizScene({
         {question.options.map((option, index) => {
           const isSelected = userAnswer === option.id;
           const isCorrect = option.isCorrect;
-          const showCorrectness = showResult;
+          const showCorrectness = effectiveShowResult;
 
+          const ButtonComponent = currentEditMode ? motion.div : motion.button;
+          
           return (
-            <motion.button
+            <ButtonComponent
               key={option.id}
               initial={{ opacity: 0, x: -20 }}
               animate={{
@@ -866,24 +1090,24 @@ export const QuizScene = React.memo(function QuizScene({
                 scale: showCorrectness ? { duration: 0.6, ease: "easeInOut" } : {}
               }}
               whileHover={
-                !showResult && !isLoading
+                !showResult && !isLoading && !currentEditMode
                   ? { scale: 1.01, y: -1 }
                   : {}
               }
               whileTap={
-                !showResult && !isLoading ? { scale: 0.99 } : {}
+                !showResult && !isLoading && !currentEditMode ? { scale: 0.99 } : {}
               }
-              onClick={() =>
+              onClick={currentEditMode ? undefined : () =>
                 !showResult &&
                 !isLoading &&
                 handleAnswer(option.id)
               }
-              disabled={showResult || isLoading}
-              className={`group relative w-full p-3 text-left glass-border-3 transition-all duration-300 focus:outline-none disabled:cursor-not-allowed`}
-              role="radio"
-              aria-checked={isSelected}
-              aria-describedby={showCorrectness ? `result-${option.id}` : undefined}
-              tabIndex={!showResult && !isLoading ? 0 : -1}
+              disabled={currentEditMode ? undefined : (showResult || isLoading)}
+              className={`group relative w-full p-3 text-left ${currentEditMode ? 'glass-border-3-no-overflow' : 'glass-border-3'} transition-all duration-300 focus:outline-none ${currentEditMode ? '' : 'disabled:cursor-not-allowed'}`}
+              role={currentEditMode ? undefined : "radio"}
+              aria-checked={currentEditMode ? undefined : isSelected}
+              aria-describedby={currentEditMode ? undefined : (showCorrectness ? `result-${option.id}` : undefined)}
+              tabIndex={currentEditMode ? undefined : (!showResult && !isLoading ? 0 : -1)}
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1 pr-3">
@@ -894,7 +1118,15 @@ export const QuizScene = React.memo(function QuizScene({
                       transition: { duration: 0.4, ease: "easeInOut" }
                     } : {}}
                   >
-                    {option.text}
+                    <EditableText
+                      configPath={`questions.list.${currentQuestionIndex}.options.${index}.text`}
+                      placeholder="Enter option text..."
+                      maxLength={200}
+                      multiline={true}
+                      as="span"
+                    >
+                      {option.text}
+                    </EditableText>
                   </motion.span>
                   {option.strength && (
                     <motion.span
@@ -963,12 +1195,12 @@ export const QuizScene = React.memo(function QuizScene({
               </div>
 
 
-            </motion.button>
+            </ButtonComponent>
           );
         })}
       </div>
     );
-  }, [currentQuestion, currentAnswer, showResult, isLoading, handleAnswer, ariaTexts?.multipleChoiceLabel, ariaTexts?.multipleChoiceDescription, ariaTexts?.correctAnswerLabel, ariaTexts?.incorrectAnswerLabel]);
+  }, [currentQuestion, editModeAnswer, effectiveShowResult, isLoading, handleAnswer, currentEditMode, ariaTexts?.multipleChoiceLabel, ariaTexts?.multipleChoiceDescription, ariaTexts?.correctAnswerLabel, ariaTexts?.incorrectAnswerLabel]);
 
   const renderTrueFalseIcon = useCallback((iconName: string) => {
     const IconComponent = getIconComponent(iconName);
@@ -982,7 +1214,7 @@ export const QuizScene = React.memo(function QuizScene({
 
   const renderTrueFalse = useCallback(() => {
     const question = currentQuestion as TrueFalseQuestion;
-    const userAnswer = currentAnswer;
+    const userAnswer = editModeAnswer;
 
     // Default options if not provided in config
     const defaultOptions = [
@@ -1009,9 +1241,17 @@ export const QuizScene = React.memo(function QuizScene({
         </div>
         <div
         >
-          <p className="text-center text-[#1C1C1E] dark:text-[#F2F2F7] mb-4 sm:mb-0">
-            {question.statement}
-          </p>
+          <div className="text-center text-[#1C1C1E] dark:text-[#F2F2F7] mb-4 sm:mb-0">
+            <EditableText
+              configPath={`questions.list.${currentQuestionIndex}.statement`}
+              placeholder="Enter true/false statement..."
+              maxLength={300}
+              multiline={true}
+              as="span"
+            >
+              {question.statement}
+            </EditableText>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-2.5">
@@ -1019,10 +1259,12 @@ export const QuizScene = React.memo(function QuizScene({
             const isSelected = userAnswer === option.value;
             const isCorrect =
               option.value === question.correctAnswer;
-            const showCorrectness = showResult;
+            const showCorrectness = effectiveShowResult;
 
+            const ButtonComponent = currentEditMode ? motion.div : motion.button;
+            
             return (
-              <motion.button
+              <ButtonComponent
                 key={option.value.toString()}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -1031,26 +1273,26 @@ export const QuizScene = React.memo(function QuizScene({
                   delay: index * 0.1,
                 }}
                 whileHover={
-                  !showResult && !isLoading
+                  !showResult && !isLoading && !currentEditMode
                     ? { scale: 1.02 }
                     : {}
                 }
                 whileTap={
-                  !showResult && !isLoading
+                  !showResult && !isLoading && !currentEditMode
                     ? { scale: 0.98 }
                     : {}
                 }
-                onClick={() =>
+                onClick={currentEditMode ? undefined : () =>
                   !showResult &&
                   !isLoading &&
                   handleAnswer(option.value)
                 }
-                disabled={showResult || isLoading}
-                className={`relative p-4 rounded-xl text-center font-medium transition-all duration-300 focus:outline-none glass-border-0 text-[#1C1C1E] dark:text-[#F2F2F7]`}
+                disabled={currentEditMode ? undefined : (effectiveShowResult || isLoading)}
+                className={`relative p-4 rounded-xl text-center font-medium transition-all duration-300 focus:outline-none ${currentEditMode ? 'glass-border-0-no-overflow' : 'glass-border-0'} text-[#1C1C1E] dark:text-[#F2F2F7] ${currentEditMode ? '' : 'disabled:cursor-not-allowed'}`}
               >
                 <div className="flex flex-col items-center space-y-2">
                   <motion.div
-                    className="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 glass-border-0 relative overflow-hidden"
+                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${currentEditMode ? 'glass-border-0-no-overflow' : 'glass-border-0'} relative overflow-hidden`}
                     style={{
                       backdropFilter: "blur(8px) saturate(150%)",
                       boxShadow: `
@@ -1105,7 +1347,14 @@ export const QuizScene = React.memo(function QuizScene({
                     }}
                   >
                     <span className="text-foreground font-medium text-sm">
-                      {option.label}
+                      <EditableText
+                        configPath={`questions.list.${currentQuestionIndex}.options.${option.value ? 'true' : 'false'}.label`}
+                        placeholder={`Enter ${option.value ? 'true' : 'false'} option label...`}
+                        maxLength={50}
+                        as="span"
+                      >
+                        {option.label}
+                      </EditableText>
                     </span>
                   </div>
                 </div>
@@ -1152,13 +1401,13 @@ export const QuizScene = React.memo(function QuizScene({
                       )}
                     </motion.div>
                   )}
-              </motion.button>
+              </ButtonComponent>
             );
           })}
         </div>
       </div>
     );
-  }, [currentQuestion, currentAnswer, showResult, isLoading, handleAnswer, ariaTexts?.trueFalseLabel, ariaTexts?.trueFalseDescription, renderTrueFalseIcon]);
+  }, [currentQuestion, editModeAnswer, effectiveShowResult, isLoading, handleAnswer, currentEditMode, ariaTexts?.trueFalseLabel, ariaTexts?.trueFalseDescription, renderTrueFalseIcon]);
 
   const renderMultiSelect = useCallback(() => {
     const question = currentQuestion as MultiSelectQuestion;
@@ -1167,14 +1416,17 @@ export const QuizScene = React.memo(function QuizScene({
       <div className="space-y-2.5">
         <div className="space-y-1.5">
           {question.options.map((option, index) => {
-            const isSelected = multiSelectAnswers.includes(
+            const effectiveMultiSelectAnswers = currentEditMode ? (editModeAnswer as string[] || []) : multiSelectAnswers;
+            const isSelected = effectiveMultiSelectAnswers.includes(
               option.id,
             );
             const isCorrect = option.isCorrect;
-            const showCorrectness = showResult;
+            const showCorrectness = effectiveShowResult;
 
+            const ButtonComponent = currentEditMode ? motion.div : motion.button;
+            
             return (
-              <motion.button
+              <ButtonComponent
                 key={option.id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -1182,17 +1434,17 @@ export const QuizScene = React.memo(function QuizScene({
                   duration: 0.3,
                   delay: index * 0.05,
                 }}
-                onClick={() => handleMultiSelectToggle(option.id)}
-                disabled={showResult || isLoading}
-                className={`w-full p-3 text-left rounded-lg transition-all duration-200 glass-border-1 hover:scale-[1.02] ${isSelected ? 'bg-[#1C1C1E]/10 dark:bg-[#F2F2F7]/10' : ''}`}
+                onClick={currentEditMode ? undefined : () => handleMultiSelectToggle(option.id)}
+                disabled={currentEditMode ? undefined : (effectiveShowResult || isLoading)}
+                className={`w-full p-3 text-left rounded-lg transition-all duration-200 ${currentEditMode ? 'glass-border-1-no-overflow' : 'glass-border-1'} ${!currentEditMode ? 'hover:scale-[1.02]' : ''} ${isSelected ? 'bg-[#1C1C1E]/10 dark:bg-[#F2F2F7]/10' : ''} ${currentEditMode ? '' : 'disabled:cursor-not-allowed'}`}
               >
                 <div className="flex items-center space-x-4">
                   <div
-                    className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all duration-300 cursor-pointer glass-border-0 ${isSelected
+                    className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all duration-300 cursor-pointer ${currentEditMode ? 'glass-border-0-no-overflow' : 'glass-border-0'} ${isSelected
                       ? "bg-[#1C1C1E]/30 dark:bg-[#F2F2F7]/30 border-[#1C1C1E] dark:border-[#F2F2F7]"
                       : "border-[#1C1C1E] dark:border-[#F2F2F7] hover:border-[#1C1C1E]/60 dark:hover:border-[#F2F2F7]/60"
                       }`}
-                    onClick={(e) => {
+                    onClick={currentEditMode ? undefined : (e) => {
                       e.stopPropagation();
                       handleMultiSelectToggle(option.id);
                     }}
@@ -1202,7 +1454,15 @@ export const QuizScene = React.memo(function QuizScene({
                     )}
                   </div>
                   <span className="flex-1 text-[#1C1C1E] dark:text-[#F2F2F7] text-sm leading-relaxed">
-                    {option.text}
+                    <EditableText
+                      configPath={`questions.list.${currentQuestionIndex}.options.${index}.text`}
+                      placeholder="Enter option text..."
+                      maxLength={200}
+                      multiline={true}
+                      as="span"
+                    >
+                      {option.text}
+                    </EditableText>
                   </span>
 
                   {showCorrectness && (
@@ -1243,7 +1503,7 @@ export const QuizScene = React.memo(function QuizScene({
                     </div>
                   )}
                 </div>
-              </motion.button>
+              </ButtonComponent>
             );
           })}
         </div>
@@ -1264,7 +1524,7 @@ export const QuizScene = React.memo(function QuizScene({
               isLoading ||
               multiSelectAnswers.length < question.minCorrect
             }
-            className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
+            className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
           >
             {/* Button shimmer effect */}
             <motion.div
@@ -1289,10 +1549,11 @@ export const QuizScene = React.memo(function QuizScene({
         </div>
       </div>
     );
-  }, [currentQuestion, multiSelectAnswers, showResult, isLoading, handleMultiSelectToggle, handleAnswer, config.texts?.checkAnswer]);
+  }, [currentQuestion, multiSelectAnswers, editModeAnswer, effectiveShowResult, isLoading, handleMultiSelectToggle, handleAnswer, currentEditMode, config.texts?.checkAnswer]);
 
   const renderSliderScale = useCallback(() => {
     const question = currentQuestion as SliderScaleQuestion;
+    const effectiveSliderValue = currentEditMode ? (editModeAnswer as number || sliderValue) : sliderValue;
 
     return (
       <div
@@ -1311,31 +1572,65 @@ export const QuizScene = React.memo(function QuizScene({
             backdropFilter: "blur(8px)",
           }}
         >
-          <p className="text-center font-medium mb-2 text-foreground dark:text-white">
-            {question.statement}
-          </p>
+          <div className="text-center font-medium mb-2 text-foreground dark:text-white">
+            <EditableText
+              configPath={`questions.list.${currentQuestionIndex}.statement`}
+              placeholder="Enter slider question statement..."
+              maxLength={200}
+              multiline={true}
+              as="span"
+            >
+              {question.statement}
+            </EditableText>
+          </div>
           {question.description && (
-            <p className="text-center text-sm text-[#1C1C1E] dark:text-[#F2F2F7]">
-              {question.description}
-            </p>
+            <div className="text-center text-sm text-[#1C1C1E] dark:text-[#F2F2F7]">
+              <EditableText
+                configPath={`questions.list.${currentQuestionIndex}.description`}
+                placeholder="Enter slider question description..."
+                maxLength={300}
+                multiline={true}
+                as="span"
+              >
+                {question.description}
+              </EditableText>
+            </div>
           )}
         </div>
 
         <div className="space-y-3">
           <div className="flex justify-between text-sm text-[#1C1C1E] dark:text-[#F2F2F7]">
-            <span>{question.labels.min}</span>
-            <span>{question.labels.max}</span>
+            <span>
+              <EditableText
+                configPath={`questions.list.${currentQuestionIndex}.labels.min`}
+                placeholder="Min label..."
+                maxLength={50}
+                as="span"
+              >
+                {question.labels.min}
+              </EditableText>
+            </span>
+            <span>
+              <EditableText
+                configPath={`questions.list.${currentQuestionIndex}.labels.max`}
+                placeholder="Max label..."
+                maxLength={50}
+                as="span"
+              >
+                {question.labels.max}
+              </EditableText>
+            </span>
           </div>
 
           <div className="px-3">
             <div className="relative">
               <Slider
-                value={[sliderValue]}
+                value={[effectiveSliderValue]}
                 onValueChange={handleSliderChange}
                 max={question.max}
                 min={question.min}
                 step={1}
-                disabled={showResult || isLoading}
+                disabled={effectiveShowResult || isLoading || currentEditMode}
                 className="w-full"
                 aria-label={`Slider for ${question.statement}. Current value: ${sliderValue}`}
                 aria-valuemin={question.min}
@@ -1348,7 +1643,7 @@ export const QuizScene = React.memo(function QuizScene({
 
           <div className="text-center">
             <div
-              className={`inline-flex items-center space-x-2 px-3 py-1.5 glass-border-4 `}
+              className={`inline-flex items-center space-x-2 px-3 py-1.5 ${currentEditMode ? 'glass-border-4-no-overflow' : 'glass-border-4'} `}
               role="status"
               aria-live="polite"
               aria-label={`Current slider value: ${sliderValue}${question.unit ? ` ${question.unit}` : ''}`}
@@ -1379,7 +1674,7 @@ export const QuizScene = React.memo(function QuizScene({
             onClick={() => handleAnswer(sliderValue)}
             disabled={showResult || isLoading}
             aria-label={isLoading ? "Processing evaluation" : "Complete evaluation"}
-            className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
+            className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
           >
             {/* Button shimmer effect */}
             <motion.div
@@ -1409,15 +1704,16 @@ export const QuizScene = React.memo(function QuizScene({
         </div>
       </div>
     );
-  }, [currentQuestion, sliderValue, showResult, isLoading, handleSliderChange, handleAnswer, handleSliderContainerTouch, handleSliderContainerWheel, config.texts?.evaluating, config.texts?.completeEvaluation]);
+  }, [currentQuestion, sliderValue, editModeAnswer, effectiveShowResult, isLoading, handleSliderChange, handleAnswer, handleSliderContainerTouch, handleSliderContainerWheel, currentEditMode, config.texts?.evaluating, config.texts?.completeEvaluation]);
 
   const renderDragDrop = useCallback(() => {
     const question = currentQuestion as DragDropQuestion;
-    const availableItems = question.items.filter((item) => !draggedItems.has(item.id));
+    const effectiveDraggedItems = currentEditMode ? (editModeAnswer as Map<string, string> || new Map()) : draggedItems;
+    const availableItems = question.items.filter((item) => !effectiveDraggedItems.has(item.id));
 
     // Mobile-first interaction: select item then tap category
     const handleItemSelect = (itemId: string) => {
-      if (showResult || isLoading) return;
+      if (effectiveShowResult || isLoading || currentEditMode) return;
       setSelectedItem(selectedItem === itemId ? null : itemId);
     };
 
@@ -1439,7 +1735,7 @@ export const QuizScene = React.memo(function QuizScene({
     };
 
     const handleDrop = (e: React.DragEvent, categoryId: string) => {
-      if (showResult || isLoading) return;
+      if (effectiveShowResult || isLoading || currentEditMode) return;
 
       e.preventDefault();
       const itemId = e.dataTransfer.getData("text/plain");
@@ -1448,7 +1744,7 @@ export const QuizScene = React.memo(function QuizScene({
 
     // Remove item from category (undo functionality)
     const handleRemoveItem = (itemId: string) => {
-      if (showResult || isLoading) return;
+      if (effectiveShowResult || isLoading || currentEditMode) return;
 
       setDraggedItems((prev) => {
         const newMap = new Map(prev);
@@ -1459,7 +1755,7 @@ export const QuizScene = React.memo(function QuizScene({
 
     // Remove all items from a category
     const handleClearCategory = (categoryId: string) => {
-      if (showResult || isLoading) return;
+      if (effectiveShowResult || isLoading || currentEditMode) return;
 
       setDraggedItems((prev) => {
         const newMap = new Map(prev);
@@ -1557,21 +1853,24 @@ export const QuizScene = React.memo(function QuizScene({
               {availableItems.map((item, index) => {
                 const isSelected = selectedItem === item.id;
 
+                const ButtonComponent = currentEditMode ? motion.div : motion.button;
+                
                 return (
-                  <motion.button
+                  <ButtonComponent
                     key={item.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3, delay: index * 0.1 }}
-                    draggable={!showResult && !isLoading}
-                    onDragStart={(e) => handleDragStart(e as any, item.id)}
-                    onClick={() => handleItemSelect(item.id)}
-                    disabled={showResult || isLoading}
+                    draggable={currentEditMode ? false : (!showResult && !isLoading)}
+                    onDragStart={currentEditMode ? undefined : (e) => handleDragStart(e as any, item.id)}
+                    onClick={currentEditMode ? undefined : () => handleItemSelect(item.id)}
+                    disabled={currentEditMode ? undefined : (effectiveShowResult || isLoading)}
                     className={`
                       group relative p-3 rounded-xl text-left font-medium 
                       transition-all duration-300 touch-manipulation
-                      ${!showResult && !isLoading ? 'hover:scale-[1.02] active:scale-[0.98]' : ''}
+                      ${!showResult && !isLoading && !currentEditMode ? 'hover:scale-[1.02] active:scale-[0.98]' : ''}
                       ${isSelected ? 'scale-[1.02]' : ''}
+                      ${currentEditMode ? '' : 'disabled:cursor-not-allowed'}
                     `}
                     style={{
                       background: isSelected
@@ -1592,7 +1891,7 @@ export const QuizScene = React.memo(function QuizScene({
                             0 1px 4px hsl(var(--foreground) / 0.02),
                             inset 0 1px 0 hsl(var(--background) / 0.15)
                           `,
-                      cursor: showResult || isLoading ? 'not-allowed' : 'pointer'
+                      cursor: effectiveShowResult || isLoading || currentEditMode ? 'not-allowed' : 'pointer'
                     }}
                   >
                     <div className="flex items-center space-x-3">
@@ -1607,7 +1906,16 @@ export const QuizScene = React.memo(function QuizScene({
                       >
                         <Move className={`w-3 h-3 ${isSelected ? 'text-primary' : 'text-blue-600'}`} />
                       </div>
-                      <span className="text-foreground flex-1">{item.text}</span>
+                      <span className="text-foreground flex-1">
+                        <EditableText
+                          configPath={`questions.list.${currentQuestionIndex}.items.${index}.text`}
+                          placeholder="Enter drag item text..."
+                          maxLength={100}
+                          as="span"
+                        >
+                          {item.text}
+                        </EditableText>
+                      </span>
                       {isSelected && (
                         <motion.div
                           initial={{ scale: 0 }}
@@ -1628,7 +1936,7 @@ export const QuizScene = React.memo(function QuizScene({
                         />
                       </div>
                     )}
-                  </motion.button>
+                  </ButtonComponent>
                 );
               })}
             </div>
@@ -1642,7 +1950,7 @@ export const QuizScene = React.memo(function QuizScene({
           <div className="grid gap-3 md:grid-cols-3">
             {question.categories.map((category, index) => {
               const categoryItems = question.items.filter(
-                (item) => draggedItems.get(item.id) === category.id,
+                (item) => effectiveDraggedItems.get(item.id) === category.id,
               );
               const hasItems = categoryItems.length > 0;
               const categoryStyles = getCategoryColorStyles(category.color, hasItems);
@@ -1681,12 +1989,27 @@ export const QuizScene = React.memo(function QuizScene({
                       </div>
                       <div>
                         <h5 className="font-semibold text-foreground text-sm">
-                          {category.name}
+                          <EditableText
+                            configPath={`questions.list.${currentQuestionIndex}.categories.${index}.name`}
+                            placeholder="Enter category name..."
+                            maxLength={50}
+                            as="span"
+                          >
+                            {category.name}
+                          </EditableText>
                         </h5>
                         {category.description && (
-                          <p className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] mt-0.5">
-                            {category.description}
-                          </p>
+                          <div className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] mt-0.5">
+                            <EditableText
+                              configPath={`questions.list.${currentQuestionIndex}.categories.${index}.description`}
+                              placeholder="Enter category description..."
+                              maxLength={100}
+                              multiline={true}
+                              as="span"
+                            >
+                              {category.description}
+                            </EditableText>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -1813,7 +2136,7 @@ export const QuizScene = React.memo(function QuizScene({
               onClick={() => handleAnswer(draggedItems)}
               disabled={isLoading}
               aria-label={isLoading ? config.texts?.evaluating : config.texts?.checkAnswer}
-              className={`relative flex items-center space-x-2 w-full px-4 py-2 sm:px-6 sm:py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
+              className={`relative flex items-center space-x-2 w-full px-4 py-2 sm:px-6 sm:py-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
             >
               {/* Button shimmer effect */}
               <motion.div
@@ -1845,7 +2168,7 @@ export const QuizScene = React.memo(function QuizScene({
         )}
       </div>
     );
-  }, [currentQuestion, draggedItems, selectedItem, showResult, isLoading, setSelectedItem, setDraggedItems, handleAnswer, config.texts?.mobileInstructions, config.texts?.desktopInstructions, config.texts?.options, config.texts?.tapHere, config.texts?.clearCategory, config.texts?.checkAnswer, config.texts?.evaluating, config.texts?.checkAnswerButton, config.texts?.categories, config.texts?.removeItem]);
+  }, [currentQuestion, draggedItems, editModeAnswer, selectedItem, effectiveShowResult, isLoading, setSelectedItem, setDraggedItems, handleAnswer, currentEditMode, config.texts?.mobileInstructions, config.texts?.desktopInstructions, config.texts?.options, config.texts?.tapHere, config.texts?.clearCategory, config.texts?.checkAnswer, config.texts?.evaluating, config.texts?.checkAnswerButton, config.texts?.categories, config.texts?.removeItem]);
 
   const renderQuestion = useCallback(() => {
     switch (currentQuestion?.type) {
@@ -1865,13 +2188,18 @@ export const QuizScene = React.memo(function QuizScene({
   }, [currentQuestion?.type, renderMultipleChoice, renderTrueFalse, renderMultiSelect, renderSliderScale, renderDragDrop]);
 
   const isAnswerCorrect = useMemo(() => {
+    // In edit mode, always show as correct to display the interface properly
+    if (currentEditMode) {
+      return true; // Edit mode always shows as correct for demo purposes
+    }
+    
     const type = currentQuestion?.type;
     if (type === QuestionType.TRUE_FALSE) {
       const correct = (currentQuestion as TrueFalseQuestion | undefined)?.correctAnswer;
       return currentAnswer === correct;
     }
     return currentAnswer ? validateAnswer(currentAnswer) : false;
-  }, [currentAnswer, validateAnswer, currentQuestion]);
+  }, [currentEditMode, currentAnswer, validateAnswer, currentQuestion]);
 
   useEffect(() => {
     if (currentQuestion?.type === QuestionType.SLIDER_SCALE && !showResult && sliderContainerRef.current) {
@@ -1956,63 +2284,97 @@ export const QuizScene = React.memo(function QuizScene({
     };
   }, [handleKeyDown]);
 
-  const getIconComponent = (iconName?: string): LucideIcon => {
-    if (!iconName) return LucideIcons.HelpCircle;
-    const camelCaseName = iconName
-      .split('-')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join('');
-    if (camelCaseName in LucideIcons) {
-      return LucideIcons[camelCaseName as keyof typeof LucideIcons] as LucideIcon;
+
+
+
+
+
+  // Memoize callbacks for better performance (before early return)
+  const handleSave = useCallback((newConfig: any) => {
+    console.log('QuizScene onSave - newConfig:', newConfig);
+    setEditChanges(newConfig);
+  }, []);
+
+  // Memoize icon component to prevent unnecessary re-renders (before early return)
+  const iconComponent = useMemo(() => {
+    if (currentConfig.icon?.component) {
+      return currentConfig.icon.component;
     }
-    return LucideIcons.HelpCircle;
-  };
+    const iconName = currentConfig.icon?.sceneIconName || 'help-circle';
+    const IconComponent = getIconComponent(iconName);
+    return (
+      <IconComponent
+        size={currentConfig.icon?.size || 40}
+        className={`${currentConfig.icon?.className || ''} text-[#1C1C1E] dark:text-[#F2F2F7]`}
+        strokeWidth={currentConfig.icon?.strokeWidth || 2}
+        style={{ color: currentConfig.icon?.color }}
+        aria-hidden="true"
+      />
+    );
+  }, [
+    currentConfig.icon?.component,
+    currentConfig.icon?.sceneIconName,
+    currentConfig.icon?.size,
+    currentConfig.icon?.className,
+    currentConfig.icon?.strokeWidth,
+    currentConfig.icon?.color
+  ]);
 
-
-
-
-
-  const iconConfig = config.icon || {};
-  let iconNode: React.ReactNode = null;
-
-  if (iconConfig.component) {
-    iconNode = iconConfig.component;
-  } else if (iconConfig.sceneIconName) {
-    const LucideIconComponent = getIconComponent(iconConfig.sceneIconName);
-    iconNode = (
-      <div className="mb-1 sm:mb-2 p-3 glass-border-3">
-        <LucideIconComponent
-          size={iconConfig.size ?? 40}
-          className={`text-[#1C1C1E] dark:text-[#F2F2F7]`}
-          strokeWidth={2}
-        />
+  // Use optimized memoized icon instead of recreating it (before early return)
+  const iconNode = useMemo(() => {
+    return (
+      <div className={`mb-1 sm:mb-2 p-3 ${currentEditMode ? 'glass-border-3-no-overflow' : 'glass-border-3'}`}>
+        {iconComponent}
       </div>
     );
-  } else {
-    iconNode = <div className="mb-1 sm:mb-2 p-3 glass-border-3">
-      <LucideIcons.HelpCircle size={40} />
-    </div>;
-  }
+  }, [iconComponent, currentEditMode]);
 
   // Safety check for currentQuestion
   if (!currentQuestion) {
     return (
-      <div
-        className="flex items-center justify-center h-full"
-        role="status"
-        aria-live="polite"
-        aria-label={`Loading question ${currentQuestionIndex + 1}`}
+      <EditModeProvider
+        key={configKey}
+        initialConfig={currentConfig}
+        onSave={handleSave}
+        onEditModeChange={setIsInEditMode}
       >
-        <div className="text-center">
-          <p className="text-[#1C1C1E] dark:text-[#F2F2F7]">
-            {questionLoadingText}
-          </p>
-        </div>
-      </div>
+        <EditModePanel />
+        <FontWrapper>
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center p-8">
+              <p className="text-[#1C1C1E] dark:text-[#F2F2F7]">
+                {questionLoadingText}
+              </p>
+            </div>
+          </div>
+        </FontWrapper>
+      </EditModeProvider>
     );
   }
+
   return (
-    <FontWrapper>
+    <EditModeProvider
+      key={configKey}
+      initialConfig={currentConfig}
+      onSave={handleSave}
+      onEditModeChange={setIsInEditMode}
+    >
+      <EditModePanel />
+      {/* Edit Mode Navigation Controls - Memoized for performance */}
+      <MemoizedNavigationControls
+        currentEditMode={currentEditMode}
+        questionsLength={questions.length}
+        onPrev={goToPrevQuestion}
+        onNext={goToNextQuestion}
+      />
+      {currentEditMode && questions.length > 1 && (
+        <div className="fixed top-20 right-4 z-50 flex flex-col gap-2">
+          <div className="text-center text-xs text-white bg-black/50 px-2 py-1 rounded mt-14">
+            {currentQuestionIndex + 1} / {questions.length}
+          </div>
+        </div>
+      )}
+      <FontWrapper>
       <div
         ref={mainRef}
         className="flex flex-col items-center justify-center px-1 pt-0 relative"
@@ -2043,12 +2405,27 @@ export const QuizScene = React.memo(function QuizScene({
           </div>}
 
           <h1 className="project-title">
-            {config.title}
+            <EditableText
+              configPath="title"
+              placeholder="Enter quiz title..."
+              maxLength={100}
+              as="span"
+            >
+              {currentConfig.title}
+            </EditableText>
           </h1>
-          {config.subtitle && (
-            <p className="project-subtitle" style={{ marginBottom: '8px' }}>
-              {config.subtitle}
-            </p>
+          {currentConfig.subtitle && (
+            <div className="project-subtitle" style={{ marginBottom: '8px' }}>
+              <EditableText
+                configPath="subtitle"
+                placeholder="Enter quiz subtitle..."
+                maxLength={200}
+                multiline={true}
+                as="span"
+              >
+                {currentConfig.subtitle}
+              </EditableText>
+            </div>
           )}
 
 
@@ -2077,7 +2454,7 @@ export const QuizScene = React.memo(function QuizScene({
             {ariaTexts?.questionDescription || "Current question with answer options"}
           </div>
           <div
-            className={`${!isMobile && "p-4 glass-border-1"}`}
+            className={`${!isMobile && (currentEditMode ? "p-4 glass-border-1-no-overflow" : "p-4 glass-border-1")}`}
 
             role="article"
             aria-labelledby="question-title"
@@ -2085,11 +2462,36 @@ export const QuizScene = React.memo(function QuizScene({
             {/* Question Header */}
             {currentQuestion?.description && <div className="text-center mb-2">
               {currentQuestion?.description && (
-                <p className="text-[#1C1C1E] dark:text-[#F2F2F7]">
-                  {currentQuestion?.description}
-                </p>
+                <div className="text-[#1C1C1E] dark:text-[#F2F2F7]">
+                  <EditableText
+                    configPath={`questions.list.${currentQuestionIndex}.description`}
+                    placeholder="Enter question description..."
+                    maxLength={300}
+                    multiline={true}
+                    as="span"
+                  >
+                    {currentQuestion?.description}
+                  </EditableText>
+                </div>
               )}
             </div>}
+
+            {/* Question Title */}
+            {currentQuestion?.title && (
+              <div className="text-center mb-4">
+                <h2 className="text-lg font-semibold text-[#1C1C1E] dark:text-[#F2F2F7]">
+                  <EditableText
+                    configPath={`questions.list.${currentQuestionIndex}.title`}
+                    placeholder="Enter question title..."
+                    maxLength={200}
+                    multiline={true}
+                    as="span"
+                  >
+                    {currentQuestion.title}
+                  </EditableText>
+                </h2>
+              </div>
+            )}
 
             {/* Question Content */}
             <div className="mb-5" role="group" aria-label="Answer options" data-testid="quiz-question">
@@ -2099,13 +2501,13 @@ export const QuizScene = React.memo(function QuizScene({
             {/* Result Panel - Desktop */}
             {!isMobile && (
               <AnimatePresence>
-                {showResult && (
+                {effectiveShowResult && (
                   <motion.div
                     ref={resultPanelRef}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
-                    className="mt-4 p-4 glass-border-2"
+                    className={`mt-4 p-4 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'}`}
                     role="region"
                     aria-label={ariaTexts?.resultPanelLabel || "Result and explanation"}
                     aria-describedby="result-panel-description"
@@ -2123,19 +2525,37 @@ export const QuizScene = React.memo(function QuizScene({
 
                     {/* Simple Explanation */}
                     <div className="mb-3">
-                      <p className="text-sm text-muted-foreground leading-relaxed text-[#1C1C1E] dark:text-[#F2F2F7]">
-                        {currentQuestion?.explanation}
-                      </p>
+                      <div className="text-sm text-muted-foreground leading-relaxed text-[#1C1C1E] dark:text-[#F2F2F7]">
+                        <EditableText
+                          configPath={`questions.list.${currentQuestionIndex}.explanation`}
+                          placeholder="Enter question explanation..."
+                          maxLength={500}
+                          multiline={true}
+                          as="span"
+                        >
+                          {currentQuestion?.explanation}
+                        </EditableText>
+                      </div>
                     </div>
 
                     {/* Simple Tips */}
                     {currentQuestion?.tips && (
                       <div className="mb-3">
                         <div className="grid gap-1">
-                          {currentQuestion?.tips.map((tip, index) => (
+                          {currentQuestion?.tips.map((tip: string, index: number) => (
                             <div key={index} className="flex items-start space-x-2 text-sm">
                               <div className="w-1.5 h-1.5 bg-[#1C1C1E] dark:bg-[#F2F2F7] rounded-full mt-2 flex-shrink-0" />
-                              <span className="text-muted-foreground text-[#1C1C1E] dark:text-[#F2F2F7]">{tip}</span>
+                              <span className="text-muted-foreground text-[#1C1C1E] dark:text-[#F2F2F7]">
+                                <EditableText
+                                  configPath={`questions.list.${currentQuestionIndex}.tips.${index}`}
+                                  placeholder="Enter tip..."
+                                  maxLength={200}
+                                  multiline={true}
+                                  as="span"
+                                >
+                                  {tip}
+                                </EditableText>
+                              </span>
                             </div>
                           ))}
                         </div>
@@ -2149,9 +2569,30 @@ export const QuizScene = React.memo(function QuizScene({
                         <span className="text-[#1C1C1E] dark:text-[#F2F2F7] font-medium">
                           {isAnswerCorrect
                             ? (currentQuestionIndex === questions.length - 1
-                              ? (config.texts?.quizCompleted || "Tamamlandı! 🎉")
-                              : (config.texts?.correctAnswer || "Doğru! 🎉"))
-                            : (config.texts?.wrongAnswer || "Incorrect answer")}
+                              ? <EditableText
+                                  configPath="texts.quizCompleted"
+                                  placeholder="Quiz completed message..."
+                                  maxLength={50}
+                                  as="span"
+                                >
+                                  {config.texts?.quizCompleted || "Tamamlandı! 🎉"}
+                                </EditableText>
+                              : <EditableText
+                                  configPath="texts.correctAnswer"
+                                  placeholder="Correct answer message..."
+                                  maxLength={50}
+                                  as="span"
+                                >
+                                  {config.texts?.correctAnswer || "Doğru! 🎉"}
+                                </EditableText>)
+                            : <EditableText
+                                configPath="texts.wrongAnswer"
+                                placeholder="Wrong answer message..."
+                                maxLength={50}
+                                as="span"
+                              >
+                                {config.texts?.wrongAnswer || "Incorrect answer"}
+                              </EditableText>}
                         </span>
                       </div>
 
@@ -2177,23 +2618,41 @@ export const QuizScene = React.memo(function QuizScene({
                   : (config.texts?.wrongAnswer || "Yanlış Cevap")
                 }
               >
-                <div className="space-y-4 glass-border-2 p-4">
+                <div className={`space-y-4 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} p-4`}>
 
                   {/* Simple Explanation */}
                   <div>
-                    <p className="text-sm text-muted-foreground leading-relaxed text-[#1C1C1E] dark:text-[#F2F2F7]">
-                      {currentQuestion?.explanation}
-                    </p>
+                    <div className="text-sm text-muted-foreground leading-relaxed text-[#1C1C1E] dark:text-[#F2F2F7]">
+                      <EditableText
+                        configPath={`questions.list.${currentQuestionIndex}.explanation`}
+                        placeholder="Enter question explanation..."
+                        maxLength={500}
+                        multiline={true}
+                        as="span"
+                      >
+                        {currentQuestion?.explanation}
+                      </EditableText>
+                    </div>
                   </div>
 
                   {/* Simple Tips */}
                   {currentQuestion?.tips && (
                     <div>
                       <div className="grid gap-2">
-                        {currentQuestion?.tips.map((tip, index) => (
+                        {currentQuestion?.tips.map((tip: string, index: number) => (
                           <div key={index} className="flex items-start space-x-2 text-sm">
                             <div className="w-1.5 h-1.5 bg-[#1C1C1E] dark:bg-[#F2F2F7] rounded-full mt-2 flex-shrink-0" />
-                            <span className="text-muted-foreground text-[#1C1C1E] dark:text-[#F2F2F7]">{tip}</span>
+                            <span className="text-muted-foreground text-[#1C1C1E] dark:text-[#F2F2F7]">
+                              <EditableText
+                                configPath={`questions.list.${currentQuestionIndex}.tips.${index}`}
+                                placeholder="Enter tip..."
+                                maxLength={200}
+                                multiline={true}
+                                as="span"
+                              >
+                                {tip}
+                              </EditableText>
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -2222,7 +2681,7 @@ export const QuizScene = React.memo(function QuizScene({
                               handleNextQuestion()
                             }, 300)
                           }}
-                          className={`relative flex items-center justify-center space-x-2 px-4 py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full`}
+                          className={`relative flex items-center justify-center space-x-2 px-4 py-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full`}
                         >
                           {/* Button shimmer effect */}
                           <motion.div
@@ -2259,7 +2718,7 @@ export const QuizScene = React.memo(function QuizScene({
                               onNextSlide();
                             }, 300)
                           }}
-                          className={`relative flex items-center justify-center space-x-2 px-4 py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full`}
+                          className={`relative flex items-center justify-center space-x-2 px-4 py-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full`}
                         >
                           {/* Button shimmer effect */}
                           <motion.div
@@ -2297,7 +2756,7 @@ export const QuizScene = React.memo(function QuizScene({
                           retryQuestion();
                         }, 300);
                       }}
-                      className={`relative flex items-center justify-center space-x-2 px-4 py-3 glass-border-2 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full`}
+                      className={`relative flex items-center justify-center space-x-2 px-4 py-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full`}
                     >
                       <motion.div
                         className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
@@ -2359,6 +2818,7 @@ export const QuizScene = React.memo(function QuizScene({
         />
 
       </div>
-    </FontWrapper >
+      </FontWrapper>
+    </EditModeProvider>
   );
 });
