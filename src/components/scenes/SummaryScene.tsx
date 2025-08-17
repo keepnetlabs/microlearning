@@ -105,6 +105,7 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
     if (isFinishing || isFinished) return;
     setFinishError(null);
     setIsFinishing(true);
+    let success = false;
     try {
       // Ensure pending time and data are committed before quitting (service will no-op or delegate in embed mode)
       scormService.commit();
@@ -113,13 +114,16 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
         setFinishError(config.texts?.finishErrorText || 'Could not finish. Please close the window or try again.');
       } else {
         setIsFinished(true);
+        success = true;
       }
     } catch (e) {
       setFinishError(config.texts?.finishErrorText || 'Could not finish. Please close the window or try again.');
     } finally {
       setIsFinishing(false);
-      // Give LMS a brief moment, then attempt to close the window
-      setTimeout(tryCloseWindow, 300);
+      // Only attempt to close the window if successful
+      if (success) {
+        setTimeout(tryCloseWindow, 300);
+      }
     }
   }
 
@@ -588,7 +592,7 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
               whileTap={!(isFinishing || isFinished) ? { scale: 0.95 } : {}}
               onClick={handleSaveAndFinish}
               disabled={isFinishing || isFinished}
-              className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 glass-border-2 ${config.styling?.downloadButton?.gradientFrom || 'from-blue-500'} ${config.styling?.downloadButton?.gradientTo || 'to-indigo-600'} ${config.styling?.downloadButton?.textColor || 'text-white'} transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden`}
+              className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 glass-border-2  transition-all text-[#1C1C1E] dark:text-[#F2F2F7] disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden`}
               data-testid="btn-save-finish"
             >
               <motion.div
@@ -607,7 +611,9 @@ export function SummaryScene({ config, completionData, sceneId, reducedMotion, d
                     ? (config.texts?.savingText || 'Saving…')
                     : isFinished
                       ? (config.texts?.finishedText || 'Saved. You can now close this window.')
-                      : (config.texts?.saveAndFinish || 'Save and Finish')}
+                      : finishError
+                        ? (config.texts?.retryText || 'Retry')
+                        : (config.texts?.saveAndFinish || 'Save and Finish')}
                 </span>
               </span>
             </motion.button>

@@ -1019,6 +1019,7 @@ export interface SummarySceneConfig {
         saveAndFinish?: string;
         savingText?: string;
         finishedText?: string;
+        retryText?: string;
         finishErrorText?: string;
         downloadedText?: string;
         downloadTrainingLogsText?: string;
