@@ -64,7 +64,7 @@ const SummarySceneContent = React.memo(function SummarySceneContent({ config, co
       delay: disableDelays ? 0 : reducedMotion ? 0 : delay
     })
   }), [reducedMotion, disableDelays]);
-  // Start celebration sequence - optimized
+  // Start celebration sequence - optimized with cleanup
   useEffect(() => {
     const celebrations = [
       () => setCelebrationPhase(1), // Initial burst
@@ -77,9 +77,17 @@ const SummarySceneContent = React.memo(function SummarySceneContent({ config, co
       celebrations.forEach((c) => c());
       return;
     }
+
+    const timeouts: NodeJS.Timeout[] = [];
     celebrations.forEach((celebration, index) => {
-      setTimeout(celebration, index * 1000);
+      const timeoutId = setTimeout(celebration, index * 1000);
+      timeouts.push(timeoutId);
     });
+
+    // Cleanup function
+    return () => {
+      timeouts.forEach(clearTimeout);
+    };
   }, [disableDelays, reducedMotion]);
 
   // Dinamik icon mapping function (diğer componentlerle aynı) - Memoized
@@ -113,6 +121,19 @@ const SummarySceneContent = React.memo(function SummarySceneContent({ config, co
   const immediateActions = useMemo(() => currentConfig.immediateActions || [], [currentConfig.immediateActions]);
 
   const resources = useMemo(() => currentConfig.resources || [], [currentConfig.resources]);
+
+  // Memoize confetti colors arrays
+  const confettiColors1 = useMemo(() => ["blue", "green", "yellow", "red", "purple", "pink"], []);
+  const confettiColors2 = useMemo(() => ["green", "yellow", "blue"], []);
+
+  // Memoize commonly used CSS class combinations
+  const cssClasses = useMemo(() => ({
+    glassBorder2: currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2',
+    glassBorder1: currentEditMode ? 'glass-border-1-no-overflow' : 'glass-border-1', 
+    glassBorder0: currentEditMode ? 'glass-border-0-no-overflow' : 'glass-border-0',
+    overflowHidden: currentEditMode ? '' : 'overflow-hidden',
+    textColor: 'text-[#1C1C1E] dark:text-[#F2F2F7]'
+  }), [currentEditMode]);
 
   const tryCloseWindow = useCallback(() => {
     try { window.top && (window.top as Window).close && (window.top as Window).close(); } catch { }
@@ -339,7 +360,7 @@ const SummarySceneContent = React.memo(function SummarySceneContent({ config, co
                 <ConfettiPiece
                   key={`confetti-1-${i}`}
                   delay={i * 0.1}
-                  color={["blue", "green", "yellow", "red", "purple", "pink"][i % 6]}
+                  color={confettiColors1[i % confettiColors1.length]}
                 />
               ))}
 
@@ -348,7 +369,7 @@ const SummarySceneContent = React.memo(function SummarySceneContent({ config, co
                 <ConfettiPiece
                   key={`confetti-2-${i}`}
                   delay={i * 0.15}
-                  color={["green", "yellow", "blue"][i % 3]}
+                  color={confettiColors2[i % confettiColors2.length]}
                 />
               ))}
 
@@ -406,7 +427,7 @@ const SummarySceneContent = React.memo(function SummarySceneContent({ config, co
           {!isMobile && <div className="relative mb-4">
 
             <motion.div
-              className={`relative w-16 h-16 sm:w-20 sm:h-20 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} flex items-center justify-center mx-auto`}
+              className={`relative w-16 h-16 sm:w-20 sm:h-20 ${cssClasses.glassBorder2} flex items-center justify-center mx-auto`}
               animate={{
                 scale: celebrationPhase >= 1 ? [1, 1.2, 1.05, 1] : [1, 1.05, 1],
               }}
@@ -515,7 +536,7 @@ const SummarySceneContent = React.memo(function SummarySceneContent({ config, co
               initial={!isMobile ? { width: 0 } : {}}
               animate={!isMobile ? { width: "auto" } : {}}
               transition={!isMobile ? { duration: 1, delay: 0.5 } : {}}
-              className={`inline-block ${currentEditMode ? '' : 'overflow-hidden'} whitespace-normal text-[#1C1C1E] dark:text-[#F2F2F7] lg:whitespace-nowrap break-words min-w-[280px]`}
+              className={`inline-block ${cssClasses.overflowHidden} whitespace-normal ${cssClasses.textColor} lg:whitespace-nowrap break-words min-w-[280px]`}
             >
               <EditableText
                 configPath="texts.completionTitle"
@@ -569,7 +590,7 @@ const SummarySceneContent = React.memo(function SummarySceneContent({ config, co
                 transition={{ type: "spring", stiffness: 400 }}
               >
                 <motion.div
-                  className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} rounded-xl mb-2 relative overflow-hidden `}
+                  className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 ${cssClasses.glassBorder2} rounded-xl mb-2 relative overflow-hidden `}
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.8 + index * 0.1, type: "spring", stiffness: 200 }}
@@ -622,7 +643,7 @@ const SummarySceneContent = React.memo(function SummarySceneContent({ config, co
                 e.preventDefault(); // Diğer durumlarda buton aksiyonunu engelle
               } : handleSaveAndFinish}
               disabled={isFinishing || isFinished}
-              className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all text-[#1C1C1E] dark:text-[#F2F2F7] disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none ${currentEditMode ? '' : 'overflow-hidden'}`}
+              className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 ${cssClasses.glassBorder2} transition-all ${cssClasses.textColor} disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none ${cssClasses.overflowHidden}`}
               data-testid="btn-save-finish"
             >
               <motion.div
@@ -720,7 +741,7 @@ const SummarySceneContent = React.memo(function SummarySceneContent({ config, co
                     logger.download(snapshot);
                   } catch { }
                 }}
-                className={`relative inline-flex mt-4 items-center gap-2 px-4 py-2 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} text-sm font-medium transition-all hover:shadow-lg text-[#1C1C1E] dark:text-[#F2F2F7]`}
+                className={`relative inline-flex mt-4 items-center gap-2 px-4 py-2 ${cssClasses.glassBorder2} text-sm font-medium transition-all hover:shadow-lg ${cssClasses.textColor}`}
                 data-testid="btn-download-training-logs"
               >
                 <Download size={16} className="relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]" />

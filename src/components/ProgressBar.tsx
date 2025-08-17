@@ -369,7 +369,7 @@ export function ProgressBar({ currentScene, totalScenes, language = 'en', config
               transition={{ duration: 1.2, ease: "easeOut", type: "spring", stiffness: 80 }}
               style={{
                 // CLEAN INDUSTRY STANDARD PROGRESS FILL - Apple/Google style
-                background: "rgba(242, 242, 247, 0.10)",
+                background: "rgba(255, 255, 255, 0.2)",
                 borderRadius: '4px'
               }}
             >
