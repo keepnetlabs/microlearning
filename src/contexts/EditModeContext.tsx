@@ -20,7 +20,7 @@ const setNestedValue = (obj: any, path: string, value: any) => {
     console.log('Object:', obj);
     console.log('Path:', path);
     console.log('Value:', value);
-    
+
     const keys = path.split('.');
     const result = { ...obj };
     let current = result;
@@ -28,7 +28,7 @@ const setNestedValue = (obj: any, path: string, value: any) => {
     for (let i = 0; i < keys.length - 1; i++) {
         const key = keys[i];
         console.log(`Processing key [${i}]: ${key}`);
-        
+
         if (!(key in current) || typeof current[key] !== 'object') {
             console.log(`Creating new object for key: ${key}`);
             // Check if the key is a number and we should create an array
@@ -53,7 +53,7 @@ const setNestedValue = (obj: any, path: string, value: any) => {
     const finalKey = keys[keys.length - 1];
     console.log(`Setting final key: ${finalKey} = ${value}`);
     current[finalKey] = value;
-    
+
     console.log('Final result:', result);
     return result;
 };
@@ -61,6 +61,7 @@ const setNestedValue = (obj: any, path: string, value: any) => {
 interface EditModeProviderProps {
     children: React.ReactNode;
     initialConfig: any;
+    sceneId?: string;
     onSave?: (config: any) => void;
     onEditModeChange?: (isEditMode: boolean) => void;
 }
@@ -68,6 +69,7 @@ interface EditModeProviderProps {
 export const EditModeProvider: React.FC<EditModeProviderProps> = ({
     children,
     initialConfig,
+    sceneId,
     onSave,
     onEditModeChange
 }) => {
@@ -112,12 +114,67 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
         console.log('=== SAVE CHANGES CALLED ===');
         console.log('tempConfig being saved:', tempConfig);
         console.log('tempConfig.highlights:', tempConfig.highlights);
+
+        // Backend'e göndermek için tempConfig'i scene ID ile wrap et
+        const patchPayload = sceneId ? { [sceneId]: tempConfig } : tempConfig;
+
+        console.log('Scene ID:', sceneId);
+        console.log('Patch payload:', patchPayload);
+
         if (onSave) {
+            // İlk önce local state'i güncelle
             onSave(tempConfig);
+
+            // Ardından backend'e patch gönder
+            const sendPatchRequest = async () => {
+                try {
+                    // URL'yi query parametrelerinden al veya default değer kullan
+                    const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+                    const langUrl = urlParams?.get('langUrl') || 'https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001/lang/en';
+
+                    // microlearningId/lang/dilKodu formatında URL oluştur
+                    console.log('Sending PATCH to:', langUrl);
+                    console.log('Payload:', patchPayload);
+                    
+                    const response = await fetch(langUrl, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json'
+                            // Accept header'ını kaldır - CORS sorununa neden olabilir
+                        },
+                        body: JSON.stringify(patchPayload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    console.log('Backend patch successful:', result);
+
+                } catch (error) {
+                    console.error('Backend patch failed:', error);
+                    
+                    // CORS hatası alıyorsak alternatif çözümler:
+                    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+                        console.warn('Possible CORS issue. Backend may need to:');
+                        console.warn('1. Allow PATCH method in CORS policy');
+                        console.warn('2. Allow Content-Type header');
+                        console.warn('3. Allow origin:', window.location.origin);
+                        console.warn('4. Handle OPTIONS preflight requests');
+                    }
+                    
+                    // Don't throw error to avoid breaking the user experience
+                }
+            };
+
+            // Async patch request - don't await to avoid blocking UI
+            sendPatchRequest();
         }
+
         setHasUnsavedChanges(false);
         console.log('=== SAVE CHANGES COMPLETED ===');
-    }, [tempConfig, onSave]);
+    }, [tempConfig, onSave, sceneId]);
 
     const discardChanges = useCallback(() => {
         setTempConfig(initialConfig);

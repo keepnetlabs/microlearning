@@ -94,6 +94,7 @@ export const NudgeScene = memo(function NudgeScene({ config, onNextSlide, sceneI
     <EditModeProvider
       key={configKey}
       initialConfig={currentConfig}
+      sceneId={sceneId?.toString()}
       onSave={handleSave}
       onEditModeChange={setIsInEditMode}
     >

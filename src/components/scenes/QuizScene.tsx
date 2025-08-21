@@ -458,7 +458,10 @@ export const QuizScene = React.memo(function QuizScene({
   setSelectedItem,
   questionLoadingText,
   isDarkMode,
-}: QuizSceneProps) {
+  sceneId,
+  reducedMotion,
+  disableDelays,
+}: QuizSceneProps & { sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean }) {
   // Destructure ariaTexts from config for accessibility
   const { ariaTexts } = config || {};
   
@@ -2335,6 +2338,7 @@ export const QuizScene = React.memo(function QuizScene({
       <EditModeProvider
         key={configKey}
         initialConfig={currentConfig}
+        sceneId={sceneId?.toString()}
         onSave={handleSave}
         onEditModeChange={setIsInEditMode}
       >
@@ -2356,6 +2360,7 @@ export const QuizScene = React.memo(function QuizScene({
     <EditModeProvider
       key={configKey}
       initialConfig={currentConfig}
+      sceneId={sceneId?.toString()}
       onSave={handleSave}
       onEditModeChange={setIsInEditMode}
     >

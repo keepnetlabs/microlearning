@@ -256,6 +256,7 @@ export const GoalScene = memo(({
     <EditModeProvider
       key={configKey}
       initialConfig={currentConfig}
+      sceneId={sceneId?.toString()}
       onSave={handleSave}
       onEditModeChange={setIsInEditMode}
     >

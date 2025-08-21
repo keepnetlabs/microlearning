@@ -564,6 +564,7 @@ export const IntroScene = React.memo(({
     <EditModeProvider
       key={configKey}
       initialConfig={currentConfig}
+      sceneId={sceneId?.toString()}
       onSave={(newConfig) => {
         console.log('IntroScene onSave - newConfig:', newConfig);
         console.log('IntroScene onSave - original config:', config);

@@ -207,6 +207,7 @@ export const SurveyScene = memo(function SurveyScene({
     <EditModeProvider
       key={configKey}
       initialConfig={currentConfig}
+      sceneId={sceneId?.toString()}
       onSave={handleSave}
       onEditModeChange={setIsInEditMode}
     >

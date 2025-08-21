@@ -1147,6 +1147,7 @@ export function SummaryScene(props: SummarySceneProps & { sceneId?: string | num
     <EditModeProvider
       key={JSON.stringify(props.config?.texts || {})}
       initialConfig={props.config}
+      sceneId={props.sceneId?.toString()}
       onSave={(updatedConfig) => {
         console.log('Config saved:', updatedConfig);
       }}
