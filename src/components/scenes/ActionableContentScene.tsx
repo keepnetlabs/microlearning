@@ -4,6 +4,10 @@ import * as LucideIcons from "lucide-react";
 import { FontWrapper } from "../common/FontWrapper";
 import { useIsMobile } from "../ui/use-mobile";
 import { CallToAction } from "../ui/CallToAction";
+import { EditModeProvider, useEditMode } from "../../contexts/EditModeContext";
+import { EditableText } from "../common/EditableText";
+import { EditModePanel } from "../common/EditModePanel";
+import { deepMerge } from "../../utils/deepMerge";
 import { Inbox } from "../Inbox";
 import { InboxSceneConfig } from "../../data/inboxConfig";
 // Props interfaces
@@ -94,12 +98,22 @@ const normalizeUrlParam = (value?: string | null): string => {
   return trimmed.startsWith('@') ? trimmed.slice(1) : trimmed;
 };
 
-export function ActionableContentScene({
+// Internal component that uses edit mode context
+function ActionableContentSceneInternal({
   config,
   onNextSlide,
   sceneId,
   reducedMotion
 }: ActionableContentSceneProps & { onNextSlide?: () => void; sceneId?: string | number; reducedMotion?: boolean; }) {
+  
+  // Edit mode context
+  const { isEditMode, tempConfig } = useEditMode();
+  
+  // Compute current config (memoized to prevent infinite loops)
+  const currentConfig = useMemo(() => {
+    return deepMerge(config, tempConfig || {});
+  }, [config, tempConfig]);
+
   // Default values for container classes
   const defaultContainerClassName = "flex flex-col items-center justify-start min-h-full sm:px-6 overflow-y-auto";
   const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
@@ -156,7 +170,7 @@ export function ActionableContentScene({
     cardSpacing,
     maxWidth,
     ariaTexts
-  } = config;
+  } = currentConfig;
 
   const isMobile = useIsMobile();
   const finalCardSpacing = cardSpacing || defaultCardSpacing;
@@ -227,12 +241,34 @@ export function ActionableContentScene({
             className="project-title"
             id="actionable-content-title"
           >
-            {title}
+            {isEditMode ? (
+              <EditableText
+                configPath="title"
+                placeholder="Enter title..."
+                maxLength={100}
+                as="span"
+              >
+                {title}
+              </EditableText>
+            ) : (
+              title
+            )}
           </h1>
           {subtitle && (
-            <p className="project-subtitle">
-              {subtitle}
-            </p>
+            <div className="project-subtitle">
+              {isEditMode ? (
+                <EditableText
+                  configPath="subtitle"
+                  placeholder="Enter subtitle..."
+                  maxLength={200}
+                  as="span"
+                >
+                  {subtitle}
+                </EditableText>
+              ) : (
+                subtitle
+              )}
+            </div>
           )}
         </header>
 
@@ -241,32 +277,45 @@ export function ActionableContentScene({
           aria-label={ariaTexts?.actionCardsLabel || "Action cards"}
           aria-describedby="actionable-content-title"
         >
-          {isLoadingInbox ? (
-            <div className="flex items-center justify-center p-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1C1C1E] dark:border-[#F2F2F7]"></div>
-              <span className="ml-2 text-[#1C1C1E] dark:text-[#F2F2F7]">Loading inbox...</span>
-            </div>
-          ) : inboxError || !inboxConfig ? (
-            <div className="flex items-center justify-center p-8 text-center">
-              <div className="text-red-600 dark:text-red-400">
-                <p className="font-medium">Failed to load inbox</p>
-                <p className="text-sm mt-1">{inboxError || 'No inbox configuration available'}</p>
+          {!isEditMode && (
+            <>
+              {isLoadingInbox ? (
+                <div className="flex items-center justify-center p-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1C1C1E] dark:border-[#F2F2F7]"></div>
+                  <span className="ml-2 text-[#1C1C1E] dark:text-[#F2F2F7]">Loading inbox...</span>
+                </div>
+              ) : inboxError || !inboxConfig ? (
+                <div className="flex items-center justify-center p-8 text-center">
+                  <div className="text-red-600 dark:text-red-400">
+                    <p className="font-medium">Failed to load inbox</p>
+                    <p className="text-sm mt-1">{inboxError || 'No inbox configuration available'}</p>
+                  </div>
+                </div>
+              ) : (
+                <Inbox
+                  config={inboxConfig}
+                  onNextSlide={onNextSlide}
+                />
+              )}
+            </>
+          )}
+          
+          {isEditMode && (
+            <div className="p-8 text-center">
+              <div className="text-[#1C1C1E] dark:text-[#F2F2F7]">
+                <p className="font-medium">Inbox Component</p>
+                <p className="text-sm mt-2 opacity-70">Inbox is not editable in edit mode</p>
               </div>
             </div>
-          ) : (
-            <Inbox
-              config={inboxConfig}
-              onNextSlide={onNextSlide}
-            />
           )}
         </section>
 
         {/* Call to Action */}
-        {config.callToActionText && (
+        {currentConfig.callToActionText && (
           <CallToAction
-            text={typeof config.callToActionText === 'string' ? config.callToActionText : undefined}
-            mobileText={typeof config.callToActionText === 'object' ? config.callToActionText.mobile : undefined}
-            desktopText={typeof config.callToActionText === 'object' ? config.callToActionText.desktop : undefined}
+            text={typeof currentConfig.callToActionText === 'string' ? currentConfig.callToActionText : undefined}
+            mobileText={typeof currentConfig.callToActionText === 'object' ? currentConfig.callToActionText.mobile : undefined}
+            desktopText={typeof currentConfig.callToActionText === 'object' ? currentConfig.callToActionText.desktop : undefined}
             delay={0.8}
             onClick={onNextSlide}
             dataTestId="cta-actionable"
@@ -275,5 +324,15 @@ export function ActionableContentScene({
 
       </main>
     </FontWrapper>
+  );
+}
+
+// Main export component with EditModeProvider
+export function ActionableContentScene(props: ActionableContentSceneProps & { onNextSlide?: () => void; sceneId?: string | number; reducedMotion?: boolean; }) {
+  return (
+    <EditModeProvider initialConfig={props.config}>
+      <EditModePanel />
+      <ActionableContentSceneInternal {...props} />
+    </EditModeProvider>
   );
 }

@@ -178,7 +178,7 @@ export function Inbox({ config, onEmailReport }: InboxProps) {
   return (
     <div>
       {/* Single Card with Header and Two-Column Layout */}
-      <div className="backdrop-blur-xl bg-white/10 dark:bg-black/10 rounded-lg border border-white/20 dark:border-white/10 overflow-hidden flex flex-col" style={{ height: 'calc(100vh - 120px)', maxHeight: 'calc(100vh - 120px)' }}>
+      <div className="backdrop-blur-xl bg-white/10 dark:bg-black/10 rounded-lg border border-white/20 dark:border-white/10 overflow-hidden flex flex-col" style={{ minHeight: '600px' }}>
         {/* Header - Desktop layout */}
         <div className="hidden lg:block p-6 border-b border-white/20 dark:border-white/10">
           <div className="flex items-center justify-between">
@@ -270,7 +270,7 @@ export function Inbox({ config, onEmailReport }: InboxProps) {
 
             {/* Mobile: Email detail view or Email list */}
             {isMobile && selectedEmail ? (
-              <div className="p-4 overflow-y-auto flex-1 min-h-0">
+              <div className="p-4 overflow-y-auto flex-1">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={selectedEmail.id}
@@ -333,7 +333,7 @@ export function Inbox({ config, onEmailReport }: InboxProps) {
                 </AnimatePresence>
               </div>
             ) : (
-              <div className="overflow-y-auto flex-1 min-h-0 relative" style={{ scrollbarWidth: 'none' }}>
+              <div className="overflow-y-auto relative flex-1" style={{ scrollbarWidth: 'none' }}>
                 {config.emails.map((email) => (
                   <motion.div
                     key={email.id}
@@ -385,7 +385,7 @@ export function Inbox({ config, onEmailReport }: InboxProps) {
 
           {/* Right: Email Viewer - Desktop only */}
           <div className="hidden lg:block lg:col-span-2">
-            <div className="p-6 overflow-y-auto scrollbar-hide" style={{ height: 'calc(-200px + 100vh)' }}>
+            <div className="p-6 overflow-y-auto scrollbar-hide flex-1">
               {selectedEmail ? (
                 <div>
                   {/* Email Header */}
