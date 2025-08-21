@@ -1,12 +1,14 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Settings, Save, X, RotateCcw, Edit3 } from 'lucide-react';
+import { Save, RotateCcw, Edit3, Eye, EyeOff } from 'lucide-react';
 import { useEditMode } from '../../contexts/EditModeContext';
 
 export const EditModePanel: React.FC = () => {
     const {
         isEditMode,
+        isViewMode,
         toggleEditMode,
+        toggleViewMode,
         saveChanges,
         discardChanges,
         hasUnsavedChanges
@@ -26,12 +28,27 @@ export const EditModePanel: React.FC = () => {
                         whileTap={{ scale: 0.95 }}
                         onClick={toggleEditMode}
                         className={`flex items-center gap-2 px-4 py-2 glass-border-1 font-medium transition-all ${isEditMode
-                            ? 'text-[#1C1C1E] dark:text-[#F2F2F7]'
+                            ? 'text-[#1C1C1E] dark:text-[#F2F2F7] bg-blue-500/10'
                             : 'text-[#1C1C1E] dark:text-[#F2F2F7]'
                             }`}
                     >
                         <Edit3 size={16} />
                         {isEditMode ? 'Exit Edit' : 'Enter Edit'}
+                    </motion.button>
+
+                    {/* View Mode Toggle */}
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={toggleViewMode}
+                        className={`flex items-center gap-2 px-4 py-2 glass-border-1 font-medium transition-all ${isViewMode
+                            ? 'text-[#1C1C1E] dark:text-[#F2F2F7] bg-green-500/10'
+                            : 'text-[#1C1C1E] dark:text-[#F2F2F7]'
+                            }`}
+                        title="View scientific basis information"
+                    >
+                        {isViewMode ? <EyeOff size={16} /> : <Eye size={16} />}
+                        {isViewMode ? 'Hide Info' : 'View Info'}
                     </motion.button>
 
                     {/* Edit Mode Controls */}
@@ -91,14 +108,19 @@ export const EditModePanel: React.FC = () => {
 
                 {/* Instructions */}
                 <AnimatePresence>
-                    {isEditMode && (
+                    {(isEditMode || isViewMode) && (
                         <motion.div
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
                             className="mt-3 pt-3 border-t border-white/20 dark:border-gray-300/20 text-xs text-[#1C1C1E]/70 dark:text-[#F2F2F7]/70"
                         >
-                            💡 Click on any text to edit it. Press Enter to save, Esc to cancel.
+                            {isEditMode && (
+                                <div>💡 Click on any text to edit it. Press Enter to save, Esc to cancel.</div>
+                            )}
+                            {isViewMode && (
+                                <div>📚 Viewing scientific basis information for learning components.</div>
+                            )}
                         </motion.div>
                     )}
                 </AnimatePresence>

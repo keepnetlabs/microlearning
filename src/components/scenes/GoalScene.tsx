@@ -5,6 +5,7 @@ import { FontWrapper } from "../common/FontWrapper";
 import { EditableText } from "../common/EditableText";
 import { EditModeProvider } from "../../contexts/EditModeContext";
 import { EditModePanel } from "../common/EditModePanel";
+import { ScientificBasisInfo } from "../common/ScientificBasisInfo";
 import { useIsMobile } from "../ui/use-mobile";
 import { motion } from "framer-motion";
 import { CallToAction } from "../ui/CallToAction";
@@ -261,6 +262,10 @@ export const GoalScene = memo(({
       onEditModeChange={setIsInEditMode}
     >
       <EditModePanel />
+      <ScientificBasisInfo 
+        config={currentConfig} 
+        sceneType={(currentConfig as any)?.scene_type || 'goal'} 
+      />
       <FontWrapper>
         <main
           className={containerClassName}

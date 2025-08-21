@@ -18,6 +18,7 @@ import { FontWrapper } from "../common/FontWrapper";
 import { EditableText } from "../common/EditableText";
 import { EditModeProvider } from "../../contexts/EditModeContext";
 import { EditModePanel } from "../common/EditModePanel";
+import { ScientificBasisInfo } from "../common/ScientificBasisInfo";
 import { useIsMobile } from "../ui/use-mobile";
 import { CallToAction } from "../ui/CallToAction";
 import { BottomSheetComponent } from "../ui/bottom-sheet";
@@ -42,11 +43,11 @@ const iconCache = new Map<string, LucideIcon>();
 
 const getIconComponent = (iconName?: string): LucideIcon => {
   if (!iconName) return LucideIcons.HelpCircle;
-  
+
   if (iconCache.has(iconName)) {
     return iconCache.get(iconName)!;
   }
-  
+
   // Convert kebab-case to PascalCase (e.g., "book-open" -> "BookOpen")
   const pascalCaseName = iconName
     .split('-')
@@ -66,14 +67,14 @@ const getIconComponent = (iconName?: string): LucideIcon => {
 };
 
 // Memoized option component for better performance  
-const MemoizedQuestionOption = React.memo(({ 
-  children, 
-  onClick, 
-  disabled, 
-  className, 
+const MemoizedQuestionOption = React.memo(({
+  children,
+  onClick,
+  disabled,
+  className,
   isSelected,
   currentEditMode,
-  ...props 
+  ...props
 }: {
   children: React.ReactNode;
   onClick?: () => void;
@@ -84,7 +85,7 @@ const MemoizedQuestionOption = React.memo(({
   [key: string]: any;
 }) => {
   const ButtonComponent = currentEditMode ? motion.div : motion.button;
-  
+
   return (
     <ButtonComponent
       onClick={currentEditMode ? undefined : onClick}
@@ -114,23 +115,23 @@ const MemoizedNavigationControls = React.memo(({
   onNext: () => void;
 }) => {
   if (!currentEditMode || questionsLength <= 1) return null;
-  
+
   return (
     <div className="fixed top-20 right-4 z-50 flex flex-col gap-2">
       <div className="flex gap-2">
         <button
           onClick={onPrev}
-          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-gray-500 hover:bg-gray-600 text-white ${currentEditMode ? 'glass-border-1-no-overflow' : 'glass-border-1'}`}
+          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200  text-[#1C1C1E] dark:text-[#F2F2F7] ${currentEditMode ? 'glass-border-1-no-overflow' : 'glass-border-1'}`}
           title="Previous Question"
         >
-          ◀️ Prev
+          ◀ Prev
         </button>
         <button
           onClick={onNext}
-          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-blue-500 hover:bg-blue-600 text-white ${currentEditMode ? 'glass-border-1-no-overflow' : 'glass-border-1'}`}
+          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-[#1C1C1E] dark:text-[#F2F2F7] ${currentEditMode ? 'glass-border-1-no-overflow' : 'glass-border-1'}`}
           title="Next Question"
         >
-          Next ▶️
+          Next ▶
         </button>
       </div>
     </div>
@@ -464,7 +465,7 @@ export const QuizScene = React.memo(function QuizScene({
 }: QuizSceneProps & { sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean }) {
   // Destructure ariaTexts from config for accessibility
   const { ariaTexts } = config || {};
-  
+
   // Edit mode states
   const [editChanges, setEditChanges] = useState<Partial<QuizSceneConfig>>({});
   const [isInEditMode, setIsInEditMode] = useState(false);
@@ -490,7 +491,7 @@ export const QuizScene = React.memo(function QuizScene({
       setEditChanges({});
     }
   }, [isInEditMode]);
-  
+
   // Theme state for forcing re-renders when theme changes
   const [/* themeState */, setThemeState] = React.useState(0);
 
@@ -533,10 +534,10 @@ export const QuizScene = React.memo(function QuizScene({
     const maxAttempts = currentConfig?.questions?.maxAttempts || 2;
     const currentQuestion = questions[currentQuestionIndex];
     const currentAnswer = answers.get(currentQuestion?.id);
-    
+
     // In edit mode, always show results to display all options and explanations
     const effectiveShowResult = currentEditMode ? true : showResult;
-    
+
     // Edit mode dummy answers
     let editModeAnswer;
     if (currentEditMode && currentQuestion) {
@@ -582,18 +583,18 @@ export const QuizScene = React.memo(function QuizScene({
   }, [currentConfig, currentQuestionIndex, answers, currentEditMode, showResult]);
 
   // Destructure computed values
-  const { 
-    questions, 
-    maxAttempts, 
-    currentQuestion, 
-    currentAnswer, 
-    effectiveShowResult, 
-    editModeAnswer 
+  const {
+    questions,
+    maxAttempts,
+    currentQuestion,
+    currentAnswer,
+    effectiveShowResult,
+    editModeAnswer
   } = computedValues;
 
   // BottomSheet hook for mobile result panel
   // BottomSheet is controlled via props to BottomSheetComponent; internal hook not used here
-  
+
   // Edit mode navigation functions
   const goToNextQuestion = useCallback(() => {
     if (currentQuestionIndex < questions.length - 1) {
@@ -610,7 +611,7 @@ export const QuizScene = React.memo(function QuizScene({
       setCurrentQuestionIndex(questions.length - 1); // Loop back to last question
     }
   }, [currentQuestionIndex, questions.length, setCurrentQuestionIndex]);
-  
+
 
 
 
@@ -1077,7 +1078,7 @@ export const QuizScene = React.memo(function QuizScene({
           const showCorrectness = effectiveShowResult;
 
           const ButtonComponent = currentEditMode ? motion.div : motion.button;
-          
+
           return (
             <ButtonComponent
               key={option.id}
@@ -1265,7 +1266,7 @@ export const QuizScene = React.memo(function QuizScene({
             const showCorrectness = effectiveShowResult;
 
             const ButtonComponent = currentEditMode ? motion.div : motion.button;
-            
+
             return (
               <ButtonComponent
                 key={option.value.toString()}
@@ -1427,7 +1428,7 @@ export const QuizScene = React.memo(function QuizScene({
             const showCorrectness = effectiveShowResult;
 
             const ButtonComponent = currentEditMode ? motion.div : motion.button;
-            
+
             return (
               <ButtonComponent
                 key={option.id}
@@ -1857,7 +1858,7 @@ export const QuizScene = React.memo(function QuizScene({
                 const isSelected = selectedItem === item.id;
 
                 const ButtonComponent = currentEditMode ? motion.div : motion.button;
-                
+
                 return (
                   <ButtonComponent
                     key={item.id}
@@ -2195,7 +2196,7 @@ export const QuizScene = React.memo(function QuizScene({
     if (currentEditMode) {
       return true; // Edit mode always shows as correct for demo purposes
     }
-    
+
     const type = currentQuestion?.type;
     if (type === QuestionType.TRUE_FALSE) {
       const correct = (currentQuestion as TrueFalseQuestion | undefined)?.correctAnswer;
@@ -2343,6 +2344,10 @@ export const QuizScene = React.memo(function QuizScene({
         onEditModeChange={setIsInEditMode}
       >
         <EditModePanel />
+        <ScientificBasisInfo
+          config={currentConfig}
+          sceneType={(currentConfig as any)?.scene_type || 'quiz'}
+        />
         <FontWrapper>
           <div className="flex items-center justify-center h-full">
             <div className="text-center p-8">
@@ -2365,6 +2370,10 @@ export const QuizScene = React.memo(function QuizScene({
       onEditModeChange={setIsInEditMode}
     >
       <EditModePanel />
+      <ScientificBasisInfo
+        config={currentConfig}
+        sceneType={(currentConfig as any)?.scene_type || 'quiz'}
+      />
       {/* Edit Mode Navigation Controls - Memoized for performance */}
       <MemoizedNavigationControls
         currentEditMode={currentEditMode}
@@ -2380,156 +2389,253 @@ export const QuizScene = React.memo(function QuizScene({
         </div>
       )}
       <FontWrapper>
-      <div
-        ref={mainRef}
-        className="flex flex-col items-center justify-center px-1 pt-0 relative"
-        role="main"
-        aria-label={ariaTexts?.mainLabel || `Quiz: ${config.title}`}
-        aria-describedby="quiz-description"
-        tabIndex={-1}
-        data-testid="scene-quiz"
-      >
         <div
-          id="quiz-description"
-          className="sr-only"
-          aria-live="polite"
-        >
-          {ariaTexts?.mainDescription || "Interactive quiz with multiple question types and real-time feedback"}
-        </div>
-
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center"
-          role="banner"
-          aria-label={ariaTexts?.headerLabel || "Quiz header"}
-        >
-          {!isMobile && <div className="flex items-center justify-center mb-3" aria-hidden="true">
-            {iconNode}
-          </div>}
-
-          <h1 className="project-title">
-            <EditableText
-              configPath="title"
-              placeholder="Enter quiz title..."
-              maxLength={100}
-              as="span"
-            >
-              {currentConfig.title}
-            </EditableText>
-          </h1>
-          {currentConfig.subtitle && (
-            <div className="project-subtitle" style={{ marginBottom: '8px' }}>
-              <EditableText
-                configPath="subtitle"
-                placeholder="Enter quiz subtitle..."
-                maxLength={200}
-                multiline={true}
-                as="span"
-              >
-                {currentConfig.subtitle}
-              </EditableText>
-            </div>
-          )}
-
-
-          <div className="flex items-center justify-center space-x-4 sm:text-sm text-xs mb-5 text-[#1C1C1E] dark:text-[#F2F2F7]">
-            <span aria-label={`Question ${currentQuestionIndex + 1} of ${questions.length}`}>
-              {config.texts?.question} {currentQuestionIndex + 1}/{questions.length}
-            </span>
-          </div>
-        </motion.div>
-
-        {/* Question Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-3xl"
-          role="region"
-          aria-label={ariaTexts?.questionLabel || "Question content"}
-          aria-describedby="question-description"
-          id="question-content"
+          ref={mainRef}
+          className="flex flex-col items-center justify-center px-1 pt-0 relative"
+          role="main"
+          aria-label={ariaTexts?.mainLabel || `Quiz: ${config.title}`}
+          aria-describedby="quiz-description"
+          tabIndex={-1}
+          data-testid="scene-quiz"
         >
           <div
-            id="question-description"
+            id="quiz-description"
             className="sr-only"
             aria-live="polite"
           >
-            {ariaTexts?.questionDescription || "Current question with answer options"}
+            {ariaTexts?.mainDescription || "Interactive quiz with multiple question types and real-time feedback"}
           </div>
-          <div
-            className={`${!isMobile && (currentEditMode ? "p-4 glass-border-1-no-overflow" : "p-4 glass-border-1")}`}
 
-            role="article"
-            aria-labelledby="question-title"
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center"
+            role="banner"
+            aria-label={ariaTexts?.headerLabel || "Quiz header"}
           >
-            {/* Question Header */}
-            {currentQuestion?.description && <div className="text-center mb-2">
-              {currentQuestion?.description && (
-                <div className="text-[#1C1C1E] dark:text-[#F2F2F7]">
-                  <EditableText
-                    configPath={`questions.list.${currentQuestionIndex}.description`}
-                    placeholder="Enter question description..."
-                    maxLength={300}
-                    multiline={true}
-                    as="span"
-                  >
-                    {currentQuestion?.description}
-                  </EditableText>
-                </div>
-              )}
+            {!isMobile && <div className="flex items-center justify-center mb-3" aria-hidden="true">
+              {iconNode}
             </div>}
 
-            {/* Question Title */}
-            {currentQuestion?.title && (
-              <div className="text-center mb-4">
-                <h2 className="text-lg font-semibold text-[#1C1C1E] dark:text-[#F2F2F7]">
-                  <EditableText
-                    configPath={`questions.list.${currentQuestionIndex}.title`}
-                    placeholder="Enter question title..."
-                    maxLength={200}
-                    multiline={true}
-                    as="span"
-                  >
-                    {currentQuestion.title}
-                  </EditableText>
-                </h2>
+            <h1 className="project-title">
+              <EditableText
+                configPath="title"
+                placeholder="Enter quiz title..."
+                maxLength={100}
+                as="span"
+              >
+                {currentConfig.title}
+              </EditableText>
+            </h1>
+            {currentConfig.subtitle && (
+              <div className="project-subtitle" style={{ marginBottom: '8px' }}>
+                <EditableText
+                  configPath="subtitle"
+                  placeholder="Enter quiz subtitle..."
+                  maxLength={200}
+                  multiline={true}
+                  as="span"
+                >
+                  {currentConfig.subtitle}
+                </EditableText>
               </div>
             )}
 
-            {/* Question Content */}
-            <div className="mb-5" role="group" aria-label="Answer options" data-testid="quiz-question">
-              {renderQuestion()}
-            </div>
 
-            {/* Result Panel - Desktop */}
-            {!isMobile && (
-              <AnimatePresence>
-                {effectiveShowResult && (
-                  <motion.div
-                    ref={resultPanelRef}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    className={`mt-4 p-4 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'}`}
-                    role="region"
-                    aria-label={ariaTexts?.resultPanelLabel || "Result and explanation"}
-                    aria-describedby="result-panel-description"
-                    aria-live="polite"
-                  >
-                    <div
-                      id="result-panel-description"
-                      className="sr-only"
+            <div className="flex items-center justify-center space-x-4 sm:text-sm text-xs mb-5 text-[#1C1C1E] dark:text-[#F2F2F7]">
+              <span aria-label={`Question ${currentQuestionIndex + 1} of ${questions.length}`}>
+                {config.texts?.question} {currentQuestionIndex + 1}/{questions.length}
+              </span>
+            </div>
+          </motion.div>
+
+          {/* Question Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="w-full max-w-3xl"
+            role="region"
+            aria-label={ariaTexts?.questionLabel || "Question content"}
+            aria-describedby="question-description"
+            id="question-content"
+          >
+            <div
+              id="question-description"
+              className="sr-only"
+              aria-live="polite"
+            >
+              {ariaTexts?.questionDescription || "Current question with answer options"}
+            </div>
+            <div
+              className={`${!isMobile && (currentEditMode ? "p-4 glass-border-1-no-overflow" : "p-4 glass-border-1")}`}
+
+              role="article"
+              aria-labelledby="question-title"
+            >
+              {/* Question Header */}
+              {currentQuestion?.description && <div className="text-center mb-2">
+                {currentQuestion?.description && (
+                  <div className="text-[#1C1C1E] dark:text-[#F2F2F7]">
+                    <EditableText
+                      configPath={`questions.list.${currentQuestionIndex}.description`}
+                      placeholder="Enter question description..."
+                      maxLength={300}
+                      multiline={true}
+                      as="span"
+                    >
+                      {currentQuestion?.description}
+                    </EditableText>
+                  </div>
+                )}
+              </div>}
+
+              {/* Question Title */}
+              {currentQuestion?.title && (
+                <div className="text-center mb-4">
+                  <h2 className="text-lg font-semibold text-[#1C1C1E] dark:text-[#F2F2F7]">
+                    <EditableText
+                      configPath={`questions.list.${currentQuestionIndex}.title`}
+                      placeholder="Enter question title..."
+                      maxLength={200}
+                      multiline={true}
+                      as="span"
+                    >
+                      {currentQuestion.title}
+                    </EditableText>
+                  </h2>
+                </div>
+              )}
+
+              {/* Question Content */}
+              <div className="mb-5" role="group" aria-label="Answer options" data-testid="quiz-question">
+                {renderQuestion()}
+              </div>
+
+              {/* Result Panel - Desktop */}
+              {!isMobile && (
+                <AnimatePresence>
+                  {effectiveShowResult && (
+                    <motion.div
+                      ref={resultPanelRef}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      className={`mt-4 p-4 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'}`}
+                      role="region"
+                      aria-label={ariaTexts?.resultPanelLabel || "Result and explanation"}
+                      aria-describedby="result-panel-description"
                       aria-live="polite"
                     >
-                      {ariaTexts?.resultPanelDescription || "Feedback on your answer with explanation and tips"}
-                    </div>
+                      <div
+                        id="result-panel-description"
+                        className="sr-only"
+                        aria-live="polite"
+                      >
+                        {ariaTexts?.resultPanelDescription || "Feedback on your answer with explanation and tips"}
+                      </div>
 
 
+
+                      {/* Simple Explanation */}
+                      <div className="mb-3">
+                        <div className="text-sm text-muted-foreground leading-relaxed text-[#1C1C1E] dark:text-[#F2F2F7]">
+                          <EditableText
+                            configPath={`questions.list.${currentQuestionIndex}.explanation`}
+                            placeholder="Enter question explanation..."
+                            maxLength={500}
+                            multiline={true}
+                            as="span"
+                          >
+                            {currentQuestion?.explanation}
+                          </EditableText>
+                        </div>
+                      </div>
+
+                      {/* Simple Tips */}
+                      {currentQuestion?.tips && (
+                        <div className="mb-3">
+                          <div className="grid gap-1">
+                            {currentQuestion?.tips.map((tip: string, index: number) => (
+                              <div key={index} className="flex items-start space-x-2 text-sm">
+                                <div className="w-1.5 h-1.5 bg-[#1C1C1E] dark:bg-[#F2F2F7] rounded-full mt-2 flex-shrink-0" />
+                                <span className="text-muted-foreground text-[#1C1C1E] dark:text-[#F2F2F7]">
+                                  <EditableText
+                                    configPath={`questions.list.${currentQuestionIndex}.tips.${index}`}
+                                    placeholder="Enter tip..."
+                                    maxLength={200}
+                                    multiline={true}
+                                    as="span"
+                                  >
+                                    {tip}
+                                  </EditableText>
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Simple Action Buttons (Retry only) */}
+                      <div className="flex justify-between items-center pt-3 border-t">
+                        {/* Status */}
+                        <div className="text-sm">
+                          <span className="text-[#1C1C1E] dark:text-[#F2F2F7] font-medium">
+                            {isAnswerCorrect
+                              ? (currentQuestionIndex === questions.length - 1
+                                ? <EditableText
+                                  configPath="texts.quizCompleted"
+                                  placeholder="Quiz completed message..."
+                                  maxLength={50}
+                                  as="span"
+                                >
+                                  {config.texts?.quizCompleted || "Tamamlandı! 🎉"}
+                                </EditableText>
+                                : <EditableText
+                                  configPath="texts.correctAnswer"
+                                  placeholder="Correct answer message..."
+                                  maxLength={50}
+                                  as="span"
+                                >
+                                  {config.texts?.correctAnswer || "Doğru! 🎉"}
+                                </EditableText>)
+                              : <EditableText
+                                configPath="texts.wrongAnswer"
+                                placeholder="Wrong answer message..."
+                                maxLength={50}
+                                as="span"
+                              >
+                                {config.texts?.wrongAnswer || "Incorrect answer"}
+                              </EditableText>}
+                          </span>
+                        </div>
+
+                        {/* Buttons */}
+                        <div className="flex gap-2" />
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              )}
+
+              {/* Mobile BottomSheet for Result Panel */}
+              {isMobile && (
+                <BottomSheetComponent
+                  open={showResult}
+                  onDismiss={handleBottomSheetDismiss}
+                  title={lastAnswerResult
+                    ? (lastAnswerResult.wasLastQuestion && lastAnswerResult.wasCorrect
+                      ? (config.texts?.quizCompleted || "Tamamlandı! 🎉")
+                      : (lastAnswerResult.wasCorrect
+                        ? (config.texts?.correctAnswer || "Doğru! 🎉")
+                        : (config.texts?.wrongAnswer || "Yanlış Cevap")))
+                    : (config.texts?.wrongAnswer || "Yanlış Cevap")
+                  }
+                >
+                  <div className={`space-y-4 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} p-4`}>
 
                     {/* Simple Explanation */}
-                    <div className="mb-3">
+                    <div>
                       <div className="text-sm text-muted-foreground leading-relaxed text-[#1C1C1E] dark:text-[#F2F2F7]">
                         <EditableText
                           configPath={`questions.list.${currentQuestionIndex}.explanation`}
@@ -2545,8 +2651,8 @@ export const QuizScene = React.memo(function QuizScene({
 
                     {/* Simple Tips */}
                     {currentQuestion?.tips && (
-                      <div className="mb-3">
-                        <div className="grid gap-1">
+                      <div>
+                        <div className="grid gap-2">
                           {currentQuestion?.tips.map((tip: string, index: number) => (
                             <div key={index} className="flex items-start space-x-2 text-sm">
                               <div className="w-1.5 h-1.5 bg-[#1C1C1E] dark:bg-[#F2F2F7] rounded-full mt-2 flex-shrink-0" />
@@ -2567,262 +2673,165 @@ export const QuizScene = React.memo(function QuizScene({
                       </div>
                     )}
 
-                    {/* Simple Action Buttons (Retry only) */}
-                    <div className="flex justify-between items-center pt-3 border-t">
-                      {/* Status */}
-                      <div className="text-sm">
-                        <span className="text-[#1C1C1E] dark:text-[#F2F2F7] font-medium">
-                          {isAnswerCorrect
-                            ? (currentQuestionIndex === questions.length - 1
-                              ? <EditableText
-                                  configPath="texts.quizCompleted"
-                                  placeholder="Quiz completed message..."
-                                  maxLength={50}
-                                  as="span"
-                                >
-                                  {config.texts?.quizCompleted || "Tamamlandı! 🎉"}
-                                </EditableText>
-                              : <EditableText
-                                  configPath="texts.correctAnswer"
-                                  placeholder="Correct answer message..."
-                                  maxLength={50}
-                                  as="span"
-                                >
-                                  {config.texts?.correctAnswer || "Doğru! 🎉"}
-                                </EditableText>)
-                            : <EditableText
-                                configPath="texts.wrongAnswer"
-                                placeholder="Wrong answer message..."
-                                maxLength={50}
-                                as="span"
-                              >
-                                {config.texts?.wrongAnswer || "Incorrect answer"}
-                              </EditableText>}
-                        </span>
-                      </div>
-
-                      {/* Buttons */}
-                      <div className="flex gap-2" />
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            )}
-
-            {/* Mobile BottomSheet for Result Panel */}
-            {isMobile && (
-              <BottomSheetComponent
-                open={showResult}
-                onDismiss={handleBottomSheetDismiss}
-                title={lastAnswerResult
-                  ? (lastAnswerResult.wasLastQuestion && lastAnswerResult.wasCorrect
-                    ? (config.texts?.quizCompleted || "Tamamlandı! 🎉")
-                    : (lastAnswerResult.wasCorrect
-                      ? (config.texts?.correctAnswer || "Doğru! 🎉")
-                      : (config.texts?.wrongAnswer || "Yanlış Cevap")))
-                  : (config.texts?.wrongAnswer || "Yanlış Cevap")
-                }
-              >
-                <div className={`space-y-4 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} p-4`}>
-
-                  {/* Simple Explanation */}
-                  <div>
-                    <div className="text-sm text-muted-foreground leading-relaxed text-[#1C1C1E] dark:text-[#F2F2F7]">
-                      <EditableText
-                        configPath={`questions.list.${currentQuestionIndex}.explanation`}
-                        placeholder="Enter question explanation..."
-                        maxLength={500}
-                        multiline={true}
-                        as="span"
-                      >
-                        {currentQuestion?.explanation}
-                      </EditableText>
-                    </div>
                   </div>
+                  {/* Action Buttons */}
+                  <div className="flex flex-col gap-3 pt-3">
+                    {(lastAnswerResult?.wasCorrect || (!lastAnswerResult?.wasCorrect && attempts >= maxAttempts) || isAnswerLocked) && (
+                      <>
+                        {/* Next Question button - shown when not on last question */}
+                        {currentQuestionIndex < questions.length - 1 && (
+                          <motion.button
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.8, delay: 0.4 }}
+                            whileHover={{
+                              scale: 1.05,
+                              boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
+                            }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => {
+                              // BottomSheet kapandıktan sonra next question işlemini yap
+                              setTimeout(() => {
+                                handleNextQuestion()
+                              }, 300)
+                            }}
+                            className={`relative flex items-center justify-center space-x-2 px-4 py-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full`}
+                          >
+                            {/* Button shimmer effect */}
+                            <motion.div
+                              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                              animate={{ x: ['-100%', '200%'] }}
+                              transition={{
+                                duration: 2,
+                                repeat: Infinity,
+                                ease: "linear"
+                              }}
+                            />
 
-                  {/* Simple Tips */}
-                  {currentQuestion?.tips && (
-                    <div>
-                      <div className="grid gap-2">
-                        {currentQuestion?.tips.map((tip: string, index: number) => (
-                          <div key={index} className="flex items-start space-x-2 text-sm">
-                            <div className="w-1.5 h-1.5 bg-[#1C1C1E] dark:bg-[#F2F2F7] rounded-full mt-2 flex-shrink-0" />
-                            <span className="text-muted-foreground text-[#1C1C1E] dark:text-[#F2F2F7]">
-                              <EditableText
-                                configPath={`questions.list.${currentQuestionIndex}.tips.${index}`}
-                                placeholder="Enter tip..."
-                                maxLength={200}
-                                multiline={true}
-                                as="span"
-                              >
-                                {tip}
-                              </EditableText>
+                            <ArrowRight size={18} className={`relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
+                            <span className={`text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
+                              {config.texts?.nextQuestion || "Sonraki Soru"}
                             </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                          </motion.button>
+                        )}
 
-                </div>
-                {/* Action Buttons */}
-                <div className="flex flex-col gap-3 pt-3">
-                  {(lastAnswerResult?.wasCorrect || (!lastAnswerResult?.wasCorrect && attempts >= maxAttempts) || isAnswerLocked) && (
-                    <>
-                      {/* Next Question button - shown when not on last question */}
-                      {currentQuestionIndex < questions.length - 1 && (
-                        <motion.button
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ duration: 0.8, delay: 0.4 }}
-                          whileHover={{
-                            scale: 1.05,
-                            boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
-                          }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => {
-                            // BottomSheet kapandıktan sonra next question işlemini yap
-                            setTimeout(() => {
-                              handleNextQuestion()
-                            }, 300)
-                          }}
-                          className={`relative flex items-center justify-center space-x-2 px-4 py-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full`}
-                        >
-                          {/* Button shimmer effect */}
-                          <motion.div
-                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                            animate={{ x: ['-100%', '200%'] }}
-                            transition={{
-                              duration: 2,
-                              repeat: Infinity,
-                              ease: "linear"
+                        {/* Next Slide button - shown when quiz is completed (last question answered correctly) */}
+                        {currentQuestionIndex === questions.length - 1 && lastAnswerResult?.wasCorrect && (
+                          <motion.button
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.8, delay: 0.4 }}
+                            whileHover={{
+                              scale: 1.05,
+                              boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
                             }}
-                          />
-
-                          <ArrowRight size={18} className={`relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
-                          <span className={`text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
-                            {config.texts?.nextQuestion || "Sonraki Soru"}
-                          </span>
-                        </motion.button>
-                      )}
-
-                      {/* Next Slide button - shown when quiz is completed (last question answered correctly) */}
-                      {currentQuestionIndex === questions.length - 1 && lastAnswerResult?.wasCorrect && (
-                        <motion.button
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ duration: 0.8, delay: 0.4 }}
-                          whileHover={{
-                            scale: 1.05,
-                            boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
-                          }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => {
-                            // BottomSheet kapandıktan sonra next slide işlemini yap
-                            setTimeout(() => {
-                              onNextSlide();
-                            }, 300)
-                          }}
-                          className={`relative flex items-center justify-center space-x-2 px-4 py-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full`}
-                        >
-                          {/* Button shimmer effect */}
-                          <motion.div
-                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                            animate={{ x: ['-100%', '200%'] }}
-                            transition={{
-                              duration: 2,
-                              repeat: Infinity,
-                              ease: "linear"
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => {
+                              // BottomSheet kapandıktan sonra next slide işlemini yap
+                              setTimeout(() => {
+                                onNextSlide();
+                              }, 300)
                             }}
-                          />
+                            className={`relative flex items-center justify-center space-x-2 px-4 py-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full`}
+                          >
+                            {/* Button shimmer effect */}
+                            <motion.div
+                              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                              animate={{ x: ['-100%', '200%'] }}
+                              transition={{
+                                duration: 2,
+                                repeat: Infinity,
+                                ease: "linear"
+                              }}
+                            />
 
-                          <ArrowUpRight size={18} className={`relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
-                          <span className={`text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
-                            {config.texts?.nextSlide || "Sonraki Slayt"}
-                          </span>
-                        </motion.button>
-                      )}
-                    </>
-                  )}
+                            <ArrowUpRight size={18} className={`relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
+                            <span className={`text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
+                              {config.texts?.nextSlide || "Sonraki Slayt"}
+                            </span>
+                          </motion.button>
+                        )}
+                      </>
+                    )}
 
-                  {/* Retry button - shown when incorrect and attempts remain */}
-                  {!lastAnswerResult?.wasCorrect && attempts < maxAttempts && !isAnswerLocked && (
-                    <motion.button
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.8, delay: 0.2 }}
-                      whileHover={{
-                        scale: 1.05,
-                        boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
-                      }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => {
-                        setTimeout(() => {
-                          retryQuestion();
-                        }, 300);
-                      }}
-                      className={`relative flex items-center justify-center space-x-2 px-4 py-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full`}
-                    >
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                        animate={{ x: ['-100%', '200%'] }}
-                        transition={{
-                          duration: 2,
-                          repeat: Infinity,
-                          ease: "linear"
+                    {/* Retry button - shown when incorrect and attempts remain */}
+                    {!lastAnswerResult?.wasCorrect && attempts < maxAttempts && !isAnswerLocked && (
+                      <motion.button
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.8, delay: 0.2 }}
+                        whileHover={{
+                          scale: 1.05,
+                          boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
                         }}
-                      />
-                      <RefreshCw size={18} className={`relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
-                      <span className={`text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
-                        {config.texts?.retryQuestion || "Tekrar Dene"}
-                      </span>
-                    </motion.button>
-                  )}
-                </div>
-              </BottomSheetComponent>
-            )}
-          </div>
-        </motion.div>
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => {
+                          setTimeout(() => {
+                            retryQuestion();
+                          }, 300);
+                        }}
+                        className={`relative flex items-center justify-center space-x-2 px-4 py-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full`}
+                      >
+                        <motion.div
+                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                          animate={{ x: ['-100%', '200%'] }}
+                          transition={{
+                            duration: 2,
+                            repeat: Infinity,
+                            ease: "linear"
+                          }}
+                        />
+                        <RefreshCw size={18} className={`relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
+                        <span className={`text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
+                          {config.texts?.retryQuestion || "Tekrar Dene"}
+                        </span>
+                      </motion.button>
+                    )}
+                  </div>
+                </BottomSheetComponent>
+              )}
+            </div>
+          </motion.div>
 
-        {/* Call To Action */}
-        <CallToAction
-          text={
-            showResult
-              ? (!isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked
-                ? (config.texts?.retryQuestion || "Try Again")
-                : (currentQuestionIndex === questions.length - 1
-                  ? (
-                    // Prefer explicit completion CTA, then Next Slide label, then generic completed text
-                    resolveCTA(config.quizCompletionCallToActionText) ||
-                    config.texts?.nextSlide ||
-                    config.texts?.quizCompleted ||
-                    "Sonraki Slayt"
-                  )
-                  : (config.texts?.nextQuestion || "Next Question")))
-              : (resolveCTA(config.callToActionText) || "Answer to Continue")
-          }
-          delay={0.8}
-          onClick={() => {
-            if (!showResult) return;
-            if (!isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked) {
-              retryQuestion();
-              return;
+          {/* Call To Action */}
+          <CallToAction
+            text={
+              showResult
+                ? (!isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked
+                  ? (config.texts?.retryQuestion || "Try Again")
+                  : (currentQuestionIndex === questions.length - 1
+                    ? (
+                      // Prefer explicit completion CTA, then Next Slide label, then generic completed text
+                      resolveCTA(config.quizCompletionCallToActionText) ||
+                      config.texts?.nextSlide ||
+                      config.texts?.quizCompleted ||
+                      "Sonraki Slayt"
+                    )
+                    : (config.texts?.nextQuestion || "Next Question")))
+                : (resolveCTA(config.callToActionText) || "Answer to Continue")
             }
-            if (currentQuestionIndex === questions.length - 1) {
-              onNextSlide();
-            } else {
-              handleNextQuestion();
-            }
-          }}
-          disabled={!showResult}
-          iconPosition={showResult && !isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked ? 'left' : 'right'}
-          icon={showResult && !isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked ? (
-            <RefreshCw size={16} className="transition-transform group-hover:-rotate-6 text-[#1C1C1E] dark:text-[#F2F2F7]" aria-hidden="true" />
-          ) : undefined}
-          dataTestId="cta-quiz"
-        />
+            delay={0.8}
+            onClick={() => {
+              if (!showResult) return;
+              if (!isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked) {
+                retryQuestion();
+                return;
+              }
+              if (currentQuestionIndex === questions.length - 1) {
+                onNextSlide();
+              } else {
+                handleNextQuestion();
+              }
+            }}
+            disabled={!showResult}
+            iconPosition={showResult && !isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked ? 'left' : 'right'}
+            icon={showResult && !isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked ? (
+              <RefreshCw size={16} className="transition-transform group-hover:-rotate-6 text-[#1C1C1E] dark:text-[#F2F2F7]" aria-hidden="true" />
+            ) : undefined}
+            dataTestId="cta-quiz"
+          />
 
-      </div>
+        </div>
       </FontWrapper>
     </EditModeProvider>
   );

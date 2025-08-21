@@ -23,6 +23,7 @@ import { FontWrapper } from "../common/FontWrapper";
 import { EditableText } from "../common/EditableText";
 import { EditModeProvider, useEditMode } from "../../contexts/EditModeContext";
 import { EditModePanel } from "../common/EditModePanel";
+import { ScientificBasisInfo } from "../common/ScientificBasisInfo";
 import { logger } from "../../utils/logger";
 import { useIsMobile } from "../ui/use-mobile";
 import { scormService } from "../../utils/scormService";
@@ -1137,6 +1138,12 @@ function SummarySceneContent({ config, completionData, sceneId, reducedMotion, d
 
       {/* Edit Mode Panel */}
       <EditModePanel />
+      
+      {/* Scientific Basis Info */}
+      <ScientificBasisInfo 
+        config={currentConfig} 
+        sceneType={(currentConfig as any)?.scene_type || 'summary'} 
+      />
     </FontWrapper>
   );
 }

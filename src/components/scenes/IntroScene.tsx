@@ -4,8 +4,9 @@ import React, { ReactNode, useMemo, useCallback, useState, useEffect } from "rea
 import { LucideIcon, ClockIcon, ChartBarIcon } from "lucide-react"
 import { FontWrapper } from "../common/FontWrapper";
 import { EditableText } from "../common/EditableText";
-import { EditModeProvider, useEditMode } from "../../contexts/EditModeContext";
+import { EditModeProvider } from "../../contexts/EditModeContext";
 import { EditModePanel } from "../common/EditModePanel";
+import { ScientificBasisInfo } from "../common/ScientificBasisInfo";
 import { useIsMobile } from "../ui/use-mobile";
 import { CallToAction } from "../ui/CallToAction";
 import { deepMerge } from "../../utils/deepMerge";
@@ -427,10 +428,10 @@ export const IntroScene = React.memo(({
   // 🎯 OPTİMİZE EDİLDİ - Daha erken animasyon başlangıcı
   const [isVisible, setIsVisible] = useState(false);
   const isMobile = useIsMobile();
-  
+
   // Memoize animation trigger delay
   const animationDelay = useMemo(() => disableDelays ? 0 : 10, [disableDelays]);
-  
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(true);
@@ -568,7 +569,7 @@ export const IntroScene = React.memo(({
       onSave={(newConfig) => {
         console.log('IntroScene onSave - newConfig:', newConfig);
         console.log('IntroScene onSave - original config:', config);
-        
+
         // Apply the entire newConfig as changes
         setEditChanges(newConfig);
         console.log('IntroScene onSave - applied config:', newConfig);
@@ -579,6 +580,10 @@ export const IntroScene = React.memo(({
       }}
     >
       <EditModePanel />
+      <ScientificBasisInfo
+        config={currentConfig}
+        sceneType={(config as any)?.scene_type || 'intro'}
+      />
       <FontWrapper variant="primary" className={containerClassName} data-scene-type={(config as any)?.scene_type || 'intro'} data-scene-id={sceneId as any} data-testid="scene-intro">
         {/* Apple-style Background Sparkles - Balanced */}
         {sparkles?.enabled && (

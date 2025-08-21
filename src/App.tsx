@@ -1757,6 +1757,7 @@ export default function App(props: AppProps = {}) {
                             <div data-scene-type={(currentSceneConfig as any)?.scene_type || 'quiz'} data-scene-id={(scenes[currentScene] as any)?.sceneId}>
                               <MemoizedQuizScene
                                 config={currentSceneConfig}
+                                sceneId={(scenes[currentScene] as any)?.sceneId}
                                 onQuizCompleted={handleQuizCompleted}
                                 onNextSlide={nextScene}
                                 isVisible={true}

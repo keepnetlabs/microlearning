@@ -6,6 +6,7 @@ import { FontWrapper } from "../common/FontWrapper";
 import { EditableText } from "../common/EditableText";
 import { EditModeProvider } from "../../contexts/EditModeContext";
 import { EditModePanel } from "../common/EditModePanel";
+import { ScientificBasisInfo } from "../common/ScientificBasisInfo";
 import { scormService } from "../../utils/scormService";
 import { useIsMobile } from "../ui/use-mobile";
 import { deepMerge } from "../../utils/deepMerge";
@@ -212,6 +213,10 @@ export const SurveyScene = memo(function SurveyScene({
       onEditModeChange={setIsInEditMode}
     >
       <EditModePanel />
+      <ScientificBasisInfo 
+        config={currentConfig} 
+        sceneType={(currentConfig as any)?.scene_type || 'survey'} 
+      />
       <FontWrapper>
         <main
           className="flex flex-col items-center justify-center h-full sm:px-6"

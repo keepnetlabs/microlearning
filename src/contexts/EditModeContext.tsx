@@ -2,7 +2,9 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 
 interface EditModeContextType {
     isEditMode: boolean;
+    isViewMode: boolean;
     toggleEditMode: () => void;
+    toggleViewMode: () => void;
     editingField: string | null;
     setEditingField: (field: string | null) => void;
     tempConfig: any;
@@ -64,6 +66,7 @@ interface EditModeProviderProps {
     sceneId?: string;
     onSave?: (config: any) => void;
     onEditModeChange?: (isEditMode: boolean) => void;
+    onViewModeChange?: (isViewMode: boolean) => void;
 }
 
 export const EditModeProvider: React.FC<EditModeProviderProps> = ({
@@ -71,9 +74,11 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
     initialConfig,
     sceneId,
     onSave,
-    onEditModeChange
+    onEditModeChange,
+    onViewModeChange
 }) => {
     const [isEditMode, setIsEditMode] = useState(false);
+    const [isViewMode, setIsViewMode] = useState(false);
     const [editingField, setEditingField] = useState<string | null>(null);
     const [tempConfig, setTempConfig] = useState(initialConfig);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -88,12 +93,39 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
         const newEditMode = !isEditMode;
         setIsEditMode(newEditMode);
         setEditingField(null);
+        
+        // Edit mode açılırken View mode'u kapat
+        if (newEditMode && isViewMode) {
+            setIsViewMode(false);
+            if (onViewModeChange) {
+                onViewModeChange(false);
+            }
+        }
 
         // Notify parent about edit mode change
         if (onEditModeChange) {
             onEditModeChange(newEditMode);
         }
-    }, [isEditMode, hasUnsavedChanges, initialConfig, onEditModeChange]);
+    }, [isEditMode, isViewMode, hasUnsavedChanges, initialConfig, onEditModeChange, onViewModeChange]);
+
+    const toggleViewMode = useCallback(() => {
+        const newViewMode = !isViewMode;
+        setIsViewMode(newViewMode);
+        
+        // View mode açılırken Edit mode'u kapat
+        if (newViewMode && isEditMode) {
+            setIsEditMode(false);
+            setEditingField(null);
+            if (onEditModeChange) {
+                onEditModeChange(false);
+            }
+        }
+
+        // Notify parent about view mode change
+        if (onViewModeChange) {
+            onViewModeChange(newViewMode);
+        }
+    }, [isViewMode, isEditMode, onViewModeChange, onEditModeChange]);
 
     const updateTempConfig = useCallback((path: string, value: any) => {
         console.log('=== UPDATE TEMP CONFIG ===');
@@ -184,7 +216,9 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
 
     const value: EditModeContextType = {
         isEditMode,
+        isViewMode,
         toggleEditMode,
+        toggleViewMode,
         editingField,
         setEditingField,
         tempConfig,

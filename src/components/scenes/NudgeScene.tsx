@@ -6,6 +6,7 @@ import { FontWrapper } from "../common/FontWrapper";
 import { EditableText } from "../common/EditableText";
 import { EditModeProvider } from "../../contexts/EditModeContext";
 import { EditModePanel } from "../common/EditModePanel";
+import { ScientificBasisInfo } from "../common/ScientificBasisInfo";
 import { useIsMobile } from "../ui/use-mobile";
 import { CallToAction } from "../ui/CallToAction";
 import { deepMerge } from "../../utils/deepMerge";
@@ -99,6 +100,10 @@ export const NudgeScene = memo(function NudgeScene({ config, onNextSlide, sceneI
       onEditModeChange={setIsInEditMode}
     >
       <EditModePanel />
+      <ScientificBasisInfo 
+        config={currentConfig} 
+        sceneType={(currentConfig as any)?.scene_type || 'nudge'} 
+      />
       <FontWrapper>
         <div className="flex flex-col items-center justify-center h-full" data-scene-type={(config as any)?.scene_type || 'nudge'} data-scene-id={sceneId as any}>
         {!isMobile && <div className="mb-4 relative">
