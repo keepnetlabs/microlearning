@@ -129,10 +129,13 @@ export default function App(props: AppProps = {}) {
   };
   const DEFAULT_BASE_URL = "https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001";
   const DEFAULT_LANG_URL = "https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001/lang/en";
+  const DEFAULT_INBOX_URL = "https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001/all/inbox/en";
   const initialRemoteBaseUrl = normalizeUrlParam(urlParams?.get('baseUrl')) || DEFAULT_BASE_URL;
   const initialRemoteLangUrl = normalizeUrlParam(urlParams?.get('langUrl')) || DEFAULT_LANG_URL;
+  const initialRemoteInboxUrl = normalizeUrlParam(urlParams?.get('inboxUrl')) || DEFAULT_INBOX_URL;
   const remoteBaseUrlRef = useRef<string>(initialRemoteBaseUrl);
   const remoteLangUrlTemplateRef = useRef<string>(initialRemoteLangUrl);
+  const remoteInboxUrlRef = useRef<string>(initialRemoteInboxUrl);
 
   // İlk mount'ta remote config'i yükle (sadece remote)
   useEffect(() => {
