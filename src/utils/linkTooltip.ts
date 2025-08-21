@@ -17,11 +17,6 @@ export const enhanceLinkTooltips = (htmlContent: string): string => {
   const linkRegex = /<a\s+([^>]*?\s+)?href\s*=\s*["']([^"']+)["'][^>]*?>(.*?)<\/a>/gi;
   
   return htmlContent.replace(linkRegex, (match, beforeHref, href, linkText) => {
-    // Check if title attribute already exists
-    if (match.includes('title=')) {
-      return match; // Return original if title already exists
-    }
-    
     let tooltipUrl = href;
     
     // If href is # or empty, try to extract URL from link text or mapping
@@ -46,11 +41,17 @@ export const enhanceLinkTooltips = (htmlContent: string): string => {
     
     // Don't show tooltip for # or empty URLs without mapping
     if ((href === '#' || href === '') && tooltipUrl === href) {
-      return match;
+      tooltipUrl = '';
     }
     
-    // Insert title attribute and class before the closing >
-    const enhancedLink = match.replace(/(<a\s+[^>]*?)>/i, `$1 title="${tooltipUrl}" class="link-with-tooltip">`);
+    // Insert data-tooltip attribute for the portal system
+    let enhancedLink = match.replace(/(<a\s+[^>]*?)>/i, `$1 data-tooltip="${tooltipUrl}" class="link-with-portal-tooltip">`);
+    
+    // Add target="_blank" if not already present
+    if (!enhancedLink.includes('target=')) {
+      enhancedLink = enhancedLink.replace(/(<a\s+[^>]*?)>/i, `$1 target="_blank" rel="noopener noreferrer">`);
+    }
+    
     return enhancedLink;
   });
 };
@@ -64,6 +65,12 @@ export const addCustomTooltipListeners = (containerElement: HTMLElement) => {
     if (href && href !== '#' && href !== '') {
       link.setAttribute('title', href);
       link.classList.add('link-with-tooltip');
+      
+      // Add target="_blank" if not already present
+      if (!link.getAttribute('target')) {
+        link.setAttribute('target', '_blank');
+        link.setAttribute('rel', 'noopener noreferrer');
+      }
     }
   });
 };

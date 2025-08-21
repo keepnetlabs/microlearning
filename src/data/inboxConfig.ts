@@ -50,6 +50,8 @@ export interface EmailAttachment {
   name: string;
   size: string;
   type: 'pdf' | 'doc' | 'xls' | 'zip' | 'img' | 'exe' | 'txt' | 'unknown';
+  content?: string; // HTML content for preview
+  url?: string; // External URL for images/files
 }
 
 export interface EmailData {
@@ -118,242 +120,167 @@ export const defaultInboxConfig: InboxSceneConfig = {
   emails: [
     {
       id: "1",
-      sender: "WhatsApp Support",
-      subject: "🔒 Security Alert: Unusual Login Detected",
-      preview: "We've detected multiple failed login attempts from Istanbul, Turkey. Verify your identity now...",
-      timestamp: "10 minutes ago",
+      sender: "security@whatsapp.com",
+      subject: "New device verification required",
+      preview: "We noticed someone tried to access your account from Istanbul. Please verify...",
+      timestamp: "3 hours ago",
       isPhishing: true,
       content: `
-      <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Dear WhatsApp User,</p>
-      <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Our security systems have detected multiple failed login attempts from an unrecognized device in <strong class="text-[#1C1C1E] dark:text-[#F2F2F7]">Istanbul, Turkey</strong> on your WhatsApp account associated with this email address.</p>
-      <p class="text-[#1C1C1E] dark:text-[#F2F2F7]"><strong class="text-[#1C1C1E] dark:text-[#F2F2F7]">Security Alert Details:</strong></p>
+      <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Hello,</p>
+      <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">We noticed someone tried to access your WhatsApp account from a new device. As part of our standard security procedure, we need to verify this was you.</p>
+      <p class="text-[#1C1C1E] dark:text-[#F2F2F7]"><strong class="text-[#1C1C1E] dark:text-[#F2F2F7]">Login attempt details:</strong></p>
       <ul class="text-[#1C1C1E] dark:text-[#F2F2F7]">
-        <li>IP Address: 185.234.217.82</li>
-        <li>Device: Samsung Galaxy S21 (Android 12)</li>
-        <li>Time: Today at 14:32 GMT+3</li>
+        <li>Device: Samsung Galaxy S21</li>
         <li>Location: Istanbul, Turkey</li>
+        <li>Time: February 16, 2024 at 2:30 PM</li>
       </ul>
-      <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">To secure your account and prevent unauthorized access, please verify your identity by scanning the QR code below with your registered device:</p>
-      <div style="text-align: center; margin: 20px 0; padding: 20px; background: #f5f5f5; border-radius: 8px;">
-        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUoAAAFKAQAAAABTUiuoAAACYElEQVR4nO2bMY7jMAxFH0cCUsrAHCBHsW82V7OPMgdYwCoDyPhbSI6zWwySIomAIQsX9is+QFDgJ2UTd8bycS8Jjjrq6AdkazFlM5vYzGzYzMwi+6fYiVZHCZIkAUEsA0jfEUYVGCVJazdaHYVWPeli0hpa3siRWnnT0wU4+jiaIywWMTtfjOVcXi3A0QfQJNmUCozfJ2l+vQBHf44IwN7Gb1FkQ8uAAbFAEpCfJ8DRB9Gt9n2QT7KJIPtagxhXYDEzs6Ebrb8bja16AMibQSqttpYhcOud367V0Q/IkWawzgXNbNa+pYJNbMbifqsPFGkFzYDmVJrLIunaZQRJa5Dmt2t1FEmlPhhVWt50eOIkteS9XaujVDs8qrQqq3WUJMa1DTm8tnpBb3LU0nNN3pyk/XT02uoCvTn1jooCgjQTxLgPED1bHaC0gW5N1O271mUkz1Zf6GaQI8epZ1OOtN7i+qEPrY6GWkc2XSfvy7lgX+tmcNivLrT+bjRSp4OAFgtFyxBo7/IApD/RSM8T4Ohj2cqfslpCaYV2MJ60D3RPsnHuQquje0942GHYBxrXpbJ38B2hW90Omw3NarXB4DGcf7IAR++N/2vrapH3B+AdfD/ocefp6A7TpW61bALv4LtCjztPm9mULga0bWS1yNU2d6H1d6N1028Q6lbfyJ9iMVBdThKK1Wbx7Vod/QfNZsdWq94snNmsXi/sTKujgE2pYF8q2LSvtmx6oQBHf4rW+u226lg/tml8uu5O3q7V0ea32p0nM805trainoT5pBv0OQIcvTPM/why1NGnoH8B6bKow7td0U8AAAAASUVORK5CYII=" alt="QR Code" style="max-width:200px;margin:0 auto;">
-        <p style="font-size: 12px; color: #666; margin: 5px 0 0 0;">Scan this code with WhatsApp on your phone</p>
-      </div>
-      <p class="text-[#1C1C1E] dark:text-[#F2F2F7]"><strong class="text-[#1C1C1E] dark:text-[#F2F2F7]">⚠️ URGENT ACTION REQUIRED:</strong></p>
-      <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">If you don't verify within 24 hours, your account will be temporarily suspended for security reasons. If this wasn't you, secure your account immediately by clicking: <a href="#" style="color: #25D366; text-decoration: none;">whatsapp-security-verify.net/urgent-protection</a></p>
-      <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">For immediate assistance, contact our 24/7 Security Team at: <strong class="text-[#1C1C1E] dark:text-[#F2F2F7]">+1 (800) WHATSAPP</strong></p>
-      <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Best regards,<br>WhatsApp Security & Trust Team<br>Meta Inc.</p>
-      <p style="font-size: 11px; color: #999; margin-top: 20px;">This email was sent to protect your account. If you believe this is an error, please ignore this message.</p>
+      <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">If this was you, please verify by clicking the link below to confirm the new device:</p>
+      <p class="text-[#1C1C1E] dark:text-[#F2F2F7]"><a href="https://whatsapp-security-verification.net/device-confirm" target="_blank" rel="noopener noreferrer" style="color: #007bff; text-decoration: underline;">Verify new device login</a></p>
+      <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">If you didn't try to log in from this device, your account is still secure. You can safely ignore this message.</p>
+      <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">For your security, we recommend enabling two-step verification in WhatsApp Settings.</p>
+      <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Thanks,<br>WhatsApp Security Team</p>
+      <p style="font-size: 11px; color: #999; margin-top: 20px;">If you have questions, visit our Help Center in the WhatsApp app.</p>
       `,
       headers: [
         "Return-Path: <security@whatsapp.com>",
         "SPF: fail (whatsapp.com does not designate 45.142.166.23 as permitted sender)",
         "DMARC: fail (p=reject dis=none) header.from=whatsapp.com"
       ],
-      difficulty: "MEDIUM-EASY",
-      explanation: "This is a WhatsApp QR code hijacking scam. The QR code links to a malicious site that can steal your WhatsApp session.",
+      difficulty: "MEDIUM",
+      explanation: "This email looks professional but the link leads to a fake domain. Real WhatsApp security notifications come through the app, not email with external links.",
       attachments: [
         {
           id: "att-1-1",
-          name: "security_verification.exe",
-          size: "2.3 MB",
-          type: "exe"
+          name: "security_report.pdf",
+          size: "245 KB",
+          type: "pdf",
+          content: `
+            <div class="p-3 sm:p-4 md:p-6 bg-white">
+              <div class="border-b border-gray-200 pb-4 mb-6">
+                <h1 class="text-xl font-bold text-gray-900">WhatsApp Security Report</h1>
+                <p class="text-sm text-gray-600 mt-1">Account Verification Details</p>
+              </div>
+              
+              <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Login Attempt Summary</h3>
+                <div class="bg-gray-50 p-3 sm:p-4 rounded border">
+                  <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div><span class="text-gray-600">IP Address:</span> 185.234.217.82</div>
+                    <div><span class="text-gray-600">Device:</span> Samsung Galaxy S21</div>
+                    <div><span class="text-gray-600">Location:</span> Istanbul, Turkey</div>
+                    <div><span class="text-gray-600">Time:</span> Feb 16, 2:30 PM</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Verification Steps</h3>
+                <ol class="space-y-2 text-sm text-gray-700">
+                  <li>1. Review the login details above</li>
+                  <li>2. Confirm if this was an authorized access</li>
+                  <li>3. Update your security settings if needed</li>
+                </ol>
+              </div>
+              
+              <div class="bg-blue-50 border border-blue-200 p-3 sm:p-4 rounded">
+                <p class="text-sm text-blue-800">
+                  <strong>Note:</strong> This report is generated automatically for your security. 
+                  No action is required if you recognize this login attempt.
+                </p>
+              </div>
+            </div>
+          `
         }
       ]
     },
     {
       id: "2",
-      sender: "WhatsApp Business Security",
-      subject: "⚠️ Account Compromised - Immediate Action Required",
-      preview: "Your WhatsApp Business account has been flagged for suspicious activity. Secure now...",
-      timestamp: "10 minutes ago",
+      sender: "business-support@whatsapp.com",
+      subject: "Complete your business verification",
+      preview: "Your WhatsApp Business application is almost ready. One more step to complete...",
+      timestamp: "5 hours ago",
       isPhishing: true,
       content: `
-        <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Hello WhatsApp User,</p>
-        <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">We've identified <strong class="text-[#1C1C1E] dark:text-[#F2F2F7]">suspicious activity</strong> on your WhatsApp Business account that requires immediate attention. Your account security may have been compromised.</p>
-        <p class="text-[#1C1C1E] dark:text-[#F2F2F7]"><strong class="text-[#1C1C1E] dark:text-[#F2F2F7]">Detected Issues:</strong></p>
+        <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Hi there,</p>
+        <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Good news! Your WhatsApp Business verification is 90% complete. We just need one final step to activate your business features.</p>
+        <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">To complete your setup:</p>
         <ul class="text-[#1C1C1E] dark:text-[#F2F2F7]">
-          <li>✗ Multiple devices attempting to access your account</li>
-          <li>✗ Unusual messaging patterns detected</li>
-          <li>✗ Account reported by 3 different users for spam</li>
-          <li>✗ Login attempts from 5 different countries in past hour</li>
+          <li>Download and run the verification tool below</li>
+          <li>Confirm your business details</li>
+          <li>Get access to advanced messaging features</li>
         </ul>
-        <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">To restore full access to your account and prevent permanent suspension, please complete the following steps:</p>
-        <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 15px; margin: 15px 0;">
-          <p style="margin: 0; font-weight: bold; color: #856404;">🔒 Secure Your Account Now</p>
-          <p style="margin: 5px 0 0 0; color: #856404;">Download our official WhatsApp Security Verification Tool</p>
-        </div>
-        <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">👉 <strong class="text-[#1C1C1E] dark:text-[#F2F2F7]">Download Link:</strong> <a href="#" style="color: #dc3545; text-decoration: underline;">whatsapp-verify-security.com/download</a></p>
-        <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">This lightweight verification tool (2.1MB) will scan your device for security threats and restore your account access within minutes.</p>
-        <p class="text-[#1C1C1E] dark:text-[#F2F2F7]"><strong class="text-[#1C1C1E] dark:text-[#F2F2F7]">⚠️ TIME SENSITIVE:</strong> You have <span style="color: #dc3545; font-weight: bold;">2 hours</span> to complete verification before your account is permanently deleted due to security policy violations.</p>
-        <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Already verified? <a href="#" style="color: #007bff;">Click here to confirm completion</a></p>
-        <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Thank you for using WhatsApp Business,<br><strong class="text-[#1C1C1E] dark:text-[#F2F2F7]">WhatsApp Support Team</strong><br>Meta Platforms Inc.</p>
-        <p style="font-size: 10px; color: #6c757d; margin-top: 25px; border-top: 1px solid #dee2e6; padding-top: 10px;">
-          WhatsApp Inc. | 1601 Willow Rd, Menlo Park, CA 94025 | © 2024 Meta Inc.
-        </p>
+        <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">This verification ensures your business meets Meta's standards for authentic communication.</p>
+        <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Your application will expire in 48 hours if not completed.</p>
+        <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Best regards,<br><strong class="text-[#1C1C1E] dark:text-[#F2F2F7]">WhatsApp Business Team</strong><br>Meta Inc.</p>
       `,
       headers: [
-        "Return-Path: <support@whatsapp.com>",
+        "Return-Path: <business-support@whatsapp.com>",
         "SPF: fail (whatsapp.com does not designate 192.168.1.45 as permitted sender)",
         "DMARC: fail (p=reject dis=none) header.from=whatsapp.com"
       ],
-      difficulty: "MEDIUM",
-      explanation: "This phishing attempt uses urgent language and threatens permanent account deletion to pressure users into clicking malicious links.",
+      difficulty: "MEDIUM-HARD",
+      explanation: "This email creates urgency about business verification, but WhatsApp Business verification doesn't require downloading external tools.",
       attachments: [
         {
           id: "att-2-1",
-          name: "WhatsApp_Security_Tool.zip",
+          name: "business_verification_tool.exe",
           size: "1.8 MB",
-          type: "zip"
-        },
-        {
-          id: "att-2-2",
-          name: "readme.txt",
-          size: "1.2 KB",
-          type: "txt"
+          type: "exe",
+          content: `
+            <div class="text-center p-3 sm:p-4 md:p-6 bg-orange-50 border border-orange-200 rounded-lg">
+              <div class="text-orange-600 text-4xl mb-4">⚠️</div>
+              <h2 class="text-xl font-bold text-orange-800 mb-3">SUSPICIOUS EXECUTABLE</h2>
+              <p class="text-orange-700 mb-4">This file claims to be a business verification tool</p>
+              <div class="bg-white p-3 sm:p-4 rounded border-l-4 border-orange-500 text-left">
+                <p class="text-sm text-gray-700 mb-2"><strong>File Name:</strong> business_verification_tool.exe</p>
+                <p class="text-sm text-gray-700 mb-2"><strong>Size:</strong> 1.8 MB</p>
+                <p class="text-sm text-gray-700 mb-2"><strong>Risk Level:</strong> <span class="text-orange-600 font-bold">HIGH</span></p>
+                <p class="text-sm text-gray-700">Legitimate business verification happens within the WhatsApp app, not through external executables.</p>
+              </div>
+              <div class="mt-4 p-3 bg-red-100 rounded">
+                <p class="text-sm text-red-800"><strong>🚫 Security Alert:</strong> WhatsApp never requires downloading verification tools!</p>
+              </div>
+            </div>
+          `
         }
       ]
     },
     {
       id: "3",
-      sender: "WhatsApp Verification Team",
-      subject: "New Device Login - Verification Required",
-      preview: "iPhone 14 Pro Max detected in New York. Enter verification code to continue...",
-      timestamp: "10 minutes ago",
+      sender: "notifications@whatsapp.com",
+      subject: "Enhanced privacy settings available",
+      preview: "New privacy features are now available for your account. Update your settings...",
+      timestamp: "1 day ago",
       isPhishing: true,
       content: `
-         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Dear Valued User,</p>
-         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">We noticed an attempt to log into your WhatsApp account from a new device that we don't recognize:</p>
-         <div style="background: #f8f9fa; border-left: 4px solid #28a745; padding: 15px; margin: 15px 0;">
-           <p style="margin: 0; font-weight: bold; color: #1C1C1E;">📱 New Device Login Detected</p>
-           <p style="margin: 5px 0 0 0; color: #1C1C1E;"><strong style="color: #1C1C1E;">Device:</strong> iPhone 14 Pro Max</p>
-           <p style="margin: 5px 0 0 0; color: #1C1C1E;"><strong style="color: #1C1C1E;">Location:</strong> New York, United States</p>
-           <p style="margin: 5px 0 0 0; color: #1C1C1E;"><strong style="color: #1C1C1E;">Time:</strong> Today at 16:45 EST</p>
-           <p style="margin: 5px 0 0 0; color: #1C1C1E;"><strong style="color: #1C1C1E;">Browser:</strong> Safari 17.2</p>
+         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Hello,</p>
+         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">We're excited to introduce new privacy features to better protect your conversations and personal information.</p>
+         <div style="background: #f8f9fa; border-left: 4px solid #25D366; padding: 15px; margin: 15px 0;">
+           <p style="margin: 0; font-weight: bold; color: #1C1C1E;">🔐 Enhanced Privacy Features</p>
+           <ul style="margin: 10px 0; color: #1C1C1E;">
+             <li>Advanced message encryption</li>
+             <li>Improved contact privacy</li>
+             <li>Enhanced backup security</li>
+           </ul>
          </div>
-         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">As an additional security measure, please verify this login attempt by entering your 6-digit verification code below:</p>
-         <div style="text-align: center; margin: 20px 0;">
-           <input type="text" placeholder="Enter 6-digit code" style="padding: 12px; font-size: 18px; width: 200px; text-align: center; border: 2px solid #25D366; border-radius: 8px; letter-spacing: 3px;">
-           <br><br>
-           <button style="background: #25D366; color: white; padding: 12px 30px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Verify Account</button>
-         </div>
-         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">If you didn't attempt to log in, someone may be trying to access your account. Secure it immediately:</p>
-         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">👉 <strong class="text-[#1C1C1E] dark:text-[#F2F2F7]">Emergency Security:</strong> <a href="#" style="color: #dc3545; font-weight: bold;">secure-whatsapp-emergency.org/protect-now</a></p>
-         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">This secure link will immediately lock your account and send you recovery instructions.</p>
-         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Stay Safe,<br>The WhatsApp Security Team<br>Meta Inc.</p>
-         <p style="font-size: 11px; color: #6c757d; margin-top: 20px;">Need help? Visit our <a href="#" style="color: #1C1C1E;">Help Center</a> or contact support at support@whatsapp.com</p>
+         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">To enable these features, please update your privacy settings:</p>
+         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]"><a href="https://privacy-settings.whatsapp-updates.com/enhanced" target="_blank" rel="noopener noreferrer" style="color: #007bff; text-decoration: underline;">Update privacy settings now</a></p>
+         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">These new features are rolling out gradually and will be available to all users by the end of this month.</p>
+         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Thank you for using WhatsApp,<br>The WhatsApp Team</p>
+         <p style="font-size: 11px; color: #6c757d; margin-top: 20px;">Learn more about privacy at whatsapp.com/privacy</p>
        `,
       headers: [
-        "Return-Path: <verify@whatsapp.com>",
+        "Return-Path: <notifications@whatsapp.com>",
         "SPF: fail (whatsapp.com does not designate 203.0.113.42 as permitted sender)",
         "DMARC: fail (p=reject dis=none) header.from=whatsapp.com"
       ],
       difficulty: "HARD",
-      explanation: "This sophisticated phishing email attempts to collect verification codes and personal information through fake security alerts.",
-      attachments: [
-        {
-          id: "att-3-1",
-          name: "device_verification.pdf.exe",
-          size: "892 KB",
-          type: "exe"
-        }
-      ]
+      explanation: "This email looks very legitimate and uses subtle social engineering about privacy features, but the external link is suspicious.",
+      attachments: []
     },
     {
       id: "4",
-      sender: "WhatsApp Emergency Security",
-      subject: "🚨 CRITICAL: Account Termination in 59 Minutes",
-      preview: "Your account violates Terms of Service. Complete verification or lose everything...",
-      timestamp: "10 minutes ago",
-      isPhishing: true,
-      content: `
-         <div style="background: #dc3545; color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 18px; margin-bottom: 20px;">
-           🚨 CRITICAL SECURITY ALERT 🚨
-         </div>
-         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]"><strong class="text-[#1C1C1E] dark:text-[#F2F2F7]">URGENT NOTIFICATION:</strong> Your WhatsApp account has been flagged for immediate termination due to violations of our Terms of Service.</p>
-         <div style="background: #ffe6e6; border: 2px solid #dc3545; border-radius: 8px; padding: 20px; margin: 20px 0;">
-           <p style="margin: 0; font-weight: bold; color: #dc3545; font-size: 16px;">⏰ ACCOUNT TERMINATION IN: 59 MINUTES</p>
-           <p style="margin: 10px 0 0 0; color: #721c24;">Reason: Automated spam detection triggered by unusual message volume</p>
-         </div>
-         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]"><strong class="text-[#1C1C1E] dark:text-[#F2F2F7]">IMMEDIATE STEPS TO PREVENT ACCOUNT LOSS:</strong></p>
-         <ol style="background: #f8f9fa; padding: 20px; border-radius: 8px;" class="text-[#1C1C1E] dark:text-[#F2F2F7]">
-           <li><strong class="text-[#1C1C1E] dark:text-[#F2F2F7]">STEP 1:</strong> Click emergency verification: <a href="#" style="color: #dc3545; font-weight: bold; text-decoration: underline;">emergency-whatsapp-verify.net/save-account</a></li>
-           <li><strong class="text-[#1C1C1E] dark:text-[#F2F2F7]">STEP 2:</strong> Enter your registered phone number</li>
-           <li><strong class="text-[#1C1C1E] dark:text-[#F2F2F7]">STEP 3:</strong> Input the verification code sent to your device</li>
-           <li><strong class="text-[#1C1C1E] dark:text-[#F2F2F7]">STEP 4:</strong> Complete identity confirmation within 60 minutes</li>
-         </ol>
-         <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 15px; margin: 20px 0;">
-           <p style="margin: 0; font-weight: bold; color: #856404;">⚠️ WARNING</p>
-           <p style="margin: 5px 0 0 0; color: #856404;">Failure to verify will result in permanent account deletion. All chat history, media, and contacts will be permanently lost.</p>
-         </div>
-         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">If you believe this is an error, contact our Emergency Response Team immediately at: <strong class="text-[#1C1C1E] dark:text-[#F2F2F7]">+1-800-WHATSAPP-HELP</strong></p>
-         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]"><strong class="text-[#1C1C1E] dark:text-[#F2F2F7]">DO NOT IGNORE THIS MESSAGE!</strong></p>
-         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">WhatsApp Emergency Security Department<br>Trust & Safety Division<br>Meta Platforms Inc.</p>
-         <p style="font-size: 10px; color: #dc3545; margin-top: 25px; font-weight: bold;">This is an automated security alert. Response required within 60 minutes to prevent data loss.</p>
-       `,
-      headers: [
-        "Return-Path: <emergency@whatsapp.com>",
-        "SPF: fail (whatsapp.com does not designate 198.51.100.23 as permitted sender)",
-        "DMARC: fail (p=reject dis=none) header.from=whatsapp.com"
-      ],
-      difficulty: "EASY",
-      explanation: "This obvious phishing email uses aggressive tactics, ALL CAPS text, and extremely short time limits to create panic and rush users into making mistakes."
-    },
-    {
-      id: "5",
-      sender: "WhatsApp Device Management",
-      subject: "Enhanced Security Setup - Complete Your Profile",
-      preview: "Upgrade your WhatsApp with advanced encryption. QR scan or online verification...",
-      timestamp: "10 minutes ago",
-      isPhishing: true,
-      content: `
-         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Hi there,</p>
-         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Great news! We're upgrading your WhatsApp experience with enhanced security features. We noticed you're setting up WhatsApp on a new device - let's make sure everything is secure.</p>
-         <div style="background: linear-gradient(135deg, #25D366, #128C7E); color: white; padding: 20px; border-radius: 12px; text-align: center; margin: 20px 0;">
-           <h3 style="margin: 0; font-size: 20px;">🔐 Enhanced Security Setup</h3>
-           <p style="margin: 10px 0 0 0; opacity: 0.9;">Protect your conversations with advanced encryption</p>
-         </div>
-         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">To complete your secure setup, please verify your identity using one of these methods:</p>
-         <div style="display: flex; gap: 20px; margin: 20px 0;">
-           <div style="flex: 1; background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
-             <p style="font-size: 48px; margin: 0;">📱</p>
-             <p style="margin: 10px 0 5px 0; font-weight: bold; color: #1C1C1E;">Method 1: QR Scan</p>
-             <div style="background: white; border: 2px dashed #25D366; padding: 20px; margin: 10px 0; border-radius: 8px;">
-               <p style="margin: 0; font-size: 14px; color: #666;">[QR CODE SCANNER]</p>
-               <p style="margin: 5px 0 0 0; font-size: 12px; color: #999;">Scan with your registered device</p>
-             </div>
-           </div>
-           <div style="flex: 1; background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
-             <p style="font-size: 48px; margin: 0;">🌐</p>
-             <p style="margin: 10px 0 5px 0; font-weight: bold; color: #1C1C1E;">Method 2: Online Verification</p>
-             <a href="#" style="display: inline-block; background: #25D366; color: white; padding: 12px 25px; text-decoration: none; border-radius: 25px; font-weight: bold; margin: 10px 0;">Verify Online</a>
-             <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">whatsapp-device-verify.com</p>
-           </div>
-         </div>
-         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">⏰ <strong class="text-[#1C1C1E] dark:text-[#F2F2F7]">Time Remaining:</strong> <span style="color: #dc3545; font-weight: bold;">29 minutes 45 seconds</span></p>
-         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">This verification link expires in 30 minutes for your security. Don't worry - if you miss it, we'll send you a new one!</p>
-         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">New features you'll unlock after verification:</p>
-         <ul class="text-[#1C1C1E] dark:text-[#F2F2F7]">
-           <li>✅ End-to-end encryption for all devices</li>
-           <li>✅ Advanced spam protection</li>
-           <li>✅ Priority customer support</li>
-           <li>✅ Enhanced backup security</li>
-         </ul>
-         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Questions? Our 24/7 support team is here to help at <strong class="text-[#1C1C1E] dark:text-[#F2F2F7]">help@whatsapp.com</strong></p>
-         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Thanks for choosing WhatsApp!<br>WhatsApp Device Management Team<br>Meta Inc.</p>
-         <p class="text-[#1C1C1E] dark:text-[#F2F2F7]" style="margin-top: 20px;">This verification was triggered by a login attempt from: Chrome Browser, Windows 11, IP: 192.168.1.1</p>
-       `,
-      headers: [
-        "Return-Path: <device@whatsapp.com>",
-        "SPF: fail (whatsapp.com does not designate 172.16.254.1 as permitted sender)",
-        "DMARC: fail (p=reject dis=none) header.from=whatsapp.com"
-      ],
-      difficulty: "MEDIUM-HARD",
-      explanation: "This phishing email appears more legitimate but uses a fake domain and QR code verification to steal account access."
-    }
-    ,
-    {
-      id: "6",
-      sender: "WhatsApp Support",
+      sender: "support@whatsapp.com",
       subject: "✅ Backup Complete: 1.2 GB Saved Successfully",
       preview: "Your chat backup completed yesterday at 21:15. No action required.",
       timestamp: "Yesterday",
@@ -376,12 +303,70 @@ export const defaultInboxConfig: InboxSceneConfig = {
         "DMARC: pass (p=reject dis=none) header.from=support.whatsapp.com"
       ],
       difficulty: "EASY",
-      explanation: "This is a routine service notification. It does not ask for sensitive information or include suspicious links."
+      explanation: "This is a routine service notification. It does not ask for sensitive information or include suspicious links.",
+      attachments: [
+        {
+          id: "att-4-1",
+          name: "backup_summary.txt",
+          size: "2.1 KB",
+          type: "txt",
+          content: `
+            <div class="p-3 bg-gray-50 rounded">
+              <div class="text-center mb-2">
+                <h3 class="text-base font-semibold text-gray-900">WhatsApp Backup Summary</h3>
+                <p class="text-xs text-gray-600">Generated: February 15, 2024 at 21:15</p>
+              </div>
+              
+              <div class="space-y-2 font-mono text-xs">
+                <div class="bg-white p-3 rounded border">
+                  <div class="text-green-600 font-bold">✓ BACKUP COMPLETED SUCCESSFULLY</div>
+                </div>
+                
+                <div class="bg-white p-3 rounded border">
+                  <div class="grid grid-cols-2 gap-2">
+                    <div><span class="text-gray-600">Device:</span> iPhone 14</div>
+                    <div><span class="text-gray-600">iOS Version:</span> 17.3.1</div>
+                    <div><span class="text-gray-600">WhatsApp Version:</span> 24.2.75</div>
+                    <div><span class="text-gray-600">Backup Size:</span> 1.2 GB</div>
+                  </div>
+                </div>
+                
+                <div class="bg-white p-3 rounded border">
+                  <div class="text-gray-700 font-semibold mb-2">Backup Contents:</div>
+                  <div class="space-y-1 text-xs">
+                    <div>• Chat messages: 45,892 messages</div>
+                    <div>• Media files: 3,245 photos, 234 videos</div>
+                    <div>• Voice notes: 456 recordings</div>
+                    <div>• Documents: 89 files</div>
+                    <div>• Contact cards: 2,341 contacts</div>
+                  </div>
+                </div>
+                
+                <div class="bg-white p-3 rounded border">
+                  <div class="text-gray-700 font-semibold mb-2">Storage Information:</div>
+                  <div class="space-y-1 text-xs">
+                    <div>• iCloud Storage Used: 1.2 GB / 50 GB</div>
+                    <div>• Available Space: 48.8 GB</div>
+                    <div>• Last Backup: Yesterday at 21:15</div>
+                    <div>• Backup Frequency: Daily (Enabled)</div>
+                  </div>
+                </div>
+                
+                <div class="bg-green-50 p-3 rounded border border-green-200">
+                  <div class="text-green-800 text-xs">
+                    <strong>NOTE:</strong> This backup is encrypted and can only be restored to your device using your WhatsApp account. Keep your phone number and verification code secure.
+                  </div>
+                </div>
+              </div>
+            </div>
+          `
+        }
+      ]
     },
     {
-      id: "7",
-      sender: "WhatsApp Business",
-      subject: "📊 Monthly Insights Report - January 2024",
+      id: "5",
+      sender: "business@whatsapp.com",
+      subject: "📊 Monthly Insights Report - February 2024",
       preview: "Your business performance summary is ready. View analytics and trends...",
       timestamp: "2 days ago",
       isPhishing: false,
@@ -402,18 +387,186 @@ export const defaultInboxConfig: InboxSceneConfig = {
       explanation: "Legitimate informational email. It directs users to in-app navigation instead of external links.",
       attachments: [
         {
-          id: "att-7-1",
-          name: "January_2024_Report.pdf",
+          id: "att-5-1",
+          name: "February_2024_Report.pdf",
           size: "456 KB",
-          type: "pdf"
-        },
-        {
-          id: "att-7-2",
-          name: "Business_Insights.xls",
-          size: "89 KB",
-          type: "xls"
+          type: "pdf",
+          content: `
+            <div class="p-3 sm:p-4 md:p-6 bg-white">
+              <div class="border-b border-gray-200 pb-4 mb-6">
+                <h1 class="text-2xl font-bold text-gray-900">WhatsApp Business</h1>
+                <h2 class="text-xl text-gray-700 mt-2">Monthly Usage Report - February 2024</h2>
+                <p class="text-sm text-gray-500 mt-1">Generated on March 1, 2024</p>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-green-50 p-3 sm:p-4 rounded-lg border border-green-200">
+                  <h3 class="font-semibold text-green-800">Messages Sent</h3>
+                  <p class="text-2xl font-bold text-green-600">3,142</p>
+                  <p class="text-sm text-green-600">↑ 15% from January</p>
+                </div>
+                <div class="bg-blue-50 p-3 sm:p-4 rounded-lg border border-blue-200">
+                  <h3 class="font-semibold text-blue-800">Active Customers</h3>
+                  <p class="text-2xl font-bold text-blue-600">1,456</p>
+                  <p class="text-sm text-blue-600">↑ 12% from January</p>
+                </div>
+                <div class="bg-purple-50 p-3 sm:p-4 rounded-lg border border-purple-200">
+                  <h3 class="font-semibold text-purple-800">Response Rate</h3>
+                  <p class="text-2xl font-bold text-purple-600">96%</p>
+                  <p class="text-sm text-purple-600">↑ 2% from January</p>
+                </div>
+              </div>
+              
+              <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Top Performing Categories</h3>
+                <div class="space-y-2">
+                  <div class="flex justify-between bg-gray-50 p-3 rounded">
+                    <span class="text-gray-700">Customer Support</span>
+                    <span class="font-semibold text-gray-900">48%</span>
+                  </div>
+                  <div class="flex justify-between bg-gray-50 p-3 rounded">
+                    <span class="text-gray-700">Product Updates</span>
+                    <span class="font-semibold text-gray-900">29%</span>
+                  </div>
+                  <div class="flex justify-between bg-gray-50 p-3 rounded">
+                    <span class="text-gray-700">Promotional Messages</span>
+                    <span class="font-semibold text-gray-900">23%</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="bg-gray-50 p-3 sm:p-4 rounded-lg">
+                <p class="text-sm text-gray-600">
+                  <strong>Note:</strong> This report is automatically generated and reflects your account activity for the specified period. 
+                  For detailed analytics, please visit your WhatsApp Business dashboard.
+                </p>
+              </div>
+            </div>
+          `
         }
       ]
+    },
+    {
+      id: "6",
+      sender: "updates@whatsapp.com",
+      subject: "Important: Update your payment method",
+      preview: "Your payment method for WhatsApp Business expires soon. Update to avoid service interruption...",
+      timestamp: "6 hours ago",
+      isPhishing: true,
+      content: `
+        <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Dear valued customer,</p>
+        <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">We're reaching out to inform you that your payment method for WhatsApp Business Premium will expire on February 25, 2024.</p>
+        <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">To ensure uninterrupted service, please update your payment information before the expiration date.</p>
+        <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 15px; margin: 15px 0;">
+          <p style="margin: 0; font-weight: bold; color: #856404;">💳 Payment Method Expiring</p>
+          <p style="margin: 5px 0 0 0; color: #856404;">Card ending in ****4327 expires 02/25/2024</p>
+        </div>
+        <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Update your payment method securely:</p>
+        <p class="text-[#1C1C1E] dark:text-[#F2F2F7]"><a href="https://billing.whatsapp-business.com/update-payment" target="_blank" rel="noopener noreferrer" style="color: #007bff; text-decoration: underline;">Update payment information</a></p>
+        <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">If you don't update by the expiration date, your account will be downgraded to the free tier and some features may be limited.</p>
+        <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Thank you for choosing WhatsApp Business,<br>WhatsApp Billing Team</p>
+        <p style="font-size: 11px; color: #6c757d; margin-top: 20px;">This email was sent regarding your WhatsApp Business account. For support, contact us through the app.</p>
+      `,
+      headers: [
+        "Return-Path: <updates@whatsapp.com>",
+        "SPF: fail (whatsapp.com does not designate 198.51.100.15 as permitted sender)",
+        "DMARC: fail (p=reject dis=none) header.from=whatsapp.com"
+      ],
+      difficulty: "MEDIUM-HARD",
+      explanation: "This phishing email targets business users with payment urgency. WhatsApp Business billing notifications typically come through the app, not email with external payment links.",
+      attachments: [
+        {
+          id: "att-6-1",
+          name: "payment_invoice.pdf",
+          size: "156 KB",
+          type: "pdf",
+          content: `
+            <div class="p-3 sm:p-4 md:p-6 bg-white">
+              <div class="border-b border-gray-200 pb-4 mb-6">
+                <h1 class="text-xl font-bold text-gray-900">WhatsApp Business</h1>
+                <h2 class="text-lg text-gray-700 mt-2">Payment Reminder</h2>
+                <p class="text-sm text-gray-500 mt-1">Invoice #WB-2024-00127</p>
+              </div>
+              
+              <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Account Information</h3>
+                <div class="bg-gray-50 p-3 sm:p-4 rounded border">
+                  <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div><span class="text-gray-600">Account:</span> WhatsApp Business Premium</div>
+                    <div><span class="text-gray-600">Billing Cycle:</span> Monthly</div>
+                    <div><span class="text-gray-600">Next Payment:</span> February 25, 2024</div>
+                    <div><span class="text-gray-600">Amount:</span> $19.99/month</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Payment Method</h3>
+                <div class="bg-yellow-50 border border-yellow-200 p-4 rounded">
+                  <div class="flex items-center gap-2 mb-2">
+                    <span class="text-yellow-600">⚠️</span>
+                    <span class="font-semibold text-yellow-800">Payment Method Expiring</span>
+                  </div>
+                  <p class="text-sm text-yellow-700">
+                    Your credit card ending in ****4327 expires on 02/25/2024.
+                    Please update your payment method to avoid service interruption.
+                  </p>
+                </div>
+              </div>
+              
+              <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Service Features</h3>
+                <ul class="space-y-2 text-sm text-gray-700">
+                  <li>• Advanced analytics and insights</li>
+                  <li>• Unlimited messaging to customers</li>
+                  <li>• Priority customer support</li>
+                  <li>• Advanced automation tools</li>
+                </ul>
+              </div>
+              
+              <div class="bg-blue-50 border border-blue-200 p-3 sm:p-4 rounded">
+                <p class="text-sm text-blue-800">
+                  <strong>Important:</strong> Update your payment method before February 25, 2024 
+                  to continue enjoying WhatsApp Business Premium features.
+                </p>
+              </div>
+            </div>
+          `
+        }
+      ]
+    },
+    {
+      id: "7",
+      sender: "no-reply@whatsapp.com",
+      subject: "Account activity summary - January 2024",
+      preview: "Your monthly WhatsApp usage report is available. 2,547 messages sent this month...",
+      timestamp: "3 days ago",
+      isPhishing: false,
+      content: `
+        <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Hi,</p>
+        <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Here's your WhatsApp activity summary for January 2024.</p>
+        <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 20px 0;">
+          <h3 style="margin: 0 0 15px 0; color: #1C1C1E;">📊 Your Activity</h3>
+          <ul style="margin: 0; color: #1C1C1E; list-style: none; padding: 0;">
+            <li style="margin-bottom: 8px;">• Messages sent: 2,547</li>
+            <li style="margin-bottom: 8px;">• Media shared: 445 files</li>
+            <li style="margin-bottom: 8px;">• Voice messages: 67</li>
+            <li style="margin-bottom: 8px;">• Video calls: 23 minutes</li>
+          </ul>
+        </div>
+        <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Your data is private and encrypted. This summary is generated locally on your device and helps you understand your usage patterns.</p>
+        <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">To manage your privacy settings, go to WhatsApp Settings → Account → Privacy.</p>
+        <p class="text-[#1C1C1E] dark:text-[#F2F2F7]">Thanks for using WhatsApp,<br>The WhatsApp Team</p>
+        <p style="font-size: 11px; color: #6c757d; margin-top: 20px;">This email is sent monthly and contains only aggregated data. Your individual messages remain private and encrypted.</p>
+      `,
+      headers: [
+        "Return-Path: <no-reply@whatsapp.com>",
+        "SPF: pass (whatsapp.com designates 192.0.2.10 as permitted sender)",
+        "DMARC: pass (p=reject dis=none) header.from=whatsapp.com"
+      ],
+      difficulty: "EASY",
+      explanation: "Legitimate monthly activity summary. Contains only general usage statistics and directs users to in-app settings rather than external links.",
+      attachments: []
     }
   ]
 };

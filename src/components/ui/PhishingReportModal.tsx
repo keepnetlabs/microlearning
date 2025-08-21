@@ -27,13 +27,13 @@ export function PhishingReportModal({
     if (isOpen) {
       // Save current scroll position
       const scrollY = window.scrollY;
-      
+
       // Lock body scroll
       document.body.style.position = 'fixed';
       document.body.style.top = `-${scrollY}px`;
       document.body.style.width = '100%';
       document.body.style.overflow = 'hidden';
-      
+
       return () => {
         // Restore body scroll
         const scrollY = document.body.style.top;
@@ -41,7 +41,7 @@ export function PhishingReportModal({
         document.body.style.top = '';
         document.body.style.width = '';
         document.body.style.overflow = '';
-        
+
         // Restore scroll position
         if (scrollY) {
           window.scrollTo(0, parseInt(scrollY || '0') * -1);
@@ -88,16 +88,16 @@ export function PhishingReportModal({
           initial={isMobile ? { y: '100%' } : { opacity: 0, scale: 0.9, y: 20 }}
           animate={isMobile ? { y: 0 } : { opacity: 1, scale: 1, y: 0 }}
           exit={isMobile ? { y: '100%' } : { opacity: 0, scale: 0.9, y: 20 }}
-          transition={isMobile 
+          transition={isMobile
             ? { type: "spring", stiffness: 400, damping: 30 }
             : { type: "spring", stiffness: 300, damping: 30 }
           }
-          className={`relative glass-border-3 ${
-            isMobile 
-              ? 'w-full max-h-[80vh] rounded-t-xl p-6' 
-              + ' pb-[calc(1.5rem+env(safe-area-inset-bottom))]' 
+          onClick={(e) => e.stopPropagation()}
+          className={`relative glass-border-3 ${isMobile
+              ? 'w-full max-h-[80vh] rounded-t-xl p-6'
+              + ' pb-[calc(1.5rem+env(safe-area-inset-bottom))]'
               : 'w-full max-w-md mx-4 p-6'
-          }`}
+            }`}
           style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
         >
           {/* Header */}
@@ -174,7 +174,7 @@ export function PhishingReportModal({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleCancel}
-              className="flex-1 py-3 px-4 glass-border-3 font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors"
+              className="flex-1 py-3 px-4 font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors underline cursor-pointer relative z-10"
             >
               <FontWrapper>{modalTexts.cancelButton}</FontWrapper>
             </motion.button>

@@ -35,8 +35,8 @@ interface SummarySceneProps {
   };
 }
 
-// Inner component that uses the EditModeContext - Optimized with React.memo
-const SummarySceneContent = React.memo(function SummarySceneContent({ config, completionData, sceneId, reducedMotion, disableDelays }: SummarySceneProps & { sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean }) {
+// Inner component that uses the EditModeContext
+function SummarySceneContent({ config, completionData, sceneId, reducedMotion, disableDelays }: SummarySceneProps & { sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean }) {
   const [showCertificate, setShowCertificate] = useState(false);
   const [hasDownloadedCertificate, setHasDownloadedCertificate] = useState(false);
   const [showConfetti, setShowConfetti] = useState(true);
@@ -758,22 +758,23 @@ const SummarySceneContent = React.memo(function SummarySceneContent({ config, co
               </motion.button>
             )}
 
-            <motion.button
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={animationProps.transition(0.6, 1.0)}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={currentEditMode ? (e: any) => {
-                if (e.target.closest('[data-editable]')) {
-                  return;
-                }
-                e.preventDefault();
-              } : handleDownloadCertificate}
-              disabled={showCertificate || hasDownloadedCertificate}
-              className={`inline-flex mt-6 sm:text-base items-center gap-2 text-sm underline disabled:opacity-70 disabled:cursor-not-allowed text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold`}
-              data-testid="btn-download-certificate"
-            >
+            {isFinished && (
+              <motion.button
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={animationProps.transition(0.6, 1.0)}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={currentEditMode ? (e: any) => {
+                  if (e.target.closest('[data-editable]')) {
+                    return;
+                  }
+                  e.preventDefault();
+                } : handleDownloadCertificate}
+                disabled={showCertificate || hasDownloadedCertificate}
+                className={`inline-flex mt-6 sm:text-base items-center gap-2 text-sm underline disabled:opacity-70 disabled:cursor-not-allowed text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold`}
+                data-testid="btn-download-certificate"
+              >
               <Download size={16} className={`relative font-semibold z-10 ${hasDownloadedCertificate ? 'opacity-60' : ''} text-[#1C1C1E] dark:text-[#F2F2F7]`} />
               <span className={`relative z-10`}>
                 {showCertificate
@@ -812,7 +813,8 @@ const SummarySceneContent = React.memo(function SummarySceneContent({ config, co
                       </EditableText>
                     )}
               </span>
-            </motion.button>
+              </motion.button>
+            )}
           </div>
         </motion.div>
 
@@ -1137,21 +1139,13 @@ const SummarySceneContent = React.memo(function SummarySceneContent({ config, co
       <EditModePanel />
     </FontWrapper>
   );
-}, (prevProps, nextProps) => {
-  // Custom comparison for better performance
-  return (
-    prevProps.config === nextProps.config &&
-    prevProps.completionData === nextProps.completionData &&
-    prevProps.sceneId === nextProps.sceneId &&
-    prevProps.reducedMotion === nextProps.reducedMotion &&
-    prevProps.disableDelays === nextProps.disableDelays
-  );
-});
+}
 
 // Main export component with EditModeProvider
 export function SummaryScene(props: SummarySceneProps & { sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean }) {
   return (
     <EditModeProvider
+      key={JSON.stringify(props.config?.texts || {})}
       initialConfig={props.config}
       onSave={(updatedConfig) => {
         console.log('Config saved:', updatedConfig);

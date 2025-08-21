@@ -27,7 +27,7 @@ export function PhishingReportButton({
         onClick={(e) => { if (!disabled) onClick?.(); e.currentTarget.blur(); }}
         disabled={disabled}
         aria-disabled={disabled}
-        className={`group relative inline-flex items-center justify-center space-x-2 px-4 h-10 glass-border-4 transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full ${disabled ? 'opacity-60 pointer-events-none' : ''}`}
+        className={`group relative inline-flex items-center justify-center space-x-2 px-4 h-10 glass-border-4 transition-all focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full ${disabled ? 'opacity-60 pointer-events-none' : ''}`}
       >
         {/* Button shimmer effect */}
         <motion.div

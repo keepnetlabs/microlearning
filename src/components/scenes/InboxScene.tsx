@@ -7,9 +7,11 @@ import { CallToAction } from "../ui/CallToAction";
 import { PhishingReportButton } from "../ui/PhishingReportButton";
 import { PhishingReportModal } from "../ui/PhishingReportModal";
 import { PhishingResultModal } from "../ui/PhishingResultModal";
+import { AttachmentPreviewModal } from "../ui/AttachmentPreviewModal";
 import { InboxSceneConfig, EmailData, EmailAttachment } from "../../data/inboxConfig";
 import { useEditMode } from "../../contexts/EditModeContext";
 import { enhanceLinkTooltips } from "../../utils/linkTooltip";
+import { EmailContentWithPortalTooltips } from "../ui/EmailContentWithTooltips";
 
 interface InboxSceneProps {
   config: InboxSceneConfig;
@@ -28,6 +30,8 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
   const [showResultModal, setShowResultModal] = useState(false);
   const [lastReportedEmail, setLastReportedEmail] = useState<EmailData | null>(null);
   const [lastReportCorrect, setLastReportCorrect] = useState(false);
+  const [previewAttachment, setPreviewAttachment] = useState<EmailAttachment | null>(null);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
   const isMobile = useIsMobile();
 
   // Optional edit mode - only use if EditModeProvider is available
@@ -41,6 +45,17 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
   }
 
   const selectedEmail = config.emails.find(email => email.id === selectedEmailId);
+
+  // Handle attachment preview
+  const handleAttachmentClick = useCallback((attachment: EmailAttachment) => {
+    setPreviewAttachment(attachment);
+    setShowPreviewModal(true);
+  }, []);
+
+  const closePreviewModal = useCallback(() => {
+    setShowPreviewModal(false);
+    setPreviewAttachment(null);
+  }, []);
 
   // Phishing Report icon component
   const PhishingIcon = () => (
@@ -74,7 +89,7 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
   };
 
   const AttachmentComponent = ({ attachments }: { attachments: EmailAttachment[] }) => (
-    <div className="border-t border-white/20 dark:border-white/10 pt-4 mt-6">
+    <div className="border-t border-white/50 dark:border-white/10 pt-4 mt-4">
       <div className="flex items-center gap-2 mb-3">
         <Download size={14} className="text-[#1C1C1E] dark:text-[#F2F2F7]" />
         <FontWrapper>
@@ -88,7 +103,8 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
           <motion.div
             key={attachment.id}
             whileHover={{ x: 2 }}
-            className={`flex items-center justify-between p-3 glass-border-2 cursor-pointer transition-all`}
+            onClick={() => handleAttachmentClick(attachment)}
+            className={`flex items-center justify-between p-3 glass-border-2 cursor-pointer transition-all hover:scale-[1.02]`}
           >
             <div className="flex items-center gap-3">
               <AttachmentIcon type={attachment.type} />
@@ -292,7 +308,7 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
                         <div className="mb-6 border-b border-white/20 dark:border-white/10 pb-4">
                           <FontWrapper>
                             <h4 className="text-sm font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] mb-3">{config.texts.emailHeadersTitle}</h4>
-                            <div className="bg-white/5 dark:bg-black/5 rounded-lg p-3 border border-white/20 dark:border-white/10">
+                            <div className="glass-border-2 rounded-lg p-3">
                               {selectedEmail.headers.map((header, index) => (
                                 <div key={index} className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] mb-1">
                                   {header}
@@ -306,7 +322,7 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
                       {/* Email Content */}
                       <div className="prose prose-sm max-w-none mb-6 prose-p:text-[#1C1C1E] dark:prose-p:text-[#F2F2F7] prose-strong:text-[#1C1C1E] dark:prose-strong:text-[#F2F2F7] prose-li:text-[#1C1C1E] dark:prose-li:text-[#F2F2F7] prose-a:text-[#1C1C1E] dark:prose-a:text-[#F2F2F7] email-content-container">
                         <FontWrapper>
-                          <div dangerouslySetInnerHTML={{ __html: enhanceLinkTooltips(selectedEmail.content) }} />
+                          <EmailContentWithPortalTooltips htmlContent={enhanceLinkTooltips(selectedEmail.content)} />
                         </FontWrapper>
                       </div>
 
@@ -323,7 +339,7 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
                   {config.emails.map((email) => (
                     <motion.div
                       key={email.id}
-                      className={`p-4 border-b border-white/20 dark:border-white/10 cursor-pointer hover:bg-white/10 dark:hover:bg-white/5 glass-border-no-radius transition-colors ${selectedEmailId === email.id ? 'lg:border-l-[7px] border-l-white/40 dark:border-l-white' : ''
+                      className={`p-4 border-b border-white/30 dark:border-white/10 cursor-pointer hover:bg-white/10 dark:hover:bg-white/5 glass-border-no-radius transition-colors ${selectedEmailId === email.id ? 'lg:border-l-[7px] border-l-white/40 dark:border-l-white' : ''
                         } ${reportedEmails.has(email.id) ? 'opacity-60' : ''}`}
                       onClick={() => handleEmailSelect(email.id)}
                       whileHover={{ scale: 1.01 }}
@@ -375,7 +391,7 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
                 {selectedEmail ? (
                   <div>
                     {/* Email Header */}
-                    <div className="flex items-start justify-between pb-4 mb-6 border-b border-white/20 dark:border-white/10">
+                    <div className="flex items-start justify-between pb-4 border-b mb-4 border-white/50 dark:border-white/10">
                       <div className="flex-1">
                         <FontWrapper>
                           <h3 className="text-lg font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] mb-2">{selectedEmail.subject}</h3>
@@ -404,10 +420,10 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
 
                     {/* Email Headers */}
                     {showHeaders && selectedEmail.headers && (
-                      <div className="mb-6 border-b border-white/20 dark:border-white/10 pb-4">
+                      <div className="mb-2 pb-4 border-b border-white/80 dark:border-white/10">
                         <FontWrapper>
                           <h4 className="text-sm font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] mb-3">{config.texts.emailHeadersTitle}</h4>
-                          <div className="bg-white/5 dark:bg-black/5 rounded-lg p-3 border border-white/20 dark:border-white/10">
+                          <div className="glass-border-2 rounded-lg p-3">
                             {selectedEmail.headers.map((header, index) => (
                               <div key={index} className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] mb-1">
                                 {header}
@@ -421,7 +437,7 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
                     {/* Email Content */}
                     <div className="prose prose-sm max-w-none mb-6 prose-p:text-[#1C1C1E] dark:prose-p:text-[#F2F2F7] prose-strong:text-[#1C1C1E] dark:prose-strong:text-[#F2F2F7] prose-li:text-[#1C1C1E] dark:prose-li:text-[#F2F2F7] prose-a:text-[#1C1C1E] dark:prose-a:text-[#F2F2F7] email-content-container">
                       <FontWrapper>
-                        <div dangerouslySetInnerHTML={{ __html: enhanceLinkTooltips(selectedEmail.content) }} />
+                        <EmailContentWithPortalTooltips htmlContent={enhanceLinkTooltips(selectedEmail.content)} />
                       </FontWrapper>
                     </div>
 
@@ -477,6 +493,13 @@ export function InboxScene({ config, onNextSlide, onEmailReport }: InboxScenePro
             isCorrect={lastReportCorrect}
           />
         )}
+
+        {/* Attachment Preview Modal */}
+        <AttachmentPreviewModal
+          attachment={previewAttachment}
+          isOpen={showPreviewModal}
+          onClose={closePreviewModal}
+        />
       </div>
     </div>
   );
