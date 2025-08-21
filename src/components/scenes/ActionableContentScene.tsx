@@ -331,7 +331,7 @@ function ActionableContentSceneInternal({
 export function ActionableContentScene(props: ActionableContentSceneProps & { onNextSlide?: () => void; sceneId?: string | number; reducedMotion?: boolean; }) {
   return (
     <EditModeProvider initialConfig={props.config}>
-      <EditModePanel />
+      {/* <EditModePanel /> */}
       <ActionableContentSceneInternal {...props} />
     </EditModeProvider>
   );

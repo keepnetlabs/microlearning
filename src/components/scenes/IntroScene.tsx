@@ -579,7 +579,7 @@ export const IntroScene = React.memo(({
         setIsInEditMode(editMode);
       }}
     >
-      <EditModePanel />
+      {/* <EditModePanel /> */}
       <ScientificBasisInfo
         config={currentConfig}
         sceneType={(config as any)?.scene_type || 'intro'}

@@ -261,7 +261,7 @@ export const GoalScene = memo(({
       onSave={handleSave}
       onEditModeChange={setIsInEditMode}
     >
-      <EditModePanel />
+      {/* <EditModePanel /> */}
       <ScientificBasisInfo 
         config={currentConfig} 
         sceneType={(currentConfig as any)?.scene_type || 'goal'} 

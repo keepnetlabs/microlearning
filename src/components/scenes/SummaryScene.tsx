@@ -1137,7 +1137,7 @@ function SummarySceneContent({ config, completionData, sceneId, reducedMotion, d
       </div>
 
       {/* Edit Mode Panel */}
-      <EditModePanel />
+      {/* <EditModePanel /> */}
       
       {/* Scientific Basis Info */}
       <ScientificBasisInfo 

@@ -2343,7 +2343,7 @@ export const QuizScene = React.memo(function QuizScene({
         onSave={handleSave}
         onEditModeChange={setIsInEditMode}
       >
-        <EditModePanel />
+        {/* <EditModePanel /> */}
         <ScientificBasisInfo
           config={currentConfig}
           sceneType={(currentConfig as any)?.scene_type || 'quiz'}
@@ -2369,7 +2369,7 @@ export const QuizScene = React.memo(function QuizScene({
       onSave={handleSave}
       onEditModeChange={setIsInEditMode}
     >
-      <EditModePanel />
+      {/* <EditModePanel /> */}
       <ScientificBasisInfo
         config={currentConfig}
         sceneType={(currentConfig as any)?.scene_type || 'quiz'}
