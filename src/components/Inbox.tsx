@@ -16,10 +16,11 @@ interface InboxProps {
   config: InboxSceneConfig;
   onNextSlide?: () => void;
   onEmailReport?: (emailId: string, isCorrect: boolean) => void;
+  selectedLanguage?: string;
 }
 
 
-export function Inbox({ config, onEmailReport }: InboxProps) {
+export function Inbox({ config, onEmailReport, selectedLanguage }: InboxProps) {
   const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
   const [reportedEmails, setReportedEmails] = useState<Set<string>>(new Set());
   const [reportResults, setReportResults] = useState<Map<string, boolean>>(new Map());
@@ -176,7 +177,7 @@ export function Inbox({ config, onEmailReport }: InboxProps) {
   }, [selectedEmail, handleEmailReport]);
 
   return (
-    <div>
+    <div key={selectedLanguage}>
       {/* Single Card with Header and Two-Column Layout */}
       <div className="backdrop-blur-xl bg-white/10 dark:bg-black/10 rounded-lg border border-white/20 dark:border-white/10 overflow-hidden flex flex-col" style={{ minHeight: '600px' }}>
         {/* Header - Desktop layout */}

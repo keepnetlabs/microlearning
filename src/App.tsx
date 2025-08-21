@@ -1803,6 +1803,7 @@ export default function App(props: AppProps = {}) {
                               onNextSlide={nextScene}
                               reducedMotion={reducedMotionBool}
                               disableDelays={disableDelaysBool}
+                              selectedLanguage={selectedLanguage}
                             />
                           )}
                         </motion.div>

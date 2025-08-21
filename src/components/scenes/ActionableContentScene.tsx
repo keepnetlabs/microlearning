@@ -103,12 +103,21 @@ function ActionableContentSceneInternal({
   config,
   onNextSlide,
   sceneId,
-  reducedMotion
-}: ActionableContentSceneProps & { onNextSlide?: () => void; sceneId?: string | number; reducedMotion?: boolean; }) {
-  
+  reducedMotion,
+  selectedLanguage
+}: ActionableContentSceneProps & { onNextSlide?: () => void; sceneId?: string | number; reducedMotion?: boolean; selectedLanguage?: string; }) {
+
   // Edit mode context
   const { isEditMode, tempConfig } = useEditMode();
-  
+
+  // State for detecting language changes and forcing re-render
+  const [configKey, setConfigKey] = useState(0);
+
+  // Detect language changes and force re-render
+  useEffect(() => {
+    setConfigKey(prev => prev + 1);
+  }, [config.title, config.subtitle]); // Use specific fields to detect language change
+
   // Compute current config (memoized to prevent infinite loops)
   const currentConfig = useMemo(() => {
     return deepMerge(config, tempConfig || {});
@@ -119,22 +128,39 @@ function ActionableContentSceneInternal({
   const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
 
   const DEFAULT_INBOX_URL = "https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001/inbox/all/en";
-  const initialRemoteInboxUrl = normalizeUrlParam(urlParams?.get('inboxUrl')) || DEFAULT_INBOX_URL;
-  const remoteInboxUrlRef = useRef<string>(initialRemoteInboxUrl);
+  const baseInboxUrl = normalizeUrlParam(urlParams?.get('inboxUrl')) || DEFAULT_INBOX_URL;
 
   // Inbox config state
   const [inboxConfig, setInboxConfig] = useState<InboxSceneConfig | null>(null);
   const [isLoadingInbox, setIsLoadingInbox] = useState(true);
   const [inboxError, setInboxError] = useState<string | null>(null);
 
-  // Fetch inbox config
+  // Compute inbox URL based on selected language
+  const computeInboxUrl = useMemo(() => {
+    let url = baseInboxUrl;
+
+    // If selectedLanguage is provided, update the URL to match the current language
+    if (selectedLanguage) {
+      // Extract the primary language code (e.g., 'en' from 'en-US')
+      const langCode = selectedLanguage.toLowerCase().split('-')[0];
+
+      // Replace the language part in the URL pattern
+      // Pattern: /inbox/all/en -> /inbox/all/{langCode}
+      url = url.replace(/\/all\/[a-z]{2}$/i, `/all/${langCode}`);
+    }
+
+    console.log('🔄 Inbox URL computed:', url, 'for language:', selectedLanguage);
+    return url;
+  }, [selectedLanguage, baseInboxUrl]);
+
+  // Fetch inbox config with language change detection
   useEffect(() => {
     const fetchInboxConfig = async () => {
       setIsLoadingInbox(true);
       setInboxError(null);
 
       try {
-        const response = await fetch(remoteInboxUrlRef.current, {
+        const response = await fetch(computeInboxUrl, {
           method: 'GET',
           headers: {
             'Accept': 'application/json'
@@ -155,7 +181,7 @@ function ActionableContentSceneInternal({
     };
 
     fetchInboxConfig();
-  }, []);
+  }, [computeInboxUrl]); // Re-run when computeInboxUrl changes (i.e., when language changes)
 
   // Default layout configuration
   const defaultCardSpacing = "space-y-4";
@@ -213,7 +239,7 @@ function ActionableContentSceneInternal({
   }, [tipConfig.iconName, tipConfig.iconSize]);
 
   return (
-    <FontWrapper>
+    <FontWrapper key={`actionable-content-${selectedLanguage}`}>
       <main
         className={defaultContainerClassName}
         role="main"
@@ -231,7 +257,10 @@ function ActionableContentSceneInternal({
           {ariaTexts?.mainDescription || "Actionable content section with interactive cards containing tips and guidance"}
         </div>
 
-        <header role="banner" aria-label={ariaTexts?.headerLabel || "Scene header"}>
+        <header
+          role="banner"
+          aria-label={ariaTexts?.headerLabel || "Scene header"}
+        >
           {!isMobile && (
             <div className="flex items-center justify-center" aria-hidden="true">
               {sceneIconComponent}
@@ -293,13 +322,15 @@ function ActionableContentSceneInternal({
                 </div>
               ) : (
                 <Inbox
+                  key={`inbox-${configKey}`}
                   config={inboxConfig}
                   onNextSlide={onNextSlide}
+                  selectedLanguage={selectedLanguage}
                 />
               )}
             </>
           )}
-          
+
           {isEditMode && (
             <div className="p-8 text-center">
               <div className="text-[#1C1C1E] dark:text-[#F2F2F7]">
@@ -328,9 +359,16 @@ function ActionableContentSceneInternal({
 }
 
 // Main export component with EditModeProvider
-export function ActionableContentScene(props: ActionableContentSceneProps & { onNextSlide?: () => void; sceneId?: string | number; reducedMotion?: boolean; }) {
+export function ActionableContentScene(props: ActionableContentSceneProps & { onNextSlide?: () => void; sceneId?: string | number; reducedMotion?: boolean; selectedLanguage?: string; }) {
+  const [configKey, setConfigKey] = useState(0);
+
+  // Detect language changes and force re-render
+  useEffect(() => {
+    setConfigKey(prev => prev + 1);
+  }, [props.config.title, props.config.subtitle]);
+
   return (
-    <EditModeProvider initialConfig={props.config}>
+    <EditModeProvider key={configKey} initialConfig={props.config}>
       {/* <EditModePanel /> */}
       <ActionableContentSceneInternal {...props} />
     </EditModeProvider>
