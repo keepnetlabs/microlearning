@@ -102,10 +102,17 @@ const normalizeUrlParam = (value?: string | null): string => {
 function ActionableContentSceneInternal({
   config,
   onNextSlide,
+  onInboxCompleted,
   sceneId,
   reducedMotion,
   selectedLanguage
-}: ActionableContentSceneProps & { onNextSlide?: () => void; sceneId?: string | number; reducedMotion?: boolean; selectedLanguage?: string; }) {
+}: ActionableContentSceneProps & { 
+  onNextSlide?: () => void; 
+  onInboxCompleted?: (completed: boolean) => void; 
+  sceneId?: string | number; 
+  reducedMotion?: boolean; 
+  selectedLanguage?: string;
+}) {
 
   // Edit mode context
   const { isEditMode, tempConfig } = useEditMode();
@@ -134,6 +141,7 @@ function ActionableContentSceneInternal({
   const [inboxConfig, setInboxConfig] = useState<InboxSceneConfig | null>(null);
   const [isLoadingInbox, setIsLoadingInbox] = useState(true);
   const [inboxError, setInboxError] = useState<string | null>(null);
+  const [allEmailsReported, setAllEmailsReported] = useState(false);
 
   // Compute inbox URL based on selected language
   const computeInboxUrl = useMemo(() => {
@@ -325,6 +333,10 @@ function ActionableContentSceneInternal({
                   key={`inbox-${configKey}`}
                   config={inboxConfig}
                   onNextSlide={onNextSlide}
+                  onAllEmailsReported={(allReported) => {
+                    setAllEmailsReported(allReported);
+                    onInboxCompleted?.(allReported);
+                  }}
                   selectedLanguage={selectedLanguage}
                 />
               )}
@@ -349,6 +361,7 @@ function ActionableContentSceneInternal({
             desktopText={typeof currentConfig.callToActionText === 'object' ? currentConfig.callToActionText.desktop : undefined}
             delay={0.8}
             onClick={onNextSlide}
+            disabled={!allEmailsReported}
             dataTestId="cta-actionable"
             icon={<MailSearch size={20} />}
             iconPosition="left"
@@ -361,7 +374,13 @@ function ActionableContentSceneInternal({
 }
 
 // Main export component with EditModeProvider
-export function ActionableContentScene(props: ActionableContentSceneProps & { onNextSlide?: () => void; sceneId?: string | number; reducedMotion?: boolean; selectedLanguage?: string; }) {
+export function ActionableContentScene(props: ActionableContentSceneProps & { 
+  onNextSlide?: () => void; 
+  onInboxCompleted?: (completed: boolean) => void; 
+  sceneId?: string | number; 
+  reducedMotion?: boolean; 
+  selectedLanguage?: string;
+}) {
   const [configKey, setConfigKey] = useState(0);
 
   // Detect language changes and force re-render

@@ -489,6 +489,9 @@ export default function App(props: AppProps = {}) {
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [languageSearchTerm, setLanguageSearchTerm] = useState('');
   const [quizCompleted, setQuizCompleted] = useState(false);
+  const [inboxCompleted, setInboxCompleted] = useState(false);
+  const [videoCompleted, setVideoCompleted] = useState(false);
+  
   const [isLoading, setIsLoading] = useState(false);
   const [totalPoints, setTotalPoints] = useState(0);
   const [achievements, setAchievements] = useState<string[]>([]);
@@ -843,8 +846,17 @@ export default function App(props: AppProps = {}) {
     if (currentScene === sceneIndices.quiz) {
       return quizCompleted;
     }
+    // Check if current scene is actionable_content (inbox scene)
+    const currentSceneConfig = scenes[currentScene]?.config;
+    if (currentSceneConfig?.scene_type === 'actionable_content') {
+      return inboxCompleted;
+    }
+    // Check if current scene is scenario (video scene)
+    if (currentSceneConfig?.scene_type === 'scenario') {
+      return videoCompleted;
+    }
     return currentScene < scenes.length - 1;
-  }, [currentScene, quizCompleted, sceneIndices.quiz, scenes.length]);
+  }, [currentScene, quizCompleted, inboxCompleted, videoCompleted, sceneIndices.quiz, scenes]);
 
   // Optimized scene timing tracking
   const trackSceneTime = useCallback((sceneIndex: number) => {
@@ -1055,6 +1067,15 @@ export default function App(props: AppProps = {}) {
       logger.push({ level: 'info', code: 'QUIZ_COMPLETED', message: 'User completed quiz', detail: { totalPoints } });
     } catch { }
   }, [totalPoints]);
+
+  const handleInboxCompleted = useCallback((completed: boolean) => {
+    setInboxCompleted(completed);
+  }, []);
+
+  const handleVideoCompleted = useCallback((completed: boolean) => {
+    setVideoCompleted(completed);
+  }, []);
+
 
   // Survey feedback submission handler
   const handleSurveySubmitted = useCallback(() => {
@@ -1800,6 +1821,10 @@ export default function App(props: AppProps = {}) {
                               surveyState={currentScene === sceneIndices.survey ? surveyState : undefined}
                               onSurveyStateChange={currentScene === sceneIndices.survey ? setSurveyState : undefined}
                               completionData={currentScene === sceneIndices.summary ? completionData : undefined}
+                              onInboxCompleted={currentSceneConfig?.scene_type === 'actionable_content' ? handleInboxCompleted : undefined}
+                              onVideoCompleted={currentSceneConfig?.scene_type === 'scenario' ? handleVideoCompleted : undefined}
+                              isVideoCompleted={currentSceneConfig?.scene_type === 'scenario' ? videoCompleted : undefined}
+                              onIsVideoCompletedChange={currentSceneConfig?.scene_type === 'scenario' ? setVideoCompleted : undefined}
                               onNextSlide={nextScene}
                               reducedMotion={reducedMotionBool}
                               disableDelays={disableDelaysBool}

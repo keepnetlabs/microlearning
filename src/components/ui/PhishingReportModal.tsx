@@ -98,7 +98,7 @@ export function PhishingReportModal({
             + ' pb-[calc(1.5rem+env(safe-area-inset-bottom))]'
             : 'w-full max-w-md mx-4 p-6'
             }`}
-          style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
+          style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
         >
           {/* Header */}
           <div className="mb-6">

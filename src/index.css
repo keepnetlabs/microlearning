@@ -530,8 +530,8 @@
 .glass-border-no-radius {
   position: relative;
   background: rgba(255, 255, 255, 0.05);
-  -webkit-backdrop-filter: blur(16px) saturate(120%);
   backdrop-filter: blur(16px) saturate(120%);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
   border-radius: 0px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   overflow: hidden;
@@ -541,8 +541,8 @@
 .glass-border-no-radius-no-overflow {
   position: relative;
   background: rgba(255, 255, 255, 0.05);
-  -webkit-backdrop-filter: blur(16px) saturate(120%);
   backdrop-filter: blur(16px) saturate(120%);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
   border-radius: 0px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   /* overflow: hidden; kaldırıldı */
@@ -562,9 +562,9 @@
   background: linear-gradient(
     135deg,
     rgba(255, 255, 255, 1) 0%,
-    /* Sol üst - belirgin beyaz */ rgba(255, 255, 255, 0) 25%,
-    /* Sağ üst geçiş - saydam */ rgba(255, 255, 255, 0.15) 50%,
-    /* Sağ üst - çok saydam */ rgba(255, 255, 255, 0.05) 75%,
+    /* Sol üst - belirgin beyaz */ rgba(255, 255, 255, 0.6) 25%,
+    /* Sağ üst geçiş - saydam */ rgba(255, 255, 255, 0.6) 50%,
+    /* Sağ üst - çok saydam */ rgba(255, 255, 255, 0.6) 75%,
     /* Sol alt - çok saydam */ rgba(255, 255, 255, 1) 100%
   );
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -652,7 +652,7 @@
 
 /* Glass modal style for AttachmentPreviewModal */
 .glass-modal {
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.1);
   -webkit-backdrop-filter: blur(16px) saturate(120%);
   backdrop-filter: blur(16px) saturate(120%);
   border-radius: 12px;

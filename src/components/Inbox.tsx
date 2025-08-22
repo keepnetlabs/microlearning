@@ -1,6 +1,6 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, AlertTriangle, Flag, ChevronRight, Reply, CornerUpRight, Archive, Delete, ArrowLeft, Eye, Star, FileText, EyeOff, MailSearch, Check, X, FileSpreadsheet, Image, Download } from "lucide-react";
+import { Mail, AlertTriangle, Flag, ChevronRight, Reply, CornerUpRight, Archive, Delete, ArrowLeft, Eye, Star, FileText, EyeOff, Check, X, FileSpreadsheet, Image, Download } from "lucide-react";
 import { FontWrapper } from "./common/FontWrapper";
 import { useIsMobile } from "./ui/use-mobile";
 import { PhishingReportButton } from "./ui/PhishingReportButton";
@@ -16,11 +16,12 @@ interface InboxProps {
   config: InboxSceneConfig;
   onNextSlide?: () => void;
   onEmailReport?: (emailId: string, isCorrect: boolean) => void;
+  onAllEmailsReported?: (allReported: boolean) => void;
   selectedLanguage?: string;
 }
 
 
-export function Inbox({ config, onEmailReport, selectedLanguage }: InboxProps) {
+export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLanguage }: InboxProps) {
   // Load initial state from localStorage
   const loadInboxState = () => {
     try {
@@ -81,9 +82,20 @@ export function Inbox({ config, onEmailReport, selectedLanguage }: InboxProps) {
     }
   }, [selectedEmailId, reportedEmails, reportResults, accuracy, totalReports, showHeaders]);
 
-  // Cleanup localStorage when page/app is being closed
+
+  // Check if all emails are correctly reported and notify parent
   useEffect(() => {
-    const handleBeforeUnload = () => {
+    const correctReports = Array.from(reportedEmails).filter(emailId => {
+      const email = config.emails.find(e => e.id === emailId);
+      return email?.isPhishing && reportResults.get(emailId) === true;
+    }).length;
+    const allEmailsCorrectlyReported = correctReports === config.emails.filter(email => email.isPhishing).length;
+    onAllEmailsReported?.(allEmailsCorrectlyReported);
+  }, [reportedEmails, reportResults, config.emails, onAllEmailsReported]);
+
+  // Cleanup localStorage when page/app is being closed or refreshed
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
       try {
         localStorage.removeItem('inbox-state');
       } catch (error) {
@@ -91,12 +103,39 @@ export function Inbox({ config, onEmailReport, selectedLanguage }: InboxProps) {
       }
     };
 
+    const handleUnload = () => {
+      try {
+        localStorage.removeItem('inbox-state');
+      } catch (error) {
+        console.warn('Failed to cleanup inbox state:', error);
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        try {
+          localStorage.removeItem('inbox-state');
+        } catch (error) {
+          console.warn('Failed to cleanup inbox state:', error);
+        }
+      }
+    };
+
+    // Multiple event listeners to ensure cleanup
     window.addEventListener('beforeunload', handleBeforeUnload);
-    
+    window.addEventListener('unload', handleUnload);
+    window.addEventListener('pagehide', handleUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('unload', handleUnload);
+      window.removeEventListener('pagehide', handleUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      // Don't cleanup localStorage on component unmount - keep state for when user returns
     };
   }, []);
+
 
   // Optional edit mode - only use if EditModeProvider is available
   let isEditMode = false;
@@ -108,6 +147,16 @@ export function Inbox({ config, onEmailReport, selectedLanguage }: InboxProps) {
     isEditMode = false;
   }
   const selectedEmail = config.emails.find(email => email.id === selectedEmailId);
+
+  // Check if all phishing emails are correctly reported
+  const allPhishingEmailsReported = useMemo(() => {
+    const phishingEmails = config.emails.filter(email => email.isPhishing);
+    const correctReports = Array.from(reportedEmails).filter(emailId => {
+      const email = config.emails.find(e => e.id === emailId);
+      return email?.isPhishing && reportResults.get(emailId) === true;
+    });
+    return correctReports.length === phishingEmails.length;
+  }, [config.emails, reportedEmails, reportResults]);
 
   // Handle attachment preview
   const handleAttachmentClick = useCallback((attachment: EmailAttachment) => {
@@ -277,7 +326,7 @@ export function Inbox({ config, onEmailReport, selectedLanguage }: InboxProps) {
             <PhishingReportButton
               text={config.texts.phishingReportLabel}
               onClick={handlePhishingReportClick}
-              disabled={!selectedEmail}
+              disabled={!selectedEmail || allPhishingEmailsReported}
               icon={<PhishingIcon />}
             />
           </div>
@@ -307,7 +356,7 @@ export function Inbox({ config, onEmailReport, selectedLanguage }: InboxProps) {
             <PhishingReportButton
               text={config.texts.phishingReportLabel}
               onClick={handlePhishingReportClick}
-              disabled={!selectedEmail}
+              disabled={!selectedEmail || allPhishingEmailsReported}
               icon={<PhishingIcon />}
             />
           </div>
@@ -432,7 +481,7 @@ export function Inbox({ config, onEmailReport, selectedLanguage }: InboxProps) {
                               <p className="text-xs text-[#1C1C1E]/80 dark:text-[#F2F2F7]/70 truncate">{config.texts.cautiousReportMessage}</p>
                             )
                           ) : (
-                            <p className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] truncate">{email.preview}</p>
+                            <p className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7]">{email.preview}</p>
                           )}
                         </FontWrapper>
                       </div>
@@ -448,7 +497,7 @@ export function Inbox({ config, onEmailReport, selectedLanguage }: InboxProps) {
           </div>
 
           {/* Right: Email Viewer - Desktop only */}
-          <div className="hidden lg:block lg:col-span-2">
+          <div className="hidden lg:block lg:col-span-2 glass-border-no-radius flex" style={{ backgroundColor: "rgba(255, 255, 255, 0.3)" }}>
             <div className="p-6 overflow-y-auto scrollbar-hide flex-1">
               {selectedEmail ? (
                 <div>
@@ -510,7 +559,7 @@ export function Inbox({ config, onEmailReport, selectedLanguage }: InboxProps) {
 
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center h-full text-center py-12">
+                <div className="flex flex-col items-center justify-center h-full text-center py-20">
                   <Mail className="w-16 h-16 text-[#1C1C1E] dark:text-[#F2F2F7] mx-auto mb-4" />
                   <FontWrapper>
                     <h3 className="text-lg font-medium text-[#1C1C1E] dark:text-[#F2F2F7] mb-2">{config.texts.selectEmailMessage}</h3>

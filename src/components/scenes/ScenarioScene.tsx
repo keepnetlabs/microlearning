@@ -131,10 +131,21 @@ interface ScenarioSceneProps {
 export function ScenarioScene({
   config,
   onNextSlide,
+  onVideoCompleted,
   sceneId,
   reducedMotion,
-  disableDelays
-}: ScenarioSceneProps & { onNextSlide?: () => void; sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean; }) {
+  disableDelays,
+  isVideoCompleted: controlledIsVideoCompleted,
+  onIsVideoCompletedChange
+}: ScenarioSceneProps & { 
+  onNextSlide?: () => void; 
+  onVideoCompleted?: (completed: boolean) => void; 
+  sceneId?: string | number; 
+  reducedMotion?: boolean; 
+  disableDelays?: boolean;
+  isVideoCompleted?: boolean;
+  onIsVideoCompletedChange?: (completed: boolean) => void;
+}) {
   
   // State for edit changes and edit mode tracking
   const [editChanges, setEditChanges] = useState<Partial<ScenarioSceneConfig>>({});
@@ -165,7 +176,22 @@ export function ScenarioScene({
   const [transcriptData, setTranscriptData] = useState<string>('');
   const [isLoadingTranscript, setIsLoadingTranscript] = useState(false);
   const [transcriptError, setTranscriptError] = useState<string | null>(null);
-  const [isVideoCompleted, setIsVideoCompleted] = useState(false);
+  // Use controlled props if provided, otherwise fallback to local state
+  const [localIsVideoCompleted, setLocalIsVideoCompleted] = useState(false);
+  
+  const isVideoCompleted = controlledIsVideoCompleted !== undefined ? controlledIsVideoCompleted : localIsVideoCompleted;
+  
+  const setIsVideoCompleted = (value: boolean) => {
+    if (onIsVideoCompletedChange) onIsVideoCompletedChange(value);
+    else setLocalIsVideoCompleted(value);
+  };
+
+
+
+  // Notify parent when video completion status changes
+  useEffect(() => {
+    onVideoCompleted?.(isVideoCompleted);
+  }, [isVideoCompleted, onVideoCompleted]);
 
   // URL algılama fonksiyonu
   const isUrl = (str: string): boolean => {
