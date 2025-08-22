@@ -18,10 +18,13 @@ interface InboxProps {
   onEmailReport?: (emailId: string, isCorrect: boolean) => void;
   onAllEmailsReported?: (allReported: boolean) => void;
   selectedLanguage?: string;
+  // External control for selected email
+  externalSelectedEmailId?: string | null;
+  onSelectedEmailIdChange?: (id: string | null) => void;
 }
 
 
-export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLanguage }: InboxProps) {
+export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLanguage, externalSelectedEmailId, onSelectedEmailIdChange }: InboxProps) {
   // Load initial state from localStorage
   const loadInboxState = () => {
     try {
@@ -237,9 +240,17 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
     </div>
   );
 
+  // Sync external control with internal state
+  useEffect(() => {
+    if (externalSelectedEmailId !== undefined && externalSelectedEmailId !== selectedEmailId) {
+      setSelectedEmailId(externalSelectedEmailId);
+    }
+  }, [externalSelectedEmailId, selectedEmailId]);
+
   const handleEmailSelect = useCallback((emailId: string) => {
     setSelectedEmailId(emailId);
-  }, []);
+    onSelectedEmailIdChange?.(emailId);
+  }, [onSelectedEmailIdChange]);
 
   const handleEmailReport = useCallback((emailId: string) => {
     const email = config.emails.find(e => e.id === emailId);
@@ -370,7 +381,10 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
             {isMobile && selectedEmail && (
               <div className="px-4 py-3 border-b border-white/20 dark:border-white/10 bg-white/5 dark:bg-black/5">
                 <button
-                  onClick={() => setSelectedEmailId(null)}
+                  onClick={() => {
+                    setSelectedEmailId(null);
+                    onSelectedEmailIdChange?.(null);
+                  }}
                   className="flex items-center gap-2 text-sm text-[#1C1C1E] dark:text-[#F2F2F7] hover:text-[#1C1C1E] dark:hover:text-[#F2F2F7] transition-colors"
                 >
                   <ArrowLeft className="w-4 h-4" />

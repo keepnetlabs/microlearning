@@ -143,6 +143,8 @@ function ActionableContentSceneInternal({
   const [isLoadingInbox, setIsLoadingInbox] = useState(true);
   const [inboxError, setInboxError] = useState<string | null>(null);
   const [allEmailsReported, setAllEmailsReported] = useState(false);
+  const [externalSelectedEmailId, setExternalSelectedEmailId] = useState<string | null>(null);
+  const [hasStartedReporting, setHasStartedReporting] = useState(false);
 
   // Compute inbox URL based on selected language
   const computeInboxUrl = useMemo(() => {
@@ -339,6 +341,9 @@ function ActionableContentSceneInternal({
                     onInboxCompleted?.(allReported);
                   }}
                   selectedLanguage={selectedLanguage}
+                  externalSelectedEmailId={externalSelectedEmailId}
+                  onSelectedEmailIdChange={setExternalSelectedEmailId}
+                  onEmailSelect={() => setHasStartedReporting(true)}
                 />
               )}
             </>
@@ -354,8 +359,8 @@ function ActionableContentSceneInternal({
           )}
         </section>
 
-        {/* Call to Action */}
-        {currentConfig.callToActionText && (
+        {/* Call to Action - Show only initially or when all emails are reported */}
+        {currentConfig.callToActionText && (!hasStartedReporting || allEmailsReported) && (
           <CallToAction
             text={allEmailsReported && currentConfig.successCallToActionText
               ? (typeof currentConfig.successCallToActionText === 'string' ? currentConfig.successCallToActionText : undefined)
@@ -367,8 +372,15 @@ function ActionableContentSceneInternal({
               ? currentConfig.successCallToActionText.desktop
               : (typeof currentConfig.callToActionText === 'object' ? currentConfig.callToActionText.desktop : undefined)}
             delay={0.8}
-            onClick={onNextSlide}
-            disabled={!allEmailsReported}
+            onClick={allEmailsReported ? onNextSlide : () => {
+              // If emails not all reported, open first email in inbox
+              if (inboxConfig && inboxConfig.emails.length > 0) {
+                const firstEmailId = inboxConfig.emails[0].id;
+                setExternalSelectedEmailId(firstEmailId);
+                setHasStartedReporting(true);
+              }
+            }}
+            disabled={false}
             dataTestId="cta-actionable"
             icon={<MailSearch size={20} />}
             iconPosition="left"
