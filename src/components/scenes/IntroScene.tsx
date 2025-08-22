@@ -770,7 +770,7 @@ export const IntroScene = React.memo(({
               initial={{ opacity: 0 }}
               animate={{ opacity: isVisible ? 1 : 0 }}
               transition={{ delay: delays.cardTitle }}
-              className="mb-3 sm:mb-4 text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold text-center text-sm sm:text-base"
+              className="mb-4 text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold text-center text-sm sm:text-base"
             >
               <EditableText
                 configPath="sectionTitle"
@@ -782,7 +782,7 @@ export const IntroScene = React.memo(({
               </EditableText>
             </motion.h3>
 
-            <div className="space-y-3 sm:space-y-4">
+            <div className="flex flex-col gap-4 text-left">
               {Array.isArray(memoizedHighlights) && memoizedHighlights.map((item, index) => (
                 <HighlightItemComponent key={`highlight-${item.iconName}-${index}`} item={item} index={index} delays={delays} isEditMode={currentEditMode} />
               ))}
@@ -793,30 +793,32 @@ export const IntroScene = React.memo(({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
               transition={{ delay: delays.stats }}
-              className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200/50 dark:border-gray-600/50"
+              className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-white/50 dark:border-white/10"
             >
-              <div className="flex justify-between items-center">
-                <StatsItem icon={ClockIcon} text={duration || ''} statsStyles={statsStyles} configPath="duration" isEditMode={currentEditMode} />
-                <StatsItem icon={ChartBarIcon} text={level || ''} statsStyles={statsStyles} configPath="level" isEditMode={currentEditMode} />
-              </div>
-            </motion.div>
-          </div>
-
+            <div className="flex justify-between items-center">
+              <StatsItem icon={ClockIcon} text={duration || ''} statsStyles={statsStyles} configPath="duration" isEditMode={currentEditMode} />
+              <StatsItem icon={ChartBarIcon} text={level || ''} statsStyles={statsStyles} configPath="level" isEditMode={currentEditMode} />
+            </div>
         </motion.div>
+      </div>
 
-        {/* Enhanced Call to Action */}
-        {callToActionText && (
-          <CallToAction
-            text={typeof callToActionText === 'string' ? callToActionText : undefined}
-            mobileText={typeof callToActionText === 'object' ? callToActionText.mobile : undefined}
-            desktopText={typeof callToActionText === 'object' ? callToActionText.desktop : undefined}
-            isVisible={isVisible}
-            delay={delays.cta}
-            onClick={onNextSlide}
-            dataTestId="cta-intro"
-          />
-        )}
-      </FontWrapper>
-    </EditModeProvider>
+    </motion.div>
+
+        {/* Enhanced Call to Action */ }
+  {
+    callToActionText && (
+      <CallToAction
+        text={typeof callToActionText === 'string' ? callToActionText : undefined}
+        mobileText={typeof callToActionText === 'object' ? callToActionText.mobile : undefined}
+        desktopText={typeof callToActionText === 'object' ? callToActionText.desktop : undefined}
+        isVisible={isVisible}
+        delay={delays.cta}
+        onClick={onNextSlide}
+        dataTestId="cta-intro"
+      />
+    )
+  }
+      </FontWrapper >
+    </EditModeProvider >
   );
 });

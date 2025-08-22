@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, AlertTriangle, Flag, ChevronRight, Reply, CornerUpRight, Archive, Delete, ArrowLeft, Eye, Star, FileText, EyeOff, MailSearch, Check, X, FileSpreadsheet, Image, Download } from "lucide-react";
 import { FontWrapper } from "./common/FontWrapper";
@@ -21,12 +21,41 @@ interface InboxProps {
 
 
 export function Inbox({ config, onEmailReport, selectedLanguage }: InboxProps) {
-  const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
-  const [reportedEmails, setReportedEmails] = useState<Set<string>>(new Set());
-  const [reportResults, setReportResults] = useState<Map<string, boolean>>(new Map());
-  const [accuracy, setAccuracy] = useState(0);
-  const [totalReports, setTotalReports] = useState(0);
-  const [showHeaders, setShowHeaders] = useState(false);
+  // Load initial state from localStorage
+  const loadInboxState = () => {
+    try {
+      const saved = localStorage.getItem('inbox-state');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return {
+          selectedEmailId: parsed.selectedEmailId || null,
+          reportedEmails: new Set<string>(parsed.reportedEmails || []),
+          reportResults: new Map<string, boolean>(parsed.reportResults || []),
+          accuracy: parsed.accuracy || 0,
+          totalReports: parsed.totalReports || 0,
+          showHeaders: parsed.showHeaders || false
+        };
+      }
+    } catch (error) {
+      console.warn('Failed to load inbox state:', error);
+    }
+    return {
+      selectedEmailId: null,
+      reportedEmails: new Set<string>(),
+      reportResults: new Map<string, boolean>(),
+      accuracy: 0,
+      totalReports: 0,
+      showHeaders: false
+    };
+  };
+
+  const initialState = loadInboxState();
+  const [selectedEmailId, setSelectedEmailId] = useState<string | null>(initialState.selectedEmailId);
+  const [reportedEmails, setReportedEmails] = useState<Set<string>>(initialState.reportedEmails);
+  const [reportResults, setReportResults] = useState<Map<string, boolean>>(initialState.reportResults);
+  const [accuracy, setAccuracy] = useState(initialState.accuracy);
+  const [totalReports, setTotalReports] = useState(initialState.totalReports);
+  const [showHeaders, setShowHeaders] = useState(initialState.showHeaders);
   const [showReportModal, setShowReportModal] = useState(false);
   const [showResultModal, setShowResultModal] = useState(false);
   const [lastReportedEmail, setLastReportedEmail] = useState<EmailData | null>(null);
@@ -34,6 +63,40 @@ export function Inbox({ config, onEmailReport, selectedLanguage }: InboxProps) {
   const [previewAttachment, setPreviewAttachment] = useState<EmailAttachment | null>(null);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const isMobile = useIsMobile();
+
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      const stateToSave = {
+        selectedEmailId,
+        reportedEmails: Array.from(reportedEmails),
+        reportResults: Array.from(reportResults.entries()),
+        accuracy,
+        totalReports,
+        showHeaders
+      };
+      localStorage.setItem('inbox-state', JSON.stringify(stateToSave));
+    } catch (error) {
+      console.warn('Failed to save inbox state:', error);
+    }
+  }, [selectedEmailId, reportedEmails, reportResults, accuracy, totalReports, showHeaders]);
+
+  // Cleanup localStorage when page/app is being closed
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      try {
+        localStorage.removeItem('inbox-state');
+      } catch (error) {
+        console.warn('Failed to cleanup inbox state:', error);
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
 
   // Optional edit mode - only use if EditModeProvider is available
   let isEditMode = false;
