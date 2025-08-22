@@ -338,7 +338,7 @@ export function Inbox({ config, onEmailReport, selectedLanguage }: InboxProps) {
                 {config.emails.map((email) => (
                   <motion.div
                     key={email.id}
-                    className={`p-4 border-b border-white/30 dark:border-white/10 cursor-pointer hover:bg-white/10 dark:hover:bg-white/5 glass-border-no-radius transition-colors ${selectedEmailId === email.id ? 'lg:border-l-[7px] border-l-white/40 dark:border-l-white' : ''
+                    className={`p-4 border-b border-white/30 dark:border-white/10 cursor-pointer glass-border-no-radius transition-colors ${selectedEmailId === email.id ? 'lg:border-l-[7px] border-l-white/40 dark:border-l-white' : ''
                       } ${reportedEmails.has(email.id) ? 'opacity-60' : ''}`}
                     onClick={() => handleEmailSelect(email.id)}
                     whileHover={{ scale: 1.01 }}

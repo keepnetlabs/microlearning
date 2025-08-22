@@ -1,4 +1,4 @@
-import { LucideIcon } from "lucide-react";
+import { LucideIcon, MailSearch } from "lucide-react";
 import { useMemo, useRef, useState, useEffect } from "react";
 import * as LucideIcons from "lucide-react";
 import { FontWrapper } from "../common/FontWrapper";
@@ -350,6 +350,8 @@ function ActionableContentSceneInternal({
             delay={0.8}
             onClick={onNextSlide}
             dataTestId="cta-actionable"
+            icon={<MailSearch size={20} />}
+            iconPosition="left"
           />
         )}
 
