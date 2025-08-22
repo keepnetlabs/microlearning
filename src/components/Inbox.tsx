@@ -21,10 +21,11 @@ interface InboxProps {
   // External control for selected email
   externalSelectedEmailId?: string | null;
   onSelectedEmailIdChange?: (id: string | null) => void;
+  onEmailSelect?: (emailId: string) => void;
 }
 
 
-export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLanguage, externalSelectedEmailId, onSelectedEmailIdChange }: InboxProps) {
+export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLanguage, externalSelectedEmailId, onSelectedEmailIdChange, onEmailSelect }: InboxProps) {
   // Load initial state from localStorage
   const loadInboxState = () => {
     try {
@@ -250,7 +251,8 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
   const handleEmailSelect = useCallback((emailId: string) => {
     setSelectedEmailId(emailId);
     onSelectedEmailIdChange?.(emailId);
-  }, [onSelectedEmailIdChange]);
+    onEmailSelect?.(emailId);
+  }, [onSelectedEmailIdChange, onEmailSelect]);
 
   const handleEmailReport = useCallback((emailId: string) => {
     const email = config.emails.find(e => e.id === emailId);
@@ -598,7 +600,14 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
       {lastReportedEmail && (
         <PhishingResultModal
           isOpen={showResultModal}
-          onClose={() => setShowResultModal(false)}
+          onClose={() => {
+            setShowResultModal(false);
+            // On mobile, return to inbox list after reporting
+            if (isMobile) {
+              setSelectedEmailId(null);
+              onSelectedEmailIdChange?.(null);
+            }
+          }}
           modalTexts={config.texts.phishingResultModal}
           email={lastReportedEmail}
           isCorrect={lastReportCorrect}
