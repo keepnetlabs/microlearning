@@ -547,6 +547,18 @@ export function VideoPlayer({
         className="rounded-lg overflow-hidden relative"
         role="region"
         aria-label={ariaTexts?.videoLabel || "Video Container"}
+        onTouchStart={(e) => {
+          // Prevent page navigation when touching video area
+          e.stopPropagation();
+        }}
+        onTouchMove={(e) => {
+          // Prevent page navigation when swiping on video
+          e.stopPropagation();
+        }}
+        onTouchEnd={(e) => {
+          // Prevent page navigation when releasing touch on video
+          e.stopPropagation();
+        }}
       >
         <video
           ref={videoRef}
