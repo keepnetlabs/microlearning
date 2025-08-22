@@ -337,14 +337,6 @@ export const AttachmentPreviewModal: React.FC<AttachmentPreviewModalProps> = ({
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className={`glass-border-1 rounded-lg transition-colors ${isMobile ? 'p-1.5' : 'p-2'}`}
-                  title="Download"
-                >
-                  <Download size={isMobile ? 16 : 20} className="text-[#1C1C1E] dark:text-[#F2F2F7]" />
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
                   onClick={onClose}
                   className={`glass-border-1 rounded-lg transition-colors ${isMobile ? 'p-1.5' : 'p-2'}`}
                 >

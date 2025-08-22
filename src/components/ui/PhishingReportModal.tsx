@@ -123,7 +123,7 @@ export function PhishingReportModal({
             {/* Options */}
             <div className="space-y-3">
               {modalTexts.options.map((option, index) => (
-                <label
+                <div
                   key={index}
                   className="flex items-start gap-3 cursor-pointer group"
                 >
@@ -131,11 +131,12 @@ export function PhishingReportModal({
                     <input
                       type="checkbox"
                       checked={selectedOptions.includes(index)}
-                      onChange={() => handleOptionToggle(index)}
+                      onChange={() => { }}
                       className="sr-only"
+                      id={`option-${index}`}
                     />
                     <div className={`w-[18px] h-[18px] border border-[#1C1C1E]/40 dark:border-[#F2F2F7]/30 rounded flex items-center justify-center transition-colors
-                      }`}>
+                      }`} onClick={() => handleOptionToggle(index)}>
                       {selectedOptions.includes(index) && (
                         <svg className="w-2.5 h-2.5 text-[#1C1C1E] dark:text-[#F2F2F7]" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -143,12 +144,12 @@ export function PhishingReportModal({
                       )}
                     </div>
                   </div>
-                  <FontWrapper>
-                    <span className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] group-hover:text-[#1C1C1E] dark:group-hover:text-[#F2F2F7] transition-colors">
+                  <FontWrapper className="z-20">
+                    <span className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] group-hover:text-[#1C1C1E] dark:group-hover:text-[#F2F2F7] transition-colors cursor-pointer" onClick={() => handleOptionToggle(index)}>
                       {option}
                     </span>
                   </FontWrapper>
-                </label>
+                </div>
               ))}
             </div>
           </div>

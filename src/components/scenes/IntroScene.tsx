@@ -757,7 +757,7 @@ export const IntroScene = React.memo(({
             scale: 1.02,
             transition: { type: "spring", stiffness: 400 }
           }}
-          className={`relative p-4 sm:p-6 md:p-8 max-w-xs sm:max-w-md w-full mx-2 ${!isMobile ?
+          className={`relative p-4 sm:p-6 md:p-8 sm:max-w-md w-full mx-2 ${!isMobile ?
             (currentEditMode ? 'glass-border-1-no-overflow' : 'glass-border-1') :
             (currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2')
             }`}

@@ -622,6 +622,7 @@
   /* Allow normal text wrapping */
   word-wrap: break-word;
   overflow-wrap: break-word;
+  line-height: 1.8;
   /* But preserve link integrity */
 }
 

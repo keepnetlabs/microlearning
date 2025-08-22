@@ -13,16 +13,19 @@ const linkUrlMapping: Record<string, string> = {
 export const enhanceLinkTooltips = (htmlContent: string): string => {
   if (!htmlContent) return htmlContent;
 
+  // Remove any target attribute from HTML content (quoted or unquoted, any case)
+  htmlContent = htmlContent.replace(/\s*target\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, '');
+  console.log('htmlContent', htmlContent);
   // Regex to match <a> tags with href attributes
   const linkRegex = /<a\s+([^>]*?\s+)?href\s*=\s*["']([^"']+)["'][^>]*?>(.*?)<\/a>/gi;
-  
+
   return htmlContent.replace(linkRegex, (match, beforeHref, href, linkText) => {
     let tooltipUrl = href;
-    
+
     // If href is # or empty, try to extract URL from link text or mapping
     if (href === '#' || href === '') {
       const cleanLinkText = linkText.replace(/<[^>]*>/g, '').trim(); // Remove HTML tags
-      
+
       // Look for URL in link text itself
       const urlInText = cleanLinkText.match(/[\w-]+\.[\w.-]+(?:\/[\w.-]*)?/);
       if (urlInText) {
@@ -38,20 +41,19 @@ export const enhanceLinkTooltips = (htmlContent: string): string => {
         }
       }
     }
-    
+
     // Don't show tooltip for # or empty URLs without mapping
     if ((href === '#' || href === '') && tooltipUrl === href) {
       tooltipUrl = '';
     }
-    
-    // Insert data-tooltip attribute for the portal system
-    let enhancedLink = match.replace(/(<a\s+[^>]*?)>/i, `$1 data-tooltip="${tooltipUrl}" class="link-with-portal-tooltip">`);
-    
-    // Add target="_blank" if not already present
-    if (!enhancedLink.includes('target=')) {
-      enhancedLink = enhancedLink.replace(/(<a\s+[^>]*?)>/i, `$1 target="_blank" rel="noopener noreferrer">`);
-    }
-    
+
+    // Remove href and rel attributes for security, keep original link structure
+    let enhancedLink = match.replace(/href\s*=\s*["'][^"']*["']/gi, '');
+    enhancedLink = enhancedLink.replace(/rel\s*=\s*["'][^"']*["']/gi, '');
+    // Also ensure any target attribute is stripped (handles quoted and unquoted)
+    enhancedLink = enhancedLink.replace(/target\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, '');
+    enhancedLink = enhancedLink.replace(/(<a\s+[^>]*?)>/i, `$1 data-tooltip="${tooltipUrl}" class="link-with-portal-tooltip cursor-pointer text-blue-600 dark:text-blue-400 hover:underline">`);
+    console.log('enhancedLink', enhancedLink);
     return enhancedLink;
   });
 };
@@ -59,18 +61,12 @@ export const enhanceLinkTooltips = (htmlContent: string): string => {
 // Function to add event listeners for custom tooltips (if needed)
 export const addCustomTooltipListeners = (containerElement: HTMLElement) => {
   const links = containerElement.querySelectorAll('a[href]:not([href="#"]):not([href=""])');
-  
+
   links.forEach(link => {
     const href = link.getAttribute('href');
     if (href && href !== '#' && href !== '') {
       link.setAttribute('title', href);
       link.classList.add('link-with-tooltip');
-      
-      // Add target="_blank" if not already present
-      if (!link.getAttribute('target')) {
-        link.setAttribute('target', '_blank');
-        link.setAttribute('rel', 'noopener noreferrer');
-      }
     }
   });
 };

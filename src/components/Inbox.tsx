@@ -319,7 +319,7 @@ export function Inbox({ config, onEmailReport, selectedLanguage }: InboxProps) {
                     )}
 
                     {/* Email Content */}
-                    <div className="prose prose-sm max-w-none mb-6 prose-p:text-[#1C1C1E] dark:prose-p:text-[#F2F2F7] prose-strong:text-[#1C1C1E] dark:prose-strong:text-[#F2F2F7] prose-li:text-[#1C1C1E] dark:prose-li:text-[#F2F2F7] prose-a:text-[#1C1C1E] dark:prose-a:text-[#F2F2F7] email-content-container">
+                    <div className="prose prose-sm max-w-none mb-6 prose-p:text-[#1C1C1E] dark:prose-p:text-[#F2F2F7] prose-p:mb-1 prose-div:mb-1 prose-strong:text-[#1C1C1E] dark:prose-strong:text-[#F2F2F7] prose-li:text-[#1C1C1E] dark:prose-li:text-[#F2F2F7] prose-a:text-[#1C1C1E] dark:prose-a:text-[#F2F2F7] email-content-container">
                       <FontWrapper>
                         <EmailContentWithPortalTooltips htmlContent={enhanceLinkTooltips(selectedEmail.content)} />
                       </FontWrapper>
@@ -434,7 +434,7 @@ export function Inbox({ config, onEmailReport, selectedLanguage }: InboxProps) {
                   )}
 
                   {/* Email Content */}
-                  <div className="prose prose-sm max-w-none mb-6 prose-p:text-[#1C1C1E] dark:prose-p:text-[#F2F2F7] prose-strong:text-[#1C1C1E] dark:prose-strong:text-[#F2F2F7] prose-li:text-[#1C1C1E] dark:prose-li:text-[#F2F2F7] prose-a:text-[#1C1C1E] dark:prose-a:text-[#F2F2F7] email-content-container">
+                  <div className="prose prose-sm max-w-none mb-6 prose-p:text-[#1C1C1E] dark:prose-p:text-[#F2F2F7] prose-p:mb-1 prose-div:mb-1 prose-strong:text-[#1C1C1E] dark:prose-strong:text-[#F2F2F7] prose-li:text-[#1C1C1E] dark:prose-li:text-[#F2F2F7] prose-a:text-[#1C1C1E] dark:prose-a:text-[#F2F2F7] email-content-container">
                     <FontWrapper>
                       <EmailContentWithPortalTooltips htmlContent={enhanceLinkTooltips(selectedEmail.content)} />
                     </FontWrapper>
