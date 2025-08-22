@@ -107,11 +107,11 @@ function ActionableContentSceneInternal({
   sceneId,
   reducedMotion,
   selectedLanguage
-}: ActionableContentSceneProps & { 
-  onNextSlide?: () => void; 
-  onInboxCompleted?: (completed: boolean) => void; 
-  sceneId?: string | number; 
-  reducedMotion?: boolean; 
+}: ActionableContentSceneProps & {
+  onNextSlide?: () => void;
+  onInboxCompleted?: (completed: boolean) => void;
+  sceneId?: string | number;
+  reducedMotion?: boolean;
   selectedLanguage?: string;
 }) {
 
@@ -382,8 +382,6 @@ function ActionableContentSceneInternal({
             }}
             disabled={false}
             dataTestId="cta-actionable"
-            icon={<MailSearch size={20} />}
-            iconPosition="left"
           />
         )}
 
@@ -393,11 +391,11 @@ function ActionableContentSceneInternal({
 }
 
 // Main export component with EditModeProvider
-export function ActionableContentScene(props: ActionableContentSceneProps & { 
-  onNextSlide?: () => void; 
-  onInboxCompleted?: (completed: boolean) => void; 
-  sceneId?: string | number; 
-  reducedMotion?: boolean; 
+export function ActionableContentScene(props: ActionableContentSceneProps & {
+  onNextSlide?: () => void;
+  onInboxCompleted?: (completed: boolean) => void;
+  sceneId?: string | number;
+  reducedMotion?: boolean;
   selectedLanguage?: string;
 }) {
   const [configKey, setConfigKey] = useState(0);

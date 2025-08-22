@@ -53,6 +53,13 @@ function SummarySceneContent({ config, completionData, sceneId, reducedMotion, d
   // Use tempConfig when in edit mode, otherwise use the original config
   const currentConfig = currentEditMode ? tempConfig : config;
 
+  // Check for logger errors on mount and set as initial error state
+  useEffect(() => {
+    if (logger.hasErrors()) {
+      setFinishError(currentConfig.texts?.finishErrorText || 'SCORM save failed. Please try again or contact support if the problem persists.');
+    }
+  }, []);
+
   // Animation optimization helper - memoized
   const animationProps = useMemo(() => ({
     // Duration optimization based on reduced motion
@@ -130,7 +137,7 @@ function SummarySceneContent({ config, completionData, sceneId, reducedMotion, d
   // Memoize commonly used CSS class combinations
   const cssClasses = useMemo(() => ({
     glassBorder2: currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2',
-    glassBorder1: currentEditMode ? 'glass-border-1-no-overflow' : 'glass-border-1', 
+    glassBorder1: currentEditMode ? 'glass-border-1-no-overflow' : 'glass-border-1',
     glassBorder0: currentEditMode ? 'glass-border-0-no-overflow' : 'glass-border-0',
     overflowHidden: currentEditMode ? '' : 'overflow-hidden',
     textColor: 'text-[#1C1C1E] dark:text-[#F2F2F7]'
@@ -157,13 +164,14 @@ function SummarySceneContent({ config, completionData, sceneId, reducedMotion, d
       scormService.commit();
       const ok = scormService.finish();
       if (!ok) {
-        setFinishError(currentConfig.texts?.finishErrorText || 'Could not finish. Please close the window or try again.');
+        setFinishError(currentConfig.texts?.finishErrorText || 'SCORM save failed. Please try again or contact support if the problem persists.');
       } else {
         setIsFinished(true);
         success = true;
       }
     } catch (e) {
-      setFinishError(currentConfig.texts?.finishErrorText || 'Could not finish. Please close the window or try again.');
+      console.error('SCORM finish error:', e);
+      setFinishError(currentConfig.texts?.finishErrorText || `SCORM error: ${e instanceof Error ? e.message : 'Unknown error'}. Please try again.`);
     } finally {
       setIsFinishing(false);
       // Only attempt to close the window if successful
@@ -691,12 +699,12 @@ function SummarySceneContent({ config, completionData, sceneId, reducedMotion, d
                         ? (
                           <EditableText
                             configPath="texts.retryText"
-                            placeholder="Retry"
+                            placeholder="Try Again"
                             maxLength={30}
                             as="span"
                             data-editable="true"
                           >
-                            {currentConfig.texts?.retryText || 'Retry'}
+                            {currentConfig.texts?.retryText || 'Try Again'}
                           </EditableText>
                         )
                         : (
@@ -776,44 +784,44 @@ function SummarySceneContent({ config, completionData, sceneId, reducedMotion, d
                 className={`inline-flex mt-6 sm:text-base items-center gap-2 text-sm underline disabled:opacity-70 disabled:cursor-not-allowed text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold`}
                 data-testid="btn-download-certificate"
               >
-              <Download size={16} className={`relative font-semibold z-10 ${hasDownloadedCertificate ? 'opacity-60' : ''} text-[#1C1C1E] dark:text-[#F2F2F7]`} />
-              <span className={`relative z-10`}>
-                {showCertificate
-                  ? (
-                    <EditableText
-                      configPath="texts.downloadingText"
-                      placeholder="Downloading…"
-                      maxLength={50}
-                      as="span"
-                      data-editable="true"
-                    >
-                      {currentConfig.texts?.downloadingText || 'Downloading…'}
-                    </EditableText>
-                  )
-                  : hasDownloadedCertificate
+                <Download size={16} className={`relative font-semibold z-10 ${hasDownloadedCertificate ? 'opacity-60' : ''} text-[#1C1C1E] dark:text-[#F2F2F7]`} />
+                <span className={`relative z-10`}>
+                  {showCertificate
                     ? (
                       <EditableText
-                        configPath="texts.downloadedText"
-                        placeholder="Downloaded"
+                        configPath="texts.downloadingText"
+                        placeholder="Downloading…"
                         maxLength={50}
                         as="span"
                         data-editable="true"
                       >
-                        {currentConfig.texts?.downloadedText || 'Downloaded'}
+                        {currentConfig.texts?.downloadingText || 'Downloading…'}
                       </EditableText>
                     )
-                    : (
-                      <EditableText
-                        configPath="texts.downloadButton"
-                        placeholder="Download certificate"
-                        maxLength={100}
-                        as="span"
-                        data-editable="true"
-                      >
-                        {currentConfig.texts?.downloadButton || 'Download certificate'}
-                      </EditableText>
-                    )}
-              </span>
+                    : hasDownloadedCertificate
+                      ? (
+                        <EditableText
+                          configPath="texts.downloadedText"
+                          placeholder="Downloaded"
+                          maxLength={50}
+                          as="span"
+                          data-editable="true"
+                        >
+                          {currentConfig.texts?.downloadedText || 'Downloaded'}
+                        </EditableText>
+                      )
+                      : (
+                        <EditableText
+                          configPath="texts.downloadButton"
+                          placeholder="Download certificate"
+                          maxLength={100}
+                          as="span"
+                          data-editable="true"
+                        >
+                          {currentConfig.texts?.downloadButton || 'Download certificate'}
+                        </EditableText>
+                      )}
+                </span>
               </motion.button>
             )}
           </div>
@@ -1138,11 +1146,11 @@ function SummarySceneContent({ config, completionData, sceneId, reducedMotion, d
 
       {/* Edit Mode Panel */}
       {/* <EditModePanel /> */}
-      
+
       {/* Scientific Basis Info */}
-      <ScientificBasisInfo 
-        config={currentConfig} 
-        sceneType={(currentConfig as any)?.scene_type || 'summary'} 
+      <ScientificBasisInfo
+        config={currentConfig}
+        sceneType={(currentConfig as any)?.scene_type || 'summary'}
       />
     </FontWrapper>
   );
