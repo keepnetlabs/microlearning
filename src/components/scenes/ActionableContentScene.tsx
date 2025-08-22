@@ -42,6 +42,7 @@ interface ActionableContentSceneConfig {
   title: string;
   subtitle: string;
   callToActionText?: string | { mobile?: string; desktop?: string; };
+  successCallToActionText?: string | { mobile?: string; desktop?: string; };
   actions: ActionItem[];
 
   // Visual configuration
@@ -356,9 +357,15 @@ function ActionableContentSceneInternal({
         {/* Call to Action */}
         {currentConfig.callToActionText && (
           <CallToAction
-            text={typeof currentConfig.callToActionText === 'string' ? currentConfig.callToActionText : undefined}
-            mobileText={typeof currentConfig.callToActionText === 'object' ? currentConfig.callToActionText.mobile : undefined}
-            desktopText={typeof currentConfig.callToActionText === 'object' ? currentConfig.callToActionText.desktop : undefined}
+            text={allEmailsReported && currentConfig.successCallToActionText
+              ? (typeof currentConfig.successCallToActionText === 'string' ? currentConfig.successCallToActionText : undefined)
+              : (typeof currentConfig.callToActionText === 'string' ? currentConfig.callToActionText : undefined)}
+            mobileText={allEmailsReported && currentConfig.successCallToActionText && typeof currentConfig.successCallToActionText === 'object'
+              ? currentConfig.successCallToActionText.mobile
+              : (typeof currentConfig.callToActionText === 'object' ? currentConfig.callToActionText.mobile : undefined)}
+            desktopText={allEmailsReported && currentConfig.successCallToActionText && typeof currentConfig.successCallToActionText === 'object'
+              ? currentConfig.successCallToActionText.desktop
+              : (typeof currentConfig.callToActionText === 'object' ? currentConfig.callToActionText.desktop : undefined)}
             delay={0.8}
             onClick={onNextSlide}
             disabled={!allEmailsReported}
