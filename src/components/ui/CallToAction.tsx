@@ -139,9 +139,11 @@ export function CallToAction({
         scale: isVisible ? 1 : 0.8
       }}
       transition={{
-        delay: reducedMotion ? 0 : delay,
-        type: reducedMotion ? undefined : "spring",
-        stiffness: reducedMotion ? 0 : 200
+        delay: 0,
+        type: "tween",
+        duration: 0.4,
+        ease: "easeOut",
+        stiffness: 100
       }}
       className={`${containerClasses} ${className}`}
       style={{
@@ -163,7 +165,7 @@ export function CallToAction({
         onClick={(e) => { if (!disabled && !isEditMode) onClick?.(); e.currentTarget.blur(); }}
         disabled={disabled}
         aria-disabled={disabled}
-        className={`group relative inline-flex items-center ${iconPosition === 'left' ? 'space-x-2' : 'space-x-2'} px-4 py-2 sm:px-6 sm:py-3 ${isEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all focus:outline-none text-[#1C1C1E] dark:text-[#F2F2F7] ${buttonMobileClasses} ${disabled ? 'opacity-60 pointer-events-none' : ''} ${isEditMode ? 'cursor-default' : ''}`}
+        className={`group relative inline-flex items-center ${iconPosition === 'left' ? 'space-x-2' : 'space-x-2'} px-4 py-2 sm:px-6 sm:py-3 ${isEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all focus:outline-none text-[#1C1C1E] dark:text-[#F2F2F7] ${buttonMobileClasses} ${disabled ? 'pointer-events-none cursor-not-allowed' : ''} ${isEditMode ? 'cursor-default' : ''}`}
       >
         {/* Button shimmer effect */}
         <motion.div

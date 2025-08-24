@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useMemo } from "react";
+import React, { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, AlertTriangle, Flag, ChevronRight, Reply, CornerUpRight, Archive, Delete, ArrowLeft, Eye, Star, FileText, EyeOff, Check, X, FileSpreadsheet, Image, Download } from "lucide-react";
 import { FontWrapper } from "./common/FontWrapper";
@@ -68,6 +68,7 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
   const [previewAttachment, setPreviewAttachment] = useState<EmailAttachment | null>(null);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const isMobile = useIsMobile();
+  const emailContentRef = useRef<HTMLDivElement>(null);
 
   // Save state to localStorage whenever it changes
   useEffect(() => {
@@ -247,6 +248,11 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
     setSelectedEmailId(emailId);
     onSelectedEmailIdChange?.(emailId);
     onEmailSelect?.(emailId);
+    
+    // Scroll to top of email content
+    if (emailContentRef.current) {
+      emailContentRef.current.scrollTop = 0;
+    }
   }, [onSelectedEmailIdChange, onEmailSelect]);
 
   const handleEmailReport = useCallback((emailId: string) => {
@@ -299,7 +305,7 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
   return (
     <div key={selectedLanguage}>
       {/* Single Card with Header and Two-Column Layout */}
-      <div className="backdrop-blur-xl bg-white/10 dark:bg-black/10 rounded-lg border border-white/20 dark:border-white/10 overflow-hidden flex flex-col" style={{ minHeight: '600px' }}>
+      <div className="backdrop-blur-xl bg-white/10 dark:bg-black/10 rounded-lg border border-white/20 dark:border-white/10 overflow-hidden flex flex-col">
         {/* Header - Desktop layout */}
         <div className="hidden lg:block p-6 border-b border-white/20 dark:border-white/10">
           <div className="flex items-center justify-between">
@@ -463,6 +469,7 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
                     key={email.id}
                     className={`p-4 border-b border-white/30 dark:border-white/10 cursor-pointer glass-border-no-radius transition-colors ${selectedEmailId === email.id ? 'lg:border-l-[7px] border-l-white/40 dark:border-l-white' : ''
                       } ${reportedEmails.has(email.id) ? 'opacity-60' : ''}`}
+                    style={{ height: '105px', minHeight: '105px' }}
                     onClick={() => handleEmailSelect(email.id)}
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
@@ -508,8 +515,8 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
           </div>
 
           {/* Right: Email Viewer - Desktop only */}
-          <div className="hidden lg:block lg:col-span-2 glass-border-no-radius flex" style={{ backgroundColor: "rgba(255, 255, 255, 0.3)" }}>
-            <div className="p-6 overflow-y-auto scrollbar-hide flex-1">
+          <div className="hidden lg:block lg:col-span-2 glass-border-no-radius flex overflow-y-auto" style={{ backgroundColor: "rgba(255, 255, 255, 0.3)" }}>
+            <div ref={emailContentRef} className="p-6 overflow-y-auto scrollbar-hide flex-1" style={{ maxHeight: `${config.emails.length * 105}px` }}>
               {selectedEmail ? (
                 <div>
                   {/* Email Header */}

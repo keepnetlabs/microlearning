@@ -129,7 +129,7 @@ const GoalCard = memo(({ goal, index, isEditMode }: {
                 {goal.title}
               </EditableText>
             </motion.h3>
-            {goal.subtitle && (
+            {goal.subtitle && false && (
               <motion.div
                 className="text-sm font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 ease-out mt-0.5"
                 initial={{ opacity: 0, y: 16 }}
@@ -262,9 +262,9 @@ export const GoalScene = memo(({
       onEditModeChange={setIsInEditMode}
     >
       {/* <EditModePanel /> */}
-      <ScientificBasisInfo 
-        config={currentConfig} 
-        sceneType={(currentConfig as any)?.scene_type || 'goal'} 
+      <ScientificBasisInfo
+        config={currentConfig}
+        sceneType={(currentConfig as any)?.scene_type || 'goal'}
       />
       <FontWrapper>
         <main
