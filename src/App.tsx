@@ -487,6 +487,7 @@ export default function App(props: AppProps = {}) {
     localStorage.setItem('selected-language', newLanguage);
   }, [availableLanguages]);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
+  const [logoLoaded, setLogoLoaded] = useState(false);
   const [languageSearchTerm, setLanguageSearchTerm] = useState('');
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [inboxCompleted, setInboxCompleted] = useState(false);
@@ -1381,21 +1382,32 @@ export default function App(props: AppProps = {}) {
                   >
                     {/* Cam Panel */}
                     <div
-                      className={`relative bg-transparent glass-border-${isMobile ? 4 : 2}`}
+                      className={`relative bg-transparent glass-border-${isMobile ? 4 : 2} min-w-[120px] min-h-[40px] flex items-center justify-center`}
                       style={{
                         filter: "drop-shadow(-8px - 10px 46px #000)"
                       }}
                     >
                       <div className="corner-top-left"></div>
                       <div className="corner-bottom-right"></div>
+                      
+                      {/* Logo skeleton/placeholder */}
+                      {!logoLoaded && (
+                        <div className="absolute inset-2 bg-white/10 rounded-lg animate-pulse" />
+                      )}
+                      
                       <img
                         key={logoSrc + getHeaderLogoClassName(isMobile, isFirstOrLastScene)}
                         src={isMobile && isFirstOrLastScene ?
                           (isDarkMode ? (themeConfig?.logo?.darkSrc ?? themeConfig?.logo?.src ?? '') : (themeConfig?.logo?.src ?? '')) :
                           logoSrc}
-                        alt={themeConfig.logo?.alt || "Application Logo"}
+                        alt=""
                         aria-label={appConfig.theme?.ariaTexts?.logoLabel || "Application logo"}
-                        className={getHeaderLogoClassName(isMobile, isFirstOrLastScene)}
+                        className={`${getHeaderLogoClassName(isMobile, isFirstOrLastScene)} transition-all duration-300 ${!logoLoaded ? 'opacity-0 invisible' : 'opacity-100 visible'}`}
+                        onLoad={() => setLogoLoaded(true)}
+                        onError={() => {
+                          // Logo yüklenemedi, placeholder'da kal
+                          setLogoLoaded(false);
+                        }}
                       />
                     </div>
                   </motion.div>
