@@ -476,7 +476,7 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <FontWrapper className="truncate">
-                            <p className="font-medium text-[#1C1C1E] dark:text-[#F2F2F7] truncate lg:mt-3 xl:mt-0">{email.sender}</p>
+                            <p className="font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] truncate lg:mt-3 text-lg xl:mt-0">{email.sender}</p>
                           </FontWrapper>
                           {reportedEmails.has(email.id) && (
                             <div className={`w-5 h-5 rounded-full flex items-center justify-center bg-white/10 dark:bg-white/5 flex-shrink-0 ml-2 ${isEditMode ? 'glass-border-4-no-overflow' : 'glass-border-4'}`}>
@@ -497,7 +497,7 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
                               <p className="text-xs text-[#1C1C1E]/80 dark:text-[#F2F2F7]/70 truncate">{config.texts.cautiousReportMessage}</p>
                             )
                           ) : (
-                            <p className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7]">{email.preview}</p>
+                            <p className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] truncate">{email.preview}</p>
                           )}
                         </FontWrapper>
                       </div>
