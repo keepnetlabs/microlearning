@@ -20,8 +20,7 @@ export function PhishingReportButton({
     <div className={`relative ${className}`}>
       <motion.button
         whileHover={!disabled ? {
-          scale: 1.05,
-          boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
+          scale: 1.05
         } : undefined}
         whileTap={!disabled ? { scale: 0.95 } : undefined}
         onClick={(e) => { if (!disabled) onClick?.(); e.currentTarget.blur(); }}
