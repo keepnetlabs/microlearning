@@ -152,15 +152,10 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
   }
   const selectedEmail = config.emails.find(email => email.id === selectedEmailId);
 
-  // Check if all phishing emails are correctly reported
-  const allPhishingEmailsReported = useMemo(() => {
-    const phishingEmails = config.emails.filter(email => email.isPhishing);
-    const correctReports = Array.from(reportedEmails).filter(emailId => {
-      const email = config.emails.find(e => e.id === emailId);
-      return email?.isPhishing && reportResults.get(emailId) === true;
-    });
-    return correctReports.length === phishingEmails.length;
-  }, [config.emails, reportedEmails, reportResults]);
+  // Check if all emails are reported
+  const allEmailsReported = useMemo(() => {
+    return reportedEmails.size === config.emails.length;
+  }, [config.emails, reportedEmails]);
 
   // Handle attachment preview
   const handleAttachmentClick = useCallback((attachment: EmailAttachment) => {
@@ -339,7 +334,7 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
             <PhishingReportButton
               text={config.texts.phishingReportLabel}
               onClick={handlePhishingReportClick}
-              disabled={!selectedEmail || allPhishingEmailsReported}
+              disabled={!selectedEmail || allEmailsReported}
               icon={<PhishingIcon />}
             />
           </div>
@@ -369,7 +364,7 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
             <PhishingReportButton
               text={config.texts.phishingReportLabel}
               onClick={handlePhishingReportClick}
-              disabled={!selectedEmail || allPhishingEmailsReported}
+              disabled={!selectedEmail || allEmailsReported}
               icon={<PhishingIcon />}
             />
           </div>
