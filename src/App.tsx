@@ -1384,7 +1384,7 @@ export default function App(props: AppProps = {}) {
                     <div
                       className={`relative bg-transparent glass-border-${isMobile ? 4 : 2} ${
                         isMobile 
-                          ? (isFirstOrLastScene ? 'min-w-[76px] min-h-[36px]' : 'min-w-[32px] min-h-[28px]')
+                          ? (isFirstOrLastScene ? 'min-w-[76px] min-h-[32px]' : 'min-w-[32px] min-h-[28px]')
                           : 'min-w-[120px] min-h-[40px]'
                       } flex items-center justify-center transition-all duration-300`}
                       style={{
