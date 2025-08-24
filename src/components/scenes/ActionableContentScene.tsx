@@ -313,7 +313,7 @@ function ActionableContentSceneInternal({
         </header>
 
         <section
-          className="glass-border-2"
+          className="glass-border-2 w-full"
           aria-label={ariaTexts?.actionCardsLabel || "Action cards"}
           aria-describedby="actionable-content-title"
         >

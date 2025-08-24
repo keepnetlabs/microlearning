@@ -1382,7 +1382,11 @@ export default function App(props: AppProps = {}) {
                   >
                     {/* Cam Panel */}
                     <div
-                      className={`relative bg-transparent glass-border-${isMobile ? 4 : 2} min-w-[120px] min-h-[40px] flex items-center justify-center`}
+                      className={`relative bg-transparent glass-border-${isMobile ? 4 : 2} ${
+                        isMobile 
+                          ? (isFirstOrLastScene ? 'min-w-[76px] min-h-[36px]' : 'min-w-[32px] min-h-[28px]')
+                          : 'min-w-[120px] min-h-[40px]'
+                      } flex items-center justify-center transition-all duration-300`}
                       style={{
                         filter: "drop-shadow(-8px - 10px 46px #000)"
                       }}
@@ -1392,7 +1396,7 @@ export default function App(props: AppProps = {}) {
                       
                       {/* Logo skeleton/placeholder */}
                       {!logoLoaded && (
-                        <div className="absolute inset-2 bg-white/10 rounded-lg animate-pulse" />
+                        <div className={`absolute ${isMobile ? 'inset-1' : 'inset-2'} bg-white/10 ${isMobile ? 'rounded-md' : 'rounded-lg'} animate-pulse`} />
                       )}
                       
                       <img
