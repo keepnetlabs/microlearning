@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
 import { Edit3, Check, X } from 'lucide-react';
 import { useEditMode } from '../../contexts/EditModeContext';
+import { RichTextEditor } from '../ui/RichTextEditor';
 
 
 interface EditableTextProps {
@@ -11,6 +12,7 @@ interface EditableTextProps {
     className?: string;
     placeholder?: string;
     multiline?: boolean;
+    richText?: boolean;
     maxLength?: number;
     validation?: (value: string) => boolean;
     onValidationError?: (error: string) => void;
@@ -24,6 +26,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
     className = '',
     placeholder = 'Click to edit...',
     multiline = false,
+    richText = false,
     maxLength,
     validation,
     onValidationError,
@@ -34,6 +37,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
     let setEditingField: (field: string | null) => void = () => { };
     let updateTempConfig: (path: string, value: any) => void = () => { };
     let tempConfig: any = {};
+    let toggleEditMode: () => void = () => { };
 
     try {
         const editModeContext = useEditMode();
@@ -41,12 +45,14 @@ export const EditableText: React.FC<EditableTextProps> = ({
         setEditingField = editModeContext.setEditingField;
         updateTempConfig = editModeContext.updateTempConfig;
         tempConfig = editModeContext.tempConfig;
+        toggleEditMode = editModeContext.toggleEditMode;
     } catch (error) {
         // EditModeProvider not available, use defaults
         isEditMode = false;
         setEditingField = () => { };
         updateTempConfig = () => { };
         tempConfig = {};
+        toggleEditMode = () => { };
     }
 
     const [localValue, setLocalValue] = useState('');
@@ -94,6 +100,8 @@ export const EditableText: React.FC<EditableTextProps> = ({
     }, [isEditMode, currentValue, configPath, setEditingField]);
 
     const handleSave = useCallback(() => {
+        console.log('[EditableText] Save clicked for:', configPath, 'Value:', localValue);
+        
         // Validation
         if (validation && !validation(localValue)) {
             const error = 'Invalid input';
@@ -118,27 +126,60 @@ export const EditableText: React.FC<EditableTextProps> = ({
         setIsEditing(false);
         setEditingField(null);
         setValidationError('');
+        
     }, [validation, localValue, maxLength, onValidationError, updateTempConfig, configPath, setEditingField]);
 
     const handleCancel = useCallback(() => {
+        console.log('[EditableText] Cancel clicked for:', configPath);
         setLocalValue(currentValue);
         setIsEditing(false);
         setEditingField(null);
         setValidationError('');
-    }, [currentValue, setEditingField]);
+        
+    }, [currentValue, setEditingField, configPath]);
 
     const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-        if (e.key === 'Enter' && !multiline) {
+        if (e.key === 'Enter' && !multiline && !richText) {
             e.preventDefault();
             handleSave();
-        } else if (e.key === 'Enter' && multiline && e.ctrlKey) {
+        } else if (e.key === 'Enter' && (multiline || richText) && e.ctrlKey) {
             e.preventDefault();
             handleSave();
         } else if (e.key === 'Escape') {
             e.preventDefault();
             handleCancel();
         }
-    }, [multiline, handleSave, handleCancel]);
+    }, [multiline, richText, handleSave, handleCancel]);
+
+    // Use ref to prevent infinite re-opening after cancel
+    const hasAutoStarted = useRef(false);
+    
+    useEffect(() => {
+        // Reset flag when edit mode changes
+        if (!isEditMode) {
+            hasAutoStarted.current = false;
+        }
+    }, [isEditMode]);
+
+    // Global keyboard shortcuts for rich text editor
+    useEffect(() => {
+        if (isEditing && richText) {
+            const handleGlobalKeyDown = (e: KeyboardEvent) => {
+                if (e.key === 'Enter' && e.ctrlKey) {
+                    e.preventDefault();
+                    handleSave();
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    handleCancel();
+                }
+            };
+
+            document.addEventListener('keydown', handleGlobalKeyDown);
+            return () => {
+                document.removeEventListener('keydown', handleGlobalKeyDown);
+            };
+        }
+    }, [isEditing, richText, handleSave, handleCancel]);
 
     // If not in edit mode, render normally
     if (!isEditMode) {
@@ -149,14 +190,15 @@ export const EditableText: React.FC<EditableTextProps> = ({
     if (!isEditing) {
         return (
             <Component
-                className={`${className} ${isEditMode ? 'cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:outline hover:outline-2 hover:outline-blue-300 dark:hover:outline-blue-600 rounded-sm transition-all duration-200 relative group' : ''}`}
+                className={`${className} ${isEditMode ? 'cursor-pointer hover:outline hover:outline-2 hover:outline-[#1C1C1E]/20 dark:hover:outline-[#F2F2F7]/20 rounded-sm transition-all duration-200 relative group' : ''}`}
                 onClick={handleEditStart}
             >
                 {currentValue}
                 {isEditMode && (
                     <Edit3
-                        size={14}
-                        className="inline-block ml-1 opacity-0 group-hover:opacity-60 transition-opacity text-blue-500"
+                        size={12}
+                        className="inline-block ml-1 opacity-0 group-hover:opacity-80 transition-opacity text-[#1C1C1E] dark:text-[#F2F2F7]"
+                        style={{ verticalAlign: 'middle', marginTop: '-1px' }}
                     />
                 )}
             </Component>
@@ -174,7 +216,46 @@ export const EditableText: React.FC<EditableTextProps> = ({
                     transition={{ duration: 0.15 }}
                     className="relative"
                 >
-                    {multiline ? (
+                    {richText ? (
+                        <div className="relative">
+                            <RichTextEditor
+                                value={localValue}
+                                onChange={setLocalValue}
+                                placeholder={placeholder}
+                                height={300}
+                                className={className}
+                            />
+                            {/* Rich Text Editor Action buttons - Top right of editor */}
+                            <div className="absolute top-2 right-2 flex gap-1 z-30">
+                                <motion.div
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.9 }}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        handleSave();
+                                    }}
+                                    className="w-8 h-8 text-[#1C1C1E] dark:text-[#F2F2F7] glass-border-1 rounded-full flex items-center justify-center text-xs cursor-pointer transition-all hover:bg-green-500/20"
+                                    title="Save (Ctrl+Enter)"
+                                >
+                                    <Check size={12} strokeWidth={3} />
+                                </motion.div>
+                                <motion.div
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.9 }}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        handleCancel();
+                                    }}
+                                    className="w-8 h-8 text-[#1C1C1E] dark:text-[#F2F2F7] glass-border-1 rounded-full flex items-center justify-center text-xs cursor-pointer transition-all hover:bg-red-500/20"
+                                    title="Cancel (Esc)"
+                                >
+                                    <X size={12} strokeWidth={3} />
+                                </motion.div>
+                            </div>
+                        </div>
+                    ) : multiline ? (
                         <textarea
                             ref={inputRef as React.RefObject<HTMLTextAreaElement>}
                             value={localValue}
@@ -211,8 +292,9 @@ export const EditableText: React.FC<EditableTextProps> = ({
                         />
                     )}
 
-                    {/* Action buttons - Positioned to the right of the input field */}
-                    <div className="absolute -right-16 top-1/2 transform -translate-y-1/2 flex gap-1 z-20">
+                    {/* Action buttons - Only for non-richText fields */}
+                    {!richText && (
+                        <div className="absolute -right-16 top-1/2 transform -translate-y-1/2 flex gap-1 z-20">
                         <motion.div
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
@@ -222,16 +304,17 @@ export const EditableText: React.FC<EditableTextProps> = ({
                         >
                             <Check size={10} strokeWidth={3} />
                         </motion.div>
-                        <motion.div
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={handleCancel}
-                            className="w-6 h-6 text-[#1C1C1E] dark:text-[#F2F2F7] glass-border-1 rounded-full flex items-center justify-center text-xs cursor-pointer"
-                            title="Cancel (Esc)"
-                        >
-                            <X size={10} strokeWidth={3} />
-                        </motion.div>
-                    </div>
+                            <motion.div
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                onClick={handleCancel}
+                                className="w-6 h-6 text-[#1C1C1E] dark:text-[#F2F2F7] glass-border-1 rounded-full flex items-center justify-center text-xs cursor-pointer"
+                                title="Cancel (Esc)"
+                            >
+                                <X size={10} strokeWidth={3} />
+                            </motion.div>
+                        </div>
+                    )}
 
                     {/* Character count */}
                     {maxLength && (

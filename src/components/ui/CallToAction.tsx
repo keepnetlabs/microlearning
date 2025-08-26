@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { useIsMobile } from "./use-mobile";
 import { createPortal } from "react-dom";
 import { EditableText } from "../common/EditableText";
+import { MultiFieldEditor } from "../common/MultiFieldEditor";
 import { useEditMode } from "../../contexts/EditModeContext";
 
 interface CallToActionProps {
@@ -90,20 +91,20 @@ export function CallToAction({
     };
   }, []);
 
-  // Get text from tempConfig if in edit mode, otherwise use props
+  // Get text from tempConfig if available, otherwise use props
   const getCallToActionText = useCallback(() => {
-    if (isEditMode && tempConfig?.callToActionText) {
+    if (tempConfig?.callToActionText) {
       const ctaConfig = tempConfig.callToActionText;
       if (typeof ctaConfig === 'object') {
         return isMobile ? ctaConfig.mobile : ctaConfig.desktop;
       }
       return ctaConfig;
     }
-    // Fallback to props
+    // Fallback to props only if no tempConfig
     return isMobile
       ? (mobileText || text || "Continue")
       : (desktopText || text || "Continue");
-  }, [isEditMode, tempConfig, isMobile, text, mobileText, desktopText]);
+  }, [tempConfig, isMobile, text, mobileText, desktopText]);
 
   const displayText = useMemo(() => getCallToActionText(), [getCallToActionText]);
 
@@ -184,8 +185,23 @@ export function CallToAction({
             )}
           </span>
         )}
-        <span className="relative z-10 font-medium">
-          {isEditMode ? (
+        <span 
+          key={`cta-span-${JSON.stringify(tempConfig?.callToActionText || {})}`}
+          className="relative z-10 font-medium"
+        >
+          {isEditMode && tempConfig?.callToActionText && typeof tempConfig.callToActionText === 'object' ? (
+            <MultiFieldEditor
+              key={`editor-${isEditMode}-${JSON.stringify(tempConfig.callToActionText)}-${isMobile}`}
+              configPath="callToActionText"
+              data={tempConfig.callToActionText}
+              labels={{
+                mobile: "Mobile Text",
+                desktop: "Desktop Text"
+              }}
+            >
+              {isMobile ? tempConfig.callToActionText.mobile : tempConfig.callToActionText.desktop}
+            </MultiFieldEditor>
+          ) : isEditMode ? (
             <EditableText
               configPath={isMobile ? "callToActionText.mobile" : "callToActionText.desktop"}
               placeholder="Enter button text..."

@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Save, RotateCcw, Edit3, Eye, EyeOff } from 'lucide-react';
 import { useEditMode } from '../../contexts/EditModeContext';
@@ -14,11 +15,12 @@ export const EditModePanel: React.FC = () => {
         hasUnsavedChanges
     } = useEditMode();
 
-    return (
+    return createPortal(
         <motion.div
             initial={{ opacity: 0, scale: 0.8, y: 100 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            className="fixed bottom-6 right-6 z-40"
+            className="fixed bottom-6 right-6 z-[9999] pointer-events-auto"
+            style={{ pointerEvents: 'auto' }}
         >
             <div className="glass-border-2 p-4 backdrop-blur-xl">
                 <div className="flex items-center gap-3">
@@ -27,10 +29,11 @@ export const EditModePanel: React.FC = () => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={toggleEditMode}
-                        className={`flex items-center gap-2 px-4 py-2 glass-border-1 font-medium transition-all ${isEditMode
+                        className={`flex items-center gap-2 px-4 py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer ${isEditMode
                             ? 'text-[#1C1C1E] dark:text-[#F2F2F7] bg-blue-500/10'
                             : 'text-[#1C1C1E] dark:text-[#F2F2F7]'
                             }`}
+                        style={{ pointerEvents: 'auto', cursor: 'pointer' }}
                     >
                         <Edit3 size={16} />
                         {isEditMode ? 'Exit Edit' : 'Enter Edit'}
@@ -41,10 +44,11 @@ export const EditModePanel: React.FC = () => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={toggleViewMode}
-                        className={`flex items-center gap-2 px-4 py-2 glass-border-1 font-medium transition-all ${isViewMode
+                        className={`flex items-center gap-2 px-4 py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer ${isViewMode
                             ? 'text-[#1C1C1E] dark:text-[#F2F2F7] bg-green-500/10'
                             : 'text-[#1C1C1E] dark:text-[#F2F2F7]'
                             }`}
+                        style={{ pointerEvents: 'auto', cursor: 'pointer' }}
                         title="View scientific basis information"
                     >
                         {isViewMode ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -125,6 +129,7 @@ export const EditModePanel: React.FC = () => {
                     )}
                 </AnimatePresence>
             </div>
-        </motion.div>
+        </motion.div>,
+        document.body
     );
 };

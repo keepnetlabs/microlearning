@@ -1,5 +1,5 @@
-import { LucideIcon, MailSearch } from "lucide-react";
-import { useMemo, useRef, useState, useEffect } from "react";
+import { LucideIcon } from "lucide-react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import * as LucideIcons from "lucide-react";
 import { FontWrapper } from "../common/FontWrapper";
 import { useIsMobile } from "../ui/use-mobile";
@@ -99,20 +99,22 @@ const normalizeUrlParam = (value?: string | null): string => {
   return trimmed.startsWith('@') ? trimmed.slice(1) : trimmed;
 };
 
-// Internal component that uses edit mode context
-function ActionableContentSceneInternal({
+// Internal component without EditModeProvider
+function ActionableContentSceneInternalCore({
   config,
   onNextSlide,
   onInboxCompleted,
   sceneId,
   reducedMotion,
-  selectedLanguage
+  selectedLanguage,
+  onInboxConfigUpdate
 }: ActionableContentSceneProps & {
   onNextSlide?: () => void;
   onInboxCompleted?: (completed: boolean) => void;
   sceneId?: string | number;
   reducedMotion?: boolean;
   selectedLanguage?: string;
+  onInboxConfigUpdate?: (updatedConfig: any) => void;
 }) {
 
   // Edit mode context
@@ -134,10 +136,12 @@ function ActionableContentSceneInternal({
   // Default values for container classes
   const defaultContainerClassName = "flex flex-col items-center justify-start min-h-full sm:px-6 overflow-y-auto";
   const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-
-  const DEFAULT_INBOX_URL = "https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001/inbox/all/en";
-  const baseInboxUrl = normalizeUrlParam(urlParams?.get('inboxUrl')) || DEFAULT_INBOX_URL;
-
+  const initialRemoteBaseUrl = normalizeUrlParam(urlParams?.get('baseUrl'));
+  const inboxUrl = normalizeUrlParam(urlParams?.get('inboxUrl'));
+  const langUrl = normalizeUrlParam(urlParams?.get('langUrl'));
+  const language = langUrl?.split('/')[1];
+  const baseInboxUrl = `${initialRemoteBaseUrl}/${inboxUrl}/${language}`;
+  console.log("baseInboxUrl", baseInboxUrl);
   // Inbox config state
   const [inboxConfig, setInboxConfig] = useState<InboxSceneConfig | null>(null);
   const [isLoadingInbox, setIsLoadingInbox] = useState(true);
@@ -183,6 +187,7 @@ function ActionableContentSceneInternal({
 
         const data = await response.json() as InboxSceneConfig;
         setInboxConfig(data);
+        onInboxConfigUpdate?.(data);
       } catch (error) {
         console.error('Failed to fetch inbox config:', error);
         setInboxError(error instanceof Error ? error.message : 'Failed to load inbox configuration');
@@ -195,23 +200,15 @@ function ActionableContentSceneInternal({
   }, [computeInboxUrl]); // Re-run when computeInboxUrl changes (i.e., when language changes)
 
   // Default layout configuration
-  const defaultCardSpacing = "space-y-4";
-  const defaultMaxWidth = "max-w-md w-full";
 
   const {
     title,
     subtitle,
-    actions,
     icon,
-    tipConfig,
-    cardSpacing,
-    maxWidth,
     ariaTexts
   } = currentConfig;
 
   const isMobile = useIsMobile();
-  const finalCardSpacing = cardSpacing || defaultCardSpacing;
-  const finalMaxWidth = maxWidth || defaultMaxWidth;
 
   // Memoize icon components
   const sceneIconComponent = useMemo(() => {
@@ -241,13 +238,6 @@ function ActionableContentSceneInternal({
     return null;
   }, [icon.component, icon.sceneIconName, icon.size]);
 
-  const tipIconComponent = useMemo(() => {
-    if (tipConfig.iconName) {
-      const TipIcon = getIconComponent(tipConfig.iconName);
-      return <TipIcon size={tipConfig.iconSize || 14} aria-hidden="true" />;
-    }
-    return null;
-  }, [tipConfig.iconName, tipConfig.iconSize]);
 
   return (
     <FontWrapper key={`actionable-content-${selectedLanguage}`}>
@@ -317,46 +307,35 @@ function ActionableContentSceneInternal({
           aria-label={ariaTexts?.actionCardsLabel || "Action cards"}
           aria-describedby="actionable-content-title"
         >
-          {!isEditMode && (
-            <>
-              {isLoadingInbox ? (
-                <div className="flex items-center justify-center p-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1C1C1E] dark:border-[#F2F2F7]"></div>
-                  <span className="ml-2 text-[#1C1C1E] dark:text-[#F2F2F7]">Loading inbox...</span>
-                </div>
-              ) : inboxError || !inboxConfig ? (
-                <div className="flex items-center justify-center p-8 text-center">
-                  <div className="text-red-600 dark:text-red-400">
-                    <p className="font-medium">Failed to load inbox</p>
-                    <p className="text-sm mt-1">{inboxError || 'No inbox configuration available'}</p>
-                  </div>
-                </div>
-              ) : (
-                <Inbox
-                  key={`inbox-${configKey}`}
-                  config={inboxConfig}
-                  onNextSlide={onNextSlide}
-                  onAllEmailsReported={(allReported) => {
-                    setAllEmailsReported(allReported);
-                    onInboxCompleted?.(allReported);
-                  }}
-                  selectedLanguage={selectedLanguage}
-                  externalSelectedEmailId={externalSelectedEmailId}
-                  onSelectedEmailIdChange={setExternalSelectedEmailId}
-                  onEmailSelect={() => setHasStartedReporting(true)}
-                />
-              )}
-            </>
-          )}
-
-          {isEditMode && (
-            <div className="p-8 text-center">
-              <div className="text-[#1C1C1E] dark:text-[#F2F2F7]">
-                <p className="font-medium">Inbox Component</p>
-                <p className="text-sm mt-2 opacity-70">Inbox is not editable in edit mode</p>
+          {isLoadingInbox ? (
+            <div className="flex items-center justify-center p-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1C1C1E] dark:border-[#F2F2F7]"></div>
+              <span className="ml-2 text-[#1C1C1E] dark:text-[#F2F2F7]">Loading inbox...</span>
+            </div>
+          ) : inboxError || !inboxConfig ? (
+            <div className="flex items-center justify-center p-8 text-center">
+              <div className="text-red-600 dark:text-red-400">
+                <p className="font-medium">Failed to load inbox</p>
+                <p className="text-sm mt-1">{inboxError || 'No inbox configuration available'}</p>
               </div>
             </div>
+          ) : (
+            <Inbox
+              key={`inbox-${configKey}`}
+              config={inboxConfig}
+              onNextSlide={onNextSlide}
+              onAllEmailsReported={(allReported) => {
+                setAllEmailsReported(allReported);
+                onInboxCompleted?.(allReported);
+              }}
+              selectedLanguage={selectedLanguage}
+              externalSelectedEmailId={externalSelectedEmailId}
+              onSelectedEmailIdChange={setExternalSelectedEmailId}
+              onEmailSelect={() => setHasStartedReporting(true)}
+              isEditMode={isEditMode}
+            />
           )}
+
         </section>
 
         {/* Call to Action - Show only initially or when all emails are reported */}
@@ -390,8 +369,8 @@ function ActionableContentSceneInternal({
   );
 }
 
-// Main export component with EditModeProvider
-export function ActionableContentScene(props: ActionableContentSceneProps & {
+// Wrapper component with EditModeProvider
+function ActionableContentSceneInternal(props: ActionableContentSceneProps & {
   onNextSlide?: () => void;
   onInboxCompleted?: (completed: boolean) => void;
   sceneId?: string | number;
@@ -399,16 +378,54 @@ export function ActionableContentScene(props: ActionableContentSceneProps & {
   selectedLanguage?: string;
 }) {
   const [configKey, setConfigKey] = useState(0);
+  const [inboxConfigRef, setInboxConfigRef] = useState<{ current: InboxSceneConfig | null }>({ current: null });
+
+  // URL parameters for inbox API
+  const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+  const initialRemoteBaseUrl = normalizeUrlParam(urlParams?.get('baseUrl'));
+  const inboxUrl = normalizeUrlParam(urlParams?.get('inboxUrl'));
+  const langUrl = normalizeUrlParam(urlParams?.get('langUrl'));
+  const language = langUrl?.split('/')[1];
+  const baseInboxUrl = `${initialRemoteBaseUrl}/${inboxUrl}/${language}`;
 
   // Detect language changes and force re-render
   useEffect(() => {
     setConfigKey(prev => prev + 1);
   }, [props.config.title, props.config.subtitle]);
 
+  const handleInboxConfigUpdate = useCallback((updatedConfig: any) => {
+    if (updatedConfig && inboxConfigRef.current) {
+      const newConfig = deepMerge(inboxConfigRef.current, updatedConfig);
+      setInboxConfigRef({ current: newConfig });
+    }
+  }, [inboxConfigRef.current]);
+
   return (
-    <EditModeProvider key={configKey} initialConfig={props.config}>
-      {/* <EditModePanel /> */}
-      <ActionableContentSceneInternal {...props} />
+    <EditModeProvider
+      key={configKey}
+      initialConfig={props.config}
+      apiUrl={baseInboxUrl}
+      onSave={(updatedConfig) => {
+        console.log('Inbox config saved:', updatedConfig);
+        handleInboxConfigUpdate(updatedConfig);
+      }}
+    >
+      <EditModePanel />
+      <ActionableContentSceneInternalCore
+        {...props}
+        onInboxConfigUpdate={(config) => setInboxConfigRef({ current: config })}
+      />
     </EditModeProvider>
   );
+}
+
+// Main export component
+export function ActionableContentScene(props: ActionableContentSceneProps & {
+  onNextSlide?: () => void;
+  onInboxCompleted?: (completed: boolean) => void;
+  sceneId?: string | number;
+  reducedMotion?: boolean;
+  selectedLanguage?: string;
+}) {
+  return <ActionableContentSceneInternal {...props} />;
 }

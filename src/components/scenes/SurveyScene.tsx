@@ -212,7 +212,7 @@ export const SurveyScene = memo(function SurveyScene({
       onSave={handleSave}
       onEditModeChange={setIsInEditMode}
     >
-      {/* <EditModePanel /> */}
+       <EditModePanel /> 
       <ScientificBasisInfo 
         config={currentConfig} 
         sceneType={(currentConfig as any)?.scene_type || 'survey'} 

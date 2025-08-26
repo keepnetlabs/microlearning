@@ -99,7 +99,7 @@ export const NudgeScene = memo(function NudgeScene({ config, onNextSlide, sceneI
       onSave={handleSave}
       onEditModeChange={setIsInEditMode}
     >
-      {/* <EditModePanel /> */}
+      <EditModePanel /> 
       <ScientificBasisInfo 
         config={currentConfig} 
         sceneType={(currentConfig as any)?.scene_type || 'nudge'} 

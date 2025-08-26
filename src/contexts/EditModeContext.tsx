@@ -64,6 +64,7 @@ interface EditModeProviderProps {
     children: React.ReactNode;
     initialConfig: any;
     sceneId?: string;
+    apiUrl?: string;
     onSave?: (config: any) => void;
     onEditModeChange?: (isEditMode: boolean) => void;
     onViewModeChange?: (isViewMode: boolean) => void;
@@ -73,6 +74,7 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
     children,
     initialConfig,
     sceneId,
+    apiUrl,
     onSave,
     onEditModeChange,
     onViewModeChange
@@ -80,6 +82,7 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
     const [isEditMode, setIsEditMode] = useState(false);
     const [isViewMode, setIsViewMode] = useState(false);
     const [editingField, setEditingField] = useState<string | null>(null);
+    const [baseConfig, setBaseConfig] = useState(initialConfig);
     const [tempConfig, setTempConfig] = useState(initialConfig);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
@@ -87,13 +90,13 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
         if (isEditMode && hasUnsavedChanges) {
             const confirmDiscard = window.confirm('You have unsaved changes. Do you want to discard them?');
             if (!confirmDiscard) return;
-            setTempConfig(initialConfig);
+            setTempConfig(baseConfig);
             setHasUnsavedChanges(false);
         }
         const newEditMode = !isEditMode;
         setIsEditMode(newEditMode);
         setEditingField(null);
-        
+
         // Edit mode açılırken View mode'u kapat
         if (newEditMode && isViewMode) {
             setIsViewMode(false);
@@ -106,12 +109,12 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
         if (onEditModeChange) {
             onEditModeChange(newEditMode);
         }
-    }, [isEditMode, isViewMode, hasUnsavedChanges, initialConfig, onEditModeChange, onViewModeChange]);
+    }, [isEditMode, isViewMode, hasUnsavedChanges, baseConfig, onEditModeChange, onViewModeChange]);
 
     const toggleViewMode = useCallback(() => {
         const newViewMode = !isViewMode;
         setIsViewMode(newViewMode);
-        
+
         // View mode açılırken Edit mode'u kapat
         if (newViewMode && isEditMode) {
             setIsEditMode(false);
@@ -145,7 +148,9 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
     const saveChanges = useCallback(() => {
         console.log('=== SAVE CHANGES CALLED ===');
         console.log('tempConfig being saved:', tempConfig);
-        console.log('tempConfig.highlights:', tempConfig.highlights);
+        console.log('tempConfig.emails:', tempConfig.emails);
+        console.log('onSave function exists:', !!onSave);
+        console.log('apiUrl:', apiUrl);
 
         // Backend'e göndermek için tempConfig'i scene ID ile wrap et
         const patchPayload = sceneId ? { [sceneId]: tempConfig } : tempConfig;
@@ -160,15 +165,31 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
             // Ardından backend'e patch gönder
             const sendPatchRequest = async () => {
                 try {
-                    // URL'yi query parametrelerinden al veya default değer kullan
-                    const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-                    const langUrl = urlParams?.get('langUrl') || 'https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001/lang/en';
+                    // Use provided apiUrl or fallback to default
+                    const patchUrl = apiUrl || (() => {
+                        const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+                        const DEFAULT_BASE_URL = "https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001";
+                        const DEFAULT_LANG_URL = "lang/en";
 
-                    // microlearningId/lang/dilKodu formatında URL oluştur
-                    console.log('Sending PATCH to:', langUrl);
+                        if (urlParams) {
+                            const normalizeUrlParam = (value?: string | null): string => {
+                                if (!value) return '';
+                                const trimmed = value.trim().replace(/^['"]|['"]$/g, '');
+                                return trimmed.startsWith('@') ? trimmed.slice(1) : trimmed;
+                            };
+
+                            const baseUrl = normalizeUrlParam(urlParams.get('baseUrl')) || DEFAULT_BASE_URL;
+                            const langUrl = normalizeUrlParam(urlParams.get('langUrl')) || DEFAULT_LANG_URL;
+                            return `${baseUrl}/${langUrl}`;
+                        }
+
+                        return `${DEFAULT_BASE_URL}/${DEFAULT_LANG_URL}`;
+                    })();
+
+                    console.log('Sending PATCH to:', patchUrl);
                     console.log('Payload:', patchPayload);
-                    
-                    const response = await fetch(langUrl, {
+
+                    const response = await fetch(patchUrl, {
                         method: 'PATCH',
                         headers: {
                             'Content-Type': 'application/json'
@@ -186,7 +207,7 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
 
                 } catch (error) {
                     console.error('Backend patch failed:', error);
-                    
+
                     // CORS hatası alıyorsak alternatif çözümler:
                     if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
                         console.warn('Possible CORS issue. Backend may need to:');
@@ -195,7 +216,7 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
                         console.warn('3. Allow origin:', window.location.origin);
                         console.warn('4. Handle OPTIONS preflight requests');
                     }
-                    
+
                     // Don't throw error to avoid breaking the user experience
                 }
             };
@@ -205,14 +226,17 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
         }
 
         setHasUnsavedChanges(false);
+        setBaseConfig(tempConfig); // Update base config with saved values
+        // Force tempConfig update for immediate re-render with new reference
+        setTempConfig((prev: any) => ({ ...prev }));
         console.log('=== SAVE CHANGES COMPLETED ===');
     }, [tempConfig, onSave, sceneId]);
 
     const discardChanges = useCallback(() => {
-        setTempConfig(initialConfig);
+        setTempConfig(baseConfig);
         setHasUnsavedChanges(false);
         setEditingField(null);
-    }, [initialConfig]);
+    }, [baseConfig]);
 
     const value: EditModeContextType = {
         isEditMode,

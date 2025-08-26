@@ -302,7 +302,7 @@ export function ScenarioScene({
       onSave={handleSave}
       onEditModeChange={setIsInEditMode}
     >
-      {/* <EditModePanel /> */}
+       <EditModePanel />
       <ScientificBasisInfo 
         config={currentConfig} 
         sceneType={(currentConfig as any)?.scene_type || 'scenario'} 

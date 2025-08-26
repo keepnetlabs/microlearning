@@ -128,14 +128,12 @@ export default function App(props: AppProps = {}) {
     return trimmed.startsWith('@') ? trimmed.slice(1) : trimmed;
   };
   const DEFAULT_BASE_URL = "https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001";
-  const DEFAULT_LANG_URL = "https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001/lang/en";
-  const DEFAULT_INBOX_URL = "https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001/all/inbox/en";
+  const DEFAULT_LANG_URL = `/lang/en`;
   const initialRemoteBaseUrl = normalizeUrlParam(urlParams?.get('baseUrl')) || DEFAULT_BASE_URL;
-  const initialRemoteLangUrl = normalizeUrlParam(urlParams?.get('langUrl')) || DEFAULT_LANG_URL;
-  const initialRemoteInboxUrl = normalizeUrlParam(urlParams?.get('inboxUrl')) || DEFAULT_INBOX_URL;
+  const initialRemoteLangUrl = `${initialRemoteBaseUrl}/${normalizeUrlParam(urlParams?.get('langUrl')) || DEFAULT_LANG_URL}`;
   const remoteBaseUrlRef = useRef<string>(initialRemoteBaseUrl);
   const remoteLangUrlTemplateRef = useRef<string>(initialRemoteLangUrl);
-  const remoteInboxUrlRef = useRef<string>(initialRemoteInboxUrl);
+
 
   // İlk mount'ta remote config'i yükle (sadece remote)
   useEffect(() => {
@@ -441,7 +439,18 @@ export default function App(props: AppProps = {}) {
   }), [themeConfig.texts]);
   const [currentScene, setCurrentScene] = useState(initialScene ?? 0);
   const [direction, setDirection] = useState(0);
-  const [selectedLanguage, setSelectedLanguage] = useState(() => normalizeBcp47Tag(testOverrides?.language ?? detectBrowserLanguage()));
+  const [selectedLanguage, setSelectedLanguage] = useState(() => {
+    // First try to get language from URL langUrl parameter (e.g., lang/tr -> tr)
+    const langUrl = normalizeUrlParam(urlParams?.get('langUrl'));
+    if (langUrl && langUrl.startsWith('lang/')) {
+      const langFromUrl = langUrl.split('/')[1];
+      if (langFromUrl) {
+        return normalizeBcp47Tag(langFromUrl);
+      }
+    }
+    // Fallback to test overrides or browser language
+    return normalizeBcp47Tag(testOverrides?.language ?? detectBrowserLanguage());
+  });
   const [resumeApplied, setResumeApplied] = useState(false);
 
   // Dil değişikliği handler'ı - appConfig'i günceller
@@ -457,22 +466,16 @@ export default function App(props: AppProps = {}) {
     setSelectedLanguage(newLanguage);
 
     const remoteBaseUrl = remoteBaseUrlRef.current;
-    const remoteLangUrl = remoteLangUrlTemplateRef.current;
-
-    const computeLangUrl = (templateUrl: string, lang: string) => {
-      const normalized = lang.toLowerCase().split('-')[0];
-      if (templateUrl.includes('/lang/')) {
-        return templateUrl.replace(/\/lang\/[^/]+$/i, `/lang/${normalized}`);
-      }
-      return templateUrl.replace('{lang}', normalized);
-    };
 
     (async () => {
-      if (remoteBaseUrl && remoteLangUrl) {
+      if (remoteBaseUrl) {
         setIsConfigLoading(true);
         try {
-          const resolvedLangUrl = computeLangUrl(remoteLangUrl, newLanguage);
-          const cfg = await loadAppConfigAsyncCombined(newLanguage, remoteBaseUrl, resolvedLangUrl, { timeoutMs: 10000 });
+          // Normalize language code
+          const normalized = newLanguage.toLowerCase().split('-')[0];
+          // Construct new language URL: baseUrl + /lang/{language}
+          const newLangUrl = `${remoteBaseUrl}/lang/${normalized}`;
+          const cfg = await loadAppConfigAsyncCombined(newLanguage, remoteBaseUrl, newLangUrl, { timeoutMs: 10000 });
           setAppConfig(cfg);
           createConfigChangeEvent(newLanguage, cfg);
         } catch (e) {
@@ -492,7 +495,7 @@ export default function App(props: AppProps = {}) {
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [inboxCompleted, setInboxCompleted] = useState(false);
   const [videoCompleted, setVideoCompleted] = useState(false);
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [totalPoints, setTotalPoints] = useState(0);
   const [achievements, setAchievements] = useState<string[]>([]);
@@ -1382,23 +1385,22 @@ export default function App(props: AppProps = {}) {
                   >
                     {/* Cam Panel */}
                     <div
-                      className={`relative bg-transparent glass-border-${isMobile ? 4 : 2} ${
-                        isMobile 
-                          ? (isFirstOrLastScene ? 'min-w-[76px] min-h-[32px]' : 'min-w-[32px] min-h-[28px]')
-                          : 'min-w-[120px] min-h-[40px]'
-                      } flex items-center justify-center transition-all duration-300`}
+                      className={`relative bg-transparent glass-border-${isMobile ? 4 : 2} ${isMobile
+                        ? (isFirstOrLastScene ? 'min-w-[76px] min-h-[32px]' : 'min-w-[32px] min-h-[28px]')
+                        : 'min-w-[120px] min-h-[40px]'
+                        } flex items-center justify-center transition-all duration-300`}
                       style={{
                         filter: "drop-shadow(-8px - 10px 46px #000)"
                       }}
                     >
                       <div className="corner-top-left"></div>
                       <div className="corner-bottom-right"></div>
-                      
+
                       {/* Logo skeleton/placeholder */}
                       {!logoLoaded && (
                         <div className={`absolute ${isMobile ? 'inset-1' : 'inset-2'} bg-white/10 ${isMobile ? 'rounded-md' : 'rounded-lg'} animate-pulse`} />
                       )}
-                      
+
                       <img
                         key={logoSrc + getHeaderLogoClassName(isMobile, isFirstOrLastScene)}
                         src={isMobile && isFirstOrLastScene ?

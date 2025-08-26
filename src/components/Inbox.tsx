@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect, useMemo, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, AlertTriangle, Flag, ChevronRight, Reply, CornerUpRight, Archive, Delete, ArrowLeft, Eye, Star, FileText, EyeOff, Check, X, FileSpreadsheet, Image, Download } from "lucide-react";
 import { FontWrapper } from "./common/FontWrapper";
+import { EditableText } from "./common/EditableText";
 import { useIsMobile } from "./ui/use-mobile";
 import { PhishingReportButton } from "./ui/PhishingReportButton";
 import { PhishingReportModal } from "./ui/PhishingReportModal";
@@ -22,10 +23,13 @@ interface InboxProps {
   externalSelectedEmailId?: string | null;
   onSelectedEmailIdChange?: (id: string | null) => void;
   onEmailSelect?: (emailId: string) => void;
+  // Edit mode prop
+  isEditMode?: boolean;
 }
 
 
-export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLanguage, externalSelectedEmailId, onSelectedEmailIdChange, onEmailSelect }: InboxProps) {
+
+export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLanguage, externalSelectedEmailId, onSelectedEmailIdChange, onEmailSelect, isEditMode: propIsEditMode }: InboxProps) {
   // Load initial state from localStorage
   const loadInboxState = () => {
     try {
@@ -142,15 +146,17 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
   }, []);
 
 
-  // Optional edit mode - only use if EditModeProvider is available
-  let isEditMode = false;
+  // Edit mode - always call hook, but use prop if provided
+  let contextIsEditMode = false;
   try {
     const editModeContext = useEditMode();
-    isEditMode = editModeContext.isEditMode;
+    contextIsEditMode = editModeContext.isEditMode;
   } catch (error) {
     // EditModeProvider not available, default to false
-    isEditMode = false;
+    contextIsEditMode = false;
   }
+  
+  const isEditMode = propIsEditMode !== undefined ? propIsEditMode : contextIsEditMode;
   const selectedEmail = config.emails.find(email => email.id === selectedEmailId);
 
   // Check if all emails are reported
@@ -216,7 +222,7 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
             key={attachment.id}
             whileHover={{ x: 2 }}
             onClick={() => handleAttachmentClick(attachment)}
-            className={`flex items-center justify-between p-3 glass-border-2 cursor-pointer transition-all hover:scale-[1.02]`}
+            className={`flex items-center justify-between p-3 ${isEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} cursor-pointer transition-all hover:scale-[1.02]`}
           >
             <div className="flex items-center gap-3">
               <AttachmentIcon type={attachment.type} />
@@ -305,7 +311,7 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
   return (
     <div key={selectedLanguage}>
       {/* Single Card with Header and Two-Column Layout */}
-      <div className="backdrop-blur-xl bg-white/10 dark:bg-black/10 rounded-lg border border-white/20 dark:border-white/10 overflow-hidden flex flex-col">
+      <div className={`backdrop-blur-xl bg-white/10 dark:bg-black/10 rounded-lg border border-white/20 dark:border-white/10 ${isEditMode ? '' : 'overflow-hidden'} flex flex-col`}>
         {/* Header - Desktop layout */}
         <div className="hidden lg:block p-6 border-b border-white/20 dark:border-white/10">
           <div className="flex items-center justify-between">
@@ -351,19 +357,19 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               {/* Email toolbar icons */}
-              <button className="p-3 glass-border-4">
+              <button className={`p-3 ${isEditMode ? 'glass-border-4-no-overflow' : 'glass-border-4'}`}>
                 <Reply className="w-4 h-4 text-[#1C1C1E] dark:text-[#F2F2F7]" />
               </button>
-              <button className="p-3 glass-border-4">
+              <button className={`p-3 ${isEditMode ? 'glass-border-4-no-overflow' : 'glass-border-4'}`}>
                 <CornerUpRight className="w-4 h-4 text-[#1C1C1E] dark:text-[#F2F2F7]" />
               </button>
-              <button className="p-3 glass-border-4">
+              <button className={`p-3 ${isEditMode ? 'glass-border-4-no-overflow' : 'glass-border-4'}`}>
                 <Archive className="w-4 h-4 text-[#1C1C1E] dark:text-[#F2F2F7]" />
               </button>
-              <button className="p-3 glass-border-4">
+              <button className={`p-3 ${isEditMode ? 'glass-border-4-no-overflow' : 'glass-border-4'}`}>
                 <Delete className="w-4 h-4 text-[#1C1C1E] dark:text-[#F2F2F7]" />
               </button>
-              <button className="p-3 glass-border-4">
+              <button className={`p-3 ${isEditMode ? 'glass-border-4-no-overflow' : 'glass-border-4'}`}>
                 <Flag className="w-4 h-4 text-[#1C1C1E] dark:text-[#F2F2F7]" />
               </button>
             </div>
@@ -377,7 +383,7 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
         </div>
 
         {/* Content - Mobile: Conditional view, Desktop: Two-column */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 flex-1 min-h-0 overflow-hidden">
+        <div className={`grid grid-cols-1 lg:grid-cols-3 flex-1 min-h-0 ${isEditMode ? '' : 'overflow-hidden'}`}>
           {/* Mobile: Show email list or detail view */}
           <div className="lg:border-r border-white/20 dark:border-white/10 flex flex-col min-h-0">
             {/* Mobile: Back to Inbox button when email is selected */}
@@ -424,7 +430,7 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
                     <div className="mb-4">
                       <button
                         onClick={() => setShowHeaders(!showHeaders)}
-                        className="flex items-center gap-2 px-3 py-2 glass-border-4 text-sm font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors"
+                        className={`flex items-center gap-2 px-3 py-2 ${isEditMode ? 'glass-border-4-no-overflow' : 'glass-border-4'} text-sm font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors`}
                       >
                         {showHeaders ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         <FontWrapper>{config.texts.headersButtonText}</FontWrapper>
@@ -436,10 +442,20 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
                       <div className="mb-6 border-b border-white/20 dark:border-white/10 pb-4">
                         <FontWrapper>
                           <h4 className="text-sm font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] mb-3">{config.texts.emailHeadersTitle}</h4>
-                          <div className="glass-border-2 rounded-lg p-3">
+                          <div className={`${isEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} rounded-lg p-3`}>
                             {selectedEmail.headers.map((header, index) => (
                               <div key={index} className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] mb-1">
-                                {header}
+                                {isEditMode ? (
+                                  <EditableText
+                                    configPath={`emails.${config.emails.findIndex(e => e.id === selectedEmail.id)}.headers.${index}`}
+                                    className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] block"
+                                    placeholder="Enter email header..."
+                                  >
+                                    {header}
+                                  </EditableText>
+                                ) : (
+                                  header
+                                )}
                               </div>
                             ))}
                           </div>
@@ -450,7 +466,18 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
                     {/* Email Content */}
                     <div className="prose prose-sm max-w-none mb-6 prose-p:text-[#1C1C1E] dark:prose-p:text-[#F2F2F7] prose-p:mb-1 prose-div:mb-1 prose-strong:text-[#1C1C1E] dark:prose-strong:text-[#F2F2F7] prose-li:text-[#1C1C1E] dark:prose-li:text-[#F2F2F7] prose-a:text-[#1C1C1E] dark:prose-a:text-[#F2F2F7] email-content-container">
                       <FontWrapper>
-                        <EmailContentWithPortalTooltips htmlContent={enhanceLinkTooltips(selectedEmail.content)} />
+                        {isEditMode ? (
+                          <EditableText
+                            configPath={`emails.${config.emails.findIndex(e => e.id === selectedEmail.id)}.content`}
+                            richText={true}
+                            className="w-full text-[#1C1C1E] dark:text-[#F2F2F7]"
+                            placeholder="Enter email content..."
+                          >
+                            {selectedEmail.content}
+                          </EditableText>
+                        ) : (
+                          <EmailContentWithPortalTooltips htmlContent={enhanceLinkTooltips(selectedEmail.content)} />
+                        )}
                       </FontWrapper>
                     </div>
 
@@ -464,21 +491,27 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
               </div>
             ) : (
               <div className="overflow-y-auto relative flex-1" style={{ scrollbarWidth: 'none' }}>
-                {config.emails.map((email) => (
+                {config.emails.map((email, index) => (
                   <motion.div
                     key={email.id}
                     className={`p-4 border-b border-white/30 dark:border-white/10 cursor-pointer glass-border-no-radius transition-colors ${selectedEmailId === email.id ? 'lg:border-l-[7px] border-l-white/40 dark:border-l-white' : ''
                       } ${reportedEmails.has(email.id) ? 'opacity-60' : ''}`}
-                    style={{ height: '105px', minHeight: '105px' }}
+                    style={{ height: isEditMode ? 'auto' : '105px', minHeight: '105px' }}
                     onClick={() => handleEmailSelect(email.id)}
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
                   >
                     <div className="flex items-start justify-between">
-                      <div className="flex-1 min-w-0">
+                      <div className={`flex-1 ${isEditMode ? 'min-w-0' : 'min-w-0'}`}>
                         <div className="flex items-center gap-2 mb-1">
-                          <FontWrapper className="truncate">
-                            <p className="font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] truncate lg:mt-3 text-lg xl:mt-0">{email.sender}</p>
+                          <FontWrapper className={isEditMode ? '' : 'truncate'}>
+                            <EditableText
+                              configPath={`emails.${index}.sender`}
+                              className={`font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] ${isEditMode ? '' : 'truncate'} lg:mt-3 text-lg xl:mt-0`}
+                              placeholder="Enter sender name"
+                            >
+                              {email.sender}
+                            </EditableText>
                           </FontWrapper>
                           {reportedEmails.has(email.id) && (
                             <div className={`w-5 h-5 rounded-full flex items-center justify-center bg-white/10 dark:bg-white/5 flex-shrink-0 ml-2 ${isEditMode ? 'glass-border-4-no-overflow' : 'glass-border-4'}`}>
@@ -491,7 +524,13 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
                           )}
                         </div>
                         <FontWrapper>
-                          <p className="text-sm font-medium text-[#1C1C1E] dark:text-[#F2F2F7] truncate mb-1">{email.subject}</p>
+                          <EditableText
+                            configPath={`emails.${index}.subject`}
+                            className={`text-sm font-medium text-[#1C1C1E] dark:text-[#F2F2F7] ${isEditMode ? '' : 'truncate'} mb-1 block`}
+                            placeholder="Enter email subject"
+                          >
+                            {email.subject}
+                          </EditableText>
                           {reportedEmails.has(email.id) ? (
                             reportResults.get(email.id) ? (
                               <p className="text-xs text-[#1C1C1E]/80 dark:text-[#F2F2F7]/70 truncate">{config.texts.correctReportMessage}</p>
@@ -499,12 +538,24 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
                               <p className="text-xs text-[#1C1C1E]/80 dark:text-[#F2F2F7]/70 truncate">{config.texts.cautiousReportMessage}</p>
                             )
                           ) : (
-                            <p className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] truncate">{email.preview}</p>
+                            <EditableText
+                              configPath={`emails.${index}.preview`}
+                              className={`text-xs text-[#1C1C1E] dark:text-[#F2F2F7] ${isEditMode ? '' : 'truncate'} block`}
+                              placeholder="Enter email preview"
+                            >
+                              {email.preview}
+                            </EditableText>
                           )}
                         </FontWrapper>
                       </div>
-                      <div className="flex items-center gap-2 ml-2">
-                        <span className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7]">{email.timestamp}</span>
+                      <div className={`flex items-center gap-2 ${isEditMode ? 'ml-8' : 'ml-2'}`}>
+                        <EditableText
+                          configPath={`emails.${index}.timestamp`}
+                          className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7]"
+                          placeholder="Enter timestamp"
+                        >
+                          {email.timestamp}
+                        </EditableText>
                         <ChevronRight className="w-4 h-4 text-[#1C1C1E] dark:text-[#F2F2F7]" />
                       </div>
                     </div>
@@ -533,15 +584,15 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
                     <div className="flex items-center gap-2 ml-4">
                       <button
                         onClick={() => setShowHeaders(!showHeaders)}
-                        className="flex items-center gap-2 px-3 py-2 glass-border-4 text-sm font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors"
+                        className={`flex items-center gap-2 px-3 py-2 ${isEditMode ? 'glass-border-4-no-overflow' : 'glass-border-4'} text-sm font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors`}
                       >
                         {showHeaders ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         <FontWrapper>{config.texts.headersButtonText}</FontWrapper>
                       </button>
-                      <button className="p-2 glass-border-4 text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors">
+                      <button className={`p-2 ${isEditMode ? 'glass-border-4-no-overflow' : 'glass-border-4'} text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors`}>
                         <Star className="w-4 h-4" />
                       </button>
-                      <button className="p-2 glass-border-4 text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors">
+                      <button className={`p-2 ${isEditMode ? 'glass-border-4-no-overflow' : 'glass-border-4'} text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors`}>
                         <FileText className="w-4 h-4" />
                       </button>
                     </div>
@@ -552,10 +603,20 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
                     <div className="mb-2 pb-4 border-b border-white/80 dark:border-white/10">
                       <FontWrapper>
                         <h4 className="text-sm font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] mb-3">{config.texts.emailHeadersTitle}</h4>
-                        <div className="glass-border-2 rounded-lg p-3">
+                        <div className={`${isEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} rounded-lg p-3`}>
                           {selectedEmail.headers.map((header, index) => (
                             <div key={index} className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] mb-1">
-                              {header}
+                              {isEditMode ? (
+                                <EditableText
+                                  configPath={`emails.${config.emails.findIndex(e => e.id === selectedEmail.id)}.headers.${index}`}
+                                  className="text-xs text-[#1C1C1E] dark:text-[#F2F2F7] block"
+                                  placeholder="Enter email header..."
+                                >
+                                  {header}
+                                </EditableText>
+                              ) : (
+                                header
+                              )}
                             </div>
                           ))}
                         </div>
@@ -564,9 +625,20 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
                   )}
 
                   {/* Email Content */}
-                  <div className="prose prose-sm max-w-none mb-6 prose-p:text-[#1C1C1E] dark:prose-p:text-[#F2F2F7] prose-p:mb-1 prose-div:mb-1 prose-strong:text-[#1C1C1E] dark:prose-strong:text-[#F2F2F7] prose-li:text-[#1C1C1E] dark:prose-li:text-[#F2F2F7] prose-a:text-[#1C1C1E] dark:prose-a:text-[#F2F2F7] email-content-container">
+                  <div className="prose prose-sm max-w-none mb-6 prose-p:text-[#1C1C1E] dark:text-[#F2F2F7] prose-p:mb-1 prose-div:mb-1 prose-strong:text-[#1C1C1E] dark:prose-strong:text-[#F2F2F7] prose-li:text-[#1C1C1E] dark:prose-li:text-[#F2F2F7] prose-a:text-[#1C1C1E] dark:prose-a:text-[#F2F2F7] email-content-container">
                     <FontWrapper>
-                      <EmailContentWithPortalTooltips htmlContent={enhanceLinkTooltips(selectedEmail.content)} />
+                      {isEditMode ? (
+                        <EditableText
+                          configPath={`emails.${config.emails.findIndex(e => e.id === selectedEmail.id)}.content`}
+                          richText={true}
+                          className="w-full text-[#1C1C1E] dark:text-[#F2F2F7]"
+                          placeholder="Enter email content..."
+                        >
+                          {selectedEmail.content}
+                        </EditableText>
+                      ) : (
+                        <EmailContentWithPortalTooltips htmlContent={enhanceLinkTooltips(selectedEmail.content)} />
+                      )}
                     </FontWrapper>
                   </div>
 
