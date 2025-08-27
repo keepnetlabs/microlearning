@@ -1,0 +1,124 @@
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { detectBrowserLanguage } from '../utils/languageUtils';
+import { createConfigChangeEvent, loadAppConfigAsyncCombined } from '../components/configs/appConfigLoader';
+
+interface TestOverrides {
+  language?: string;
+}
+
+interface UseAppConfigOptions {
+  testOverrides?: TestOverrides;
+}
+
+export const useAppConfig = ({ testOverrides }: UseAppConfigOptions = {}) => {
+  // Dinamik appConfig state'i - sadece remote'tan yüklenecek
+  const [appConfig, setAppConfig] = useState<any>({ theme: {}, scenes: [] });
+  const [isConfigLoading, setIsConfigLoading] = useState(true);
+
+  // Read remote URLs from query params (no env fallbacks), with defaults; store in refs for reuse
+  const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+  const normalizeUrlParam = (value?: string | null): string => {
+    if (!value) return '';
+    const trimmed = value.trim().replace(/^['"]|['"]$/g, '');
+    return trimmed.startsWith('@') ? trimmed.slice(1) : trimmed;
+  };
+
+  const DEFAULT_BASE_URL = "https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001";
+  const DEFAULT_LANG_URL = `lang/en`;
+  const initialRemoteBaseUrl = normalizeUrlParam(urlParams?.get('baseUrl')) || DEFAULT_BASE_URL;
+  const initialRemoteLangUrl = `${initialRemoteBaseUrl}/${normalizeUrlParam(urlParams?.get('langUrl')) || DEFAULT_LANG_URL}`;
+  const remoteBaseUrlRef = useRef<string>(initialRemoteBaseUrl);
+  const remoteLangUrlTemplateRef = useRef<string>(initialRemoteLangUrl);
+
+  // Backend'den gelecek tema config'i için state
+  const [themeConfig, setThemeConfig] = useState(() => {
+    // LocalStorage'dan kaydedilmiş tema config'ini yükle
+    if (typeof window !== 'undefined') {
+      const savedConfig = localStorage.getItem('theme-config');
+      if (savedConfig) {
+        try {
+          return JSON.parse(savedConfig);
+        } catch (error) {
+          console.error('Error loading theme config:', error);
+        }
+      }
+    }
+
+    return {};
+  });
+
+  // İlk mount'ta remote config'i yükle (sadece remote)
+  useEffect(() => {
+    const detectedLanguage = testOverrides?.language ?? detectBrowserLanguage();
+    const remoteBaseUrl = remoteBaseUrlRef.current;
+    const remoteLangUrl = remoteLangUrlTemplateRef.current;
+    setIsConfigLoading(true);
+
+    // Eğer base+lang URL'si sağlanmışsa onları paralel indirip birleştir
+    if (remoteBaseUrl && remoteLangUrl) {
+      let isMounted = true;
+      setIsConfigLoading(true);
+
+      // During initial load: if template contains a concrete /lang/<code>, keep as-is;
+      // otherwise support {lang} placeholder.
+      const computeLangUrlInitial = (templateUrl: string, lang: string) => {
+        const normalized = lang.toLowerCase().split('-')[0];
+        if (templateUrl.includes('{lang}')) {
+          return templateUrl.replace('{lang}', normalized);
+        }
+        return templateUrl;
+      };
+
+      const resolvedLangUrl = computeLangUrlInitial(remoteLangUrl, detectedLanguage);
+
+      loadAppConfigAsyncCombined(detectedLanguage, remoteBaseUrl, resolvedLangUrl, { timeoutMs: 10000 })
+        .then(cfg => { if (isMounted && cfg) { setAppConfig(cfg); createConfigChangeEvent(detectedLanguage, cfg); } })
+        .catch(err => { console.warn('[App] Remote combined config yüklenemedi:', err); })
+        .finally(() => { if (isMounted) setIsConfigLoading(false); });
+
+      return () => { isMounted = false; };
+    }
+
+    // Base + Language URL yoksa yükleme durdurulur
+    setIsConfigLoading(false);
+  }, [testOverrides?.language]);
+
+  // appConfig değiştiğinde themeConfig'i güncelle
+  useEffect(() => {
+    setThemeConfig(appConfig.theme || {});
+  }, [appConfig]);
+
+  // Language change handler
+  const changeLanguage = useCallback(async (newLanguage: string) => {
+    const remoteBaseUrl = remoteBaseUrlRef.current;
+
+    if (remoteBaseUrl) {
+      setIsConfigLoading(true);
+      try {
+        // Normalize language code
+        const normalized = newLanguage.toLowerCase().split('-')[0];
+        // Construct new language URL: baseUrl + /lang/{language}
+        const newLangUrl = `${remoteBaseUrl}/lang/${normalized}`;
+        const cfg = await loadAppConfigAsyncCombined(newLanguage, remoteBaseUrl, newLangUrl, { timeoutMs: 10000 });
+        setAppConfig(cfg);
+        createConfigChangeEvent(newLanguage, cfg);
+      } catch (e) {
+        console.warn('[App] Dil değişiminde remote combined yüklenemedi:', e);
+      } finally {
+        setIsConfigLoading(false);
+      }
+    }
+  }, []);
+
+  return {
+    appConfig,
+    themeConfig,
+    isConfigLoading,
+    setThemeConfig,
+    setIsConfigLoading,
+    changeLanguage,
+    urlParams,
+    normalizeUrlParam,
+    remoteBaseUrlRef
+  };
+};

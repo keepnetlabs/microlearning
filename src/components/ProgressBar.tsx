@@ -63,6 +63,10 @@ interface ProgressBarProps {
   config?: Partial<ProgressBarConfig>;
   dataTestId?: string;
   reducedMotion?: boolean;
+  startLabel?: string;
+  completedLabel?: string;
+  progressLabel?: string;
+  ariaLabel?: string;
 }
 
 const defaultConfig: ProgressBarConfig = {
@@ -155,13 +159,31 @@ const defaultConfig: ProgressBarConfig = {
   ariaLabel: 'Eğitim ilerlemesi'
 };
 
-export function ProgressBar({ currentScene, totalScenes, language = 'en', config = {}, dataTestId, reducedMotion = false }: ProgressBarProps) {
+export function ProgressBar({ 
+  currentScene, 
+  totalScenes, 
+  language = 'en', 
+  config = {}, 
+  dataTestId, 
+  reducedMotion = false,
+  startLabel,
+  completedLabel,
+  progressLabel,
+  ariaLabel
+}: ProgressBarProps) {
   // Calculate progress so that the first scene (Intro) starts at 0%
   // `currentScene` is expected as 1-based (App passes `currentScene + 1`)
   const normalizedTotal = Math.max(totalScenes - 1, 1);
   const normalizedCurrent = Math.max(Math.min(currentScene - 1, normalizedTotal), 0);
   const progress = (normalizedCurrent / normalizedTotal) * 100;
-  const finalConfig = { ...defaultConfig, ...config };
+  const finalConfig = { 
+    ...defaultConfig, 
+    ...config,
+    startLabel: startLabel ?? defaultConfig.startLabel,
+    completedLabel: completedLabel ?? defaultConfig.completedLabel,
+    progressLabel: progressLabel ?? defaultConfig.progressLabel,
+    ariaLabel: ariaLabel ?? defaultConfig.ariaLabel
+  };
   const isMobile = useIsMobile();
   const tooltipTransition = {
     duration: reducedMotion ? 0 : 0.8,

@@ -136,9 +136,9 @@ function ActionableContentSceneInternalCore({
   // Default values for container classes
   const defaultContainerClassName = "flex flex-col items-center justify-start min-h-full sm:px-6 overflow-y-auto";
   const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-  const initialRemoteBaseUrl = normalizeUrlParam(urlParams?.get('baseUrl'));
-  const inboxUrl = normalizeUrlParam(urlParams?.get('inboxUrl'));
-  const langUrl = normalizeUrlParam(urlParams?.get('langUrl'));
+  const initialRemoteBaseUrl = normalizeUrlParam(urlParams?.get('baseUrl')) || "https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001";
+  const inboxUrl = normalizeUrlParam(urlParams?.get('inboxUrl')) || "inbox/all";
+  const langUrl = normalizeUrlParam(urlParams?.get('langUrl')) || "lang/en";
   const language = langUrl?.split('/')[1];
   const baseInboxUrl = `${initialRemoteBaseUrl}/${inboxUrl}/${language}`;
   console.log("baseInboxUrl", baseInboxUrl);

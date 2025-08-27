@@ -579,11 +579,6 @@ export const IntroScene = React.memo(({
         setIsInEditMode(editMode);
       }}
     >
-      <EditModePanel />
-      <ScientificBasisInfo
-        config={currentConfig}
-        sceneType={(config as any)?.scene_type || 'intro'}
-      />
       <FontWrapper variant="primary" className={containerClassName} data-scene-type={(config as any)?.scene_type || 'intro'} data-scene-id={sceneId as any} data-testid="scene-intro">
         {/* Apple-style Background Sparkles - Balanced */}
         {sparkles?.enabled && (
@@ -795,30 +790,35 @@ export const IntroScene = React.memo(({
               transition={{ delay: delays.stats }}
               className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-white/50 dark:border-white/10"
             >
-            <div className="flex justify-between items-center">
-              <StatsItem icon={ClockIcon} text={duration || ''} statsStyles={statsStyles} configPath="duration" isEditMode={currentEditMode} />
-              <StatsItem icon={ChartBarIcon} text={level || ''} statsStyles={statsStyles} configPath="level" isEditMode={currentEditMode} />
-            </div>
+              <div className="flex justify-between items-center">
+                <StatsItem icon={ClockIcon} text={duration || ''} statsStyles={statsStyles} configPath="duration" isEditMode={currentEditMode} />
+                <StatsItem icon={ChartBarIcon} text={level || ''} statsStyles={statsStyles} configPath="level" isEditMode={currentEditMode} />
+              </div>
+            </motion.div>
+          </div>
+
         </motion.div>
-      </div>
 
-    </motion.div>
-
-        {/* Enhanced Call to Action */ }
-  {
-    callToActionText && (
-      <CallToAction
-        text={typeof callToActionText === 'string' ? callToActionText : undefined}
-        mobileText={typeof callToActionText === 'object' ? callToActionText.mobile : undefined}
-        desktopText={typeof callToActionText === 'object' ? callToActionText.desktop : undefined}
-        isVisible={isVisible}
-        delay={delays.cta}
-        onClick={onNextSlide}
-        dataTestId="cta-intro"
-      />
-    )
-  }
+        {/* Enhanced Call to Action */}
+        {
+          callToActionText && (
+            <CallToAction
+              text={typeof callToActionText === 'string' ? callToActionText : undefined}
+              mobileText={typeof callToActionText === 'object' ? callToActionText.mobile : undefined}
+              desktopText={typeof callToActionText === 'object' ? callToActionText.desktop : undefined}
+              isVisible={isVisible}
+              delay={delays.cta}
+              onClick={onNextSlide}
+              dataTestId="cta-intro"
+            />
+          )
+        }
       </FontWrapper>
+      <EditModePanel />
+      <ScientificBasisInfo
+        config={currentConfig}
+        sceneType={(config as any)?.scene_type || 'intro'}
+      />
     </EditModeProvider>
   );
 });

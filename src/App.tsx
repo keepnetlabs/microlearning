@@ -1,9 +1,14 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { motion, AnimatePresence, MotionConfig } from "framer-motion";
 import { Toaster } from "./components/ui/sonner";
-import { createPortal } from "react-dom";
 import { ProgressBar } from "./components/ProgressBar";
 import { NavButton } from "./components/NavButton";
+import { HeaderLogo } from "./components/HeaderLogo";
+import { SurveyNotification } from "./components/SurveyNotification";
+import { ScrollToTopButton } from "./components/ScrollToTopButton";
+import { AchievementNotification } from "./components/AchievementNotification";
+import { PointsBadge } from "./components/PointsBadge";
+import { ThemeToggleButton } from "./components/ThemeToggleButton";
 import { IntroScene } from "./components/scenes/IntroScene";
 import { GoalScene } from "./components/scenes/GoalScene";
 import { ScenarioScene } from "./components/scenes/ScenarioScene";
@@ -12,82 +17,17 @@ import { QuizScene } from "./components/scenes/QuizScene";
 import { SurveyScene } from "./components/scenes/SurveyScene";
 import { SummaryScene } from "./components/scenes/SummaryScene";
 import { NudgeScene } from "./components/scenes/NudgeScene";
-import { ChevronDown, Search, Loader2, X, Moon, Sun, Award, ChevronUp, Star } from "lucide-react";
+import { ChevronDown, Search, Loader2, X, Moon, Sun, Award} from "lucide-react";
 import ReactCountryFlag from "react-country-flag";
 import { getCountryCode, detectBrowserLanguage, useIsMobile, languages, resolveSupportedLanguage, normalizeBcp47Tag } from "./utils/languageUtils";
-import { createConfigChangeEvent, loadAppConfigAsyncCombined } from "./components/configs/appConfigLoader";
 import { useFontFamily } from "./hooks/useFontFamily";
+import { useAppConfig } from "./hooks/useAppConfig";
 import { FontFamilyProvider } from "./contexts/FontFamilyContext";
 import { scormService, destroySCORMService } from "./utils/scormService";
 import { logger } from "./utils/logger";
-
-// Computes a clean, responsive className for the header logo
-export function getHeaderLogoClassName(isMobile: boolean, isFirstOrLastScene: boolean): string {
-  const baseLogoClasses = "relative z-10 h-8 sm:h-10 md:h-14 w-full object-contain md:w-auto p-1.5 sm:p-2";
-  const maxWidthClass = isMobile ? (isFirstOrLastScene ? "max-w-[88px]" : "max-w-[56px]") : "";
-  return `${baseLogoClasses} ${maxWidthClass}`.trim();
-}
-
-// Static CSS classes - Component dışında tanımlandı çünkü hiç değişmiyor
-const STATIC_CSS_CLASSES = {
-  // Loading overlay
-  loadingOverlay: "fixed inset-0 bg-white/50 dark:bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center transition-colors duration-300",
-  loadingText: "text-sm font-medium text-[#1C1C1E] dark:text-[#F2F2F7]",
-  // Background
-  backgroundContainer: "fixed inset-0 pointer-events-none overflow-hidden",
-  // Header
-  headerContainer: "relative shrink-0",
-  headerContent: "relative z-10 px-4 pt-4 pb-3 lg:px-16 xl:px-20 2xl:px-24 min-h-[72px]",
-  // Controls
-  controlsContainer: "flex items-center sm:space-x-1.5 md:space-x-3 flex-shrink-0 z-20",
-  // Points badge
-  pointsBadge: "relative flex items-center justify-center min-w-[54px] sm:min-w-[70px] space-x-1 sm:space-x-1.5 md:space-x-1.5 px-1.5 sm:px-2 md:px-3 h-8 sm:h-10 rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 glass-border-3 ease-out group",
-  pointsBadgeNoise: "absolute inset-0 opacity-[0.020] dark:opacity-[0.012] rounded-lg sm:rounded-xl mix-blend-overlay pointer-events-none",
-  pointsText: "text-xs md:text-sm font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300",
-  // Theme button
-  themeButton: "relative glass-border-3 flex items-center justify-center p-1.5 md:p-2 h-[32px] sm:h-[40px] sm:max-h-[40px] rounded-md sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group ",
-  themeButtonIcon: "w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300",
-  // Language button
-  languageButton: "relative flex items-center justify-center space-x-0.5 sm:rounded-xl sm:space-x-1 md:space-x-2 px-1 sm:px-1.5 md:px-3 h-8 sm:h-10 w-[56px] sm:w-[100px] sm:rounded-lg md:rounded-xl overflow-hidden transition-all duration-500 ease-out group",
-  languageFlag: "w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 rounded-sm transition-opacity duration-300",
-  languageChevron: "w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4 text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300",
-  // Language dropdown
-  languageSearch: "w-full px-3 py-2 text-sm bg-transparent border-0 focus:outline-none focus:ring-0 text-[#1C1C1E] dark:text-[#F2F2F7] placeholder-gray-500 dark:placeholder-gray-400",
-  languageList: "max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent",
-  languageItem: "flex items-center space-x-2 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 cursor-pointer",
-  languageItemText: "text-sm text-[#1C1C1E] dark:text-[#F2F2F7]",
-  languageItemFlag: "w-4 h-4 rounded-sm",
-  // Content area
-  contentContainer: "flex-1 relative z-10 overflow-hidden",
-  // Achievement notification
-  achievementContainer: "fixed top-24 right-4 z-40",
-  achievementContent: "relative px-4 py-2 glass-border-1 text-sm text-[#1C1C1E] dark:text-[#F2F2F7] group",
-  achievementClose: "ml-2 p-1 rounded-full text-[#1C1C1E] dark:text-[#F2F2F7]",
-  // Navigation
-  navContainer: "fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30",
-  navButtonIcon: "w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300",
-  // Quiz completion notification
-  quizNotificationContainer: "fixed z-30 bottom-4 right-4 sm:bottom-6 sm:right-6",
-  quizNotificationClose: "ml-1 p-1 rounded-full hover:bg-amber-200/50 dark:hover:bg-amber-900/40 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400/30 dark:focus:ring-amber-600/30 opacity-60",
-} as const;
-
-// Memoized constants for better performance
-const MEMOIZED_CONSTANTS = {
-  SWIPE_THRESHOLD: 50,
-  SCROLL_THRESHOLD: 10,
-  MOBILE_SCROLL_THRESHOLD: 200,
-  ANIMATION_DURATIONS: {
-    MOBILE: 0.3,
-    DESKTOP: 0.5,
-    FADE: 0.2,
-    SCALE: 0.4
-  },
-  TOUCH_THRESHOLDS: {
-    HORIZONTAL: 30,
-    VERTICAL: 75,
-    MIN_MOVEMENT: 3
-  }
-} as const;
+import { STATIC_CSS_CLASSES } from "./utils/cssClasses";
+import { slideVariants } from "./utils/animationVariants";
+import { MEMOIZED_CONSTANTS } from "./utils/constants";
 
 // Memoized components for better performance
 const MemoizedProgressBar = React.memo(ProgressBar);
@@ -116,77 +56,16 @@ interface AppProps {
 
 export default function App(props: AppProps = {}) {
   const { initialScene, testOverrides } = props;
-  // Dinamik appConfig state'i - sadece remote'tan yüklenecek
-  const [appConfig, setAppConfig] = useState<any>({ theme: {}, scenes: [] });
-  const [isConfigLoading, setIsConfigLoading] = useState(false);
-
-  // Read remote URLs from query params (no env fallbacks), with defaults; store in refs for reuse
-  const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-  const normalizeUrlParam = (value?: string | null): string => {
-    if (!value) return '';
-    const trimmed = value.trim().replace(/^['"]|['"]$/g, '');
-    return trimmed.startsWith('@') ? trimmed.slice(1) : trimmed;
-  };
-  const DEFAULT_BASE_URL = "https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001";
-  const DEFAULT_LANG_URL = `/lang/en`;
-  const initialRemoteBaseUrl = normalizeUrlParam(urlParams?.get('baseUrl')) || DEFAULT_BASE_URL;
-  const initialRemoteLangUrl = `${initialRemoteBaseUrl}/${normalizeUrlParam(urlParams?.get('langUrl')) || DEFAULT_LANG_URL}`;
-  const remoteBaseUrlRef = useRef<string>(initialRemoteBaseUrl);
-  const remoteLangUrlTemplateRef = useRef<string>(initialRemoteLangUrl);
-
-
-  // İlk mount'ta remote config'i yükle (sadece remote)
-  useEffect(() => {
-    const detectedLanguage = testOverrides?.language ?? detectBrowserLanguage();
-    const remoteBaseUrl = remoteBaseUrlRef.current;
-    const remoteLangUrl = remoteLangUrlTemplateRef.current;
-    setIsConfigLoading(true);
-
-    // Eğer base+lang URL'si sağlanmışsa onları paralel indirip birleştir
-    if (remoteBaseUrl && remoteLangUrl) {
-      let isMounted = true;
-      setIsConfigLoading(true);
-
-      // During initial load: if template contains a concrete /lang/<code>, keep as-is;
-      // otherwise support {lang} placeholder.
-      const computeLangUrlInitial = (templateUrl: string, lang: string) => {
-        const normalized = lang.toLowerCase().split('-')[0];
-        if (templateUrl.includes('{lang}')) {
-          return templateUrl.replace('{lang}', normalized);
-        }
-        return templateUrl;
-      };
-
-      const resolvedLangUrl = computeLangUrlInitial(remoteLangUrl, detectedLanguage);
-
-      loadAppConfigAsyncCombined(detectedLanguage, remoteBaseUrl, resolvedLangUrl, { timeoutMs: 10000 })
-        .then(cfg => { if (isMounted && cfg) { setAppConfig(cfg); createConfigChangeEvent(detectedLanguage, cfg); } })
-        .catch(err => { console.warn('[App] Remote combined config yüklenemedi:', err); })
-        .finally(() => { if (isMounted) setIsConfigLoading(false); });
-
-      return () => { isMounted = false; };
-    }
-
-    // Base + Language URL yoksa yükleme durdurulur
-    setIsConfigLoading(false);
-  }, [testOverrides?.language]);
-
-  // Backend'den gelecek tema config'i için state
-  const [themeConfig, setThemeConfig] = useState(() => {
-    // LocalStorage'dan kaydedilmiş tema config'ini yükle
-    if (typeof window !== 'undefined') {
-      const savedConfig = localStorage.getItem('theme-config');
-      if (savedConfig) {
-        try {
-          return JSON.parse(savedConfig);
-        } catch (error) {
-          console.error('Error loading theme config:', error);
-        }
-      }
-    }
-
-    return appConfig.theme;
-  });
+  // Use custom hook for app config management
+  const {
+    appConfig,
+    themeConfig,
+    isConfigLoading,
+    setIsConfigLoading,
+    changeLanguage,
+    urlParams,
+    normalizeUrlParam,
+  } = useAppConfig({ testOverrides });
 
   // Dynamic scene mapping based on appConfig.scenes
   const sceneComponentMap = useMemo(() => ({
@@ -271,33 +150,6 @@ export default function App(props: AppProps = {}) {
     goal: getSceneIndexByType('goal')
   }), [getSceneIndexByType]);
 
-  // Backend'den tema config'ini güncelleme fonksiyonu
-  const updateThemeConfig = useCallback((newConfig: any) => {
-    setThemeConfig(newConfig);
-    localStorage.setItem('theme-config', JSON.stringify(newConfig));
-  }, []);
-
-  // Backend'den tema config'ini yükleme (örnek)
-  useEffect(() => {
-    // Bu kısım backend'den JSON gelecek şekilde değiştirilecek
-    const loadThemeFromBackend = async () => {
-      try {
-        // const response = await fetch('/api/theme-config');
-        // const backendConfig = await response.json();
-        // updateThemeConfig(backendConfig);
-      } catch (error) {
-        console.error('Error loading theme from backend:', error);
-      }
-    };
-
-    loadThemeFromBackend();
-  }, [updateThemeConfig]);
-
-  // appConfig değiştiğinde themeConfig'i güncelle
-  useEffect(() => {
-    setThemeConfig(appConfig.theme);
-  }, [appConfig]);
-
   // Font family configuration
   const fontStyles = useFontFamily(themeConfig.fontFamily);
 
@@ -335,7 +187,7 @@ export default function App(props: AppProps = {}) {
     const metaTitle = (appConfig as any)?.microlearning_metadata?.title;
     const themeTitle = (themeConfig as any)?.texts?.appTitle;
     return metaTitle || themeTitle || 'Microlearning';
-  }, [appConfig?.microlearning_metadata?.title, themeConfig?.texts?.appTitle]);
+  }, [appConfig, themeConfig]);
 
   useEffect(() => {
     if (typeof document !== 'undefined' && appTitle) {
@@ -343,100 +195,6 @@ export default function App(props: AppProps = {}) {
     }
   }, [appTitle]);
 
-  // ProgressBar Config - Ayrı memoize edildi çünkü sadece texts değiştiğinde güncellenmesi gerekiyor
-  const progressBarConfig = useMemo(() => ({
-    // Container colors
-    containerBackground: `white`,
-    containerBorder: '1px solid #C7C7CC',
-    containerBoxShadow: `
-      0 2px 8px rgba(148, 163, 184, 0.12),
-      0 1px 4px rgba(148, 163, 184, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.20)
-    `,
-
-    // Background gradients
-    backgroundGradient: 'bg-gradient-to-br from-slate-100/20 via-slate-200/12 to-slate-300/8',
-    backgroundGradientDark: 'dark:from-slate-700/18 dark:via-slate-600/12 dark:to-slate-500/8',
-
-    // Progress fill colors
-    progressFillBackground: `linear-gradient(135deg, 
-      #3B82F6 0%, 
-      #3B82F6 50%,
-      #3B82F6 100%
-    )`,
-    progressFillBorder: '1px solid #3B82F6',
-    progressFillBoxShadow: `
-      0 2px 8px rgba(59, 130, 246, 0.30),
-      0 1px 4px rgba(59, 130, 246, 0.20),
-      inset 0 1px 0 rgba(255, 255, 255, 0.30)
-    `,
-
-    // Dot colors
-    dotCompletedBackground: `linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.95) 0%, 
-      rgba(255, 255, 255, 0.90) 50%, 
-      rgba(255, 255, 255, 0.85) 100%
-    )`,
-    dotActiveBackground: `linear-gradient(135deg, 
-      rgba(59, 130, 246, 0.90) 0%, 
-      rgba(59, 130, 246, 0.85) 50%, 
-      rgba(59, 130, 246, 0.80) 100%
-    )`,
-    dotInactiveBackground: `linear-gradient(135deg, 
-      rgba(148, 163, 184, 0.50) 0%, 
-      rgba(148, 163, 184, 0.40) 50%, 
-      rgba(148, 163, 184, 0.30) 100%
-    )`,
-    dotCompletedBorder: '0.5px solid rgba(255, 255, 255, 0.70)',
-    dotActiveBorder: '0.5px solid rgba(59, 130, 246, 0.60)',
-    dotInactiveBorder: '0.5px solid rgba(148, 163, 184, 0.40)',
-    dotCompletedBoxShadow: `
-      0 2px 6px rgba(255, 255, 255, 0.25),
-      0 1px 3px rgba(255, 255, 255, 0.20),
-      inset 0 1px 0 rgba(255, 255, 255, 0.35)
-    `,
-    dotActiveBoxShadow: `
-      0 2px 6px rgba(59, 130, 246, 0.30),
-      0 1px 3px rgba(59, 130, 246, 0.20),
-      inset 0 1px 0 rgba(255, 255, 255, 0.30)
-    `,
-    dotInactiveBoxShadow: `
-      0 1px 3px rgba(148, 163, 184, 0.20),
-      inset 0 1px 0 rgba(255, 255, 255, 0.20)
-    `,
-
-    // Text colors
-    textBackground: `linear-gradient(135deg, 
-      rgba(71, 85, 105, 0.08) 0%, 
-      rgba(100, 116, 139, 0.06) 50%, 
-      rgba(148, 163, 184, 0.04) 100%
-    )`,
-    textBorder: '0.5px solid rgba(71, 85, 105, 0.15)',
-    textBoxShadow: `
-      0 1px 3px rgba(71, 85, 105, 0.05),
-      inset 0 1px 0 rgba(255, 255, 255, 0.10)
-    `,
-    textColor: 'rgb(71, 85, 105)',
-
-    // Percentage colors
-    percentageBackground: `linear-gradient(135deg, 
-      rgba(59, 130, 246, 0.15) 0%, 
-      rgba(59, 130, 246, 0.12) 50%, 
-      rgba(59, 130, 246, 0.10) 100%
-    )`,
-    percentageBorder: '0.5px solid rgba(59, 130, 246, 0.20)',
-    percentageBoxShadow: `
-      0 1px 3px rgba(59, 130, 246, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15)
-    `,
-    percentageColor: 'rgb(59, 130, 246)',
-
-    // Text labels
-    startLabel: themeConfig.texts?.startLabel,
-    completedLabel: themeConfig.texts?.completedLabel,
-    progressLabel: themeConfig.texts?.progressLabel,
-    ariaLabel: 'Training progress'
-  }), [themeConfig.texts]);
   const [currentScene, setCurrentScene] = useState(initialScene ?? 0);
   const [direction, setDirection] = useState(0);
   const [selectedLanguage, setSelectedLanguage] = useState(() => {
@@ -462,35 +220,14 @@ export default function App(props: AppProps = {}) {
         return;
       }
     }
-
     setSelectedLanguage(newLanguage);
-
-    const remoteBaseUrl = remoteBaseUrlRef.current;
-
-    (async () => {
-      if (remoteBaseUrl) {
-        setIsConfigLoading(true);
-        try {
-          // Normalize language code
-          const normalized = newLanguage.toLowerCase().split('-')[0];
-          // Construct new language URL: baseUrl + /lang/{language}
-          const newLangUrl = `${remoteBaseUrl}/lang/${normalized}`;
-          const cfg = await loadAppConfigAsyncCombined(newLanguage, remoteBaseUrl, newLangUrl, { timeoutMs: 10000 });
-          setAppConfig(cfg);
-          createConfigChangeEvent(newLanguage, cfg);
-        } catch (e) {
-          console.warn('[App] Dil değişiminde remote combined yüklenemedi:', e);
-        } finally {
-          setIsConfigLoading(false);
-        }
-      }
-    })();
+    // Use the changeLanguage function from the hook
+    changeLanguage(newLanguage);
 
     // LocalStorage'a kaydet
     localStorage.setItem('selected-language', newLanguage);
-  }, [availableLanguages]);
+  }, [availableLanguages, changeLanguage]);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
-  const [logoLoaded, setLogoLoaded] = useState(false);
   const [languageSearchTerm, setLanguageSearchTerm] = useState('');
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [inboxCompleted, setInboxCompleted] = useState(false);
@@ -549,9 +286,6 @@ export default function App(props: AppProps = {}) {
   const setQuizIsLoadingStable = useCallback((loading: boolean) => {
     setQuizIsLoading(loading);
   }, []);
-
-  // Survey feedback submission state
-  const [isSurveySubmitted, setIsSurveySubmitted] = useState(false);
 
   // Survey form state - persistent across scene changes
   const [surveyState, setSurveyState] = useState({
@@ -625,21 +359,6 @@ export default function App(props: AppProps = {}) {
     }
   }, [isDarkMode]);
 
-  // Compute logo source based on device and theme
-  const getLogoSrc = useCallback((): string => {
-    const logo = themeConfig?.logo ?? {};
-    const defaultSrc: string = logo.src ?? '';
-    const darkSrc: string = logo.darkSrc ?? defaultSrc;
-    const minimizedSrc: string = logo.minimizedSrc ?? defaultSrc;
-    const minimizedDarkSrc: string = logo.minimizedDarkSrc ?? darkSrc;
-
-    if (isMobile) {
-      return isDarkMode ? minimizedDarkSrc : minimizedSrc;
-    }
-    return isDarkMode ? darkSrc : defaultSrc;
-  }, [themeConfig?.logo, isMobile, isDarkMode]);
-
-  const logoSrc = useMemo(() => getLogoSrc(), [getLogoSrc]);
 
   // Listen for system theme changes only if no manual preference exists
   useEffect(() => {
@@ -677,72 +396,6 @@ export default function App(props: AppProps = {}) {
     return () => window.removeEventListener('keydown', handleKeyboardShortcut);
   }, [toggleTheme]);
 
-  // Auto-save functionality - Optimized with requestIdleCallback
-  const saveDataToStorage = useCallback(() => {
-    /*
-    const saveData = {
-      currentScene,
-      totalPoints,
-      achievements,
-      visitedScenes: Array.from(visitedScenes),
-      pointsAwardedScenes: Array.from(pointsAwardedScenes),
-      quizCompleted,
-      selectedLanguage,
-      shownAchievements,
-      isSurveySubmitted
-    };
-
-    // SCORM'a veri gönder
-    if (scormService && scormService.isAvailable()) {
-      scormService.updateProgress(totalPoints, currentScene, scenes.length);
-      scormService.saveSuspendData(saveData);
-    }
-    // Use requestIdleCallback for better performance
-    if ('requestIdleCallback' in window) {
-      requestIdleCallback(() => {
-        localStorage.setItem('cyber-training-progress', JSON.stringify(saveData));
-      });
-    } else {
-      setTimeout(() => {
-        localStorage.setItem('cyber-training-progress', JSON.stringify(saveData));
-      }, 0);
-    }
-    */
-  }, [currentScene, totalPoints, achievements, visitedScenes, pointsAwardedScenes, quizCompleted, selectedLanguage, shownAchievements, isSurveySubmitted, scenes.length]);
-
-  useEffect(() => {
-    saveDataToStorage();
-  }, [saveDataToStorage]);
-
-  // Load saved data on mount
-  useEffect(() => {
-    /*
-    const savedData = localStorage.getItem('cyber-training-progress');
-    if (savedData) {
-      try {
-        const parsed = JSON.parse(savedData);
-        setCurrentScene(parsed.currentScene || 0);
-        setTotalPoints(parsed.totalPoints || 0);
-        setAchievements(parsed.achievements || []);
-        setVisitedScenes(new Set(parsed.visitedScenes || [0]));
-        setPointsAwardedScenes(new Set(parsed.pointsAwardedScenes || []));
-        setQuizCompleted(parsed.quizCompleted || false);
-        setShownAchievements(parsed.shownAchievements || []);
-        setIsSurveySubmitted(parsed.isSurveySubmitted || false);
-        if (parsed.surveyState) {
-          setSurveyState(parsed.surveyState);
-        }
-        if (parsed.selectedLanguage) {
-          setSelectedLanguage(parsed.selectedLanguage);
-        }
-      } catch (error) {
-        console.error('Error loading saved data:', error);
-      }
-    }
-    */
-  }, []);
-
-
   // Optimized achievement notification - only show for NEW achievements in key scenes
   useEffect(() => {
     // Check if current scene has achievement notifications enabled
@@ -771,10 +424,6 @@ export default function App(props: AppProps = {}) {
       setShowAchievementNotification(false);
     }
   }, [currentScene, showAchievementNotification]);
-
-
-
-  // Keep Quiz result state so navigating back shows last outcome
 
   // Reset scroll position when scene changes
   const resetScrollPosition = useCallback(() => {
@@ -1084,7 +733,6 @@ export default function App(props: AppProps = {}) {
   // Survey feedback submission handler
   const handleSurveySubmitted = useCallback(() => {
     setSurveyState(prev => ({ ...prev, isSubmitted: true, isSubmitting: false }));
-    setIsSurveySubmitted(true);
     setShowSurveySubmittedNotification(true);
     try {
       logger.push({ level: 'info', code: 'SURVEY_SUBMITTED', message: 'Survey submitted' });
@@ -1172,7 +820,7 @@ export default function App(props: AppProps = {}) {
     if (!hasScenes) {
       setIsConfigLoading(true);
     }
-  }, [hasScenes]);
+  }, [hasScenes, setIsConfigLoading]);
   // One-time resume from SCORM 1.2 (suspend_data or lesson_location)
   useEffect(() => {
     if (!hasScenes || resumeApplied) return;
@@ -1240,26 +888,6 @@ export default function App(props: AppProps = {}) {
   const currentSceneConfig = hasScenes ? scenes[currentScene].config : undefined;
   const isFirstOrLastScene = currentScene === 0 || currentScene === scenes.length - 1;
 
-  // Ultra-optimized slide variants for mobile performance - Static for better performance
-  const slideVariants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? '100%' : '-100%',
-      opacity: 1,
-      scale: 1
-    }),
-    center: {
-      zIndex: 1,
-      x: 0,
-      opacity: 1,
-      scale: 1
-    },
-    exit: (direction: number) => ({
-      zIndex: 0,
-      x: direction < 0 ? '100%' : '-100%',
-      opacity: 1,
-      scale: 1
-    })
-  };
 
   const shouldAnimate = !(testOverrides?.disableAnimations);
   const slideTransition = useMemo(() => ({
@@ -1377,47 +1005,13 @@ export default function App(props: AppProps = {}) {
               {/* Header Layout - Logo Left, Progress Center, Controls Right */}
               <div className="flex items-center justify-between">
                 {/* Left - Logo */}
-                <div className="flex items-center justify-center" role="banner">
-                  <motion.div
-                    className="relative flex items-center group"
-                    whileHover={{ scale: 1.02, y: -1 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {/* Cam Panel */}
-                    <div
-                      className={`relative bg-transparent glass-border-${isMobile ? 4 : 2} ${isMobile
-                        ? (isFirstOrLastScene ? 'min-w-[76px] min-h-[32px]' : 'min-w-[32px] min-h-[28px]')
-                        : 'min-w-[120px] min-h-[40px]'
-                        } flex items-center justify-center transition-all duration-300`}
-                      style={{
-                        filter: "drop-shadow(-8px - 10px 46px #000)"
-                      }}
-                    >
-                      <div className="corner-top-left"></div>
-                      <div className="corner-bottom-right"></div>
-
-                      {/* Logo skeleton/placeholder */}
-                      {!logoLoaded && (
-                        <div className={`absolute ${isMobile ? 'inset-1' : 'inset-2'} bg-white/10 ${isMobile ? 'rounded-md' : 'rounded-lg'} animate-pulse`} />
-                      )}
-
-                      <img
-                        key={logoSrc + getHeaderLogoClassName(isMobile, isFirstOrLastScene)}
-                        src={isMobile && isFirstOrLastScene ?
-                          (isDarkMode ? (themeConfig?.logo?.darkSrc ?? themeConfig?.logo?.src ?? '') : (themeConfig?.logo?.src ?? '')) :
-                          logoSrc}
-                        alt=""
-                        aria-label={appConfig.theme?.ariaTexts?.logoLabel || "Application logo"}
-                        className={`${getHeaderLogoClassName(isMobile, isFirstOrLastScene)} transition-all duration-300 ${!logoLoaded ? 'opacity-0 invisible' : 'opacity-100 visible'}`}
-                        onLoad={() => setLogoLoaded(true)}
-                        onError={() => {
-                          // Logo yüklenemedi, placeholder'da kal
-                          setLogoLoaded(false);
-                        }}
-                      />
-                    </div>
-                  </motion.div>
-                </div>
+                <HeaderLogo
+                  isMobile={isMobile}
+                  isFirstOrLastScene={isFirstOrLastScene}
+                  isDarkMode={isDarkMode}
+                  themeConfig={themeConfig}
+                  appConfig={appConfig}
+                />
 
                 {/* Center - Progress Bar */}
                 <div className="flex-1" role="progressbar" aria-label={appConfig.theme?.ariaTexts?.progressLabel || "Training progress"}>
@@ -1426,8 +1020,11 @@ export default function App(props: AppProps = {}) {
                       currentScene={currentScene + 1}
                       totalScenes={scenes.length}
                       language={selectedLanguage}
-                      config={progressBarConfig}
                       reducedMotion={reducedMotionBool}
+                      startLabel={themeConfig.texts?.startLabel}
+                      completedLabel={themeConfig.texts?.completedLabel}
+                      progressLabel={themeConfig.texts?.progressLabel}
+                      ariaLabel="Training progress"
                     />
                   </div>
                 </div>
@@ -1435,93 +1032,21 @@ export default function App(props: AppProps = {}) {
                 {/* Right - Controls */}
                 <div className={cssClasses.controlsContainer}>
                   {/* ENHANCED LIQUID GLASS POINTS BADGE - Mobile Optimized */}
-                  <motion.div
-                    className={`${cssClasses.pointsBadge} hidden sm:block`}
-                    whileHover={{
-                      scale: 1.02,
-                      y: -1
-                    }}
-                    role="status"
-                    aria-label={appConfig.theme?.ariaTexts?.pointsLabel || "Total points earned"}
-                    aria-live="polite"
-                  >
-                    {/* Badge Content */}
-                    <div className="relative z-10 flex justify-center h-full items-center space-x-1 sm:space-x-1.5 md:space-x-1.5">
-                      <Award size={isMobile ? 16 : 20} className="text-[#1C1C1E] dark:text-[#F2F2F7] sm:w-4 sm:h-4 md:w-5 md:h-5 transition-colors duration-300" aria-hidden="true" />
-                      <span className={cssClasses.pointsText} aria-label={`${totalPoints} ${appConfig.theme?.ariaTexts?.pointsDescription || "points earned"}`}>
-                        {totalPoints}
-                      </span>
-                    </div>
-                  </motion.div>
+                  <PointsBadge
+                    totalPoints={totalPoints}
+                    isMobile={isMobile}
+                    ariaLabel={appConfig.theme?.ariaTexts?.pointsLabel || "Total points earned"}
+                    pointsDescription={appConfig.theme?.ariaTexts?.pointsDescription || "points earned"}
+                  />
 
                   {/* ENHANCED LIQUID GLASS THEME TOGGLE BUTTON - Mobile Optimized */}
-                  <motion.button
+                  <ThemeToggleButton
+                    isDarkMode={isDarkMode}
                     onClick={toggleTheme}
-                    className={`${cssClasses.themeButton} hidden sm:block`}
-                    whileHover={{
-                      scale: 1.05,
-                      y: -2
-                    }}
-                    whileTap={{ scale: 0.95 }}
-                    aria-label={isDarkMode ? themeConfig.texts?.toggleButtonLightMode : themeConfig.texts?.toggleButtonDarkMode}
-                    title={isDarkMode ? themeConfig.texts?.toggleButtonLightMode : themeConfig.texts?.toggleButtonDarkMode}
-                    aria-checked={isDarkMode}
-                    role="switch"
-                    aria-describedby="theme-toggle-description"
-                    data-testid="theme-toggle"
-                  >
-                    {/* Hover glow effect */}
-                    <motion.div
-                      className="absolute inset-0 rounded-lg sm:rounded-xl opacity-0 pointer-events-none"
-                      style={{
-                        background: `linear-gradient(135deg, 
-                      rgba(59, 130, 246, 0.20) 0%, 
-                      rgba(99, 102, 241, 0.15) 50%, 
-                      rgba(139, 92, 246, 0.12) 100%
-                    )`
-                      }}
-                      transition={{ duration: 0.4, ease: "easeOut" }}
-                    />
-
-                    {/* Icon Container */}
-                    <div className="relative z-10">
-                      <AnimatePresence mode="wait">
-                        {isDarkMode ? (
-                          <motion.div
-                            key="light"
-                            initial={{ scale: 0, rotate: -90 }}
-                            animate={{ scale: 1, rotate: 0 }}
-                            exit={{ scale: 0, rotate: 90 }}
-                            transition={{ duration: 0.3, ease: "easeOut" }}
-                          >
-                            <Sun
-                              size={40}
-                              className="text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 w-5 h-5 sm:w-6 sm:h-6"
-                              aria-hidden="true"
-                            />
-                          </motion.div>
-                        ) : (
-                          <motion.div
-                            key="dark"
-                            initial={{ scale: 0, rotate: 90 }}
-                            animate={{ scale: 1, rotate: 0 }}
-                            exit={{ scale: 0, rotate: -90 }}
-                            transition={{ duration: 0.3, ease: "easeOut" }}
-                          >
-                            <Moon
-                              size={40}
-                              className="text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 w-5 h-5 sm:w-6 sm:h-6"
-                              aria-hidden="true"
-                            />
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                    {/* Hidden description for screen readers */}
-                    <div id="theme-toggle-description" className="sr-only">
-                      {appConfig.theme?.ariaTexts?.themeToggleDescription || "Toggle between light and dark theme"}
-                    </div>
-                  </motion.button>
+                    lightModeLabel={themeConfig.texts?.toggleButtonLightMode}
+                    darkModeLabel={themeConfig.texts?.toggleButtonDarkMode}
+                    description={appConfig.theme?.ariaTexts?.themeToggleDescription || "Toggle between light and dark theme"}
+                  />
 
                   {/* ENHANCED LIQUID GLASS LANGUAGE SELECTOR - Mobile Optimized */}
                   <div className="relative" ref={dropdownRef} role="combobox" aria-haspopup="listbox" aria-expanded={isLanguageDropdownOpen} aria-controls="language-dropdown-list">
@@ -1990,100 +1515,31 @@ export default function App(props: AppProps = {}) {
           </main>
 
           {/* Enhanced Achievement Notifications */}
-          <AnimatePresence>
-            {showAchievementNotification && achievements.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, x: 300 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 300 }}
-                className={cssClasses.achievementContainer}
-                role="alert"
-                aria-live="polite"
-                aria-label={appConfig.theme?.ariaTexts?.achievementLabel || "Achievement notification"}
-              >
-                <div className={cssClasses.achievementContent}>
-                  <div className="flex items-center space-x-3 relative z-10">
-                    <Award size={16} className="text-[#1C1C1E] dark:text-[#F2F2F7] flex-shrink-0" aria-hidden="true" />
-                    <span className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold transition-colors duration-300">
-                      {themeConfig.texts?.achievementNotification}
-                    </span>
-                    <button
-                      onClick={() => setShowAchievementNotification(false)}
-                      className={cssClasses.achievementClose}
-                      aria-label={themeConfig.texts?.closeNotification}
-                      style={{ touchAction: 'manipulation' }}
-                    >
-                      <X size={14} className="text-[#1C1C1E] dark:text-[#F2F2F7]" aria-hidden="true" />
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <AchievementNotification
+            show={showAchievementNotification}
+            hasAchievements={achievements.length > 0}
+            onClose={() => setShowAchievementNotification(false)}
+            message={themeConfig.texts?.achievementNotification}
+            ariaLabel={appConfig.theme?.ariaTexts?.achievementLabel || "Achievement notification"}
+            closeAriaLabel={themeConfig.texts?.closeNotification}
+          />
 
-          {/* Quiz completion hint removed */}
-
-          {/* Survey Submitted Notification - via Portal to avoid transformed containers */}
-          {createPortal(
-            (
-              <AnimatePresence>
-                {showSurveySubmittedNotification && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 80 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 40 }}
-                    transition={{ type: 'spring', stiffness: 380, damping: 26 }}
-                    className="fixed z-[9999] right-4 sm:right-6"
-                    role="alert"
-                    aria-live="polite"
-                    aria-label={appConfig.theme?.ariaTexts?.quizCompletionLabel || "Survey submitted"}
-                    style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)' }}
-                  >
-                    <div className={cssClasses.quizNotificationContent}>
-                      <div className="flex items-center space-x-2.5 relative z-10">
-                        <Star size={14} className="mr-2" aria-hidden="true" />
-                        <p className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] font-medium transition-colors duration-300">
-                          {themeConfig.texts?.surveySubmittedToast || "Geri bildiriminiz için teşekkürler!"}
-                        </p>
-                        <button
-                          onClick={() => setShowSurveySubmittedNotification(false)}
-                          className={cssClasses.quizNotificationClose}
-                          aria-label={themeConfig.texts?.closeNotification}
-                          style={{ touchAction: 'manipulation' }}
-                        >
-                          <X size={16} className="text-[#1C1C1E] font-semibold dark:text-[#F2F2F7]" style={{ marginBottom: '-1px' }} aria-hidden="true" />
-                        </button>
-                      </div>
-                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-400/5 to-orange-400/5 dark:from-amber-400/10 dark:to-orange-400/10 pointer-events-none" aria-hidden="true"></div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            ),
-            portalTarget
-          )}
+          {/* Survey Submitted Notification */}
+          <SurveyNotification
+            show={showSurveySubmittedNotification}
+            onClose={() => setShowSurveySubmittedNotification(false)}
+            message={themeConfig.texts?.surveySubmittedToast || "Geri bildiriminiz için teşekkürler!"}
+            ariaLabel={appConfig.theme?.ariaTexts?.quizCompletionLabel || "Survey submitted"}
+            closeAriaLabel={themeConfig.texts?.closeNotification}
+            portalTarget={portalTarget}
+          />
           {/* Mobile Floating Scroll-to-Top Button */}
-          <AnimatePresence>
-            {showScrollToTop && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                className="md:hidden fixed bottom-4 right-4 z-[9999]"
-              >
-                <motion.button
-                  onClick={handleScrollToTop}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="flex items-center justify-center w-14 h-14 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border border-white/40 dark:border-gray-600/60 rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
-                  title={appConfig.theme?.ariaTexts?.scrollToTopLabel || "Sayfanın Başına Dön"}
-                  aria-label={appConfig.theme?.ariaTexts?.scrollToTopLabel || "Scroll to top of page"}
-                >
-                  <ChevronUp className="w-6 h-6 text-blue-600 dark:text-blue-400" aria-hidden="true" />
-                </motion.button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <ScrollToTopButton
+            show={showScrollToTop}
+            onClick={handleScrollToTop}
+            title={appConfig.theme?.ariaTexts?.scrollToTopLabel || "Sayfanın Başına Dön"}
+            ariaLabel={appConfig.theme?.ariaTexts?.scrollToTopLabel || "Scroll to top of page"}
+          />
           <Toaster />
         </div>
       </FontFamilyProvider>
