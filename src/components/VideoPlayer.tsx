@@ -8,9 +8,11 @@ import React, {
 import Plyr from "plyr";
 import "plyr/dist/plyr.css";
 import Hls from "hls.js";
-import { motion } from "framer-motion";
-import { FileText, Lock, RotateCw } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { createPortal } from "react-dom";
+import { FileText, Lock, RotateCw, Edit3 } from "lucide-react";
 import { useIsMobile } from "./ui/use-mobile";
+import { useEditMode } from "../contexts/EditModeContext";
 
 // HTMLVideoElement'e _lastTime özelliği ekle
 interface VideoWithLastTime extends HTMLVideoElement {
@@ -128,6 +130,11 @@ export function VideoPlayer({
   const [transcriptContainerHeight, setTranscriptContainerHeight] = useState<number | undefined>(
     undefined,
   );
+  
+  // Edit mode state
+  const { isEditMode, updateTempConfig } = useEditMode();
+  const [showUrlDialog, setShowUrlDialog] = useState(false);
+  const [tempVideoUrl, setTempVideoUrl] = useState(src);
   // Dark mode detection
   useEffect(() => {
     const checkDarkMode = () => {
@@ -542,24 +549,25 @@ export function VideoPlayer({
         {ariaTexts?.mainDescription || "Video player with transcript functionality. Use the transcript panel to navigate through video content."}
       </div>
 
-      <div
-        style={videoContainerStyle}
-        className="rounded-lg overflow-hidden relative"
-        role="region"
-        aria-label={ariaTexts?.videoLabel || "Video Container"}
-        onTouchStart={(e) => {
-          // Prevent page navigation when touching video area
-          e.stopPropagation();
-        }}
-        onTouchMove={(e) => {
-          // Prevent page navigation when swiping on video
-          e.stopPropagation();
-        }}
-        onTouchEnd={(e) => {
-          // Prevent page navigation when releasing touch on video
-          e.stopPropagation();
-        }}
-      >
+      <div className="relative">
+        <div
+          style={videoContainerStyle}
+          className="rounded-lg overflow-hidden relative"
+          role="region"
+          aria-label={ariaTexts?.videoLabel || "Video Container"}
+          onTouchStart={(e) => {
+            // Prevent page navigation when touching video area
+            e.stopPropagation();
+          }}
+          onTouchMove={(e) => {
+            // Prevent page navigation when swiping on video
+            e.stopPropagation();
+          }}
+          onTouchEnd={(e) => {
+            // Prevent page navigation when releasing touch on video
+            e.stopPropagation();
+          }}
+        >
         <video
           ref={videoRef}
           id="player"
@@ -617,6 +625,7 @@ export function VideoPlayer({
           </motion.button>
         )}
 
+
         {/* Replay Button - Only show when video has ended */}
         {isVideoEnded && !isIOS && (
           <motion.button
@@ -643,6 +652,29 @@ export function VideoPlayer({
               className={`w-5 h-5 ${isReplaying ? 'animate-spin' : ''}`}
               aria-hidden="true"
             />
+          </motion.button>
+        )}
+        </div>
+
+        {/* URL Edit Button - Slightly outside video container, only show in edit mode */}
+        {isEditMode && (
+          <motion.button
+            onClick={() => setShowUrlDialog(true)}
+            whileHover={reducedMotion ? undefined : { scale: 1.05 }}
+            whileTap={reducedMotion ? undefined : { scale: 0.95 }}
+            className="z-20 p-2 glass-border-2 transition-all duration-300"
+            style={{ position: 'absolute', right: '-40px', top: 0 }}
+            title="Edit Video URL"
+            aria-label="Edit video URL"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setShowUrlDialog(true);
+              }
+            }}
+          >
+            <Edit3 className="w-4 h-4 text-[#1C1C1E] dark:text-[#F2F2F7]" aria-hidden="true" />
           </motion.button>
         )}
       </div>
@@ -820,6 +852,87 @@ export function VideoPlayer({
             </div>
           </div>
         </motion.div>
+      )}
+
+      {/* URL Edit Dialog */}
+      {createPortal(
+        <AnimatePresence>
+          {showUrlDialog && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[70] flex items-center justify-center p-4"
+              onClick={() => setShowUrlDialog(false)}
+            >
+              {/* Backdrop */}
+              <div className="absolute inset-0 backdrop-blur-sm bg-black/50" />
+
+              {/* Modal */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="relative glass-border-3 w-full max-w-lg mx-4 p-6"
+                style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Header */}
+                <div className="mb-6">
+                  <h2 className="text-xl font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] mb-2">
+                    Edit Video
+                  </h2>
+                </div>
+
+                {/* Content */}
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="video-url" className="block text-sm font-medium text-[#1C1C1E] dark:text-[#F2F2F7] mb-2">
+                      Video URL
+                    </label>
+                    <input
+                      id="video-url"
+                      type="url"
+                      value={tempVideoUrl}
+                      onChange={(e) => setTempVideoUrl(e.target.value)}
+                      className="w-full px-3 py-2 glass-border-1 rounded-lg bg-white/10 dark:bg-black/10 text-[#1C1C1E] dark:text-[#F2F2F7] outline-none border border-white/20 dark:border-white/10"
+                      placeholder="https://example.com/video.m3u8"
+                    />
+                  </div>
+                  
+                </div>
+
+                {/* Footer */}
+                <div className="flex gap-3 mt-6">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => {
+                      setShowUrlDialog(false);
+                      setTempVideoUrl(src);
+                    }}
+                    className="flex-1 py-3 px-4 glass-border-3 font-medium text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors"
+                  >
+                    Cancel
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => {
+                      updateTempConfig('videoUrl', tempVideoUrl);
+                      setShowUrlDialog(false);
+                    }}
+                    className="flex-1 py-3 px-4 glass-border-3 font-medium text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors"
+                  >
+                    Save
+                  </motion.button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
       )}
     </div>
   )
