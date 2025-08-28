@@ -445,6 +445,7 @@ export function ScenarioScene({
               transcript={tactiqTranscript}
               showTranscript={currentConfig.video.showTranscript}
               transcriptTitle={currentConfig.video.transcriptTitle}
+              sceneId={sceneId}
               className="w-full"
               data-testid="scenario-video"
               onEnded={() => setIsVideoCompleted(true)}

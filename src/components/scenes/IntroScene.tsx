@@ -10,6 +10,7 @@ import { ScientificBasisInfo } from "../common/ScientificBasisInfo";
 import { useIsMobile } from "../ui/use-mobile";
 import { CallToAction } from "../ui/CallToAction";
 import { deepMerge } from "../../utils/deepMerge";
+import { useGlobalEditMode } from "../../contexts/GlobalEditModeContext";
 import { 
   DEFAULT_PARTICLES, 
   DEFAULT_SPARKLES, 
@@ -392,6 +393,9 @@ export const IntroScene = React.memo(({
   disableDelays
 }: { config: IntroSceneConfig; onNextSlide?: () => void; sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean; }) => {
 
+  // Global edit mode context
+  const { setGlobalEditMode } = useGlobalEditMode();
+
   // State for edit changes and edit mode tracking
   const [editChanges, setEditChanges] = useState<Partial<IntroSceneConfig>>({});
   const [isInEditMode, setIsInEditMode] = useState(false);
@@ -570,6 +574,8 @@ export const IntroScene = React.memo(({
       onEditModeChange={(editMode) => {
         console.log('Edit mode changed:', editMode);
         setIsInEditMode(editMode);
+        // Update global edit mode state
+        setGlobalEditMode(editMode);
       }}
     >
       <FontWrapper variant="primary" className={containerClassName} data-scene-type={(config as any)?.scene_type || 'intro'} data-scene-id={sceneId as any} data-testid="scene-intro">

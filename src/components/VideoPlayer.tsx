@@ -37,6 +37,7 @@ interface VideoPlayerProps {
   showTranscript?: boolean;
   transcriptTitle?: string;
   onEnded?: () => void;
+  sceneId?: string | number;
   ariaTexts?: {
     mainLabel?: string;
     mainDescription?: string;
@@ -102,15 +103,16 @@ function formatTime(seconds: number): string {
 const isIOS = navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad') || navigator.userAgent.includes('iPod');
 
 export function VideoPlayer({
-  src = "https://customer-0lll6yc8omc23rbm.cloudflarestream.com/5fdb12ff1436c991f50b698a02e2faa1/manifest/video.m3u8",
+  src: propSrc = "https://customer-0lll6yc8omc23rbm.cloudflarestr  eam.com/5fdb12ff1436c991f50b698a02e2faa1/manifest/video.m3u8",
   poster,
   disableForwardSeek = true,
   className,
   style,
   transcript,
   showTranscript = true,
-  transcriptTitle = "Video Transkripti",
+  transcriptTitle,
   onEnded,
+  sceneId,
   ariaTexts,
   dataTestId,
   reducedMotion = false,
@@ -130,11 +132,209 @@ export function VideoPlayer({
   const [transcriptContainerHeight, setTranscriptContainerHeight] = useState<number | undefined>(
     undefined,
   );
-  
+
   // Edit mode state
   const { isEditMode, updateTempConfig } = useEditMode();
   const [showUrlDialog, setShowUrlDialog] = useState(false);
-  const [tempVideoUrl, setTempVideoUrl] = useState(src);
+  const [tempVideoUrl, setTempVideoUrl] = useState(propSrc);
+  const [showTranscriptDialog, setShowTranscriptDialog] = useState(false);
+  const [tempTranscriptUrl, setTempTranscriptUrl] = useState('');
+  const [tempTranscriptText, setTempTranscriptText] = useState('');
+  const [transcriptEditMode, setTranscriptEditMode] = useState<'url' | 'text'>('url');
+
+  // Local state to override transcript after successful save
+  const [localTranscript, setLocalTranscript] = useState<TranscriptRow[] | string | undefined>(undefined);
+
+  // Local state to override video URL after successful save
+  const [localVideoUrl, setLocalVideoUrl] = useState<string | undefined>(undefined);
+
+  // Use local video URL if available, otherwise fall back to original src
+  const src = localVideoUrl !== undefined ? localVideoUrl : propSrc;
+
+  // Convert transcript array back to text format
+  const transcriptArrayToText = useCallback((transcriptArray: TranscriptRow[]): string => {
+    return transcriptArray.map(row => {
+      const hours = Math.floor(row.start / 3600);
+      const minutes = Math.floor((row.start % 3600) / 60);
+      const seconds = Math.floor(row.start % 60);
+      const milliseconds = Math.floor((row.start % 1) * 1000);
+
+      const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`;
+      return `${timeString} ${row.text}`;
+    }).join('\n');
+  }, []);
+
+  // Initialize transcript form data when dialog opens
+  const initializeTranscriptData = useCallback(() => {
+    console.log('Initializing transcript data:', transcript, typeof transcript);
+    if (typeof transcript === 'string') {
+      console.log('Setting text mode with transcript:', transcript);
+      setTempTranscriptText(transcript);
+      setTempTranscriptUrl('');
+      setTranscriptEditMode('text');
+    } else if (Array.isArray(transcript) && transcript.length > 0) {
+      console.log('Setting text mode for array transcript, converting to text');
+      // Convert parsed transcript array back to text format
+      const textFormat = transcriptArrayToText(transcript);
+      setTempTranscriptText(textFormat);
+      setTempTranscriptUrl('');
+      setTranscriptEditMode('text');
+    } else {
+      console.log('Setting default URL mode for empty/undefined transcript');
+      // No transcript or empty
+      setTempTranscriptText('');
+      setTempTranscriptUrl('');
+      setTranscriptEditMode('url');
+    }
+  }, [transcript, transcriptArrayToText]);
+
+  // Handle transcript save - update local config and send to API
+  const handleTranscriptSave = useCallback(async () => {
+    console.log('Saving transcript config:', { transcriptEditMode, tempTranscriptUrl, tempTranscriptText });
+
+    try {
+      // Ensure we have a scene ID
+      if (!sceneId) {
+        console.error('Scene ID is required for saving transcript');
+        return;
+      }
+
+      const patchPayload: any = {};
+
+      // Create nested structure with scene ID
+      patchPayload[sceneId] = {
+        video: {}
+      };
+
+      if (transcriptEditMode === 'url') {
+        patchPayload[sceneId].video.transcriptUrl = tempTranscriptUrl;
+        // Clear transcript text when using URL
+        patchPayload[sceneId].video.transcript = undefined;
+      } else {
+        patchPayload[sceneId].video.transcript = tempTranscriptText;
+        // Clear transcript URL when using text
+        patchPayload[sceneId].video.transcriptUrl = undefined;
+      }
+
+      const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+      const DEFAULT_BASE_URL = "https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001";
+      const DEFAULT_LANG_URL = "lang/en";
+
+      const normalizeUrlParam = (value?: string | null): string => {
+        if (!value) return '';
+        const trimmed = value.trim().replace(/^['"]|['"]$/g, '');
+        return trimmed.startsWith('@') ? trimmed.slice(1) : trimmed;
+      };
+
+      const baseUrl = urlParams ? normalizeUrlParam(urlParams.get('baseUrl')) || DEFAULT_BASE_URL : DEFAULT_BASE_URL;
+      const langUrl = urlParams ? normalizeUrlParam(urlParams.get('langUrl')) || DEFAULT_LANG_URL : DEFAULT_LANG_URL;
+      const patchUrl = `${baseUrl}/${langUrl}`;
+
+      console.log('Sending PATCH to:', patchUrl);
+      console.log('Payload:', patchPayload);
+
+      const response = await fetch(patchUrl, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(patchPayload)
+      });
+
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log('Transcript config saved successfully:', result);
+
+      // Update local transcript to reflect changes immediately
+      if (transcriptEditMode === 'text') {
+        setLocalTranscript(tempTranscriptText);
+      } else {
+        // For URL mode, we can't predict the result, so clear local override
+        setLocalTranscript(undefined);
+      }
+
+      // Also update temp config for immediate preview
+      if (transcriptEditMode === 'url') {
+        updateTempConfig('transcriptUrl', tempTranscriptUrl);
+      } else {
+        updateTempConfig('transcriptText', tempTranscriptText);
+      }
+
+    } catch (error) {
+      console.error('Failed to save transcript config:', error);
+    }
+
+    setShowTranscriptDialog(false);
+  }, [transcriptEditMode, tempTranscriptUrl, tempTranscriptText, updateTempConfig, sceneId]);
+
+  // Handle video URL save - update local config and send to API
+  const handleVideoUrlSave = useCallback(async () => {
+    console.log('Saving video URL config:', { tempVideoUrl });
+
+    try {
+      // Ensure we have a scene ID
+      if (!sceneId) {
+        console.error('Scene ID is required for saving video URL');
+        return;
+      }
+
+      const patchPayload: any = {};
+
+      // Create nested structure with scene ID
+      patchPayload[sceneId] = {
+        video: {
+          src: tempVideoUrl
+        }
+      };
+
+      const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+      const DEFAULT_BASE_URL = "https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001";
+      const DEFAULT_LANG_URL = "lang/en";
+
+      const normalizeUrlParam = (value?: string | null): string => {
+        if (!value) return '';
+        const trimmed = value.trim().replace(/^['"]|['"]$/g, '');
+        return trimmed.startsWith('@') ? trimmed.slice(1) : trimmed;
+      };
+
+      const baseUrl = urlParams ? normalizeUrlParam(urlParams.get('baseUrl')) || DEFAULT_BASE_URL : DEFAULT_BASE_URL;
+      const langUrl = urlParams ? normalizeUrlParam(urlParams.get('langUrl')) || DEFAULT_LANG_URL : DEFAULT_LANG_URL;
+      const patchUrl = `${baseUrl}/${langUrl}`;
+
+      console.log('Sending PATCH to:', patchUrl);
+      console.log('Payload:', patchPayload);
+
+      const response = await fetch(patchUrl, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(patchPayload)
+      });
+
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log('Video URL config saved successfully:', result);
+
+      // Update local video URL to reflect changes immediately
+      setLocalVideoUrl(tempVideoUrl);
+
+      // Also update temp config for immediate preview
+      updateTempConfig('videoUrl', tempVideoUrl);
+
+    } catch (error) {
+      console.error('Failed to save video URL config:', error);
+    }
+
+    setShowUrlDialog(false);
+  }, [tempVideoUrl, updateTempConfig, sceneId]);
+
   // Dark mode detection
   useEffect(() => {
     const checkDarkMode = () => {
@@ -324,12 +524,13 @@ export function VideoPlayer({
     }
   }, [src, initializePlayer, disableForwardSeek]);
 
-  const parsedTranscript = useMemo(() =>
-    typeof transcript === "string"
-      ? parseTactiqTranscript(transcript)
-      : transcript || [],
-    [transcript]
-  );
+  const parsedTranscript = useMemo(() => {
+    // Use local transcript if available, otherwise fall back to original transcript
+    const currentTranscript = localTranscript !== undefined ? localTranscript : transcript;
+    return typeof currentTranscript === "string"
+      ? parseTactiqTranscript(currentTranscript)
+      : currentTranscript || [];
+  }, [transcript, localTranscript]);
   // Find current transcript row - useMemo ile optimize edildi
   const currentRowIndex = useMemo(() =>
     parsedTranscript.findIndex(
@@ -568,92 +769,92 @@ export function VideoPlayer({
             e.stopPropagation();
           }}
         >
-        <video
-          ref={videoRef}
-          id="player"
-          controls
-          playsInline
-          poster={poster}
-          crossOrigin="anonymous"
-          style={videoStyle}
-          aria-label={ariaTexts?.videoDescription || "Video content"}
-          aria-describedby="video-description"
-        >
-        </video>
-
-        <div
-          id="video-description"
-          className="sr-only"
-          aria-live="polite"
-        >
-          {isVideoEnded
-            ? (ariaTexts?.videoEndedDescription || "Video has ended. Use replay button to restart.")
-            : (ariaTexts?.videoPlayingDescription || "Video is playing.")
-          }
-        </div>
-
-        {parsedTranscript && parsedTranscript.length > 0 && (
-          <motion.button
-            onClick={() =>
-              setIsTranscriptOpen(!isTranscriptOpen)
-            }
-            whileHover={reducedMotion ? undefined : { scale: 1.05 }}
-            whileTap={reducedMotion ? undefined : { scale: 0.95 }}
-            className="absolute top-4 right-4 z-20 overflow-hidden transition-all duration-300"
-            style={toggleButtonStyle}
-            title={
-              isTranscriptOpen
-                ? "Transkripti Gizle"
-                : "Transkripti Göster"
-            }
-            aria-label={
-              isTranscriptOpen
-                ? (ariaTexts?.hideTranscriptLabel || "Hide transcript panel")
-                : (ariaTexts?.showTranscriptLabel || "Show transcript panel")
-            }
-            aria-expanded={isTranscriptOpen}
-            aria-controls="transcript-panel"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                setIsTranscriptOpen(!isTranscriptOpen);
-              }
-            }}
+          <video
+            ref={videoRef}
+            id="player"
+            controls
+            playsInline
+            poster={poster}
+            crossOrigin="anonymous"
+            style={videoStyle}
+            aria-label={ariaTexts?.videoDescription || "Video content"}
+            aria-describedby="video-description"
           >
-            <FileText className="w-5 h-5" aria-hidden="true" />
-          </motion.button>
-        )}
+          </video>
 
-
-        {/* Replay Button - Only show when video has ended */}
-        {isVideoEnded && !isIOS && (
-          <motion.button
-            onClick={handleReplay}
-            whileHover={reducedMotion ? undefined : { scale: 1.05 }}
-            whileTap={reducedMotion ? undefined : { scale: 0.95 }}
-            className="absolute top-4 left-4 z-20 overflow-hidden transition-all duration-300"
-            style={toggleButtonStyle}
-            title="Videoyu Baştan Oynat"
-            aria-label={ariaTexts?.replayLabel || "Replay video from beginning"}
-            disabled={isReplaying}
-            initial={{ opacity: reducedMotion ? 1 : 0, scale: reducedMotion ? 1 : 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: reducedMotion ? 0 : 0.3 }}
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if ((e.key === 'Enter' || e.key === ' ') && !isReplaying) {
-                e.preventDefault();
-                handleReplay();
-              }
-            }}
+          <div
+            id="video-description"
+            className="sr-only"
+            aria-live="polite"
           >
-            <RotateCw
-              className={`w-5 h-5 ${isReplaying ? 'animate-spin' : ''}`}
-              aria-hidden="true"
-            />
-          </motion.button>
-        )}
+            {isVideoEnded
+              ? (ariaTexts?.videoEndedDescription || "Video has ended. Use replay button to restart.")
+              : (ariaTexts?.videoPlayingDescription || "Video is playing.")
+            }
+          </div>
+
+          {parsedTranscript && parsedTranscript.length > 0 && (
+            <motion.button
+              onClick={() =>
+                setIsTranscriptOpen(!isTranscriptOpen)
+              }
+              whileHover={reducedMotion ? undefined : { scale: 1.05 }}
+              whileTap={reducedMotion ? undefined : { scale: 0.95 }}
+              className="absolute top-4 right-4 z-20 overflow-hidden transition-all duration-300"
+              style={toggleButtonStyle}
+              title={
+                isTranscriptOpen
+                  ? "Transkripti Gizle"
+                  : "Transkripti Göster"
+              }
+              aria-label={
+                isTranscriptOpen
+                  ? (ariaTexts?.hideTranscriptLabel || "Hide transcript panel")
+                  : (ariaTexts?.showTranscriptLabel || "Show transcript panel")
+              }
+              aria-expanded={isTranscriptOpen}
+              aria-controls="transcript-panel"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setIsTranscriptOpen(!isTranscriptOpen);
+                }
+              }}
+            >
+              <FileText className="w-5 h-5" aria-hidden="true" />
+            </motion.button>
+          )}
+
+
+          {/* Replay Button - Only show when video has ended */}
+          {isVideoEnded && !isIOS && (
+            <motion.button
+              onClick={handleReplay}
+              whileHover={reducedMotion ? undefined : { scale: 1.05 }}
+              whileTap={reducedMotion ? undefined : { scale: 0.95 }}
+              className="absolute top-4 left-4 z-20 overflow-hidden transition-all duration-300"
+              style={toggleButtonStyle}
+              title="Videoyu Baştan Oynat"
+              aria-label={ariaTexts?.replayLabel || "Replay video from beginning"}
+              disabled={isReplaying}
+              initial={{ opacity: reducedMotion ? 1 : 0, scale: reducedMotion ? 1 : 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: reducedMotion ? 0 : 0.3 }}
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if ((e.key === 'Enter' || e.key === ' ') && !isReplaying) {
+                  e.preventDefault();
+                  handleReplay();
+                }
+              }}
+            >
+              <RotateCw
+                className={`w-5 h-5 ${isReplaying ? 'animate-spin' : ''}`}
+                aria-hidden="true"
+              />
+            </motion.button>
+          )}
         </div>
 
         {/* URL Edit Button - Slightly outside video container, only show in edit mode */}
@@ -662,7 +863,7 @@ export function VideoPlayer({
             onClick={() => setShowUrlDialog(true)}
             whileHover={reducedMotion ? undefined : { scale: 1.05 }}
             whileTap={reducedMotion ? undefined : { scale: 0.95 }}
-            className="z-20 p-2 glass-border-2 transition-all duration-300"
+            className="z-20 p-2 glass-border-2 rounded-full transition-all duration-300"
             style={{ position: 'absolute', right: '-40px', top: 0 }}
             title="Edit Video URL"
             aria-label="Edit video URL"
@@ -726,6 +927,32 @@ export function VideoPlayer({
                     </h3>
                   </div>
                 </div>
+
+                {/* Transcript Edit Button */}
+                {isEditMode && (
+                  <motion.button
+                    onClick={() => {
+                      initializeTranscriptData();
+                      setShowTranscriptDialog(true);
+                    }}
+                    whileHover={reducedMotion ? undefined : { scale: 1.05 }}
+                    whileTap={reducedMotion ? undefined : { scale: 0.95 }}
+                    className="p-2 glass-border-4 rounded-full hover:scale-105 transition-all duration-200"
+                    title="Edit Transcript"
+                    aria-label="Edit transcript"
+                    tabIndex={0}
+                    style={{ borderRadius: '100%' }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        initializeTranscriptData();
+                        setShowTranscriptDialog(true);
+                      }
+                    }}
+                  >
+                    <Edit3 className="w-4 h-4 text-[#1C1C1E] dark:text-[#F2F2F7]" />
+                  </motion.button>
+                )}
               </div>
             </header>
 
@@ -900,7 +1127,7 @@ export function VideoPlayer({
                       placeholder="https://example.com/video.m3u8"
                     />
                   </div>
-                  
+
                 </div>
 
                 {/* Footer */}
@@ -919,10 +1146,154 @@ export function VideoPlayer({
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
+                    onClick={handleVideoUrlSave}
+                    className="flex-1 py-3 px-4 glass-border-3 font-medium text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors"
+                  >
+                    Save
+                  </motion.button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
+
+      {/* Transcript Edit Dialog */}
+      {createPortal(
+        <AnimatePresence>
+          {showTranscriptDialog && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[90] flex items-center justify-center p-4"
+              onClick={() => setShowTranscriptDialog(false)}
+            >
+              {/* Backdrop */}
+              <div className="absolute inset-0 backdrop-blur-sm bg-black/50" />
+
+              {/* Modal */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="relative glass-border-3 w-full max-w-2xl mx-4 p-6"
+                style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Header */}
+                <div className="mb-6">
+                  <h2 className="text-xl font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] mb-4">
+                    Edit Transcript
+                  </h2>
+
+                  {/* Mode Toggle */}
+                  <div className="flex space-x-1 bg-white/10 dark:bg-black/10 rounded-lg p-1 relative z-10">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setTranscriptEditMode('url');
+                      }}
+                      className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all cursor-pointer relative z-20 ${transcriptEditMode === 'url'
+                          ? 'bg-white/20 text-[#1C1C1E] dark:text-[#F2F2F7]'
+                          : 'text-[#1C1C1E]/70 dark:text-[#F2F2F7]/70 hover:bg-white/10'
+                        }`}
+                    >
+                      URL
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setTranscriptEditMode('text');
+                      }}
+                      className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all cursor-pointer relative z-20 ${transcriptEditMode === 'text'
+                          ? 'bg-white/20 text-[#1C1C1E] dark:text-[#F2F2F7]'
+                          : 'text-[#1C1C1E]/70 dark:text-[#F2F2F7]/70 hover:bg-white/10'
+                        }`}
+                    >
+                      Text
+                    </button>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="space-y-4">
+                  {transcriptEditMode === 'url' ? (
+                    <div>
+                      <label htmlFor="transcript-url" className="block text-sm font-medium text-[#1C1C1E] dark:text-[#F2F2F7] mb-2">
+                        Transcript URL
+                      </label>
+                      <input
+                        id="transcript-url"
+                        type="url"
+                        value={tempTranscriptUrl}
+                        onChange={(e) => setTempTranscriptUrl(e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
+                        onFocus={(e) => e.stopPropagation()}
+                        className="w-full p-3 glass-border-4 rounded bg-transparent text-[#1C1C1E] dark:text-[#F2F2F7] placeholder-[#1C1C1E]/50 dark:placeholder-[#F2F2F7]/50 focus:outline-none"
+                        placeholder="https://example.com/transcript.txt"
+                      />
+                      <p className="text-xs text-[#1C1C1E]/60 dark:text-[#F2F2F7]/60 mt-1">
+                        Enter a URL to fetch transcript content
+                      </p>
+                    </div>
+                  ) : (
+                    <div>
+                      <label htmlFor="transcript-text" className="block text-sm font-medium text-[#1C1C1E] dark:text-[#F2F2F7] mb-2">
+                        Transcript Text
+                      </label>
+                      <textarea
+                        id="transcript-text"
+                        value={tempTranscriptText}
+                        onChange={(e) => setTempTranscriptText(e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
+                        onFocus={(e) => e.stopPropagation()}
+                        onWheel={(e) => e.stopPropagation()}
+                        onTouchStart={(e) => e.stopPropagation()}
+                        onTouchMove={(e) => e.stopPropagation()}
+                        rows={12}
+                        className="w-full p-3 glass-border-4 rounded bg-transparent text-[#1C1C1E] dark:text-[#F2F2F7] placeholder-[#1C1C1E]/50 dark:placeholder-[#F2F2F7]/50 focus:outline-none font-mono text-sm resize-none"
+                        style={{
+                          minHeight: '300px',
+                          maxHeight: '400px',
+                          scrollBehavior: 'smooth',
+                          overflowY: 'auto',
+                          overflow: 'auto'
+                        }}
+                        placeholder="00:00:05.000 Welcome to this video...
+00:00:10.500 In this tutorial we will learn..."
+                      />
+                      <p className="text-xs text-[#1C1C1E]/60 dark:text-[#F2F2F7]/60 mt-1">
+                        Enter transcript in format: HH:MM:SS.mmm Text content
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Footer */}
+                <div className="flex gap-3 mt-6">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => {
-                      updateTempConfig('videoUrl', tempVideoUrl);
-                      setShowUrlDialog(false);
+                      setShowTranscriptDialog(false);
+                      setTempTranscriptUrl('');
+                      setTempTranscriptText('');
                     }}
+                    className="flex-1 py-3 px-4 glass-border-3 font-medium text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors"
+                  >
+                    Cancel
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleTranscriptSave}
                     className="flex-1 py-3 px-4 glass-border-3 font-medium text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors"
                   >
                     Save

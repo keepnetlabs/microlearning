@@ -25,6 +25,7 @@ import { getCountryCode, detectBrowserLanguage, useIsMobile, languages, resolveS
 import { useFontFamily } from "./hooks/useFontFamily";
 import { useAppConfig } from "./hooks/useAppConfig";
 import { FontFamilyProvider } from "./contexts/FontFamilyContext";
+import { GlobalEditModeProvider } from "./contexts/GlobalEditModeContext";
 import { scormService, destroySCORMService } from "./utils/scormService";
 import { logger } from "./utils/logger";
 import { STATIC_CSS_CLASSES } from "./utils/cssClasses";
@@ -916,7 +917,8 @@ export default function App(props: AppProps = {}) {
 
   return (
     <MotionConfig reducedMotion={reducedMotionSetting}>
-      <FontFamilyProvider fontFamilyConfig={themeConfig.fontFamily}>
+      <GlobalEditModeProvider>
+        <FontFamilyProvider fontFamilyConfig={themeConfig.fontFamily}>
         <div
           className={cssClasses.mainContainer}
           style={{
@@ -1321,6 +1323,7 @@ export default function App(props: AppProps = {}) {
           <Toaster />
         </div>
       </FontFamilyProvider>
+      </GlobalEditModeProvider>
     </MotionConfig>
   );
 }

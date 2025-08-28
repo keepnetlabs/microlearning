@@ -418,10 +418,36 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
                     {/* Email Header */}
                     <div className="border-b border-white/20 dark:border-white/10 pb-4 mb-6">
                       <FontWrapper>
-                        <h3 className="text-lg font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] mb-2">{selectedEmail.subject}</h3>
+                        {isEditMode ? (
+                          <EditableText
+                            configPath={`emails.${config.emails.findIndex(e => e.id === selectedEmail.id)}.subject`}
+                            className="text-lg font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] mb-2 block"
+                            placeholder="Enter email subject"
+                          >
+                            {selectedEmail.subject}
+                          </EditableText>
+                        ) : (
+                          <h3 className="text-lg font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] mb-2">{selectedEmail.subject}</h3>
+                        )}
                         <div className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] space-y-1">
-                          <p><span className="font-semibold">From:</span> {selectedEmail.sender}</p>
-                          <p><span className="font-semibold">Time:</span> {selectedEmail.timestamp}</p>
+                          <p><span className="font-semibold">From:</span> {isEditMode ? (
+                            <EditableText
+                              configPath={`emails.${config.emails.findIndex(e => e.id === selectedEmail.id)}.sender`}
+                              className="inline text-sm text-[#1C1C1E] dark:text-[#F2F2F7]"
+                              placeholder="Enter sender name"
+                            >
+                              {selectedEmail.sender}
+                            </EditableText>
+                          ) : selectedEmail.sender}</p>
+                          <p><span className="font-semibold">Time:</span> {isEditMode ? (
+                            <EditableText
+                              configPath={`emails.${config.emails.findIndex(e => e.id === selectedEmail.id)}.timestamp`}
+                              className="inline text-sm text-[#1C1C1E] dark:text-[#F2F2F7]"
+                              placeholder="Enter timestamp"
+                            >
+                              {selectedEmail.timestamp}
+                            </EditableText>
+                          ) : selectedEmail.timestamp}</p>
                         </div>
                       </FontWrapper>
                     </div>
@@ -574,10 +600,36 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
                   <div className="flex items-start justify-between pb-4 border-b mb-4 border-white/50 dark:border-white/10">
                     <div className="flex-1">
                       <FontWrapper>
-                        <h3 className="text-lg font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] mb-2">{selectedEmail.subject}</h3>
+                        {isEditMode ? (
+                          <EditableText
+                            configPath={`emails.${config.emails.findIndex(e => e.id === selectedEmail.id)}.subject`}
+                            className="text-lg font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] mb-2 block"
+                            placeholder="Enter email subject"
+                          >
+                            {selectedEmail.subject}
+                          </EditableText>
+                        ) : (
+                          <h3 className="text-lg font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] mb-2">{selectedEmail.subject}</h3>
+                        )}
                         <div className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] space-y-1">
-                          <p><span className="font-semibold">From:</span> {selectedEmail.sender}</p>
-                          <p><span className="font-semibold">Time:</span> {selectedEmail.timestamp}</p>
+                          <p><span className="font-semibold">From:</span> {isEditMode ? (
+                            <EditableText
+                              configPath={`emails.${config.emails.findIndex(e => e.id === selectedEmail.id)}.sender`}
+                              className="inline text-sm text-[#1C1C1E] dark:text-[#F2F2F7]"
+                              placeholder="Enter sender name"
+                            >
+                              {selectedEmail.sender}
+                            </EditableText>
+                          ) : selectedEmail.sender}</p>
+                          <p><span className="font-semibold">Time:</span> {isEditMode ? (
+                            <EditableText
+                              configPath={`emails.${config.emails.findIndex(e => e.id === selectedEmail.id)}.timestamp`}
+                              className="inline text-sm text-[#1C1C1E] dark:text-[#F2F2F7]"
+                              placeholder="Enter timestamp"
+                            >
+                              {selectedEmail.timestamp}
+                            </EditableText>
+                          ) : selectedEmail.timestamp}</p>
                         </div>
                       </FontWrapper>
                     </div>
