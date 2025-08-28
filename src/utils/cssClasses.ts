@@ -3,6 +3,8 @@ export const STATIC_CSS_CLASSES = {
   // Loading overlay
   loadingOverlay: "fixed inset-0 bg-white/50 dark:bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center transition-colors duration-300",
   loadingText: "text-sm font-medium text-[#1C1C1E] dark:text-[#F2F2F7]",
+  loadingSpinner: "animate-spin text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300",
+  loadingContainer: "flex items-center justify-center space-x-3",
   // Background
   backgroundContainer: "fixed inset-0 pointer-events-none overflow-hidden",
   // Header

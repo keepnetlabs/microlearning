@@ -10,6 +10,12 @@ import { ScientificBasisInfo } from "../common/ScientificBasisInfo";
 import { useIsMobile } from "../ui/use-mobile";
 import { CallToAction } from "../ui/CallToAction";
 import { deepMerge } from "../../utils/deepMerge";
+import { 
+  DEFAULT_PARTICLES, 
+  DEFAULT_SPARKLES, 
+  DEFAULT_CONTAINER_CLASSNAME, 
+  DEFAULT_ANIMATION_DELAYS 
+} from "../../utils/introSceneConstants";
 
 // İkon mapping fonksiyonu - useCallback ile optimize edildi
 const getIconComponent = (iconName: string): LucideIcon => {
@@ -29,19 +35,6 @@ const getIconComponent = (iconName: string): LucideIcon => {
   return LucideIcons.HelpCircle;
 };
 
-// Default değerleri component dışına taşı - her render'da yeniden oluşturulmasın
-const DEFAULT_PARTICLES = { enabled: true, count: 15, color: "bg-red-400/60", baseDuration: 5 };
-const DEFAULT_SPARKLES = {
-  enabled: true,
-  ambient: { count: 6, opacity: 30, size: 0.5, duration: 10, delay: 1 },
-  floating: { count: 8, opacity: 25, size: 0.5, duration: 12, delay: 2 },
-  twinkling: { count: 10, opacity: 20, size: 0.5, duration: 8, delay: 3 },
-  gradient: { count: 4, opacity: 18, size: 1, duration: 15, delay: 4 },
-  drifting: { count: 6, opacity: 15, size: 0.5, duration: 18, delay: 5 },
-  breathing: { count: 7, opacity: 12, size: 0.5, duration: 11, delay: 6 }
-};
-const DEFAULT_CONTAINER_CLASSNAME = "flex flex-col items-center justify-center h-full text-center relative overflow-hidden sm:px-4";
-const DEFAULT_ANIMATION_DELAYS = { welcomeDelay: 0.3, iconDelay: 0.1, titleDelay: 0.2, subtitleDelay: 0.4, cardDelay: 0.3, statsDelay: 0.5, ctaDelay: 0.6 };
 
 // Props interfaces
 interface HighlightItemData {
@@ -451,7 +444,7 @@ export const IntroScene = React.memo(({
     icon
   } = currentConfig;
 
-  // Use default values for removed properties - artık component dışından geliyor
+  // Use default values from constants file
   const particles = DEFAULT_PARTICLES;
   const sparkles = DEFAULT_SPARKLES;
   const containerClassName = DEFAULT_CONTAINER_CLASSNAME;
