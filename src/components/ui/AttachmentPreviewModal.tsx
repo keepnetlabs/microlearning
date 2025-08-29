@@ -5,17 +5,20 @@ import { X, Download, FileText, Image, Video, Volume2, FileSpreadsheet, File } f
 import { FontWrapper } from '../common/FontWrapper';
 import { useIsMobile } from './use-mobile';
 import { EmailAttachment } from '../../data/inboxConfig';
+import ModalFooter from './ModalFooter';
 
 interface AttachmentPreviewModalProps {
   attachment: EmailAttachment | null;
   isOpen: boolean;
   onClose: () => void;
+  isEditMode?: boolean;
 }
 
 export const AttachmentPreviewModal: React.FC<AttachmentPreviewModalProps> = ({
   attachment,
   isOpen,
-  onClose
+  onClose,
+  isEditMode
 }) => {
   const isMobile = useIsMobile();
 
@@ -349,6 +352,11 @@ export const AttachmentPreviewModal: React.FC<AttachmentPreviewModalProps> = ({
             <div className="flex-1 overflow-y-auto min-h-0" style={{ maxHeight: 'calc(90vh - 100px)' }}>
               {renderPreviewContent()}
             </div>
+            {isEditMode && (
+              <div className="p-3 md:p-4">
+                <ModalFooter onCancel={onClose} onSave={onClose} />
+              </div>
+            )}
           </motion.div>
         </motion.div>
       )}

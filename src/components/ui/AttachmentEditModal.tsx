@@ -5,6 +5,7 @@ import { X } from 'lucide-react';
 import { FontWrapper } from '../common/FontWrapper';
 import { useIsMobile } from './use-mobile';
 import { RichTextEditor } from './RichTextEditor';
+import ModalFooter from './ModalFooter';
 
 interface AttachmentEditModalProps {
     isOpen: boolean;
@@ -97,23 +98,8 @@ export const AttachmentEditModal: React.FC<AttachmentEditModalProps> = ({
                             />
                         </div>
 
-                        <div className="p-3 md:p-4 border-t border-white/20 dark:border-white/10 flex items-center justify-end gap-2">
-                            <motion.button
-                                whileHover={{ scale: 1.03 }}
-                                whileTap={{ scale: 0.97 }}
-                                onClick={onClose}
-                                className={`glass-border-1 rounded-lg transition-colors ${isMobile ? 'px-3 py-1.5 text-xs' : 'px-4 py-2 text-sm'}`}
-                            >
-                                Cancel
-                            </motion.button>
-                            <motion.button
-                                whileHover={{ scale: 1.03 }}
-                                whileTap={{ scale: 0.97 }}
-                                onClick={() => onSave(value)}
-                                className={`glass-border-1 rounded-lg transition-colors ${isMobile ? 'px-3 py-1.5 text-xs' : 'px-4 py-2 text-sm'}`}
-                            >
-                                Save
-                            </motion.button>
+                        <div className="p-3 md:p-4">
+                            <ModalFooter onCancel={onClose} onSave={() => onSave(value)} />
                         </div>
                     </motion.div>
                 </motion.div>

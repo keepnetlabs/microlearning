@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Edit3, Save, X } from "lucide-react";
+import { Edit3, X } from "lucide-react";
+import ModalFooter from "./ui/ModalFooter";
 import { useEditMode } from "../contexts/EditModeContext";
 import { useGlobalEditMode } from "../contexts/GlobalEditModeContext";
 
@@ -317,21 +318,7 @@ const HeaderLogoContent: React.FC<HeaderLogoProps> = ({
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2 mt-6">
-                <button
-                  onClick={() => setShowEditPopup(false)}
-                  className="px-4 py-2 glass-border-1 rounded hover:scale-105 transition-all text-[#1C1C1E] dark:text-[#F2F2F7]"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSave}
-                  className="px-4 py-2 bg-blue-500/20 glass-border-1 rounded hover:scale-105 transition-all text-[#1C1C1E] dark:text-[#F2F2F7] flex items-center gap-2"
-                >
-                  <Save size={14} />
-                  Save
-                </button>
-              </div>
+              <ModalFooter onCancel={() => setShowEditPopup(false)} onSave={handleSave} />
             </motion.div>
           </motion.div>
         )}

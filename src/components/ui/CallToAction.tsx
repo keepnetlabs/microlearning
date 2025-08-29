@@ -111,11 +111,13 @@ export function CallToAction({
   // For EditableText, ensure we have a proper string value
   const editableTextValue = useMemo(() => String(displayText || "Continue"), [displayText]);
 
-  const containerClasses = isMobile
-    ? "fixed inset-x-0 bottom-0 z-[60] flex justify-center px-4 pointer-events-none"
-    : hasScroll
-      ? "fixed inset-x-0 bottom-0 z-[60] flex justify-center px-4"
-      : "mt-4 sm:mt-6 relative flex justify-center px-4";
+  const containerClasses = isEditMode
+    ? "mt-4 sm:mt-6 relative flex justify-center px-4"
+    : (isMobile
+      ? "fixed inset-x-0 bottom-0 z-[60] flex justify-center px-4 pointer-events-none"
+      : hasScroll
+        ? "fixed inset-x-0 bottom-0 z-[60] flex justify-center px-4"
+        : "mt-4 sm:mt-6 relative flex justify-center px-4");
 
   const buttonMobileClasses = isMobile ? "pointer-events-auto" : "";
 
@@ -148,11 +150,13 @@ export function CallToAction({
       }}
       className={`${containerClasses} ${className}`}
       style={{
-        paddingBottom: isMobile
-          ? "max(1rem, env(safe-area-inset-bottom))"
-          : hasScroll
-            ? "2.5rem"
-            : undefined
+        paddingBottom: !isEditMode
+          ? (isMobile
+            ? "max(1rem, env(safe-area-inset-bottom))"
+            : hasScroll
+              ? "2.5rem"
+              : undefined)
+          : undefined
       }}
       data-testid={dataTestId}
     >
@@ -185,7 +189,7 @@ export function CallToAction({
             )}
           </span>
         )}
-        <span 
+        <span
           key={`cta-span-${JSON.stringify(tempConfig?.callToActionText || {})}`}
           className="relative z-10 font-medium"
         >

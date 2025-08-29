@@ -768,6 +768,7 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
         attachment={previewAttachment}
         isOpen={showPreviewModal}
         onClose={closePreviewModal}
+        isEditMode={isEditMode}
       />
 
       {/* Attachment Edit Modal */}
