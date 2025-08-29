@@ -1,5 +1,5 @@
 import { LucideIcon } from "lucide-react";
-import { useMemo, useState, useEffect, useCallback } from "react";
+import { useMemo, useState, useEffect, useCallback, useRef } from "react";
 import * as LucideIcons from "lucide-react";
 import { FontWrapper } from "../common/FontWrapper";
 import { useIsMobile } from "../ui/use-mobile";
@@ -10,72 +10,7 @@ import { EditModePanel } from "../common/EditModePanel";
 import { deepMerge } from "../../utils/deepMerge";
 import { Inbox } from "../Inbox";
 import { InboxSceneConfig } from "../../data/inboxConfig";
-// Props interfaces
-interface ActionItem {
-  iconName: string;
-  title: string;
-  description: string;
-  tip: string;
-  iconColorClass: string;
-  bgGradientClass: string;
-  tipColorClass: string;
-  tipTextColorClass: string;
-  tipIconColorClass: string;
-}
-
-interface IconConfig {
-  component?: LucideIcon;
-  size?: number;
-  className?: string;
-  sceneIconName?: string;
-}
-
-interface TipConfig {
-  iconName?: string;
-  iconSize?: number;
-  tipColorClass?: string;
-  tipTextColorClass?: string;
-  tipIconColorClass?: string;
-}
-
-interface ActionableContentSceneConfig {
-  title: string;
-  subtitle: string;
-  callToActionText?: string | { mobile?: string; desktop?: string; };
-  successCallToActionText?: string | { mobile?: string; desktop?: string; };
-  actions: ActionItem[];
-
-  // Visual configuration
-  icon: IconConfig;
-  tipConfig: TipConfig;
-
-  // Layout configuration (optional - will use defaults if not provided)
-  cardSpacing?: string;
-  maxWidth?: string;
-
-  // Glass effect configuration (optional - will use defaults if not provided)
-  glassEffect?: {
-    cardBackground: string;
-    cardBorder: string;
-    shadow: string;
-    backdropBlur: string;
-  };
-
-  // Accessibility configuration (optional - will use defaults if not provided)
-  ariaTexts?: {
-    mainLabel?: string;
-    mainDescription?: string;
-    headerLabel?: string;
-    actionCardsLabel?: string;
-    actionCardsDescription?: string;
-    actionCardLabel?: string;
-    tipLabel?: string;
-  };
-}
-
-interface ActionableContentSceneProps {
-  config: ActionableContentSceneConfig;
-}
+import { ActionableContentSceneProps } from "./actionable/types";
 
 const getIconComponent = (iconName: string): LucideIcon => {
   // İkon adını camelCase'e çevir (örn: "book-open" -> "BookOpen")
@@ -133,6 +68,12 @@ function ActionableContentSceneInternalCore({
     return deepMerge(config, tempConfig || {});
   }, [config, tempConfig]);
 
+  // Stable callback ref to avoid refetch loops when parent recreates function
+  const onInboxConfigUpdateRef = useRef(onInboxConfigUpdate);
+  useEffect(() => {
+    onInboxConfigUpdateRef.current = onInboxConfigUpdate;
+  }, [onInboxConfigUpdate]);
+
   // Default values for container classes
   const defaultContainerClassName = "flex flex-col items-center justify-start min-h-full sm:px-6 overflow-y-auto";
   const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
@@ -187,7 +128,7 @@ function ActionableContentSceneInternalCore({
 
         const data = await response.json() as InboxSceneConfig;
         setInboxConfig(data);
-        onInboxConfigUpdate?.(data);
+        onInboxConfigUpdateRef.current?.(data);
       } catch (error) {
         console.error('Failed to fetch inbox config:', error);
         setInboxError(error instanceof Error ? error.message : 'Failed to load inbox configuration');
@@ -209,6 +150,19 @@ function ActionableContentSceneInternalCore({
   } = currentConfig;
 
   const isMobile = useIsMobile();
+
+  // Merge live edits into fetched inbox config for instant reflection in edit mode
+  const effectiveInboxConfig: InboxSceneConfig | null = useMemo(() => {
+    if (!inboxConfig) return null;
+    const overlay: any = {};
+    if (tempConfig && (tempConfig as any).emails) {
+      overlay.emails = (tempConfig as any).emails;
+    }
+    if (tempConfig && (tempConfig as any).texts) {
+      overlay.texts = (tempConfig as any).texts;
+    }
+    return Object.keys(overlay).length ? (deepMerge(inboxConfig, overlay) as InboxSceneConfig) : inboxConfig;
+  }, [inboxConfig, tempConfig]);
 
   // Memoize icon components
   const sceneIconComponent = useMemo(() => {
@@ -312,7 +266,7 @@ function ActionableContentSceneInternalCore({
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1C1C1E] dark:border-[#F2F2F7]"></div>
               <span className="ml-2 text-[#1C1C1E] dark:text-[#F2F2F7]">Loading inbox...</span>
             </div>
-          ) : inboxError || !inboxConfig ? (
+          ) : inboxError || !effectiveInboxConfig ? (
             <div className="flex items-center justify-center p-8 text-center">
               <div className="text-red-600 dark:text-red-400">
                 <p className="font-medium">Failed to load inbox</p>
@@ -322,7 +276,7 @@ function ActionableContentSceneInternalCore({
           ) : (
             <Inbox
               key={`inbox-${configKey}`}
-              config={inboxConfig}
+              config={effectiveInboxConfig}
               onNextSlide={onNextSlide}
               onAllEmailsReported={(allReported) => {
                 setAllEmailsReported(allReported);
@@ -353,8 +307,8 @@ function ActionableContentSceneInternalCore({
             delay={0.8}
             onClick={allEmailsReported ? onNextSlide : () => {
               // If emails not all reported, open first email in inbox
-              if (inboxConfig && inboxConfig.emails.length > 0) {
-                const firstEmailId = inboxConfig.emails[0].id;
+              if (effectiveInboxConfig && effectiveInboxConfig.emails.length > 0) {
+                const firstEmailId = effectiveInboxConfig.emails[0].id;
                 setExternalSelectedEmailId(firstEmailId);
                 setHasStartedReporting(true);
               }
@@ -398,7 +352,7 @@ function ActionableContentSceneInternal(props: ActionableContentSceneProps & {
       const newConfig = deepMerge(inboxConfigRef.current, updatedConfig);
       setInboxConfigRef({ current: newConfig });
     }
-  }, [inboxConfigRef.current]);
+  }, [inboxConfigRef]);
 
   return (
     <EditModeProvider

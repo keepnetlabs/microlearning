@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, AlertTriangle, Flag, ChevronRight, Reply, CornerUpRight, Archive, Delete, ArrowLeft, Eye, Star, FileText, EyeOff, Check, X, FileSpreadsheet, Image, Download } from "lucide-react";
+import { Mail, AlertTriangle, Flag, ChevronRight, Reply, CornerUpRight, Archive, Delete, ArrowLeft, Eye, Star, FileText, EyeOff, Check, X, FileSpreadsheet, Image, Download, Edit3 } from "lucide-react";
 import { FontWrapper } from "./common/FontWrapper";
 import { EditableText } from "./common/EditableText";
 import { useIsMobile } from "./ui/use-mobile";
@@ -8,6 +8,7 @@ import { PhishingReportButton } from "./ui/PhishingReportButton";
 import { PhishingReportModal } from "./ui/PhishingReportModal";
 import { PhishingResultModal } from "./ui/PhishingResultModal";
 import { AttachmentPreviewModal } from "./ui/AttachmentPreviewModal";
+import { AttachmentEditModal } from "./ui/AttachmentEditModal";
 import { InboxSceneConfig, EmailData, EmailAttachment } from "../data/inboxConfig";
 import { useEditMode } from "../contexts/EditModeContext";
 import { enhanceLinkTooltips } from "../utils/linkTooltip";
@@ -71,6 +72,9 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
   const [lastReportCorrect, setLastReportCorrect] = useState(false);
   const [previewAttachment, setPreviewAttachment] = useState<EmailAttachment | null>(null);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [editingAttachment, setEditingAttachment] = useState<{ emailIndex: number; attIndex: number } | null>(null);
+  const [showAttachmentEditModal, setShowAttachmentEditModal] = useState(false);
+  let updateTempConfigFn: ((path: string, value: any) => void) | null = null;
   const isMobile = useIsMobile();
   const emailContentRef = useRef<HTMLDivElement>(null);
 
@@ -151,11 +155,12 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
   try {
     const editModeContext = useEditMode();
     contextIsEditMode = editModeContext.isEditMode;
+    updateTempConfigFn = editModeContext.updateTempConfig;
   } catch (error) {
     // EditModeProvider not available, default to false
     contextIsEditMode = false;
   }
-  
+
   const isEditMode = propIsEditMode !== undefined ? propIsEditMode : contextIsEditMode;
   const selectedEmail = config.emails.find(email => email.id === selectedEmailId);
 
@@ -217,7 +222,7 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
         </FontWrapper>
       </div>
       <div className="space-y-2">
-        {attachments.map((attachment) => (
+        {attachments.map((attachment, attIndex) => (
           <motion.div
             key={attachment.id}
             whileHover={{ x: 2 }}
@@ -237,6 +242,24 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
                 </FontWrapper>
               </div>
             </div>
+            {isEditMode && (
+              <div className="flex items-center gap-2">
+                <button
+                  className={`p-2 ${isEditMode ? 'glass-border-4-no-overflow' : 'glass-border-4'} rounded-full`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const emailIndex = selectedEmail ? config.emails.findIndex(e => e.id === selectedEmail.id) : -1;
+                    if (emailIndex >= 0) {
+                      setEditingAttachment({ emailIndex, attIndex });
+                      setShowAttachmentEditModal(true);
+                    }
+                  }}
+                  aria-label="Edit attachment content"
+                >
+                  <Edit3 className="w-4 h-4 text-[#1C1C1E] dark:text-[#F2F2F7]" />
+                </button>
+              </div>
+            )}
           </motion.div>
         ))}
       </div>
@@ -254,7 +277,7 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
     setSelectedEmailId(emailId);
     onSelectedEmailIdChange?.(emailId);
     onEmailSelect?.(emailId);
-    
+
     // Scroll to top of email content
     if (emailContentRef.current) {
       emailContentRef.current.scrollTop = 0;
@@ -746,6 +769,29 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
         isOpen={showPreviewModal}
         onClose={closePreviewModal}
       />
+
+      {/* Attachment Edit Modal */}
+      {selectedEmail && editingAttachment && (
+        <AttachmentEditModal
+          isOpen={showAttachmentEditModal}
+          initialValue={selectedEmail.attachments?.[editingAttachment.attIndex]?.content || ''}
+          onClose={() => {
+            setShowAttachmentEditModal(false);
+            setEditingAttachment(null);
+          }}
+          onSave={(newHtml) => {
+            const { emailIndex, attIndex } = editingAttachment;
+            if (updateTempConfigFn) {
+              updateTempConfigFn(`emails.${emailIndex}.attachments.${attIndex}.content`, newHtml);
+            } else {
+              console.warn('EditModeProvider not available for attachment content update');
+            }
+            setShowAttachmentEditModal(false);
+            setEditingAttachment(null);
+          }}
+          title="Edit Attachment Content"
+        />
+      )}
     </div>
   );
 }

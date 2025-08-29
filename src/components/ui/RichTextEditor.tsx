@@ -1,7 +1,5 @@
 import React from 'react';
-import ReactQuill from 'react-quill';
-import 'quill/dist/quill.snow.css';
-import './quill-custom.css';
+import { Editor } from '@tinymce/tinymce-react';
 
 interface RichTextEditorProps {
   value: string;
@@ -20,38 +18,32 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   className = "",
   disabled = false
 }) => {
-  const modules = {
-    toolbar: [
-      [{ 'header': [1, 2, 3, false] }],
-      ['bold', 'italic', 'underline', 'strike'],
-      [{ 'color': [] }, { 'background': [] }],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      [{ 'align': [] }],
-      ['link', 'image'],
-      ['clean'],
-      [{ 'code-block': true }]
-    ],
-  };
-
-  const formats = [
-    'header', 'bold', 'italic', 'underline', 'strike',
-    'color', 'background', 'list', 'bullet', 'align',
-    'link', 'image', 'code-block'
-  ];
-
   return (
     <div className={`rich-text-editor ${className} relative`}>
-      <ReactQuill
-        theme="snow"
+      <Editor
         value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        readOnly={disabled}
-        modules={modules}
-        formats={formats}
-        style={{ 
-          height: height,
-          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
+        onEditorChange={(content) => onChange(content)}
+        disabled={disabled}
+        tinymceScriptSrc={`${(process.env.PUBLIC_URL || '')}/tinymce/tinymce.min.js`}
+        licenseKey="gpl"
+        init={{
+          base_url: `${(process.env.PUBLIC_URL || '')}/tinymce`,
+          suffix: '.min',
+          height,
+          menubar: false,
+          plugins: [
+            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview', 'anchor',
+            'searchreplace', 'visualblocks', 'code', 'fullscreen', 'insertdatetime', 'media', 'table', 'help', 'wordcount'
+          ],
+          toolbar:
+            'undo redo | blocks | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | ' +
+            'bullist numlist outdent indent | link image | removeformat | code',
+          placeholder: placeholder || '',
+          verify_html: false,
+          valid_elements: '*[*]',
+          extended_valid_elements: '*[*]',
+          forced_root_block: '',
+          content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 14px; }',
         }}
       />
     </div>

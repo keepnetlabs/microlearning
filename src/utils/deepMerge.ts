@@ -6,9 +6,9 @@
 export const deepMerge = (target: any, source: any): any => {
   if (!source || typeof source !== 'object') return target;
   if (!target || typeof target !== 'object') return source;
-  
+
   const result = { ...target };
-  
+
   Object.keys(source).forEach(key => {
     if (Array.isArray(source[key])) {
       // For arrays, replace completely
@@ -16,14 +16,16 @@ export const deepMerge = (target: any, source: any): any => {
     } else if (source[key] && typeof source[key] === 'object') {
       // Special case: if source is object but target is array (like highlights/goals)
       // and source object has numeric keys, convert back to array
-      if (Array.isArray(target[key]) && 
-          Object.keys(source[key]).every(k => !isNaN(Number(k)))) {
-        const arrayResult: any[] = [];
+      if (Array.isArray(target[key]) &&
+        Object.keys(source[key]).every(k => !isNaN(Number(k)))) {
+        // Start from existing target array to preserve order and unmodified items
+        const arrayResult: any[] = [...target[key]];
         Object.keys(source[key]).forEach(index => {
-          arrayResult[Number(index)] = {
-            ...target[key][Number(index)],
-            ...source[key][index]
-          };
+          const idx = Number(index);
+          const targetItem = target[key][idx];
+          const sourceItem = source[key][index];
+          // Merge recursively to preserve nested structures
+          arrayResult[idx] = deepMerge(targetItem || {}, sourceItem);
         });
         result[key] = arrayResult;
       } else {
@@ -35,6 +37,6 @@ export const deepMerge = (target: any, source: any): any => {
       result[key] = source[key];
     }
   });
-  
+
   return result;
 };

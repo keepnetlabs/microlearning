@@ -1,6 +1,7 @@
 import * as LucideIcons from "lucide-react";
 import { motion } from "framer-motion";
-import React, { ReactNode, useMemo, useCallback, useState, useEffect } from "react";
+import React, { useMemo, useCallback, useState, useEffect } from "react";
+import { IntroSceneConfig } from "./intro/components";
 import { LucideIcon, ClockIcon, ChartBarIcon } from "lucide-react"
 import { FontWrapper } from "../common/FontWrapper";
 import { EditableText } from "../common/EditableText";
@@ -39,119 +40,7 @@ const getIconComponent = (iconName: string): LucideIcon => {
 };
 
 
-// Props interfaces
-interface HighlightItemData {
-  iconName: string;
-  text: string;
-  textColor: string;
-  liquidGlassBackground?: string;
-  liquidGlassBorder?: string;
-  liquidGlassBoxShadow?: string;
-  multiLayerGradient?: string;
-  radialHighlight?: string;
-  innerDepthGradient?: string;
-}
-
-interface ParticlesConfig {
-  enabled?: boolean;
-  count?: number;
-  color?: string;
-  baseDuration?: number;
-}
-
-interface IconConfig {
-  component?: ReactNode;
-  size?: number;
-  sparkleCount?: number;
-  sparkleEnabled?: boolean;
-  sparkleIconName?: string;
-  sceneIconName?: string;
-  className?: string;
-}
-
-interface SparklesConfig {
-  enabled?: boolean;
-  ambient?: {
-    count?: number;
-    opacity?: number;
-    size?: number;
-    duration?: number;
-    delay?: number;
-  };
-  floating?: {
-    count?: number;
-    opacity?: number;
-    size?: number;
-    duration?: number;
-    delay?: number;
-  };
-  twinkling?: {
-    count?: number;
-    opacity?: number;
-    size?: number;
-    duration?: number;
-    delay?: number;
-  };
-  gradient?: {
-    count?: number;
-    opacity?: number;
-    size?: number;
-    duration?: number;
-    delay?: number;
-  };
-  drifting?: {
-    count?: number;
-    opacity?: number;
-    size?: number;
-    duration?: number;
-    delay?: number;
-  };
-  breathing?: {
-    count?: number;
-    opacity?: number;
-    size?: number;
-    duration?: number;
-    delay?: number;
-  };
-}
-
-interface AnimationDelays {
-  welcomeDelay?: number;
-  iconDelay?: number;
-  titleDelay?: number;
-  subtitleDelay?: number;
-  cardDelay?: number;
-  statsDelay?: number;
-  ctaDelay?: number;
-}
-
-interface IntroSceneConfig {
-  // Content
-  title?: string;
-  subtitle?: string;
-  sectionTitle?: string;
-  highlights?: HighlightItemData[];
-  duration?: string;
-  level?: string;
-  callToActionText?: string | { mobile?: string; desktop?: string; };
-
-  // Visual configuration
-  particles?: ParticlesConfig;
-  icon?: IconConfig;
-  sparkles?: SparklesConfig;
-  card?: {
-    backgroundColor?: string;
-    borderColor?: string;
-    gradientFrom?: string;
-    gradientTo?: string;
-  };
-
-  // Layout
-  containerClassName?: string;
-
-  // Animation delays
-  animationDelays?: AnimationDelays;
-}
+// types already imported at top
 
 // moved imports to top
 

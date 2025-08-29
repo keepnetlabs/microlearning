@@ -30,3 +30,5 @@ yarn-error.log*
 
 # OS
 Thumbs.db 
+playwright-report/index.html
+.claude/settings.local.json

@@ -39,4 +39,40 @@ export type SparkleConfigType = {
 
 export type HighlightItemWithIcon = HighlightItemData & { Icon: LucideIcon; index: number };
 
+export interface SparklesConfig {
+    enabled?: boolean;
+    ambient?: { count?: number; opacity?: number; size?: number; duration?: number; delay?: number; };
+    floating?: { count?: number; opacity?: number; size?: number; duration?: number; delay?: number; };
+    twinkling?: { count?: number; opacity?: number; size?: number; duration?: number; delay?: number; };
+    gradient?: { count?: number; opacity?: number; size?: number; duration?: number; delay?: number; };
+    drifting?: { count?: number; opacity?: number; size?: number; duration?: number; delay?: number; };
+    breathing?: { count?: number; opacity?: number; size?: number; duration?: number; delay?: number; };
+}
+
+export interface AnimationDelays {
+    welcomeDelay?: number;
+    iconDelay?: number;
+    titleDelay?: number;
+    subtitleDelay?: number;
+    cardDelay?: number;
+    statsDelay?: number;
+    ctaDelay?: number;
+}
+
+export interface IntroSceneConfig {
+    title?: string;
+    subtitle?: string;
+    sectionTitle?: string;
+    highlights?: HighlightItemData[];
+    duration?: string;
+    level?: string;
+    callToActionText?: string | { mobile?: string; desktop?: string; };
+    particles?: ParticlesConfig;
+    icon?: IconConfig;
+    sparkles?: SparklesConfig;
+    card?: { backgroundColor?: string; borderColor?: string; gradientFrom?: string; gradientTo?: string; };
+    containerClassName?: string;
+    animationDelays?: AnimationDelays;
+}
+
 

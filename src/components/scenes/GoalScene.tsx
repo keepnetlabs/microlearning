@@ -1,4 +1,4 @@
-import { ReactNode, useMemo, memo, useState, useEffect, useCallback } from "react";
+import { useMemo, memo, useState, useEffect, useCallback } from "react";
 import { FontWrapper } from "../common/FontWrapper";
 import { EditableText } from "../common/EditableText";
 import { EditModeProvider } from "../../contexts/EditModeContext";
@@ -10,47 +10,14 @@ import { CallToAction } from "../ui/CallToAction";
 import { deepMerge } from "../../utils/deepMerge";
 import { GoalCard } from "./goal/components";
 import { getIconComponent } from "./goal/utils/icons";
-
+import { GoalSceneConfig } from "./goal/types";
 
 // Default values moved outside component to prevent recreation
 const DEFAULT_CONTAINER_CLASS = "flex flex-col items-center justify-center h-full text-center";
 const DEFAULT_CARD_SPACING = "space-y-6";
 const DEFAULT_MAX_WIDTH = "max-w-md w-full";
 
-// Props interfaces
-export interface GoalItem {
-  iconName: string; // "briefcase", "users", "shield" gibi
-  title: string;
-  subtitle?: string; // Optional subtitle
-  description: string;
-  iconColor: string;
-  strongBgGradient: string;
-  darkBgGradient: string;
-}
-
-interface IconConfig {
-  component?: ReactNode;
-  size?: number;
-  sceneIconName?: string;
-  className?: string;
-}
-
-interface GoalSceneConfig {
-  // Content props
-  title?: string;
-  subtitle?: string;
-  callToActionText?: string | { mobile?: string; desktop?: string; };
-  goals?: GoalItem[];
-
-  // Visual configuration
-  icon?: IconConfig;
-
-  // Layout props
-  containerClassName?: string;
-  cardSpacing?: string;
-  maxWidth?: string;
-
-}
+// moved type import to top
 
 // GoalCard moved to ./goal/components
 

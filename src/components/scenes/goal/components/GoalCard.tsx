@@ -3,16 +3,7 @@ import { motion } from "framer-motion";
 import { EditableText } from "../../../common/EditableText";
 import { LucideIcon } from "lucide-react";
 import { getIconComponent } from "../utils/icons";
-
-export interface GoalItem {
-    iconName: string;
-    title: string;
-    subtitle?: string;
-    description: string;
-    iconColor: string;
-    strongBgGradient: string;
-    darkBgGradient: string;
-}
+import { GoalItem } from "../types";
 
 export const GoalCard = memo(({ goal, index, isEditMode }: {
     goal: GoalItem;
