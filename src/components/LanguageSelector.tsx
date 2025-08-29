@@ -51,18 +51,33 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
 }) => {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
+  // Auto-focus search input when dropdown opens
+  React.useEffect(() => {
+    if (isDropdownOpen && searchInputRef.current) {
+      const timer = setTimeout(() => {
+        if (searchInputRef.current) {
+          searchInputRef.current.focus();
+          if (searchInputRef.current.value) {
+            searchInputRef.current.select();
+          }
+        }
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [isDropdownOpen]);
+
   const handleLanguageSelect = (languageCode: string) => {
     onLanguageChange(languageCode);
     onSearchChange('');
   };
 
   return (
-    <div 
-      className="relative" 
-      ref={dropdownRef} 
-      role="combobox" 
-      aria-haspopup="listbox" 
-      aria-expanded={isDropdownOpen} 
+    <div
+      className="relative"
+      ref={dropdownRef}
+      role="combobox"
+      aria-haspopup="listbox"
+      aria-expanded={isDropdownOpen}
       aria-controls="language-dropdown-list"
     >
       <motion.button

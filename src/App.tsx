@@ -21,9 +21,11 @@ import { QuizScene } from "./components/scenes/QuizScene";
 import { SurveyScene } from "./components/scenes/SurveyScene";
 import { SummaryScene } from "./components/scenes/SummaryScene";
 import { NudgeScene } from "./components/scenes/NudgeScene";
-import { getCountryCode, detectBrowserLanguage, useIsMobile, languages, resolveSupportedLanguage, normalizeBcp47Tag } from "./utils/languageUtils";
+import { useIsMobile } from "./utils/languageUtils";
 import { useFontFamily } from "./hooks/useFontFamily";
 import { useAppConfig } from "./hooks/useAppConfig";
+import { useLanguage } from "./hooks/useLanguage";
+import { useDarkMode } from "./hooks/useDarkMode";
 import { FontFamilyProvider } from "./contexts/FontFamilyContext";
 import { GlobalEditModeProvider } from "./contexts/GlobalEditModeContext";
 import { scormService, destroySCORMService } from "./utils/scormService";
@@ -107,34 +109,20 @@ export default function App(props: AppProps = {}) {
     }).filter(Boolean); // Remove null entries
   }, [appConfig.scenes, sceneComponentMap]);
 
-  // Available languages derived from microlearning.json → microlearning_metadata.language_availability
-  const availableLanguages = useMemo(() => {
-    const codes = Array.isArray((appConfig as any)?.microlearning_metadata?.language_availability)
-      ? ((appConfig as any).microlearning_metadata.language_availability as string[]).map(c => c.toLowerCase())
-      : [] as string[];
-    if (codes.length === 0) return [] as Array<{ code: string; name: string; flag: string }>;
-
-    const mapAvailabilityToLanguageCode = (code: string): string => {
-      switch (code.toLowerCase()) {
-        case 'gr':
-          return 'el';
-        case 'en-uk':
-          return 'en-gb';
-        default:
-          return code.toLowerCase();
-      }
-    };
-
-    return codes.map(code => {
-      const metaCode = mapAvailabilityToLanguageCode(code);
-      const meta = languages.find(l => l.code.toLowerCase() === metaCode);
-      return {
-        code, // keep original availability code for selection and API
-        name: meta?.name || code.toUpperCase(),
-        flag: meta?.flag || '🏳️'
-      };
-    });
-  }, [appConfig]);
+  // Language state/logic
+  const {
+    selectedLanguage,
+    currentLanguage,
+    isLanguageDropdownOpen,
+    languageSearchTerm,
+    filteredLanguages,
+    dropdownRef,
+    setIsLanguageDropdownOpen,
+    setLanguageSearchTerm,
+    onDropdownToggle,
+    handleLanguageChange,
+    getCountryCode
+  } = useLanguage({ appConfig, urlParams, normalizeUrlParam, testOverrides, changeLanguage });
 
   // Helper function to get scene index by type
   const getSceneIndexByType = useCallback((sceneType: string): number => {
@@ -160,11 +148,9 @@ export default function App(props: AppProps = {}) {
   const dynamicCssClasses = useMemo(() => ({
     // Ana container
     mainContainer: `min-h-screen ${themeConfig.colors?.background} dark:bg-gradient-to-br dark:from-gray-600 dark:via-gray-850 dark:to-gray-900 flex flex-col relative overflow-hidden transition-colors duration-300`,
-
     // Loading container
     loadingContainer: `flex items-center space-x-3 px-6 py-4 bg-${themeConfig.colors?.surface || 'white'}/90 dark:bg-gray-900/90 ${themeConfig.effects?.backdropBlur || 'backdrop-blur-xl'} ${themeConfig.effects?.borderRadius || 'rounded-2xl'} border border-${themeConfig.colors?.surface || 'white'}/${themeConfig.effects?.borderOpacity || '60'} dark:border-gray-600/60 ${themeConfig.effects?.shadow || 'shadow-xl'} transition-colors duration-300`,
     loadingSpinner: `animate-spin`,
-
     // Content card
     contentCard: `relative inset-0 w-full h-full overflow-hidden transition-colors duration-300`,
 
@@ -173,7 +159,6 @@ export default function App(props: AppProps = {}) {
 
     // Language dropdown
     languageDropdown: `absolute top-full right-0 mt-1 w-64 bg-${themeConfig.colors?.surface || 'white'}/95 dark:bg-gray-900/95 backdrop-blur-xl border border-${themeConfig.colors?.surface || 'white'}/60 dark:border-gray-600/60 rounded-xl shadow-xl shadow-black/10 dark:shadow-black/30 transition-all duration-300 z-50`,
-
 
     // Quiz notification
     quizNotificationContent: `relative px-4 py-2 glass-border-1 text-sm text-[#1C1C1E] dark:text-[#F2F2F7] group`,
@@ -200,38 +185,10 @@ export default function App(props: AppProps = {}) {
 
   const [currentScene, setCurrentScene] = useState(initialScene ?? 0);
   const [direction, setDirection] = useState(0);
-  const [selectedLanguage, setSelectedLanguage] = useState(() => {
-    // First try to get language from URL langUrl parameter (e.g., lang/tr -> tr)
-    const langUrl = normalizeUrlParam(urlParams?.get('langUrl'));
-    if (langUrl && langUrl.startsWith('lang/')) {
-      const langFromUrl = langUrl.split('/')[1];
-      if (langFromUrl) {
-        return normalizeBcp47Tag(langFromUrl);
-      }
-    }
-    // Fallback to test overrides or browser language
-    return normalizeBcp47Tag(testOverrides?.language ?? detectBrowserLanguage());
-  });
+  // language state moved to useLanguage
   const [resumeApplied, setResumeApplied] = useState(false);
 
-  // Dil değişikliği handler'ı - appConfig'i günceller
-  const handleLanguageChange = useCallback((newLanguage: string) => {
-    // Guard: only allow languages present in availability list (if provided)
-    if (availableLanguages.length > 0) {
-      const allowed = new Set(availableLanguages.map(l => l.code.toLowerCase()));
-      if (!allowed.has(newLanguage.toLowerCase())) {
-        return;
-      }
-    }
-    setSelectedLanguage(newLanguage);
-    // Use the changeLanguage function from the hook
-    changeLanguage(newLanguage);
-
-    // LocalStorage'a kaydet
-    localStorage.setItem('selected-language', newLanguage);
-  }, [availableLanguages, changeLanguage]);
-  const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
-  const [languageSearchTerm, setLanguageSearchTerm] = useState('');
+  // language handlers and ui state moved to useLanguage
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [inboxCompleted, setInboxCompleted] = useState(false);
   const [videoCompleted, setVideoCompleted] = useState(false);
@@ -264,9 +221,7 @@ export default function App(props: AppProps = {}) {
   const [quizDraggedItems, setQuizDraggedItems] = useState<Map<string, string>>(new Map());
   const [quizSelectedItem, setQuizSelectedItem] = useState<string | null>(null);
 
-  // Dropdown refs for click outside handling
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const searchInputRef = useRef<HTMLInputElement>(null);
+  // Dropdown search input ref removed (managed by LanguageSelector)
   const surveyToastTimeoutRef = useRef<number | null>(null);
 
   // Stabilized state setters with useCallback to prevent unnecessary re-renders
@@ -320,28 +275,8 @@ export default function App(props: AppProps = {}) {
   const touchEndY = useRef<number>(0);
   const [isSwiping, setIsSwiping] = useState(false);
 
-  // Dark mode state - Light mode is now primary/default
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    if (testOverrides?.isDarkMode !== undefined) {
-      return testOverrides.isDarkMode;
-    }
-    if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('theme-preference');
-      if (savedTheme) {
-        return savedTheme === 'dark';
-      }
-      // Default to light mode - dark mode is secondary option
-      return false;
-    }
-    return false;
-  });
-
-  // Keep isDarkMode in sync with test override if provided
-  useEffect(() => {
-    if (testOverrides?.isDarkMode !== undefined) {
-      setIsDarkMode(testOverrides.isDarkMode);
-    }
-  }, [testOverrides?.isDarkMode]);
+  // Dark mode logic via hook
+  const { isDarkMode, toggleDarkMode } = useDarkMode({ testOverrides });
 
   // Refs for scroll container and parallax background
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -349,55 +284,7 @@ export default function App(props: AppProps = {}) {
   // Parallax scroll state for background movement
   const [scrollY, setScrollY] = useState(0);
 
-  // Apply dark mode to document
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const root = window.document.documentElement;
-      if (isDarkMode) {
-        root.classList.add('dark');
-      } else {
-        root.classList.remove('dark');
-      }
-      localStorage.setItem('theme-preference', isDarkMode ? 'dark' : 'light');
-    }
-  }, [isDarkMode]);
-
-
-  // Listen for system theme changes only if no manual preference exists
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-
-      const handleSystemThemeChange = (e: MediaQueryListEvent) => {
-        const savedTheme = localStorage.getItem('theme-preference');
-        // Only auto-switch if user hasn't manually set a preference
-        if (!savedTheme) {
-          setIsDarkMode(e.matches);
-        }
-      };
-
-      mediaQuery.addEventListener('change', handleSystemThemeChange);
-      return () => mediaQuery.removeEventListener('change', handleSystemThemeChange);
-    }
-  }, []);
-
-  // Simplified toggle theme function
-  const toggleTheme = useCallback(() => {
-    setIsDarkMode(prev => !prev);
-  }, []);
-
-  // Desktop keyboard shortcut: Ctrl + Shift + D (keep for power users)
-  useEffect(() => {
-    const handleKeyboardShortcut = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.shiftKey && e.key === 'D') {
-        e.preventDefault();
-        toggleTheme();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyboardShortcut);
-    return () => window.removeEventListener('keydown', handleKeyboardShortcut);
-  }, [toggleTheme]);
+  // toggleTheme now comes from hook
 
   // Optimized achievement notification - only show for NEW achievements in key scenes
   useEffect(() => {
@@ -472,7 +359,7 @@ export default function App(props: AppProps = {}) {
     if (!isMobile) {
       setScrollY(scrollTop);
     }
-  }, [isMobile, currentScene]);
+  }, [isMobile, currentScene, sceneIndices.goal]);
 
   // Scroll to top function
   const handleScrollToTop = useCallback(() => {
@@ -484,19 +371,7 @@ export default function App(props: AppProps = {}) {
     }
   }, []);
 
-  // Ultra-optimized language filtering
-  const filteredLanguages = useMemo(() => {
-    const source = availableLanguages.length > 0 ? availableLanguages : [] as typeof availableLanguages;
-    if (!languageSearchTerm) {
-      return source; // Return unsorted when no search term
-    }
-
-    const searchTerm = languageSearchTerm.toLowerCase();
-    return source.filter(lang =>
-      lang.name.toLowerCase().includes(searchTerm) ||
-      lang.code.toLowerCase().includes(searchTerm)
-    );
-  }, [languageSearchTerm, availableLanguages]);
+  // Language filtering handled by useLanguage
 
   const canProceedNext = useCallback(() => {
     if (currentScene === sceneIndices.quiz) {
@@ -561,7 +436,6 @@ export default function App(props: AppProps = {}) {
     const seconds = Math.floor((totalTimeSpent % 60000) / 1000);
     const timeSpentString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-
     return {
       totalPoints,
       timeSpent: timeSpentString,
@@ -569,10 +443,10 @@ export default function App(props: AppProps = {}) {
     };
   }, [totalPoints, sceneTimeSpent, currentScene, sceneIndices.summary]);
 
-  // Component unmount olduğunda SCORM'u temizle
+  // Component mount/unmount: initialize/cleanup SCORM (run once)
   useEffect(() => {
     scormService.initializeMicrolearning();
-    trackSceneTime(0);
+    setSceneStartTimes(prev => new Map(prev.set(0, Date.now())));
     return () => {
       destroySCORMService();
     };
@@ -664,55 +538,22 @@ export default function App(props: AppProps = {}) {
     testOverrides?.disableDelays
   ]);
 
-  // Keyboard navigation
+  // Keyboard navigation (Escape handling lives in useLanguage)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight' && canProceedNext()) {
         nextScene();
       } else if (e.key === 'ArrowLeft' && currentScene > 0) {
         prevScene();
-      } else if (e.key === 'Escape' && isLanguageDropdownOpen) {
-        setIsLanguageDropdownOpen(false);
-        setLanguageSearchTerm('');
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [canProceedNext, nextScene, prevScene, isLanguageDropdownOpen]);
+  }, [canProceedNext, nextScene, prevScene, currentScene]);
 
-  // Click outside handling for dropdown
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsLanguageDropdownOpen(false);
-        setLanguageSearchTerm('');
-      }
-    };
 
-    if (isLanguageDropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [isLanguageDropdownOpen]);
-
-  // Focus management for dropdown
-  useEffect(() => {
-    if (isLanguageDropdownOpen && searchInputRef.current) {
-      // Small delay to ensure dropdown is rendered
-      const timer = setTimeout(() => {
-        if (searchInputRef.current) {
-          searchInputRef.current.focus();
-          // Also select the text if there's any
-          if (searchInputRef.current.value) {
-            searchInputRef.current.select();
-          }
-        }
-      }, 150);
-
-      return () => clearTimeout(timer);
-    }
-  }, [isLanguageDropdownOpen]);
+  // Focus management moved into LanguageSelector
 
   const handleQuizCompleted = useCallback(() => {
     setQuizCompleted(true);
@@ -748,7 +589,7 @@ export default function App(props: AppProps = {}) {
       nextScene();
       surveyToastTimeoutRef.current = null;
     }, testOverrides?.disableDelays ? 0 : 2000);
-  }, [nextScene]);
+  }, [nextScene, testOverrides?.disableDelays]);
 
   // Mobile swipe gesture handlers - ONLY FOR MOBILE
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
@@ -867,26 +708,7 @@ export default function App(props: AppProps = {}) {
     return () => { cancelled = true; };
   }, [hasScenes, scenes.length, resumeApplied]);
   const CurrentSceneComponent = (hasScenes ? scenes[currentScene].component : (() => null)) as React.ComponentType<any>;
-  const currentLanguage = useMemo(() => {
-    const source = availableLanguages.length > 0 ? availableLanguages : languages;
-    const exact = source.find(lang => lang.code === selectedLanguage);
-    if (exact) return exact;
-    const lower = source.find(lang => lang.code.toLowerCase() === selectedLanguage.toLowerCase());
-    if (lower) return lower;
-    const primary = selectedLanguage.split('-')[0].toLowerCase();
-    const primaryMatch = source.find(lang => lang.code.split('-')[0].toLowerCase() === primary);
-    return primaryMatch || source[0];
-  }, [selectedLanguage, availableLanguages]);
-
-  // Ensure selectedLanguage is valid once availableLanguages come from config
-  useEffect(() => {
-    if (availableLanguages.length === 0) return;
-    const supported = availableLanguages.map(l => l.code);
-    const resolved = resolveSupportedLanguage(selectedLanguage, supported, availableLanguages[0]?.code);
-    if (resolved && resolved !== selectedLanguage) {
-      setSelectedLanguage(resolved);
-    }
-  }, [availableLanguages, selectedLanguage]);
+  // currentLanguage and selectedLanguage validation handled by useLanguage
   const currentSceneConfig = hasScenes ? scenes[currentScene].config : undefined;
   const isFirstOrLastScene = currentScene === 0 || currentScene === scenes.length - 1;
 
@@ -919,410 +741,410 @@ export default function App(props: AppProps = {}) {
     <MotionConfig reducedMotion={reducedMotionSetting}>
       <GlobalEditModeProvider>
         <FontFamilyProvider fontFamilyConfig={themeConfig.fontFamily}>
-        <div
-          className={cssClasses.mainContainer}
-          style={{
-            // Hardware acceleration for better mobile performance
-            transform: 'translateZ(0)',
-            willChange: 'transform',
-            ...fontStyles.primary
-          }}
-          data-testid="app-root"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          role="application"
-          aria-label={appConfig.theme?.ariaTexts?.appLabel || "Cyber Security Training Application"}
-          aria-describedby="app-description"
-        >
-          {/* Hidden description for screen readers */}
-          <div id="app-description" className="sr-only">
-            {appConfig.theme?.ariaTexts?.appDescription || "Interactive cyber security training application with multiple learning modules and progress tracking"}
-          </div>
-          {/* Loading Overlay - Show during config load (all devices), and during scene load (desktop only) */}
-          <LoadingOverlay
-            show={isConfigLoading || (isLoading && !isMobile) || !hasScenes}
-            hasScenes={hasScenes}
-            loadingText={themeConfig.texts?.loading}
-            ariaLabel={appConfig.theme?.ariaTexts?.loadingLabel || "Loading content"}
-          />
-
-          {/* Optimized background - Disabled on mobile for performance */}
-          <BackgroundContainer
-            show={!isMobile}
-            scrollY={scrollY}
-          />
-
-          {/* Optimized Mobile Header - Enhanced dark mode contrast */}
-          <header
-            className={`${cssClasses.headerContainer} ${isIOS && currentScene >= 4 ? 'pt-2.5' : ''}`}
-            role="banner"
-            aria-label={appConfig.theme?.ariaTexts?.headerLabel || "Application header"}
+          <div
+            className={cssClasses.mainContainer}
+            style={{
+              // Hardware acceleration for better mobile performance
+              transform: 'translateZ(0)',
+              willChange: 'transform',
+              ...fontStyles.primary
+            }}
+            data-testid="app-root"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            role="application"
+            aria-label={appConfig.theme?.ariaTexts?.appLabel || "Cyber Security Training Application"}
+            aria-describedby="app-description"
           >
-            <div className={cssClasses.headerContent}>
-              {/* Header Layout - Logo Left, Progress Center, Controls Right */}
-              <div className="flex items-center justify-between">
-                {/* Left - Logo */}
-                <HeaderLogo
-                  isMobile={isMobile}
-                  isFirstOrLastScene={isFirstOrLastScene}
-                  isDarkMode={isDarkMode}
-                  themeConfig={themeConfig}
-                  appConfig={appConfig}
-                />
+            {/* Hidden description for screen readers */}
+            <div id="app-description" className="sr-only">
+              {appConfig.theme?.ariaTexts?.appDescription || "Interactive cyber security training application with multiple learning modules and progress tracking"}
+            </div>
+            {/* Loading Overlay - Show during config load (all devices), and during scene load (desktop only) */}
+            <LoadingOverlay
+              show={isConfigLoading || (isLoading && !isMobile) || !hasScenes}
+              hasScenes={hasScenes}
+              loadingText={themeConfig.texts?.loading}
+              ariaLabel={appConfig.theme?.ariaTexts?.loadingLabel || "Loading content"}
+            />
 
-                {/* Center - Progress Bar */}
-                <div className="flex-1" role="progressbar" aria-label={appConfig.theme?.ariaTexts?.progressLabel || "Training progress"}>
-                  <div className="relative" data-testid="progress-bar">
-                    <MemoizedProgressBar
-                      currentScene={currentScene + 1}
-                      totalScenes={scenes.length}
-                      language={selectedLanguage}
-                      reducedMotion={reducedMotionBool}
-                      startLabel={themeConfig.texts?.startLabel}
-                      completedLabel={themeConfig.texts?.completedLabel}
-                      progressLabel={themeConfig.texts?.progressLabel}
-                      ariaLabel="Training progress"
+            {/* Optimized background - Disabled on mobile for performance */}
+            <BackgroundContainer
+              show={!isMobile}
+              scrollY={scrollY}
+            />
+
+            {/* Optimized Mobile Header - Enhanced dark mode contrast */}
+            <header
+              className={`${cssClasses.headerContainer} ${isIOS && currentScene >= 4 ? 'pt-2.5' : ''}`}
+              role="banner"
+              aria-label={appConfig.theme?.ariaTexts?.headerLabel || "Application header"}
+            >
+              <div className={cssClasses.headerContent}>
+                {/* Header Layout - Logo Left, Progress Center, Controls Right */}
+                <div className="flex items-center justify-between">
+                  {/* Left - Logo */}
+                  <HeaderLogo
+                    isMobile={isMobile}
+                    isFirstOrLastScene={isFirstOrLastScene}
+                    isDarkMode={isDarkMode}
+                    themeConfig={themeConfig}
+                    appConfig={appConfig}
+                  />
+
+                  {/* Center - Progress Bar */}
+                  <div className="flex-1" role="progressbar" aria-label={appConfig.theme?.ariaTexts?.progressLabel || "Training progress"}>
+                    <div className="relative" data-testid="progress-bar">
+                      <MemoizedProgressBar
+                        currentScene={currentScene + 1}
+                        totalScenes={scenes.length}
+                        language={selectedLanguage}
+                        reducedMotion={reducedMotionBool}
+                        startLabel={themeConfig.texts?.startLabel}
+                        completedLabel={themeConfig.texts?.completedLabel}
+                        progressLabel={themeConfig.texts?.progressLabel}
+                        ariaLabel="Training progress"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Right - Controls */}
+                  <div className={cssClasses.controlsContainer}>
+                    {/* ENHANCED LIQUID GLASS POINTS BADGE - Mobile Optimized */}
+                    <PointsBadge
+                      totalPoints={totalPoints}
+                      isMobile={isMobile}
+                      ariaLabel={appConfig.theme?.ariaTexts?.pointsLabel || "Total points earned"}
+                      pointsDescription={appConfig.theme?.ariaTexts?.pointsDescription || "points earned"}
+                    />
+
+                    {/* ENHANCED LIQUID GLASS THEME TOGGLE BUTTON - Mobile Optimized */}
+                    <ThemeToggleButton
+                      isDarkMode={isDarkMode}
+                      onClick={toggleDarkMode}
+                      lightModeLabel={themeConfig.texts?.toggleButtonLightMode}
+                      darkModeLabel={themeConfig.texts?.toggleButtonDarkMode}
+                      description={appConfig.theme?.ariaTexts?.themeToggleDescription || "Toggle between light and dark theme"}
+                    />
+
+                    {/* ENHANCED LIQUID GLASS LANGUAGE SELECTOR - Mobile Optimized */}
+                    <LanguageSelector
+                      currentLanguage={currentLanguage}
+                      selectedLanguage={selectedLanguage}
+                      isDropdownOpen={isLanguageDropdownOpen}
+                      isMobile={isMobile}
+                      searchTerm={languageSearchTerm}
+                      filteredLanguages={filteredLanguages}
+                      dropdownRef={dropdownRef}
+                      onDropdownToggle={onDropdownToggle}
+                      onLanguageChange={(code) => {
+                        handleLanguageChange(code);
+                        setIsLanguageDropdownOpen(false);
+                      }}
+                      onSearchChange={setLanguageSearchTerm}
+                      getCountryCode={getCountryCode}
+                      ariaLabels={{
+                        selectorLabel: appConfig.theme?.ariaTexts?.languageSelectorLabel || "Language selector",
+                        selectorDescription: appConfig.theme?.ariaTexts?.languageSelectorDescription || "Select your preferred language for the application",
+                        listLabel: appConfig.theme?.ariaTexts?.languageListLabel || "Language Selector",
+                        listDescription: appConfig.theme?.ariaTexts?.languageListDescription || "List of available languages for the application",
+                        searchDescription: appConfig.theme?.ariaTexts?.languageSearchDescription
+                      }}
+                      texts={{
+                        languageNotFound: themeConfig.texts?.languageNotFound
+                      }}
                     />
                   </div>
                 </div>
-
-                {/* Right - Controls */}
-                <div className={cssClasses.controlsContainer}>
-                  {/* ENHANCED LIQUID GLASS POINTS BADGE - Mobile Optimized */}
-                  <PointsBadge
-                    totalPoints={totalPoints}
-                    isMobile={isMobile}
-                    ariaLabel={appConfig.theme?.ariaTexts?.pointsLabel || "Total points earned"}
-                    pointsDescription={appConfig.theme?.ariaTexts?.pointsDescription || "points earned"}
-                  />
-
-                  {/* ENHANCED LIQUID GLASS THEME TOGGLE BUTTON - Mobile Optimized */}
-                  <ThemeToggleButton
+              </div>
+            </header>
+            {/* Navigation Area - Optimized spacing */}
+            <main className="flex-1 relative sm:flex sm:items-center" role="main" aria-label={appConfig.theme?.ariaTexts?.contentLabel || "Training content area"}>
+              {/* Left Navigation - Hidden on mobile and only show when active */}
+              {currentScene > 0 && (
+                <div className="absolute left-2 sm:left-4 z-30 top-1/2 transform -translate-y-1/2 hidden md:block" data-testid="nav-prev">
+                  <MemoizedNavButton
+                    direction="prev"
+                    onClick={prevScene}
+                    disabled={false}
+                    label="Önceki bölüm"
                     isDarkMode={isDarkMode}
-                    onClick={toggleTheme}
-                    lightModeLabel={themeConfig.texts?.toggleButtonLightMode}
-                    darkModeLabel={themeConfig.texts?.toggleButtonDarkMode}
-                    description={appConfig.theme?.ariaTexts?.themeToggleDescription || "Toggle between light and dark theme"}
-                  />
-
-                  {/* ENHANCED LIQUID GLASS LANGUAGE SELECTOR - Mobile Optimized */}
-                  <LanguageSelector
-                    currentLanguage={currentLanguage}
-                    selectedLanguage={selectedLanguage}
-                    isDropdownOpen={isLanguageDropdownOpen}
-                    isMobile={isMobile}
-                    searchTerm={languageSearchTerm}
-                    filteredLanguages={filteredLanguages}
-                    dropdownRef={dropdownRef}
-                    onDropdownToggle={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
-                    onLanguageChange={(code) => {
-                      handleLanguageChange(code);
-                      setIsLanguageDropdownOpen(false);
-                    }}
-                    onSearchChange={setLanguageSearchTerm}
-                    getCountryCode={getCountryCode}
-                    ariaLabels={{
-                      selectorLabel: appConfig.theme?.ariaTexts?.languageSelectorLabel || "Language selector",
-                      selectorDescription: appConfig.theme?.ariaTexts?.languageSelectorDescription || "Select your preferred language for the application",
-                      listLabel: appConfig.theme?.ariaTexts?.languageListLabel || "Language Selector",
-                      listDescription: appConfig.theme?.ariaTexts?.languageListDescription || "List of available languages for the application",
-                      searchDescription: appConfig.theme?.ariaTexts?.languageSearchDescription
-                    }}
-                    texts={{
-                      languageNotFound: themeConfig.texts?.languageNotFound
-                    }}
                   />
                 </div>
-              </div>
-            </div>
-          </header>
-          {/* Navigation Area - Optimized spacing */}
-          <main className="flex-1 relative sm:flex sm:items-center" role="main" aria-label={appConfig.theme?.ariaTexts?.contentLabel || "Training content area"}>
-            {/* Left Navigation - Hidden on mobile and only show when active */}
-            {currentScene > 0 && (
-              <div className="absolute left-2 sm:left-4 z-30 top-1/2 transform -translate-y-1/2 hidden md:block" data-testid="nav-prev">
-                <MemoizedNavButton
-                  direction="prev"
-                  onClick={prevScene}
-                  disabled={false}
-                  label="Önceki bölüm"
-                  isDarkMode={isDarkMode}
-                />
-              </div>
-            )}
-            {/* APPLE VISIONOS FLOATING GLASS CARD - Enhanced prominence with darker background */}
-            <div className="flex-1 mx-2 sm:mx-4 md:mx-16 lg:mx-20 xl:mx-24 sm:my-3 md:my-6 sm:flex sm:items-center sm:justify-center">
-              <div className="w-full sm:h-[calc(100vh-140px)] relative mb-2 sm:mb-0">
-                <AnimatePresence initial={false} custom={direction} mode="wait">
-                  <motion.div
-                    key={currentScene}
-                    custom={direction}
-                    variants={slideVariants}
-                    initial="enter"
-                    animate="center"
-                    exit="exit"
-                    transition={slideTransition}
-                    className={`${cssClasses.contentCard} ${!isMobile ? 'glass-border-2' : 'glass-desktop-2'}`}
-                    onAnimationComplete={handleAnimationComplete}
-                    whileHover={!isMobile ? {
-                      y: -2,
-                      scale: 1.002,
-                      transition: { type: "spring", stiffness: 400, damping: 25 }
-                    } : undefined}
-                    style={{
-                      // Hardware acceleration + Card stays anchored during scroll
-                      transform: 'translateZ(0)',
-                      willChange: 'transform',
-                      transformStyle: "preserve-3d",
-                      transformOrigin: "center center",
-                      // Dark mode specific styling
-                      ...(isDarkMode && {
-                        background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.06) 100%)',
-                        backdropFilter: 'blur(24px)',
-                        WebkitBackdropFilter: 'blur(24px)'
-                      }),
-                      // Light mode styling
-                      ...(!isDarkMode && {
-                        backdropFilter: isMobile ? 'blur(12px)' : 'blur(24px)',
-                        WebkitBackdropFilter: isMobile ? 'blur(12px)' : 'blur(24px)'
-                      })
-                    }}
-                  >
-                    {/* Content Scroll Container - ANCHORED (doesn't move with parallax) */}
-                    <div
-                      ref={scrollContainerRef}
-                      className="relative z-10 h-full overflow-y-auto overflow-x-hidden scroll-smooth"
-                      onScroll={handleScroll}
-                      role="main"
-                      aria-label={appConfig.theme?.ariaTexts?.contentLabel || "Training content"}
-                      aria-describedby="content-description"
+              )}
+              {/* APPLE VISIONOS FLOATING GLASS CARD - Enhanced prominence with darker background */}
+              <div className="flex-1 mx-2 sm:mx-4 md:mx-16 lg:mx-20 xl:mx-24 sm:my-3 md:my-6 sm:flex sm:items-center sm:justify-center">
+                <div className="w-full sm:h-[calc(100vh-140px)] relative mb-2 sm:mb-0">
+                  <AnimatePresence initial={false} custom={direction} mode="wait">
+                    <motion.div
+                      key={currentScene}
+                      custom={direction}
+                      variants={slideVariants}
+                      initial="enter"
+                      animate="center"
+                      exit="exit"
+                      transition={slideTransition}
+                      className={`${cssClasses.contentCard} ${!isMobile ? 'glass-border-2' : 'glass-desktop-2'}`}
+                      onAnimationComplete={handleAnimationComplete}
+                      whileHover={!isMobile ? {
+                        y: -2,
+                        scale: 1.002,
+                        transition: { type: "spring", stiffness: 400, damping: 25 }
+                      } : undefined}
                       style={{
-                        scrollbarWidth: 'thin',
-                        WebkitOverflowScrolling: 'touch',
-                        scrollbarColor: 'transparent transparent',
-                        touchAction: 'pan-y',
-                        overscrollBehavior: 'contain',
-                        // Hardware acceleration
-                        transform: 'translateZ(0)'
+                        // Hardware acceleration + Card stays anchored during scroll
+                        transform: 'translateZ(0)',
+                        willChange: 'transform',
+                        transformStyle: "preserve-3d",
+                        transformOrigin: "center center",
+                        // Dark mode specific styling
+                        ...(isDarkMode && {
+                          background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.06) 100%)',
+                          backdropFilter: 'blur(24px)',
+                          WebkitBackdropFilter: 'blur(24px)'
+                        }),
+                        // Light mode styling
+                        ...(!isDarkMode && {
+                          backdropFilter: isMobile ? 'blur(12px)' : 'blur(24px)',
+                          WebkitBackdropFilter: isMobile ? 'blur(12px)' : 'blur(24px)'
+                        })
                       }}
-                      data-testid="scene-scroll"
                     >
-                      {/* Hidden description for screen readers */}
-                      <div id="content-description" className="sr-only">
-                        {appConfig.theme?.ariaTexts?.contentDescription || "Scrollable training content area with interactive learning modules"}
-                      </div>
-                      {/* Optimized Content Padding - Industry Standards */}
-                      <div className="p-2 py-0 sm:p-3 sm:py-4 md:p-4 lg:p-5">
-                        <motion.div
-                          initial={{ opacity: 0, y: isMobile ? 20 : 30 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{
-                            duration: isMobile ? 0.4 : 0.6,
-                            delay: isMobile ? 0.2 : 0.4,
-                            ease: [0.25, 0.46, 0.45, 0.94]
-                          }}
-                          className="w-full"
-                        >
-                          {/* Quiz Scene - Render only when active to avoid config mismatch */}
-                          {hasScenes && currentScene === sceneIndices.quiz && currentSceneConfig && (
-                            <div data-scene-type={(currentSceneConfig as any)?.scene_type || 'quiz'} data-scene-id={(scenes[currentScene] as any)?.sceneId}>
-                              <MemoizedQuizScene
-                                config={currentSceneConfig}
+                      {/* Content Scroll Container - ANCHORED (doesn't move with parallax) */}
+                      <div
+                        ref={scrollContainerRef}
+                        className="relative z-10 h-full overflow-y-auto overflow-x-hidden scroll-smooth"
+                        onScroll={handleScroll}
+                        role="main"
+                        aria-label={appConfig.theme?.ariaTexts?.contentLabel || "Training content"}
+                        aria-describedby="content-description"
+                        style={{
+                          scrollbarWidth: 'thin',
+                          WebkitOverflowScrolling: 'touch',
+                          scrollbarColor: 'transparent transparent',
+                          touchAction: 'pan-y',
+                          overscrollBehavior: 'contain',
+                          // Hardware acceleration
+                          transform: 'translateZ(0)'
+                        }}
+                        data-testid="scene-scroll"
+                      >
+                        {/* Hidden description for screen readers */}
+                        <div id="content-description" className="sr-only">
+                          {appConfig.theme?.ariaTexts?.contentDescription || "Scrollable training content area with interactive learning modules"}
+                        </div>
+                        {/* Optimized Content Padding - Industry Standards */}
+                        <div className="p-2 py-0 sm:p-3 sm:py-4 md:p-4 lg:p-5">
+                          <motion.div
+                            initial={{ opacity: 0, y: isMobile ? 20 : 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{
+                              duration: isMobile ? 0.4 : 0.6,
+                              delay: isMobile ? 0.2 : 0.4,
+                              ease: [0.25, 0.46, 0.45, 0.94]
+                            }}
+                            className="w-full"
+                          >
+                            {/* Quiz Scene - Render only when active to avoid config mismatch */}
+                            {hasScenes && currentScene === sceneIndices.quiz && currentSceneConfig && (
+                              <div data-scene-type={(currentSceneConfig as any)?.scene_type || 'quiz'} data-scene-id={(scenes[currentScene] as any)?.sceneId}>
+                                <MemoizedQuizScene
+                                  config={currentSceneConfig}
+                                  sceneId={(scenes[currentScene] as any)?.sceneId}
+                                  onQuizCompleted={handleQuizCompleted}
+                                  onNextSlide={nextScene}
+                                  isVisible={true}
+                                  currentQuestionIndex={quizCurrentQuestionIndex}
+                                  setCurrentQuestionIndex={setQuizCurrentQuestionIndex}
+                                  answers={quizAnswers}
+                                  setAnswers={setQuizAnswersStable}
+                                  showResult={quizShowResult}
+                                  setShowResult={setQuizShowResultStable}
+                                  attempts={quizAttempts}
+                                  setAttempts={setQuizAttemptsStable}
+                                  isAnswerLocked={quizIsAnswerLocked}
+                                  setIsAnswerLocked={setQuizIsAnswerLockedStable}
+                                  isLoading={quizIsLoading}
+                                  setIsLoading={setQuizIsLoadingStable}
+                                  multiSelectAnswers={quizMultiSelectAnswers}
+                                  setMultiSelectAnswers={setQuizMultiSelectAnswers}
+                                  sliderValue={quizSliderValue}
+                                  setSliderValue={setQuizSliderValue}
+                                  draggedItems={quizDraggedItems}
+                                  setDraggedItems={setQuizDraggedItems}
+                                  selectedItem={quizSelectedItem}
+                                  setSelectedItem={setQuizSelectedItem}
+                                  questionLoadingText={themeConfig.texts?.questionLoading}
+                                  isDarkMode={isDarkMode}
+                                  reducedMotion={reducedMotionBool}
+                                  disableDelays={disableDelaysBool}
+                                />
+                              </div>
+                            )}
+
+                            {/* Other scenes */}
+                            {hasScenes && currentScene !== sceneIndices.quiz && currentSceneConfig && (
+                              <CurrentSceneComponent config={currentSceneConfig}
                                 sceneId={(scenes[currentScene] as any)?.sceneId}
-                                onQuizCompleted={handleQuizCompleted}
+                                onSurveySubmitted={handleSurveySubmitted}
+                                surveyState={currentScene === sceneIndices.survey ? surveyState : undefined}
+                                onSurveyStateChange={currentScene === sceneIndices.survey ? setSurveyState : undefined}
+                                completionData={currentScene === sceneIndices.summary ? completionData : undefined}
+                                onInboxCompleted={currentSceneConfig?.scene_type === 'actionable_content' ? handleInboxCompleted : undefined}
+                                onVideoCompleted={currentSceneConfig?.scene_type === 'scenario' ? handleVideoCompleted : undefined}
+                                isVideoCompleted={currentSceneConfig?.scene_type === 'scenario' ? videoCompleted : undefined}
+                                onIsVideoCompletedChange={currentSceneConfig?.scene_type === 'scenario' ? setVideoCompleted : undefined}
                                 onNextSlide={nextScene}
-                                isVisible={true}
-                                currentQuestionIndex={quizCurrentQuestionIndex}
-                                setCurrentQuestionIndex={setQuizCurrentQuestionIndex}
-                                answers={quizAnswers}
-                                setAnswers={setQuizAnswersStable}
-                                showResult={quizShowResult}
-                                setShowResult={setQuizShowResultStable}
-                                attempts={quizAttempts}
-                                setAttempts={setQuizAttemptsStable}
-                                isAnswerLocked={quizIsAnswerLocked}
-                                setIsAnswerLocked={setQuizIsAnswerLockedStable}
-                                isLoading={quizIsLoading}
-                                setIsLoading={setQuizIsLoadingStable}
-                                multiSelectAnswers={quizMultiSelectAnswers}
-                                setMultiSelectAnswers={setQuizMultiSelectAnswers}
-                                sliderValue={quizSliderValue}
-                                setSliderValue={setQuizSliderValue}
-                                draggedItems={quizDraggedItems}
-                                setDraggedItems={setQuizDraggedItems}
-                                selectedItem={quizSelectedItem}
-                                setSelectedItem={setQuizSelectedItem}
-                                questionLoadingText={themeConfig.texts?.questionLoading}
-                                isDarkMode={isDarkMode}
                                 reducedMotion={reducedMotionBool}
                                 disableDelays={disableDelaysBool}
+                                selectedLanguage={selectedLanguage}
                               />
-                            </div>
-                          )}
-
-                          {/* Other scenes */}
-                          {hasScenes && currentScene !== sceneIndices.quiz && currentSceneConfig && (
-                            <CurrentSceneComponent config={currentSceneConfig}
-                              sceneId={(scenes[currentScene] as any)?.sceneId}
-                              onSurveySubmitted={handleSurveySubmitted}
-                              surveyState={currentScene === sceneIndices.survey ? surveyState : undefined}
-                              onSurveyStateChange={currentScene === sceneIndices.survey ? setSurveyState : undefined}
-                              completionData={currentScene === sceneIndices.summary ? completionData : undefined}
-                              onInboxCompleted={currentSceneConfig?.scene_type === 'actionable_content' ? handleInboxCompleted : undefined}
-                              onVideoCompleted={currentSceneConfig?.scene_type === 'scenario' ? handleVideoCompleted : undefined}
-                              isVideoCompleted={currentSceneConfig?.scene_type === 'scenario' ? videoCompleted : undefined}
-                              onIsVideoCompletedChange={currentSceneConfig?.scene_type === 'scenario' ? setVideoCompleted : undefined}
-                              onNextSlide={nextScene}
-                              reducedMotion={reducedMotionBool}
-                              disableDelays={disableDelaysBool}
-                              selectedLanguage={selectedLanguage}
-                            />
-                          )}
-                        </motion.div>
+                            )}
+                          </motion.div>
+                        </div>
                       </div>
-                    </div>
-                    {/* Enhanced Scroll Indicator - Hidden on mobile for better UX */}
-                    <ScrollIndicator 
-                      show={showScrollIndicator && !scrollPosition.bottom && currentScene !== 2 && !isMobile}
-                      scrollHintText="Scroll"
-                    />
-                  </motion.div>
-                </AnimatePresence>
+                      {/* Enhanced Scroll Indicator - Hidden on mobile for better UX */}
+                      <ScrollIndicator
+                        show={showScrollIndicator && !scrollPosition.bottom && currentScene !== 2 && !isMobile}
+                        scrollHintText="Scroll"
+                      />
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
               </div>
-            </div>
 
-            {/* Right Navigation - Hidden on mobile and on last scene */}
-            {currentScene < scenes.length - 1 && (
-              <div className="absolute right-2 sm:right-4 z-30 top-1/2 transform -translate-y-1/2 hidden md:block" data-testid="nav-next">
-                <MemoizedNavButton
-                  direction="next"
-                  onClick={nextScene}
-                  disabled={!canProceedNext()}
-                  label={themeConfig.texts?.nextSection}
-                  isDarkMode={isDarkMode}
+              {/* Right Navigation - Hidden on mobile and on last scene */}
+              {currentScene < scenes.length - 1 && (
+                <div className="absolute right-2 sm:right-4 z-30 top-1/2 transform -translate-y-1/2 hidden md:block" data-testid="nav-next">
+                  <MemoizedNavButton
+                    direction="next"
+                    onClick={nextScene}
+                    disabled={!canProceedNext()}
+                    label={themeConfig.texts?.nextSection}
+                    isDarkMode={isDarkMode}
+                  />
+                </div>
+              )}
+              {/* ULTRA RESPONSIVE Mobile Touch Gesture Layer */}
+              <div
+                className="absolute inset-0 pointer-events-none md:hidden z-10"
+                style={{
+                  pointerEvents: 'none',
+                  zIndex: "-1"
+                }}
+              >
+                {/* Optimized Left Gesture Area */}
+                <div
+                  className="absolute left-0 top-0 bottom-0 w-16 pointer-events-auto"
+                  style={{
+                    touchAction: 'pan-x',
+                    background: 'transparent',
+                    pointerEvents: currentScene === sceneIndices.goal ? 'none' : 'auto',
+                    zIndex: "-1"
+                  }}
+                  onTouchStart={(e) => {
+                    const startX = e.touches[0].clientX;
+                    const startY = e.touches[0].clientY;
+                    let hasMovedHorizontally = false;
+
+                    const handleTouchMove = (moveEvent: TouchEvent) => {
+                      const diffX = Math.abs(startX - moveEvent.touches[0].clientX);
+                      const diffY = Math.abs(startY - moveEvent.touches[0].clientY);
+                      if (diffX > diffY && diffX > 5) hasMovedHorizontally = true;
+                    };
+
+                    const handleTouchEnd = (endEvent: TouchEvent) => {
+                      if (!hasMovedHorizontally) {
+                        document.removeEventListener('touchmove', handleTouchMove);
+                        document.removeEventListener('touchend', handleTouchEnd);
+                        return;
+                      }
+
+                      const diffX = startX - endEvent.changedTouches[0].clientX;
+                      if (diffX < -30 && currentScene > 0) prevScene();
+
+                      document.removeEventListener('touchmove', handleTouchMove);
+                      document.removeEventListener('touchend', handleTouchEnd);
+                    };
+
+                    document.addEventListener('touchmove', handleTouchMove, { passive: true });
+                    document.addEventListener('touchend', handleTouchEnd);
+                  }}
+                />
+
+                {/* Optimized Right Gesture Area */}
+                <div
+                  className="absolute right-0 top-0 bottom-0 w-16 pointer-events-auto"
+                  style={{
+                    touchAction: 'pan-x',
+                    background: 'transparent',
+                    pointerEvents: currentScene === sceneIndices.goal ? 'none' : 'auto',
+                    zIndex: "-1"
+                  }}
+                  onTouchStart={(e) => {
+                    const startX = e.touches[0].clientX;
+                    const startY = e.touches[0].clientY;
+                    let hasMovedHorizontally = false;
+
+                    const handleTouchMove = (moveEvent: TouchEvent) => {
+                      const diffX = Math.abs(startX - moveEvent.touches[0].clientX);
+                      const diffY = Math.abs(startY - moveEvent.touches[0].clientY);
+                      if (diffX > diffY && diffX > 5) hasMovedHorizontally = true;
+                    };
+
+                    const handleTouchEnd = (endEvent: TouchEvent) => {
+                      if (!hasMovedHorizontally) {
+                        document.removeEventListener('touchmove', handleTouchMove);
+                        document.removeEventListener('touchend', handleTouchEnd);
+                        return;
+                      }
+
+                      const diffX = startX - endEvent.changedTouches[0].clientX;
+                      if (diffX > 30 && canProceedNext() && currentScene < scenes.length - 1) {
+                        nextScene();
+                      }
+
+                      document.removeEventListener('touchmove', handleTouchMove);
+                      document.removeEventListener('touchend', handleTouchEnd);
+                    };
+
+                    document.addEventListener('touchmove', handleTouchMove, { passive: true });
+                    document.addEventListener('touchend', handleTouchEnd);
+                  }}
                 />
               </div>
-            )}
-            {/* ULTRA RESPONSIVE Mobile Touch Gesture Layer */}
-            <div
-              className="absolute inset-0 pointer-events-none md:hidden z-10"
-              style={{
-                pointerEvents: 'none',
-                zIndex: "-1"
-              }}
-            >
-              {/* Optimized Left Gesture Area */}
-              <div
-                className="absolute left-0 top-0 bottom-0 w-16 pointer-events-auto"
-                style={{
-                  touchAction: 'pan-x',
-                  background: 'transparent',
-                  pointerEvents: currentScene === sceneIndices.goal ? 'none' : 'auto',
-                  zIndex: "-1"
-                }}
-                onTouchStart={(e) => {
-                  const startX = e.touches[0].clientX;
-                  const startY = e.touches[0].clientY;
-                  let hasMovedHorizontally = false;
+            </main>
 
-                  const handleTouchMove = (moveEvent: TouchEvent) => {
-                    const diffX = Math.abs(startX - moveEvent.touches[0].clientX);
-                    const diffY = Math.abs(startY - moveEvent.touches[0].clientY);
-                    if (diffX > diffY && diffX > 5) hasMovedHorizontally = true;
-                  };
+            {/* Enhanced Achievement Notifications */}
+            <AchievementNotification
+              show={showAchievementNotification}
+              hasAchievements={achievements.length > 0}
+              onClose={() => setShowAchievementNotification(false)}
+              message={themeConfig.texts?.achievementNotification}
+              ariaLabel={appConfig.theme?.ariaTexts?.achievementLabel || "Achievement notification"}
+              closeAriaLabel={themeConfig.texts?.closeNotification}
+            />
 
-                  const handleTouchEnd = (endEvent: TouchEvent) => {
-                    if (!hasMovedHorizontally) {
-                      document.removeEventListener('touchmove', handleTouchMove);
-                      document.removeEventListener('touchend', handleTouchEnd);
-                      return;
-                    }
-
-                    const diffX = startX - endEvent.changedTouches[0].clientX;
-                    if (diffX < -30 && currentScene > 0) prevScene();
-
-                    document.removeEventListener('touchmove', handleTouchMove);
-                    document.removeEventListener('touchend', handleTouchEnd);
-                  };
-
-                  document.addEventListener('touchmove', handleTouchMove, { passive: true });
-                  document.addEventListener('touchend', handleTouchEnd);
-                }}
-              />
-
-              {/* Optimized Right Gesture Area */}
-              <div
-                className="absolute right-0 top-0 bottom-0 w-16 pointer-events-auto"
-                style={{
-                  touchAction: 'pan-x',
-                  background: 'transparent',
-                  pointerEvents: currentScene === sceneIndices.goal ? 'none' : 'auto',
-                  zIndex: "-1"
-                }}
-                onTouchStart={(e) => {
-                  const startX = e.touches[0].clientX;
-                  const startY = e.touches[0].clientY;
-                  let hasMovedHorizontally = false;
-
-                  const handleTouchMove = (moveEvent: TouchEvent) => {
-                    const diffX = Math.abs(startX - moveEvent.touches[0].clientX);
-                    const diffY = Math.abs(startY - moveEvent.touches[0].clientY);
-                    if (diffX > diffY && diffX > 5) hasMovedHorizontally = true;
-                  };
-
-                  const handleTouchEnd = (endEvent: TouchEvent) => {
-                    if (!hasMovedHorizontally) {
-                      document.removeEventListener('touchmove', handleTouchMove);
-                      document.removeEventListener('touchend', handleTouchEnd);
-                      return;
-                    }
-
-                    const diffX = startX - endEvent.changedTouches[0].clientX;
-                    if (diffX > 30 && canProceedNext() && currentScene < scenes.length - 1) {
-                      nextScene();
-                    }
-
-                    document.removeEventListener('touchmove', handleTouchMove);
-                    document.removeEventListener('touchend', handleTouchEnd);
-                  };
-
-                  document.addEventListener('touchmove', handleTouchMove, { passive: true });
-                  document.addEventListener('touchend', handleTouchEnd);
-                }}
-              />
-            </div>
-          </main>
-
-          {/* Enhanced Achievement Notifications */}
-          <AchievementNotification
-            show={showAchievementNotification}
-            hasAchievements={achievements.length > 0}
-            onClose={() => setShowAchievementNotification(false)}
-            message={themeConfig.texts?.achievementNotification}
-            ariaLabel={appConfig.theme?.ariaTexts?.achievementLabel || "Achievement notification"}
-            closeAriaLabel={themeConfig.texts?.closeNotification}
-          />
-
-          {/* Survey Submitted Notification */}
-          <SurveyNotification
-            show={showSurveySubmittedNotification}
-            onClose={() => setShowSurveySubmittedNotification(false)}
-            message={themeConfig.texts?.surveySubmittedToast || "Geri bildiriminiz için teşekkürler!"}
-            ariaLabel={appConfig.theme?.ariaTexts?.quizCompletionLabel || "Survey submitted"}
-            closeAriaLabel={themeConfig.texts?.closeNotification}
-            portalTarget={portalTarget}
-          />
-          {/* Mobile Floating Scroll-to-Top Button */}
-          <ScrollToTopButton
-            show={showScrollToTop}
-            onClick={handleScrollToTop}
-            title={appConfig.theme?.ariaTexts?.scrollToTopLabel || "Sayfanın Başına Dön"}
-            ariaLabel={appConfig.theme?.ariaTexts?.scrollToTopLabel || "Scroll to top of page"}
-          />
-          <Toaster />
-        </div>
-      </FontFamilyProvider>
+            {/* Survey Submitted Notification */}
+            <SurveyNotification
+              show={showSurveySubmittedNotification}
+              onClose={() => setShowSurveySubmittedNotification(false)}
+              message={themeConfig.texts?.surveySubmittedToast || "Geri bildiriminiz için teşekkürler!"}
+              ariaLabel={appConfig.theme?.ariaTexts?.quizCompletionLabel || "Survey submitted"}
+              closeAriaLabel={themeConfig.texts?.closeNotification}
+              portalTarget={portalTarget}
+            />
+            {/* Mobile Floating Scroll-to-Top Button */}
+            <ScrollToTopButton
+              show={showScrollToTop}
+              onClick={handleScrollToTop}
+              title={appConfig.theme?.ariaTexts?.scrollToTopLabel || "Sayfanın Başına Dön"}
+              ariaLabel={appConfig.theme?.ariaTexts?.scrollToTopLabel || "Scroll to top of page"}
+            />
+            <Toaster />
+          </div>
+        </FontFamilyProvider>
       </GlobalEditModeProvider>
     </MotionConfig>
   );
