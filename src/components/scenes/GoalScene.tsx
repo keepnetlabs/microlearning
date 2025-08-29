@@ -1,6 +1,4 @@
-import * as LucideIcons from "lucide-react";
 import { ReactNode, useMemo, memo, useState, useEffect, useCallback } from "react";
-import { LucideIcon } from "lucide-react";
 import { FontWrapper } from "../common/FontWrapper";
 import { EditableText } from "../common/EditableText";
 import { EditModeProvider } from "../../contexts/EditModeContext";
@@ -10,34 +8,9 @@ import { useIsMobile } from "../ui/use-mobile";
 import { motion } from "framer-motion";
 import { CallToAction } from "../ui/CallToAction";
 import { deepMerge } from "../../utils/deepMerge";
+import { GoalCard } from "./goal/components";
+import { getIconComponent } from "./goal/utils/icons";
 
-// İkon mapping fonksiyonu (memoized for performance)
-const iconCache = new Map<string, LucideIcon>();
-
-const getIconComponent = (iconName: string): LucideIcon => {
-  if (iconCache.has(iconName)) {
-    return iconCache.get(iconName)!;
-  }
-
-  // İkon adını camelCase'e çevir (örn: "book-open" -> "BookOpen")
-  const camelCaseName = iconName
-    .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join('');
-
-  // Lucide ikonlarını kontrol et
-  let iconComponent: LucideIcon;
-  if (camelCaseName in LucideIcons) {
-    iconComponent = LucideIcons[camelCaseName as keyof typeof LucideIcons] as LucideIcon;
-  } else {
-    // Fallback ikon
-    console.warn(`Icon "${iconName}" not found, using default icon`);
-    iconComponent = LucideIcons.HelpCircle;
-  }
-
-  iconCache.set(iconName, iconComponent);
-  return iconComponent;
-};
 
 // Default values moved outside component to prevent recreation
 const DEFAULT_CONTAINER_CLASS = "flex flex-col items-center justify-center h-full text-center";
@@ -45,7 +18,7 @@ const DEFAULT_CARD_SPACING = "space-y-6";
 const DEFAULT_MAX_WIDTH = "max-w-md w-full";
 
 // Props interfaces
-interface GoalItem {
+export interface GoalItem {
   iconName: string; // "briefcase", "users", "shield" gibi
   title: string;
   subtitle?: string; // Optional subtitle
@@ -79,98 +52,7 @@ interface GoalSceneConfig {
 
 }
 
-// Memoized GoalCard component for better performance
-const GoalCard = memo(({ goal, index, isEditMode }: {
-  goal: GoalItem;
-  index: number;
-  isEditMode: boolean;
-}) => {
-  // Memoize icon component
-  const Icon = useMemo(() => getIconComponent(goal.iconName), [goal.iconName]);
-  return (
-    <article
-      className={`relative p-4 sm:p-5 ${isEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all duration-500 ease-out group hover:scale-[1.03] cursor-pointer`}
-      aria-labelledby={`goal-title-${index}`}
-      aria-describedby={`goal-description-${index}`}
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-        }
-      }}
-    >
-
-      <div className="relative z-10">
-        <header className="flex items-center mb-3">
-          <div
-            className={`p-2 sm:p-2.5 ${isEditMode ? 'glass-border-4-no-overflow' : 'glass-border-4'} rounded-xl mr-3 transition-all duration-300 ease-out group-hover:scale-105`}
-            aria-hidden="true"
-          >
-
-            <Icon
-              size={16}
-              className={'relative z-10 transition-all duration-300 ease-out group-hover:scale-105 text-[#1C1C1E] dark:text-[#F2F2F7]'}
-              aria-hidden="true"
-            />
-          </div>
-
-          {/* APPLE TITLE & SUBTITLE TEXT - Ultra-crisp typography */}
-          <div className="flex flex-col items-start">
-            <motion.h3
-              id={`goal-title-${index}`}
-              className="text-base font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 ease-out"
-            >
-              <EditableText
-                configPath={`goals.${index}.title`}
-                placeholder="Enter goal title..."
-                maxLength={100}
-                as="span"
-              >
-                {goal.title}
-              </EditableText>
-            </motion.h3>
-            {goal.subtitle && false && (
-              <motion.div
-                className="text-sm font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] transition-colors duration-300 ease-out mt-0.5"
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-              >
-                <EditableText
-                  configPath={`goals.${index}.subtitle`}
-                  placeholder="Enter goal subtitle..."
-                  maxLength={100}
-                  as="span"
-                >
-                  {goal.subtitle}
-                </EditableText>
-              </motion.div>
-            )}
-          </div>
-        </header>
-
-        {/* APPLE DESCRIPTION TEXT - Perfect readability */}
-        <div
-          id={`goal-description-${index}`}
-          className="text-sm text-left text-[#1C1C1E] dark:text-[#F2F2F7] leading-relaxed transition-colors duration-300 ease-out"
-        >
-          <EditableText
-            configPath={`goals.${index}.description`}
-            placeholder="Enter goal description..."
-            maxLength={300}
-            multiline={true}
-            as="span"
-          >
-            {goal.description}
-          </EditableText>
-        </div>
-      </div>
-
-    </article>
-  );
-});
-
-GoalCard.displayName = 'GoalCard';
+// GoalCard moved to ./goal/components
 
 export const GoalScene = memo(({
   config,
@@ -261,7 +143,7 @@ export const GoalScene = memo(({
       onSave={handleSave}
       onEditModeChange={setIsInEditMode}
     >
-       <EditModePanel /> 
+      <EditModePanel />
       <ScientificBasisInfo
         config={currentConfig}
         sceneType={(currentConfig as any)?.scene_type || 'goal'}
