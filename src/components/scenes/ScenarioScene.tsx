@@ -137,16 +137,16 @@ export function ScenarioScene({
   disableDelays,
   isVideoCompleted: controlledIsVideoCompleted,
   onIsVideoCompletedChange
-}: ScenarioSceneProps & { 
-  onNextSlide?: () => void; 
-  onVideoCompleted?: (completed: boolean) => void; 
-  sceneId?: string | number; 
-  reducedMotion?: boolean; 
+}: ScenarioSceneProps & {
+  onNextSlide?: () => void;
+  onVideoCompleted?: (completed: boolean) => void;
+  sceneId?: string | number;
+  reducedMotion?: boolean;
   disableDelays?: boolean;
   isVideoCompleted?: boolean;
   onIsVideoCompletedChange?: (completed: boolean) => void;
 }) {
-  
+
   // State for edit changes and edit mode tracking
   const [editChanges, setEditChanges] = useState<Partial<ScenarioSceneConfig>>({});
   const [isInEditMode, setIsInEditMode] = useState(false);
@@ -163,7 +163,11 @@ export function ScenarioScene({
 
   // Compute current config (memoized to prevent infinite loops)
   const currentConfig = useMemo(() => {
-    return deepMerge(config, editChanges);
+    const merged = deepMerge(config, editChanges);
+    console.log('ScenarioScene currentConfig updated - config:', config);
+    console.log('ScenarioScene currentConfig updated - editChanges:', editChanges);
+    console.log('ScenarioScene currentConfig updated - merged:', merged);
+    return merged;
   }, [config, editChanges]);
 
   // Clear edit changes when exiting edit mode
@@ -178,9 +182,9 @@ export function ScenarioScene({
   const [transcriptError, setTranscriptError] = useState<string | null>(null);
   // Use controlled props if provided, otherwise fallback to local state
   const [localIsVideoCompleted, setLocalIsVideoCompleted] = useState(false);
-  
+
   const isVideoCompleted = controlledIsVideoCompleted !== undefined ? controlledIsVideoCompleted : localIsVideoCompleted;
-  
+
   const setIsVideoCompleted = (value: boolean) => {
     if (onIsVideoCompletedChange) onIsVideoCompletedChange(value);
     else setLocalIsVideoCompleted(value);
@@ -280,8 +284,8 @@ export function ScenarioScene({
       videoContainerClassName
     };
   }, [
-    currentConfig.icon?.component, 
-    currentConfig.icon?.sceneIconName, 
+    currentConfig.icon?.component,
+    currentConfig.icon?.sceneIconName,
     currentConfig.icon?.size,
     currentConfig.containerClassName,
     currentConfig.videoContainerClassName
@@ -291,8 +295,11 @@ export function ScenarioScene({
 
   // Memoize callbacks for better performance
   const handleSave = useCallback((newConfig: any) => {
+    console.log('ScenarioScene handleSave - newConfig:', newConfig);
+    console.log('ScenarioScene handleSave - original config:', config);
     setEditChanges(newConfig);
-  }, []);
+    console.log('ScenarioScene handleSave - editChanges set');
+  }, [config]);
 
   return (
     <EditModeProvider
@@ -302,10 +309,10 @@ export function ScenarioScene({
       onSave={handleSave}
       onEditModeChange={setIsInEditMode}
     >
-       <EditModePanel />
-      <ScientificBasisInfo 
-        config={currentConfig} 
-        sceneType={(currentConfig as any)?.scene_type || 'scenario'} 
+      <EditModePanel />
+      <ScientificBasisInfo
+        config={currentConfig}
+        sceneType={(currentConfig as any)?.scene_type || 'scenario'}
       />
       <FontWrapper>
         <main
@@ -318,160 +325,167 @@ export function ScenarioScene({
           data-scene-id={sceneId as any}
           data-testid="scene-scenario"
         >
-        {/* Header Icon */}
-        {!isMobile && (<motion.div
-          initial={{ opacity: 0, scale: 0.8, y: -20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: reducedMotion ? 0 : 0.8, ease: "easeOut" }}
-          className={`mb-1 sm:mb-2 p-3 ${currentEditMode ? 'glass-border-3-no-overflow' : 'glass-border-3'}`}
-          aria-hidden="true"
-        >
-          {memoizedValues.iconComponent}
-        </motion.div>)}
-
-        {/* Title */}
-        <motion.h1
-          id="scenario-scene-title"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reducedMotion ? 0 : 0.8, delay: reducedMotion ? 0 : 0.2 }}
-          className="project-title"
-        >
-          <EditableText
-            configPath="title"
-            placeholder="Enter scenario title..."
-            maxLength={100}
-            as="span"
+          {/* Header Icon */}
+          {!isMobile && (<motion.div
+            initial={{ opacity: 0, scale: 0.8, y: -20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: reducedMotion ? 0 : 0.8, ease: "easeOut" }}
+            className={`mb-1 sm:mb-2 p-3 ${currentEditMode ? 'glass-border-3-no-overflow' : 'glass-border-3'}`}
+            aria-hidden="true"
           >
-            {currentConfig.title}
-          </EditableText>
-        </motion.h1>
-        {/* Subtitle */}
-        {currentConfig.subtitle && (
-          <motion.div
-            id="scenario-scene-subtitle"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: reducedMotion ? 0 : 0.6, delay: reducedMotion ? 0 : 0.3 }}
-            className="project-subtitle"
-            aria-label="Subtitle"
-          >
-            <EditableText
-              configPath="subtitle"
-              placeholder="Enter scenario subtitle..."
-              maxLength={200}
-              multiline={true}
-              as="span"
-            >
-              {currentConfig.subtitle}
-            </EditableText>
-          </motion.div>
-        )}
+            {memoizedValues.iconComponent}
+          </motion.div>)}
 
-        {/* Description */}
-        {currentConfig.description && (
-          <motion.div
-            id="scenario-scene-description"
+          {/* Title */}
+          <motion.h1
+            id="scenario-scene-title"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: reducedMotion ? 0 : 0.8, delay: reducedMotion ? 0 : 0.3 }}
-            className="text-base text-[#1C1C1E] dark:text-[#F2F2F7] text-center mb-4"
+            transition={{ duration: reducedMotion ? 0 : 0.8, delay: reducedMotion ? 0 : 0.2 }}
+            className="project-title"
           >
             <EditableText
-              configPath="description"
-              placeholder="Enter scenario description..."
-              maxLength={300}
-              multiline={true}
+              configPath="title"
+              placeholder="Enter scenario title..."
+              maxLength={100}
               as="span"
             >
-              {currentConfig.description}
+              {currentConfig.title}
             </EditableText>
-          </motion.div>
-        )}
+          </motion.h1>
+          {/* Subtitle */}
+          {currentConfig.subtitle && (
+            <motion.div
+              id="scenario-scene-subtitle"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: reducedMotion ? 0 : 0.6, delay: reducedMotion ? 0 : 0.3 }}
+              className="project-subtitle"
+              aria-label="Subtitle"
+            >
+              <EditableText
+                configPath="subtitle"
+                placeholder="Enter scenario subtitle..."
+                maxLength={200}
+                multiline={true}
+                as="span"
+              >
+                {currentConfig.subtitle}
+              </EditableText>
+            </motion.div>
+          )}
 
-        {/* Loading State */}
-        {isLoadingTranscript && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-8"
-            role="status"
-            aria-live="polite"
-            aria-label={currentConfig.ariaTexts?.loadingLabel || "Loading transcript"}
-          >
-            <div className="inline-flex items-center space-x-2">
-              <div
-                className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"
-                aria-hidden="true"
-              ></div>
-              <span className="text-gray-600 dark:text-gray-400">
-                {currentConfig.texts?.transcriptLoading || "Transcript yükleniyor..."}
-              </span>
-            </div>
-          </motion.div>
-        )}
+          {/* Description */}
+          {currentConfig.description && (
+            <motion.div
+              id="scenario-scene-description"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: reducedMotion ? 0 : 0.8, delay: reducedMotion ? 0 : 0.3 }}
+              className="text-base text-[#1C1C1E] dark:text-[#F2F2F7] text-center mb-4"
+            >
+              <EditableText
+                configPath="description"
+                placeholder="Enter scenario description..."
+                maxLength={300}
+                multiline={true}
+                as="span"
+              >
+                {currentConfig.description}
+              </EditableText>
+            </motion.div>
+          )}
 
-        {/* Error State */}
-        {transcriptError && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-8"
-            role="alert"
-            aria-live="assertive"
-            aria-label={currentConfig.ariaTexts?.errorLabel || "Transcript loading error"}
-          >
-            <div className="inline-flex items-center space-x-2 text-[#1C1C1E] dark:text-[#F2F2F7]">
-              <span>{transcriptError}</span>
-            </div>
-          </motion.div>
-        )}
+          {/* Loading State */}
+          {isLoadingTranscript && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-8"
+              role="status"
+              aria-live="polite"
+              aria-label={currentConfig.ariaTexts?.loadingLabel || "Loading transcript"}
+            >
+              <div className="inline-flex items-center space-x-2">
+                <div
+                  className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"
+                  aria-hidden="true"
+                ></div>
+                <span className="text-gray-600 dark:text-gray-400">
+                  {currentConfig.texts?.transcriptLoading || "Transcript yükleniyor..."}
+                </span>
+              </div>
+            </motion.div>
+          )}
 
-        {/* Video Player */}
-        {!isLoadingTranscript && !transcriptError && (
-          <motion.section
-            initial={{ opacity: 0, y: 40, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className={memoizedValues.videoContainerClassName}
-            role="region"
-            aria-label={currentConfig.ariaTexts?.videoPlayerLabel || "Video Player"}
-            data-testid="scenario-video-section"
-          >
-            <VideoPlayer
-              src={currentConfig.video.src}
-              poster={currentConfig.video.poster || undefined}
-              disableForwardSeek={currentConfig.video.disableForwardSeek}
-              transcript={tactiqTranscript}
-              showTranscript={currentConfig.video.showTranscript}
-              transcriptTitle={currentConfig.video.transcriptTitle}
-              sceneId={sceneId}
-              className="w-full"
-              data-testid="scenario-video"
-              onEnded={() => setIsVideoCompleted(true)}
+          {/* Error State */}
+          {transcriptError && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-8"
+              role="alert"
+              aria-live="assertive"
+              aria-label={currentConfig.ariaTexts?.errorLabel || "Transcript loading error"}
+            >
+              <div className="inline-flex items-center space-x-2 text-[#1C1C1E] dark:text-[#F2F2F7]">
+                <span>{transcriptError}</span>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Video Player */}
+          {!isLoadingTranscript && !transcriptError && (
+            <motion.section
+              initial={{ opacity: 0, y: 40, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className={memoizedValues.videoContainerClassName}
+              role="region"
+              aria-label={currentConfig.ariaTexts?.videoPlayerLabel || "Video Player"}
+              data-testid="scenario-video-section"
+            >
+              <VideoPlayer
+                src={currentConfig.video.src}
+                poster={currentConfig.video.poster || undefined}
+                disableForwardSeek={currentConfig.video.disableForwardSeek}
+                transcript={tactiqTranscript}
+                showTranscript={currentConfig.video.showTranscript}
+                transcriptTitle={currentConfig.video.transcriptTitle}
+                sceneId={sceneId}
+                className="w-full"
+                data-testid="scenario-video"
+                onEnded={() => setIsVideoCompleted(true)}
+              />
+            </motion.section>
+          )}
+
+          {/* Call to Action */}
+          {currentConfig.callToActionText && (
+            <CallToAction
+              text={isVideoCompleted
+                ? (
+                  typeof currentConfig.callToActionText === 'string'
+                    ? currentConfig.callToActionText
+                    : (typeof currentConfig.callToActionText === 'object' ?
+                      (currentConfig.callToActionText.mobile) :
+                      currentConfig.texts?.desktop || 'Continue')
+                )
+                : (currentConfig.texts?.ctaLocked || 'Watch to continue')}
+              mobileText={typeof currentConfig.callToActionText === 'object' ? currentConfig.callToActionText.mobile : undefined}
+              desktopText={typeof currentConfig.callToActionText === 'object' ? currentConfig.callToActionText.desktop : undefined}
+              fieldLabels={{
+                mobile: "After finished",
+                desktop: "Unfinished"
+              }}
+              className="mt-0 sm:mt-0"
+              delay={0.8}
+              onClick={onNextSlide}
+              dataTestId="cta-scenario"
+              noCheckMobile={isVideoCompleted}
+              disabled={!isVideoCompleted}
             />
-          </motion.section>
-        )}
-
-        {/* Call to Action */}
-        {currentConfig.callToActionText && (
-          <CallToAction
-            text={isVideoCompleted
-              ? (
-                typeof currentConfig.callToActionText === 'string'
-                  ? currentConfig.callToActionText
-                  : currentConfig.texts?.ctaUnlocked || 'Continue'
-              )
-              : (currentConfig.texts?.ctaLocked || 'Watch to continue')}
-            mobileText={isVideoCompleted && typeof currentConfig.callToActionText === 'object' ? currentConfig.callToActionText.mobile : undefined}
-            desktopText={isVideoCompleted && typeof currentConfig.callToActionText === 'object' ? currentConfig.callToActionText.desktop : undefined}
-            className="mt-0 sm:mt-0"
-            delay={0.8}
-            onClick={onNextSlide}
-            dataTestId="cta-scenario"
-            disabled={!isVideoCompleted}
-          />
-        )}
+          )}
 
         </main>
       </FontWrapper>

@@ -22,6 +22,8 @@ interface CallToActionProps {
   disabled?: boolean;
   icon?: React.ReactNode; // optional custom icon
   iconPosition?: 'left' | 'right'; // position of the icon relative to text
+  fieldLabels?: { mobile?: string; desktop?: string; }; // labels for MultiFieldEditor
+  noCheckMobile?: boolean;
 }
 
 export function CallToAction({
@@ -38,26 +40,55 @@ export function CallToAction({
   portalContainer,
   disabled = false,
   icon,
-  iconPosition = 'right'
+  iconPosition = 'right',
+  fieldLabels,
+  noCheckMobile = false
 }: CallToActionProps) {
   const isMobile = useIsMobile();
 
   // Optional edit mode - only use if EditModeProvider is available
   let isEditMode = false;
   let tempConfig: any = null;
+  let updateTempConfig: (path: string, value: any) => void = () => { };
   try {
     const editModeContext = useEditMode();
     isEditMode = editModeContext.isEditMode;
     tempConfig = editModeContext.tempConfig;
+    updateTempConfig = editModeContext.updateTempConfig;
   } catch (error) {
     // EditModeProvider not available, use default values
     isEditMode = false;
     tempConfig = null;
+    updateTempConfig = () => { };
   }
 
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const [spacerHeight, setSpacerHeight] = useState<number>(72);
   const [hasScroll, setHasScroll] = useState<boolean>(false);
+
+  // Initialize callToActionText as object if we're in edit mode and need multi-field editing
+  useEffect(() => {
+    if (isEditMode && !tempConfig?.callToActionText) {
+      // Create object if mobileText/desktopText props exist OR if text suggests multi-platform support
+      const shouldCreateObject = mobileText || desktopText ||
+        (text && typeof text === 'string');
+
+      if (shouldCreateObject) {
+        const callToActionObject = {
+          mobile: mobileText || text || "Continue",
+          desktop: desktopText || text || "Continue"
+        };
+        updateTempConfig('callToActionText', callToActionObject);
+      }
+    } else if (isEditMode && tempConfig?.callToActionText && typeof tempConfig.callToActionText === 'string') {
+      // Convert string to object for multi-field editing
+      const callToActionObject = {
+        mobile: tempConfig.callToActionText,
+        desktop: tempConfig.callToActionText
+      };
+      updateTempConfig('callToActionText', callToActionObject);
+    }
+  }, [isEditMode, mobileText, desktopText, text, tempConfig?.callToActionText, updateTempConfig]);
 
   // Check if page has scroll
   useEffect(() => {
@@ -96,6 +127,9 @@ export function CallToAction({
     if (tempConfig?.callToActionText) {
       const ctaConfig = tempConfig.callToActionText;
       if (typeof ctaConfig === 'object') {
+        if (noCheckMobile) {
+          return ctaConfig.mobile
+        }
         return isMobile ? ctaConfig.mobile : ctaConfig.desktop;
       }
       return ctaConfig;
@@ -104,7 +138,7 @@ export function CallToAction({
     return isMobile
       ? (mobileText || text || "Continue")
       : (desktopText || text || "Continue");
-  }, [tempConfig, isMobile, text, mobileText, desktopText]);
+  }, [tempConfig, isMobile, text, mobileText, desktopText, noCheckMobile]);
 
   const displayText = useMemo(() => getCallToActionText(), [getCallToActionText]);
 
@@ -168,9 +202,9 @@ export function CallToAction({
         }}
         whileTap={reducedMotion || isEditMode ? undefined : { scale: 0.95 }}
         onClick={(e) => { if (!disabled && !isEditMode) onClick?.(); e.currentTarget.blur(); }}
-        disabled={disabled}
-        aria-disabled={disabled}
-        className={`group relative inline-flex items-center ${iconPosition === 'left' ? 'space-x-2' : 'space-x-2'} px-4 py-2 sm:px-6 sm:py-3 ${isEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all focus:outline-none text-[#1C1C1E] dark:text-[#F2F2F7] ${buttonMobileClasses} ${disabled ? 'pointer-events-none cursor-not-allowed' : ''} ${isEditMode ? 'cursor-default' : ''}`}
+        disabled={isEditMode ? false : disabled}
+        aria-disabled={isEditMode ? false : disabled}
+        className={`group relative inline-flex items-center ${iconPosition === 'left' ? 'space-x-2' : 'space-x-2'} px-4 py-2 sm:px-6 sm:py-3 ${isEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all focus:outline-none text-[#1C1C1E] dark:text-[#F2F2F7] ${buttonMobileClasses} ${disabled && !isEditMode ? 'pointer-events-none cursor-not-allowed' : ''} ${isEditMode ? 'cursor-default' : ''}`}
       >
         {/* Button shimmer effect */}
         <motion.div
@@ -198,7 +232,7 @@ export function CallToAction({
               key={`editor-${isEditMode}-${JSON.stringify(tempConfig.callToActionText)}-${isMobile}`}
               configPath="callToActionText"
               data={tempConfig.callToActionText}
-              labels={{
+              labels={fieldLabels || {
                 mobile: "Mobile Text",
                 desktop: "Desktop Text"
               }}

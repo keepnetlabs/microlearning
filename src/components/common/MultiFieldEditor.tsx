@@ -107,7 +107,8 @@ export const MultiFieldEditor: React.FC<MultiFieldEditorProps> = ({
   return (
     <div
       ref={containerRef}
-      className={`relative inline-flex items-center gap-2 ${className}`}
+      className={`relative inline-flex items-center gap-2 overflow-visible ${className}`}
+      style={{ zIndex: 60 }}
     >
       {children}
 
@@ -121,7 +122,7 @@ export const MultiFieldEditor: React.FC<MultiFieldEditorProps> = ({
             transition={{ duration: 0.15 }}
             onClick={() => setShowEditor(true)}
             style={{ borderRadius: '100%' }}
-            className="w-6 h-6 glass-border-4 text-[#1C1C1E] dark:text-[#F2F2F7] rounded-full flex items-center justify-center z-50 transition-all hover:scale-110 flex-shrink-0 cursor-pointer"
+            className="w-6 h-6 glass-border-4 text-[#1C1C1E] dark:text-[#F2F2F7] rounded-full flex items-center justify-center z-[70] transition-all hover:scale-110 flex-shrink-0 cursor-pointer"
             title="Edit multiple fields"
           >
             <Edit3 size={10} />
