@@ -197,7 +197,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
                 {isEditMode && (
                     <Edit3
                         size={12}
-                        className="inline-block ml-1 opacity-0 group-hover:opacity-80 transition-opacity text-[#1C1C1E] dark:text-[#F2F2F7]"
+                        className="inline-block ml-1 opacity-80 transition-opacity text-[#1C1C1E] dark:text-[#F2F2F7]"
                         style={{ verticalAlign: 'middle', marginTop: '-1px' }}
                     />
                 )}

@@ -23,7 +23,6 @@ export const MultiFieldEditor: React.FC<MultiFieldEditorProps> = ({
   const { isEditMode, updateTempConfig, tempConfig } = useEditMode();
   const [showEditor, setShowEditor] = useState(false);
   const [tempValues, setTempValues] = useState<Record<string, string>>({});
-  const [isHovered, setIsHovered] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
 
@@ -31,7 +30,6 @@ export const MultiFieldEditor: React.FC<MultiFieldEditorProps> = ({
   useEffect(() => {
     setShowEditor(false);
     setTempValues({});
-    setIsHovered(false);
   }, []);
 
   // Get current data from tempConfig if available, otherwise use props
@@ -110,14 +108,12 @@ export const MultiFieldEditor: React.FC<MultiFieldEditorProps> = ({
     <div
       ref={containerRef}
       className={`relative inline-flex items-center gap-2 ${className}`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       {children}
 
       {/* Edit Button - inline with content */}
       <AnimatePresence>
-        {isHovered && !showEditor && (
+        {!showEditor && (
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
