@@ -75,12 +75,7 @@ export const IntroScene = React.memo(({
     return deepMerge(config, editChanges);
   }, [config, editChanges]);
 
-  // Clear edit changes when exiting edit mode
-  useEffect(() => {
-    if (!isInEditMode) {
-      setEditChanges({});
-    }
-  }, [isInEditMode]);
+  // Don't clear edit changes when exiting edit mode - keep saved changes
 
   // 🎯 OPTİMİZE EDİLDİ - Daha erken animasyon başlangıcı
   const [isVisible, setIsVisible] = useState(false);

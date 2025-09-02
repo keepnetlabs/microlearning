@@ -68,8 +68,16 @@ export function CallToAction({
 
   // Initialize callToActionText as object if we're in edit mode and need multi-field editing
   useEffect(() => {
-    if (isEditMode && !tempConfig?.callToActionText) {
-      // Create object if mobileText/desktopText props exist OR if text suggests multi-platform support
+    if (isEditMode && fieldLabels?.mobile === "Initial Text") {
+      // ActionableContentScene: Initialize both callToActionText and successCallToActionText
+      if (!tempConfig?.callToActionText) {
+        updateTempConfig('callToActionText', text || "Start Reporting");
+      }
+      if (!tempConfig?.successCallToActionText) {
+        updateTempConfig('successCallToActionText', "Go to Reinforcement");
+      }
+    } else if (isEditMode && !tempConfig?.callToActionText) {
+      // Other scenes: Create object if mobileText/desktopText props exist OR if text suggests multi-platform support
       const shouldCreateObject = mobileText || desktopText ||
         (text && typeof text === 'string');
 
@@ -88,7 +96,7 @@ export function CallToAction({
       };
       updateTempConfig('callToActionText', callToActionObject);
     }
-  }, [isEditMode, mobileText, desktopText, text, tempConfig?.callToActionText, updateTempConfig]);
+  }, [isEditMode, mobileText, desktopText, text, tempConfig?.callToActionText, tempConfig?.successCallToActionText, updateTempConfig, fieldLabels]);
 
   // Check if page has scroll
   useEffect(() => {
@@ -122,23 +130,52 @@ export function CallToAction({
     };
   }, []);
 
-  // Get text from tempConfig if available, otherwise use props
+  // Prefer explicit props (text/mobile/desktop) when provided; otherwise use tempConfig
   const getCallToActionText = useCallback(() => {
-    if (tempConfig?.callToActionText) {
+    console.log('getCallToActionText - isEditMode:', isEditMode, 'fieldLabels:', fieldLabels, 'text:', text, 'tempConfig:', tempConfig);
+    
+    // Special handling for ActionableContentScene in edit mode
+    if (isEditMode && fieldLabels?.mobile === "Initial Text") {
+      // Always show Initial Text ("Start Reporting") in edit mode for ActionableContentScene
+      console.log('ActionableContentScene edit mode - callToActionText:', tempConfig?.callToActionText);
+      return tempConfig?.callToActionText || "Start Reporting";
+    }
+
+    // 2) In edit mode, always prioritize tempConfig for live updates
+    if (isEditMode && tempConfig?.callToActionText) {
       const ctaConfig = tempConfig.callToActionText;
       if (typeof ctaConfig === 'object') {
         if (noCheckMobile) {
-          return ctaConfig.mobile
+          return ctaConfig.mobile;
         }
         return isMobile ? ctaConfig.mobile : ctaConfig.desktop;
       }
       return ctaConfig;
     }
-    // Fallback to props only if no tempConfig
-    return isMobile
-      ? (mobileText || text || "Continue")
-      : (desktopText || text || "Continue");
-  }, [tempConfig, isMobile, text, mobileText, desktopText, noCheckMobile]);
+
+    // 1) If caller provided text props, use them (for non-edit mode)
+    if (text || mobileText || desktopText) {
+      if (noCheckMobile) {
+        return mobileText || text || "Continue";
+      }
+      return isMobile ? (mobileText || text || "Continue") : (desktopText || text || "Continue");
+    }
+
+    // 3) Check tempConfig even in non-edit mode (for saved changes)
+    if (tempConfig?.callToActionText) {
+      const ctaConfig = tempConfig.callToActionText;
+      if (typeof ctaConfig === 'object') {
+        if (noCheckMobile) {
+          return ctaConfig.mobile;
+        }
+        return isMobile ? ctaConfig.mobile : ctaConfig.desktop;
+      }
+      return ctaConfig;
+    }
+
+    // 4) Final fallback to props default
+    return isMobile ? (mobileText || text || "Continue") : (desktopText || text || "Continue");
+  }, [text, mobileText, desktopText, noCheckMobile, isMobile, tempConfig?.callToActionText, tempConfig?.successCallToActionText, isEditMode, fieldLabels]);
 
   const displayText = useMemo(() => getCallToActionText(), [getCallToActionText]);
 
@@ -227,17 +264,20 @@ export function CallToAction({
           key={`cta-span-${JSON.stringify(tempConfig?.callToActionText || {})}`}
           className="relative z-10 font-medium"
         >
-          {isEditMode && tempConfig?.callToActionText && typeof tempConfig.callToActionText === 'object' ? (
+          {isEditMode && (tempConfig?.callToActionText || fieldLabels?.mobile === "Initial Text") ? (
             <MultiFieldEditor
-              key={`editor-${isEditMode}-${JSON.stringify(tempConfig.callToActionText)}-${isMobile}`}
-              configPath="callToActionText"
-              data={tempConfig.callToActionText}
+              key={`editor-${isEditMode}-${JSON.stringify({cta: tempConfig?.callToActionText, success: tempConfig?.successCallToActionText})}-${isMobile}`}
+              configPath={fieldLabels?.mobile === "Initial Text" ? "actionableTexts" : "callToActionText"}
+              data={fieldLabels?.mobile === "Initial Text" ? {
+                mobile: tempConfig?.callToActionText || "Start Reporting",
+                desktop: tempConfig?.successCallToActionText || "Go to Reinforcement"
+              } : tempConfig.callToActionText}
               labels={fieldLabels || {
                 mobile: "Mobile Text",
                 desktop: "Desktop Text"
               }}
             >
-              {isMobile ? tempConfig.callToActionText.mobile : tempConfig.callToActionText.desktop}
+              {displayText}
             </MultiFieldEditor>
           ) : isEditMode ? (
             <EditableText

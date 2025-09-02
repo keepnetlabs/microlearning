@@ -34,6 +34,13 @@ const normalizeUrlParam = (value?: string | null): string => {
   return trimmed.startsWith('@') ? trimmed.slice(1) : trimmed;
 };
 
+const joinUrls = (...parts: string[]): string => {
+  return parts
+    .map(part => part.replace(/^\/+|\/+$/g, '')) // Remove leading/trailing slashes
+    .filter(part => part.length > 0)
+    .join('/');
+};
+
 // Internal component without EditModeProvider
 function ActionableContentSceneInternalCore({
   config,
@@ -81,7 +88,7 @@ function ActionableContentSceneInternalCore({
   const inboxUrl = normalizeUrlParam(urlParams?.get('inboxUrl')) || "inbox/all";
   const langUrl = normalizeUrlParam(urlParams?.get('langUrl')) || "lang/en";
   const language = langUrl?.split('/')[1];
-  const baseInboxUrl = `${initialRemoteBaseUrl}/${inboxUrl}/${language}`;
+  const baseInboxUrl = joinUrls(initialRemoteBaseUrl, inboxUrl, language);
   console.log("baseInboxUrl", baseInboxUrl);
   // Inbox config state
   const [inboxConfig, setInboxConfig] = useState<InboxSceneConfig | null>(null);
@@ -102,7 +109,11 @@ function ActionableContentSceneInternalCore({
 
       // Replace the language part in the URL pattern
       // Pattern: /inbox/all/en -> /inbox/all/{langCode}
-      url = url.replace(/\/all\/[a-z]{2}$/i, `/all/${langCode}`);
+      const urlParts = url.split('/');
+      if (urlParts.length >= 3) {
+        urlParts[urlParts.length - 1] = langCode;
+        url = urlParts.join('/');
+      }
     }
 
     console.log('🔄 Inbox URL computed:', url, 'for language:', selectedLanguage);
@@ -304,6 +315,10 @@ function ActionableContentSceneInternalCore({
             desktopText={allEmailsReported && currentConfig.successCallToActionText && typeof currentConfig.successCallToActionText === 'object'
               ? currentConfig.successCallToActionText.desktop
               : (typeof currentConfig.callToActionText === 'object' ? currentConfig.callToActionText.desktop : undefined)}
+            fieldLabels={{
+              mobile: "Initial Text",
+              desktop: "After finishing"
+            }}
             delay={0.8}
             onClick={allEmailsReported ? onNextSlide : () => {
               // If emails not all reported, open first email in inbox
@@ -340,7 +355,6 @@ function ActionableContentSceneInternal(props: ActionableContentSceneProps & {
   const inboxUrl = normalizeUrlParam(urlParams?.get('inboxUrl'));
   const langUrl = normalizeUrlParam(urlParams?.get('langUrl'));
   const language = langUrl?.split('/')[1];
-  const baseInboxUrl = `${initialRemoteBaseUrl}/${inboxUrl}/${language}`;
 
   // Detect language changes and force re-render
   useEffect(() => {
@@ -354,13 +368,21 @@ function ActionableContentSceneInternal(props: ActionableContentSceneProps & {
     }
   }, [inboxConfigRef]);
 
+  // Scene API URL (different from inbox API URL)
+  const sceneApiUrl = (() => {
+    const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+    const baseUrl = normalizeUrlParam(urlParams?.get('baseUrl')) || "https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001";
+    const langUrl = normalizeUrlParam(urlParams?.get('langUrl')) || "lang/en";
+    return joinUrls(baseUrl, langUrl);
+  })();
+
   return (
     <EditModeProvider
       key={configKey}
       initialConfig={props.config}
-      apiUrl={baseInboxUrl}
+      sceneId={props.sceneId?.toString()}
       onSave={(updatedConfig) => {
-        console.log('Inbox config saved:', updatedConfig);
+        console.log('Scene config saved:', updatedConfig);
         handleInboxConfigUpdate(updatedConfig);
       }}
     >

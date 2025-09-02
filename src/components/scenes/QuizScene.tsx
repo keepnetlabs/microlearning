@@ -536,7 +536,7 @@ export const QuizScene = React.memo(function QuizScene({
     const currentAnswer = answers.get(currentQuestion?.id);
 
     // In edit mode, always show results to display all options and explanations
-    const effectiveShowResult = currentEditMode ? true : showResult;
+    const effectiveShowResult = currentEditMode ? false : showResult;
 
     // Edit mode dummy answers
     let editModeAnswer;

@@ -165,8 +165,8 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
             // Ardından backend'e patch gönder
             const sendPatchRequest = async () => {
                 try {
-                    // Use provided apiUrl or fallback to default
-                    const patchUrl = apiUrl || (() => {
+                    // Use provided apiUrl or fallback to default  
+                    let patchUrl = apiUrl || (() => {
                         const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
                         const DEFAULT_BASE_URL = "https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001";
                         const DEFAULT_LANG_URL = "lang/en";
@@ -185,6 +185,9 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
 
                         return `${DEFAULT_BASE_URL}/${DEFAULT_LANG_URL}`;
                     })();
+
+                    // Clean up double slashes in URL
+                    patchUrl = patchUrl.replace(/([^:]\/)\/+/g, '$1');
 
                     console.log('Sending PATCH to:', patchUrl);
                     console.log('Payload:', patchPayload);

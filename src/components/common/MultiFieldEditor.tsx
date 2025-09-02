@@ -83,7 +83,13 @@ export const MultiFieldEditor: React.FC<MultiFieldEditorProps> = ({
   }, [showEditor]);
 
   const handleSave = () => {
-    updateTempConfig(configPath, tempValues);
+    if (configPath === "actionableTexts") {
+      // Special handling for ActionableContentScene
+      updateTempConfig("callToActionText", tempValues.mobile);
+      updateTempConfig("successCallToActionText", tempValues.desktop);
+    } else {
+      updateTempConfig(configPath, tempValues);
+    }
     setShowEditor(false);
   };
 
