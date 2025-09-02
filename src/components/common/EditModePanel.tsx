@@ -1,8 +1,9 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Save, RotateCcw, Edit3, Eye, EyeOff } from 'lucide-react';
+import { Save, RotateCcw, Edit3, Eye, EyeOff, Download } from 'lucide-react';
 import { useEditMode } from '../../contexts/EditModeContext';
+import { downloadSCORMPackage } from '../../utils/scormDownload';
 
 export const EditModePanel: React.FC = () => {
     const {
@@ -14,6 +15,24 @@ export const EditModePanel: React.FC = () => {
         discardChanges,
         hasUnsavedChanges
     } = useEditMode();
+
+    // Custom toggle function that handles URL parameter management
+    const handleToggleEditMode = () => {
+        toggleEditMode();
+
+        const url = new URL(window.location.href);
+
+        if (isEditMode) {
+            // If exiting edit mode, remove isEditMode parameter from URL
+            url.searchParams.delete('isEditMode');
+        } else {
+            // If entering edit mode, add isEditMode parameter to URL
+            url.searchParams.set('isEditMode', 'true');
+        }
+
+        // Update URL without page reload
+        window.history.replaceState({}, '', url.toString());
+    };
 
     // Check if EditModePanel should be visible based on URL parameter
     const shouldShowPanel = React.useMemo(() => {
@@ -40,7 +59,7 @@ export const EditModePanel: React.FC = () => {
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        onClick={toggleEditMode}
+                        onClick={handleToggleEditMode}
                         className={`flex items-center gap-2 px-4 py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer ${isEditMode
                             ? 'text-[#1C1C1E] dark:text-[#F2F2F7] bg-blue-500/10'
                             : 'text-[#1C1C1E] dark:text-[#F2F2F7]'
@@ -49,6 +68,19 @@ export const EditModePanel: React.FC = () => {
                     >
                         <Edit3 size={16} />
                         {isEditMode ? 'Exit Edit' : 'Enter Edit'}
+                    </motion.button>
+
+                    {/* Download SCORM Button */}
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={downloadSCORMPackage}
+                        className="flex items-center gap-2 px-4 py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer text-[#1C1C1E] dark:text-[#F2F2F7]"
+                        style={{ pointerEvents: 'auto', cursor: 'pointer' }}
+                        title="Download SCORM package"
+                    >
+                        <Download size={16} />
+                        Download SCORM
                     </motion.button>
 
                     {/* View Mode Toggle */}
