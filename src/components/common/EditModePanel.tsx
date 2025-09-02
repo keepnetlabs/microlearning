@@ -15,6 +15,18 @@ export const EditModePanel: React.FC = () => {
         hasUnsavedChanges
     } = useEditMode();
 
+    // Check if EditModePanel should be visible based on URL parameter
+    const shouldShowPanel = React.useMemo(() => {
+        if (typeof window === 'undefined') return false;
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('isEditMode') === 'true';
+    }, []);
+
+    // Don't render panel if URL parameter is not set to true
+    if (!shouldShowPanel) {
+        return null;
+    }
+
     return createPortal(
         <motion.div
             initial={{ opacity: 0, scale: 0.8, y: 100 }}

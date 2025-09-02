@@ -79,7 +79,16 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
     onEditModeChange,
     onViewModeChange
 }) => {
-    const [isEditMode, setIsEditMode] = useState(false);
+    // Check URL parameter for initial edit mode state
+    const getInitialEditMode = () => {
+        if (typeof window !== 'undefined') {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('isEditMode') === 'true';
+        }
+        return false;
+    };
+
+    const [isEditMode, setIsEditMode] = useState(getInitialEditMode);
     const [isViewMode, setIsViewMode] = useState(false);
     const [editingField, setEditingField] = useState<string | null>(null);
     const [baseConfig, setBaseConfig] = useState(initialConfig);
