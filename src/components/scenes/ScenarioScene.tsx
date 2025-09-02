@@ -11,6 +11,7 @@ import { ScientificBasisInfo } from "../common/ScientificBasisInfo";
 import { useIsMobile } from "../ui/use-mobile";
 import { CallToAction } from "../ui/CallToAction";
 import { deepMerge } from "../../utils/deepMerge";
+import { useIsEditMode } from "../../hooks/useIsEditMode";
 
 export interface TranscriptRow {
   start: number;
@@ -146,6 +147,9 @@ export function ScenarioScene({
   isVideoCompleted?: boolean;
   onIsVideoCompletedChange?: (completed: boolean) => void;
 }) {
+
+  // Check if edit mode is enabled
+  const isEditMode = useIsEditMode();
 
   // State for edit changes and edit mode tracking
   const [editChanges, setEditChanges] = useState<Partial<ScenarioSceneConfig>>({});
@@ -483,7 +487,7 @@ export function ScenarioScene({
               onClick={onNextSlide}
               dataTestId="cta-scenario"
               noCheckMobile={isVideoCompleted}
-              disabled={!isVideoCompleted}
+              disabled={!isVideoCompleted && !isEditMode}
             />
           )}
 

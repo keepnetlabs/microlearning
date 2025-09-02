@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
 interface EditModeContextType {
     isEditMode: boolean;
@@ -79,21 +79,27 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
     onEditModeChange,
     onViewModeChange
 }) => {
-    // Check URL parameter for initial edit mode state
-    const getInitialEditMode = () => {
-        if (typeof window !== 'undefined') {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('isEditMode') === 'true';
-        }
-        return false;
-    };
-
-    const [isEditMode, setIsEditMode] = useState(getInitialEditMode);
+    const [isEditMode, setIsEditMode] = useState(false);
     const [isViewMode, setIsViewMode] = useState(false);
     const [editingField, setEditingField] = useState<string | null>(null);
     const [baseConfig, setBaseConfig] = useState(initialConfig);
     const [tempConfig, setTempConfig] = useState(initialConfig);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+    // Check URL parameter for edit mode after component mount
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const urlParams = new URLSearchParams(window.location.search);
+            const shouldEnableEditMode = urlParams.get('isEditMode') === 'true';
+            if (shouldEnableEditMode) {
+                setIsEditMode(true);
+                // Notify parent about edit mode change
+                if (onEditModeChange) {
+                    onEditModeChange(true);
+                }
+            }
+        }
+    }, [onEditModeChange]);
 
     const toggleEditMode = useCallback(() => {
         if (isEditMode && hasUnsavedChanges) {

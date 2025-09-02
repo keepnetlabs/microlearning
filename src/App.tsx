@@ -34,6 +34,7 @@ import { logger } from "./utils/logger";
 import { slideVariants } from "./utils/animationVariants";
 import { MEMOIZED_CONSTANTS } from "./utils/constants";
 import { useThemeClasses } from "./hooks/useThemeClasses";
+import { useIsEditMode } from "./hooks/useIsEditMode";
 
 // Memoized components for better performance
 const MemoizedProgressBar = React.memo(ProgressBar);
@@ -62,6 +63,10 @@ interface AppProps {
 
 export default function App(props: AppProps = {}) {
   const { initialScene, testOverrides } = props;
+
+  // Edit mode state
+  const isEditMode = useIsEditMode();
+
   // Use custom hook for app config management
   const {
     appConfig,
@@ -349,6 +354,11 @@ export default function App(props: AppProps = {}) {
   // Language filtering handled by useLanguage
 
   const canProceedNext = useCallback(() => {
+    // If in edit mode, allow navigation without restrictions
+    if (isEditMode) {
+      return currentScene < scenes.length - 1;
+    }
+
     if (currentScene === sceneIndices.quiz) {
       return quizCompleted;
     }
@@ -362,7 +372,7 @@ export default function App(props: AppProps = {}) {
       return videoCompleted;
     }
     return currentScene < scenes.length - 1;
-  }, [currentScene, quizCompleted, inboxCompleted, videoCompleted, sceneIndices.quiz, scenes]);
+  }, [isEditMode, currentScene, quizCompleted, inboxCompleted, videoCompleted, sceneIndices.quiz, scenes]);
 
   // Optimized scene timing tracking
   const trackSceneTime = useCallback((sceneIndex: number) => {
@@ -430,7 +440,7 @@ export default function App(props: AppProps = {}) {
   // ULTRA FAST MOBILE TRANSITIONS - NO LOADING DELAY
   const nextScene = useCallback(() => {
     // Allow progression if quiz is completed or we're not on quiz scene
-    if (currentScene === sceneIndices.quiz && !quizCompleted) {
+    if (currentScene === sceneIndices.quiz && !quizCompleted && !isEditMode) {
       return;
     }
 

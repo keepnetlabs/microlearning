@@ -25,6 +25,7 @@ import { BottomSheetComponent } from "../ui/bottom-sheet";
 import { scormService } from "../../utils/scormService";
 import { logger } from "../../utils/logger";
 import { deepMerge } from "../../utils/deepMerge";
+import { useIsEditMode } from "../../hooks/useIsEditMode";
 
 // Performance optimization - Move constants outside component to prevent recreation
 
@@ -465,6 +466,9 @@ export const QuizScene = React.memo(function QuizScene({
 }: QuizSceneProps & { sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean }) {
   // Destructure ariaTexts from config for accessibility
   const { ariaTexts } = config || {};
+
+  // Check if edit mode is enabled
+  const isEditMode = useIsEditMode();
 
   // Edit mode states
   const [editChanges, setEditChanges] = useState<Partial<QuizSceneConfig>>({});
@@ -2823,7 +2827,7 @@ export const QuizScene = React.memo(function QuizScene({
                 handleNextQuestion();
               }
             }}
-            disabled={!showResult}
+            disabled={!showResult && !isEditMode}
             iconPosition={showResult && !isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked ? 'left' : 'right'}
             icon={showResult && !isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked ? (
               <RefreshCw size={16} className="transition-transform group-hover:-rotate-6 text-[#1C1C1E] dark:text-[#F2F2F7]" aria-hidden="true" />
