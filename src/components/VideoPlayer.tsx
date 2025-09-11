@@ -94,6 +94,74 @@ function parseTactiqTranscript(raw: string): TranscriptRow[] {
   return transcript.sort((a, b) => a.start - b.start);
 }
 
+// Parse text that contains inline timestamps (e.g., "... an00:00:07.919 experience ...")
+function parseInlineTimestampedText(text: string, initialStart?: number): TranscriptRow[] {
+  if (!text || typeof text !== "string") return [];
+
+  const rows: TranscriptRow[] = [];
+  const regex = /(\d{2}):(\d{2}):(\d{2})\.(\d{3})/g;
+
+  let lastIndex = 0;
+  let currentStart = typeof initialStart === "number" ? initialStart : 0;
+  let match: RegExpExecArray | null;
+
+  const pushSegment = (segment: string, start: number) => {
+    const cleaned = segment
+      .replace(/\s+/g, " ")
+      .replace(/^\s+|\s+$/g, "");
+    if (cleaned.length > 0) {
+      rows.push({ start, text: cleaned });
+    }
+  };
+
+  while ((match = regex.exec(text)) !== null) {
+    const segment = text.slice(lastIndex, match.index);
+    pushSegment(segment, currentStart);
+
+    const hours = parseInt(match[1], 10);
+    const minutes = parseInt(match[2], 10);
+    const seconds = parseInt(match[3], 10);
+    const milliseconds = parseInt(match[4], 10);
+    currentStart = hours * 3600 + minutes * 60 + seconds + milliseconds / 1000;
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  const tail = text.slice(lastIndex);
+  pushSegment(tail, currentStart);
+
+  return rows;
+}
+
+// Flexibly parse any transcript input, including arrays with inline timestamps inside text
+function parseFlexibleTranscript(input?: TranscriptRow[] | string): TranscriptRow[] {
+  if (!input) return [];
+
+  if (typeof input === "string") {
+    return parseTactiqTranscript(input);
+  }
+
+  if (Array.isArray(input)) {
+    const hasInlineTimestamps = input.some(row => /\d{2}:\d{2}:\d{2}\.\d{3}/.test(row.text));
+    if (!hasInlineTimestamps) {
+      return [...input].sort((a, b) => a.start - b.start);
+    }
+
+    const expanded: TranscriptRow[] = [];
+    for (const row of input) {
+      if (/\d{2}:\d{2}:\d{2}\.\d{3}/.test(row.text)) {
+        const parts = parseInlineTimestampedText(row.text, row.start);
+        expanded.push(...parts);
+      } else if (row.text && row.text.trim().length > 0) {
+        expanded.push({ start: row.start, text: row.text.trim() });
+      }
+    }
+    return expanded.sort((a, b) => a.start - b.start);
+  }
+
+  return [];
+}
+
 // Time formatting function
 function formatTime(seconds: number): string {
   const minutes = Math.floor(seconds / 60);
@@ -527,9 +595,7 @@ export function VideoPlayer({
   const parsedTranscript = useMemo(() => {
     // Use local transcript if available, otherwise fall back to original transcript
     const currentTranscript = localTranscript !== undefined ? localTranscript : transcript;
-    return typeof currentTranscript === "string"
-      ? parseTactiqTranscript(currentTranscript)
-      : currentTranscript || [];
+    return parseFlexibleTranscript(currentTranscript);
   }, [transcript, localTranscript]);
   // Find current transcript row - useMemo ile optimize edildi
   const currentRowIndex = useMemo(() =>
@@ -1064,7 +1130,11 @@ export function VideoPlayer({
                             style={{
                               lineHeight: "1.5",
                               fontWeight: isActive ? "500" : "400",
-                              marginTop: "0"
+                              marginTop: "0",
+                              whiteSpace: "pre-wrap",
+                              overflowWrap: "anywhere",
+                              wordBreak: "break-word",
+                              hyphens: "auto"
                             }}
                             aria-label={`${ariaTexts?.transcriptTextLabel || "Transcript text"}: ${row.text}`}
                           >
