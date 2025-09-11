@@ -526,6 +526,8 @@ export default function App(props: AppProps = {}) {
   // Keyboard navigation (Escape handling lives in useLanguage)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (isEditMode) return; // Prevent navigation when edit mode is active
+      
       if (e.key === 'ArrowRight' && canProceedNext()) {
         nextScene();
       } else if (e.key === 'ArrowLeft' && currentScene > 0) {
@@ -535,7 +537,7 @@ export default function App(props: AppProps = {}) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [canProceedNext, nextScene, prevScene, currentScene]);
+  }, [canProceedNext, nextScene, prevScene, currentScene, isEditMode]);
 
 
   // Focus management moved into LanguageSelector

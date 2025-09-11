@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Save, RotateCcw, Edit3, Eye, EyeOff, Download } from 'lucide-react';
@@ -6,6 +6,7 @@ import { useEditMode } from '../../contexts/EditModeContext';
 import { downloadSCORMPackage } from '../../utils/scormDownload';
 
 export const EditModePanel: React.FC = () => {
+    const [shouldShowPanel, setShouldShowPanel] = useState(false);
     const {
         isEditMode,
         isViewMode,
@@ -16,32 +17,77 @@ export const EditModePanel: React.FC = () => {
         hasUnsavedChanges
     } = useEditMode();
 
+    // Check if EditModePanel should be visible
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        
+        const checkPanelVisibility = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlEditMode = urlParams.get('isEditMode') === 'true';
+            const sessionActivated = sessionStorage.getItem('editModeActivatedInSession') === 'true';
+            
+            if (urlEditMode) {
+                // If URL has edit mode, show panel and mark as activated in session
+                setShouldShowPanel(true);
+                sessionStorage.setItem('editModeActivatedInSession', 'true');
+            } else if (sessionActivated) {
+                // If URL doesn't have edit mode but was activated in this session, keep panel visible
+                setShouldShowPanel(true);
+            } else {
+                // If URL doesn't have edit mode and wasn't activated in this session, hide panel
+                setShouldShowPanel(false);
+            }
+        };
+
+        // Check on mount
+        checkPanelVisibility();
+
+        // Listen for URL changes
+        window.addEventListener('popstate', checkPanelVisibility);
+        window.addEventListener('hashchange', checkPanelVisibility);
+        
+        // Clear session storage on page unload
+        const handleBeforeUnload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlEditMode = urlParams.get('isEditMode') === 'true';
+            // Only clear if there's no URL parameter
+            if (!urlEditMode) {
+                sessionStorage.removeItem('editModeActivatedInSession');
+            }
+        };
+        
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        
+        return () => {
+            window.removeEventListener('popstate', checkPanelVisibility);
+            window.removeEventListener('hashchange', checkPanelVisibility);
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, []);
+
     // Custom toggle function that handles URL parameter management
     const handleToggleEditMode = () => {
-        toggleEditMode();
-
         const url = new URL(window.location.href);
 
         if (isEditMode) {
-            // If exiting edit mode, remove isEditMode parameter from URL
+            // If exiting edit mode, remove isEditMode parameter from URL but keep panel visible
             url.searchParams.delete('isEditMode');
+            // Panel stays visible because session storage maintains activation state
         } else {
             // If entering edit mode, add isEditMode parameter to URL
             url.searchParams.set('isEditMode', 'true');
+            sessionStorage.setItem('editModeActivatedInSession', 'true');
+            setShouldShowPanel(true);
         }
 
         // Update URL without page reload
         window.history.replaceState({}, '', url.toString());
+        
+        // Toggle edit mode after URL update
+        toggleEditMode();
     };
 
-    // Check if EditModePanel should be visible based on URL parameter
-    const shouldShowPanel = React.useMemo(() => {
-        if (typeof window === 'undefined') return false;
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get('isEditMode') === 'true';
-    }, []);
-
-    // Don't render panel if URL parameter is not set to true
+    // Don't render panel if it shouldn't be shown
     if (!shouldShowPanel) {
         return null;
     }

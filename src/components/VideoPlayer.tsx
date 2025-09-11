@@ -1102,7 +1102,7 @@ export function VideoPlayer({
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 className="relative glass-border-3 w-full max-w-lg mx-4 p-6"
-                style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+                style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Header */}
@@ -1199,8 +1199,8 @@ export function VideoPlayer({
                         setTranscriptEditMode('url');
                       }}
                       className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all cursor-pointer relative z-20 ${transcriptEditMode === 'url'
-                          ? 'bg-white/20 text-[#1C1C1E] dark:text-[#F2F2F7]'
-                          : 'text-[#1C1C1E]/70 dark:text-[#F2F2F7]/70 hover:bg-white/10'
+                        ? 'bg-white/20 text-[#1C1C1E] dark:text-[#F2F2F7]'
+                        : 'text-[#1C1C1E]/70 dark:text-[#F2F2F7]/70 hover:bg-white/10'
                         }`}
                     >
                       URL
@@ -1213,8 +1213,8 @@ export function VideoPlayer({
                         setTranscriptEditMode('text');
                       }}
                       className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all cursor-pointer relative z-20 ${transcriptEditMode === 'text'
-                          ? 'bg-white/20 text-[#1C1C1E] dark:text-[#F2F2F7]'
-                          : 'text-[#1C1C1E]/70 dark:text-[#F2F2F7]/70 hover:bg-white/10'
+                        ? 'bg-white/20 text-[#1C1C1E] dark:text-[#F2F2F7]'
+                        : 'text-[#1C1C1E]/70 dark:text-[#F2F2F7]/70 hover:bg-white/10'
                         }`}
                     >
                       Text
