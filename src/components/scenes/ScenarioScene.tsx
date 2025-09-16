@@ -55,17 +55,31 @@ const DEFAULT_VIDEO_CONTAINER_CLASS = "w-full max-w-sm sm:max-w-md lg:max-w-lg";
 function parseTactiqTranscript(raw: string): TranscriptRow[] {
   const lines = raw.split("\n");
   const transcript: TranscriptRow[] = [];
+
   for (const line of lines) {
-    const match = line.match(
+    // Önceki format: 00:00:02.000 [Music]
+    const tactiqMatch = line.match(
       /^(\d{2}):(\d{2}):(\d{2})\.(\d{3})\s+(.+)$/,
     );
-    if (match) {
-      const h = parseInt(match[1], 10);
-      const m = parseInt(match[2], 10);
-      const s = parseInt(match[3], 10);
-      const ms = parseInt(match[4], 10);
+
+    // Yeni format: 00:00:02 [Music]
+    const simpleMatch = line.match(
+      /^(\d{2}):(\d{2}):(\d{2})\s+(.+)$/,
+    );
+
+    if (tactiqMatch) {
+      const h = parseInt(tactiqMatch[1], 10);
+      const m = parseInt(tactiqMatch[2], 10);
+      const s = parseInt(tactiqMatch[3], 10);
+      const ms = parseInt(tactiqMatch[4], 10);
       const start = h * 3600 + m * 60 + s + ms / 1000;
-      transcript.push({ start, text: match[5] });
+      transcript.push({ start, text: tactiqMatch[5] });
+    } else if (simpleMatch) {
+      const h = parseInt(simpleMatch[1], 10);
+      const m = parseInt(simpleMatch[2], 10);
+      const s = parseInt(simpleMatch[3], 10);
+      const start = h * 3600 + m * 60 + s;
+      transcript.push({ start, text: simpleMatch[4] });
     }
   }
   return transcript;
@@ -459,14 +473,17 @@ export function ScenarioScene({
                 transcriptTitle={currentConfig.video.transcriptTitle}
                 sceneId={sceneId} */}
               <ReactVideoPlayer
-                src="https://www.youtube.com/watch?v=34EW73Ee_RM"
+                src={currentConfig.video.src}
                 width="512px"
                 height="288px"
                 controls={false}
                 playing={false}
-                disableForwardSeek={true}
+                disableForwardSeek={false}
                 className="w-full"
                 data-testid="scenario-video"
+                transcript={tactiqTranscript}
+                showTranscript={currentConfig.video.showTranscript}
+                transcriptTitle={currentConfig.video.transcriptTitle}
                 onEnded={() => setIsVideoCompleted(true)}
               />
             </motion.section>
