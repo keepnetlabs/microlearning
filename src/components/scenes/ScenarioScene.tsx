@@ -53,35 +53,48 @@ const DEFAULT_VIDEO_CONTAINER_CLASS = "w-full max-w-sm sm:max-w-md lg:max-w-lg";
 
 // Enhanced video data with multi-language transcript support
 function parseTactiqTranscript(raw: string): TranscriptRow[] {
-  const lines = raw.split("\n");
+  if (!raw || typeof raw !== "string") {
+    return [];
+  }
+
+  // Backend'den gelen format: "00:00:00 Text\n00:00:04 More text\n..."
+  const lines = raw.split(/\\n|\n/); // Hem \n hem \\n destekle
   const transcript: TranscriptRow[] = [];
 
   for (const line of lines) {
+    if (!line.trim()) continue;
+
+    // Backend format: 00:00:04 Text content
+    const backendMatch = line.match(/^(\d{2}):(\d{2}):(\d{2})\s+(.+)$/);
+
     // Önceki format: 00:00:02.000 [Music]
-    const tactiqMatch = line.match(
-      /^(\d{2}):(\d{2}):(\d{2})\.(\d{3})\s+(.+)$/,
-    );
+    const tactiqMatch = line.match(/^(\d{2}):(\d{2}):(\d{2})\.(\d{3})\s+(.+)$/);
 
-    // Yeni format: 00:00:02 [Music]
-    const simpleMatch = line.match(
-      /^(\d{2}):(\d{2}):(\d{2})\s+(.+)$/,
-    );
+    if (backendMatch) {
+      const h = parseInt(backendMatch[1], 10);
+      const m = parseInt(backendMatch[2], 10);
+      const s = parseInt(backendMatch[3], 10);
+      const start = h * 3600 + m * 60 + s;
+      const text = backendMatch[4].trim();
 
-    if (tactiqMatch) {
+      if (text) {
+        transcript.push({ start, text });
+      }
+    } else if (tactiqMatch) {
       const h = parseInt(tactiqMatch[1], 10);
       const m = parseInt(tactiqMatch[2], 10);
       const s = parseInt(tactiqMatch[3], 10);
       const ms = parseInt(tactiqMatch[4], 10);
       const start = h * 3600 + m * 60 + s + ms / 1000;
-      transcript.push({ start, text: tactiqMatch[5] });
-    } else if (simpleMatch) {
-      const h = parseInt(simpleMatch[1], 10);
-      const m = parseInt(simpleMatch[2], 10);
-      const s = parseInt(simpleMatch[3], 10);
-      const start = h * 3600 + m * 60 + s;
-      transcript.push({ start, text: simpleMatch[4] });
+      const text = tactiqMatch[5].trim();
+
+      if (text) {
+        transcript.push({ start, text });
+      }
     }
   }
+
+  console.log('Parsed transcript entries:', transcript.length);
   return transcript;
 }
 
