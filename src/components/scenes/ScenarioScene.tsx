@@ -2,7 +2,8 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { motion } from "framer-motion";
 import * as LucideIcons from "lucide-react";
 import { LucideIcon } from "lucide-react";
-import { VideoPlayer } from "../VideoPlayer";
+// import { VideoPlayer } from "../VideoPlayer";
+import { ReactVideoPlayer } from "../ReactVideoPlayer";
 import { FontWrapper } from "../common/FontWrapper";
 import { EditableText } from "../common/EditableText";
 import { EditModeProvider } from "../../contexts/EditModeContext";
@@ -449,14 +450,21 @@ export function ScenarioScene({
               aria-label={currentConfig.ariaTexts?.videoPlayerLabel || "Video Player"}
               data-testid="scenario-video-section"
             >
-              <VideoPlayer
+              {/* <VideoPlayer
                 src={currentConfig.video.src}
                 poster={currentConfig.video.poster || undefined}
                 disableForwardSeek={currentConfig.video.disableForwardSeek}
                 transcript={tactiqTranscript}
                 showTranscript={currentConfig.video.showTranscript}
                 transcriptTitle={currentConfig.video.transcriptTitle}
-                sceneId={sceneId}
+                sceneId={sceneId} */}
+              <ReactVideoPlayer
+                src="https://www.youtube.com/watch?v=34EW73Ee_RM"
+                width="512px"
+                height="288px"
+                controls={false}
+                playing={false}
+                disableForwardSeek={true}
                 className="w-full"
                 data-testid="scenario-video"
                 onEnded={() => setIsVideoCompleted(true)}
