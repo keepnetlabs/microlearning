@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { motion } from "framer-motion";
 import * as LucideIcons from "lucide-react";
 import { LucideIcon } from "lucide-react";
-// import { VideoPlayer } from "../VideoPlayer";
+import { VideoPlayer } from "../VideoPlayer";
 import { ReactVideoPlayer } from "../ReactVideoPlayer";
 import { FontWrapper } from "../common/FontWrapper";
 import { EditableText } from "../common/EditableText";
@@ -18,6 +18,13 @@ export interface TranscriptRow {
   start: number;
   text: string;
 }
+
+// Utility function to check if video source is YouTube
+const isYouTubeVideo = (src: string | undefined | null): boolean => {
+  if (!src || typeof src !== 'string') return false;
+  const lowerSrc = src.toLowerCase();
+  return lowerSrc.includes('youtube') || lowerSrc.includes('youtu.be');
+};
 
 // İkon mapping fonksiyonu (memoized for performance)
 const iconCache = new Map<string, LucideIcon>();
@@ -477,28 +484,32 @@ export function ScenarioScene({
               aria-label={currentConfig.ariaTexts?.videoPlayerLabel || "Video Player"}
               data-testid="scenario-video-section"
             >
-              {/* <VideoPlayer
-                src={currentConfig.video.src}
-                poster={currentConfig.video.poster || undefined}
-                disableForwardSeek={currentConfig.video.disableForwardSeek}
-                transcript={tactiqTranscript}
-                showTranscript={currentConfig.video.showTranscript}
-                transcriptTitle={currentConfig.video.transcriptTitle}
-                sceneId={sceneId} */}
-              <ReactVideoPlayer
-                src={currentConfig.video.src}
-                width="512px"
-                height="288px"
-                controls={false}
-                playing={false}
-                disableForwardSeek={false}
-                className="w-full"
-                data-testid="scenario-video"
-                transcript={tactiqTranscript}
-                showTranscript={currentConfig.video.showTranscript}
-                transcriptTitle={currentConfig.video.transcriptTitle}
-                onEnded={() => setIsVideoCompleted(true)}
-              />
+              {isYouTubeVideo(currentConfig.video.src) ? (
+                <ReactVideoPlayer
+                  src={currentConfig.video.src}
+                  width="512px"
+                  height="288px"
+                  controls={false}
+                  playing={false}
+                  disableForwardSeek={false}
+                  className="w-full"
+                  data-testid="scenario-video"
+                  transcript={tactiqTranscript}
+                  showTranscript={currentConfig.video.showTranscript}
+                  transcriptTitle={currentConfig.video.transcriptTitle}
+                  onEnded={() => setIsVideoCompleted(true)}
+                />
+              ) : (
+                <VideoPlayer
+                  src={currentConfig.video.src}
+                  poster={currentConfig.video.poster || undefined}
+                  disableForwardSeek={currentConfig.video.disableForwardSeek}
+                  transcript={tactiqTranscript}
+                  showTranscript={currentConfig.video.showTranscript}
+                  transcriptTitle={currentConfig.video.transcriptTitle}
+                  sceneId={sceneId}
+                />
+              )}
             </motion.section>
           )}
 
