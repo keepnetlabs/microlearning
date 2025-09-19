@@ -271,7 +271,7 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
       <div className="w-full space-y-4">
         <div
           ref={containerRef}
-          className={cn("w-full rounded-lg overflow-hidden relative", isFullscreen && "fixed inset-0 z-50 bg-black rounded-none", className)}
+          className={cn("w-full rounded-lg overflow-hidden relative group", isFullscreen && "fixed inset-0 z-50 bg-black rounded-none", className)}
         >
         <ReactPlayer
           ref={(player) => {
@@ -308,7 +308,9 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
         
         {/* Custom Controls Overlay */}
         {!controls && (
-          <div className={`absolute inset-0 pointer-events-none group ${isFullscreen ? 'z-[60]' : ''}`}>
+          <div
+            className={`absolute inset-0 pointer-events-none ${isFullscreen ? 'z-[60]' : ''}`}
+          >
             {/* Center Play/Pause Button */}
             <div className="absolute inset-0 flex items-center justify-center">
               {!hasEnded && (
@@ -326,7 +328,7 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
                   )}
                 </button>
               )}
-              
+
               {/* Replay Button */}
               {hasEnded && (
                 <button
@@ -341,16 +343,17 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
               )}
             </div>
 
-            {/* Control Buttons - Bottom Left Corner */}
-            <div className={`absolute flex gap-2 ${isFullscreen ? 'bottom-8 left-8' : 'bottom-4 left-4'}`}>
-              {/* Transcript Button */}
+            {/* Control Buttons */}
+            <div className={`absolute flex gap-2 transition-opacity duration-300 opacity-0 group-hover:opacity-100 ${isFullscreen ? 'bottom-8 left-8' : 'bottom-4 left-4'}`}>
+              {/* Transcript Button (CC) */}
               {transcript.length > 0 && (
                 <button
                   onClick={toggleTranscript}
-                  className={`bg-black/70 hover:bg-black/80 text-white rounded-lg transition-all duration-300 pointer-events-auto z-10 opacity-0 group-hover:opacity-100 ${
+                  className={`bg-black/70 hover:bg-black/80 text-white rounded-lg transition-all duration-300 pointer-events-auto z-10 ${
                     isFullscreen ? 'p-3' : 'p-2'
                   } ${isTranscriptOpen ? 'ring-2 ring-white/50' : ''}`}
-                  aria-label={isTranscriptOpen ? "Hide transcript" : "Show transcript"}
+                  aria-label={isTranscriptOpen ? "Hide captions" : "Show captions"}
+                  title="CC"
                 >
                   <FileText size={isFullscreen ? 24 : 20} />
                 </button>
@@ -359,7 +362,7 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
               {/* Fullscreen Button */}
               <button
                 onClick={toggleFullscreen}
-                className={`bg-black/70 hover:bg-black/80 text-white rounded-lg transition-all duration-300 pointer-events-auto z-10 opacity-0 group-hover:opacity-100 ${
+                className={`bg-black/70 hover:bg-black/80 text-white rounded-lg transition-all duration-300 pointer-events-auto z-10 ${
                   isFullscreen ? 'p-3' : 'p-2'
                 }`}
                 aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
