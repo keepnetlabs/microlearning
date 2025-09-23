@@ -48,7 +48,9 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
     const [hasEnded, setHasEnded] = React.useState(false);
     const [isFullscreen, setIsFullscreen] = React.useState(false);
     const [isTranscriptOpen, setIsTranscriptOpen] = React.useState(showTranscript && transcript.length > 0);
+    const [isCaptionsOn, setIsCaptionsOn] = React.useState(true); // YouTube CC durumu
     const [currentTime, setCurrentTime] = React.useState(0);
+    const [playerKey, setPlayerKey] = React.useState(0); // Player yeniden mount için
     const playerRef = React.useRef<any>(null);
     const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -162,6 +164,20 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
       setIsTranscriptOpen(!isTranscriptOpen);
     }, [isTranscriptOpen]);
 
+    const toggleCaptions = React.useCallback(() => {
+      // Mevcut zamanı güvenli şekilde al
+      const savedTime = Math.max(0, Math.floor(currentTime || lastTime || 0));
+      console.log('CC button clicked! Saved time:', savedTime);
+
+      // Önce state'leri güncelle
+      setIsCaptionsOn(prevCC => !prevCC);
+
+      // Küçük bir gecikme ile player'ı yeniden mount et
+      setTimeout(() => {
+        setPlayerKey(prev => prev + 1);
+      }, 100);
+    }, [isCaptionsOn, currentTime, lastTime]);
+
     const handleTranscriptClick = React.useCallback((startTime: number) => {
       // Sadece izlenen süreyi geçmişse seek yapabilir
       if (startTime <= lastTime && playerRef.current) {
@@ -274,6 +290,7 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
           className={cn("w-full rounded-lg overflow-hidden relative group", isFullscreen && "fixed inset-0 z-50 bg-black rounded-none", className)}
         >
         <ReactPlayer
+          key={`player-${playerKey}-cc-${isCaptionsOn}`} // Key ile yeniden mount
           ref={(player) => {
             playerRef.current = player;
             if (typeof ref === 'function') {
@@ -300,7 +317,8 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
           config={{
             youtube: {
               disablekb: disableForwardSeek ? 1 : 0,
-              cc_load_policy: 1, // Altyazı her zaman açık
+              cc_load_policy: isCaptionsOn ? 1 : 0, // CC state'e göre
+              start: Math.floor(currentTime || 0), // Başlangıç saniyesi
             } as any,
           }}
           {...props}
@@ -345,15 +363,27 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
 
             {/* Control Buttons */}
             <div className={`absolute flex gap-2 transition-opacity duration-300 opacity-0 group-hover:opacity-100 ${isFullscreen ? 'bottom-8 left-8' : 'bottom-4 left-4'}`}>
-              {/* Transcript Button (CC) */}
+              {/* YouTube CC Button */}
+              <button
+                onClick={toggleCaptions}
+                className={`bg-black/80 hover:bg-black/90 text-white rounded-md transition-all duration-300 pointer-events-auto z-10 min-w-[36px] min-h-[36px] flex items-center justify-center ${
+                  isFullscreen ? 'min-w-[48px] min-h-[48px]' : ''
+                } ${isCaptionsOn ? 'ring-2 ring-white bg-white/20' : 'border border-white/30'}`}
+                aria-label={isCaptionsOn ? "Hide captions" : "Show captions"}
+                title="Captions (CC)"
+              >
+                <span className={`font-bold tracking-tight ${isFullscreen ? 'text-sm' : 'text-xs'}`}>CC</span>
+              </button>
+
+              {/* Transcript Button */}
               {transcript.length > 0 && (
                 <button
                   onClick={toggleTranscript}
-                  className={`bg-black/70 hover:bg-black/80 text-white rounded-lg transition-all duration-300 pointer-events-auto z-10 ${
-                    isFullscreen ? 'p-3' : 'p-2'
-                  } ${isTranscriptOpen ? 'ring-2 ring-white/50' : ''}`}
-                  aria-label={isTranscriptOpen ? "Hide captions" : "Show captions"}
-                  title="CC"
+                  className={`bg-black/80 hover:bg-black/90 text-white rounded-md transition-all duration-300 pointer-events-auto z-10 min-w-[36px] min-h-[36px] flex items-center justify-center ${
+                    isFullscreen ? 'min-w-[48px] min-h-[48px]' : ''
+                  } ${isTranscriptOpen ? 'ring-2 ring-white bg-white/20' : 'border border-white/30'}`}
+                  aria-label={isTranscriptOpen ? "Hide transcript" : "Show transcript"}
+                  title="Transcript"
                 >
                   <FileText size={isFullscreen ? 24 : 20} />
                 </button>
@@ -362,9 +392,9 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
               {/* Fullscreen Button */}
               <button
                 onClick={toggleFullscreen}
-                className={`bg-black/70 hover:bg-black/80 text-white rounded-lg transition-all duration-300 pointer-events-auto z-10 ${
-                  isFullscreen ? 'p-3' : 'p-2'
-                }`}
+                className={`bg-black/80 hover:bg-black/90 text-white rounded-md transition-all duration-300 pointer-events-auto z-10 min-w-[36px] min-h-[36px] flex items-center justify-center ${
+                  isFullscreen ? 'min-w-[48px] min-h-[48px]' : ''
+                } border border-white/30`}
                 aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
               >
                 {isFullscreen ? <Minimize size={isFullscreen ? 24 : 20} /> : <Maximize size={isFullscreen ? 24 : 20} />}
