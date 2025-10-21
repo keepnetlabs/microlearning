@@ -153,13 +153,26 @@ export const EditableText: React.FC<EditableTextProps> = ({
 
     // Use ref to prevent infinite re-opening after cancel
     const hasAutoStarted = useRef(false);
-    
+
     useEffect(() => {
-        // Reset flag when edit mode changes
+        // Reset flag when configPath changes (email changed)
+        hasAutoStarted.current = false;
+    }, [configPath]);
+
+    useEffect(() => {
+        // Auto-start editing when edit mode is enabled
+        if (isEditMode && !hasAutoStarted.current && richText) {
+            hasAutoStarted.current = true;
+            setLocalValue(currentValue);
+            setIsEditing(true);
+            setEditingField(configPath);
+        }
+
+        // Reset flag when edit mode changes to false
         if (!isEditMode) {
             hasAutoStarted.current = false;
         }
-    }, [isEditMode]);
+    }, [isEditMode, currentValue, richText, configPath, setEditingField]);
 
     // Global keyboard shortcuts for rich text editor
     useEffect(() => {

@@ -134,12 +134,12 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
     const handleReady = React.useCallback(() => {
       console.log('=== Player Ready ===');
       setIsPlayerReady(true);
-      
+
       // YouTube iframe'i direkt bulup kontrol et
       setTimeout(() => {
         const iframe = document.querySelector('iframe[src*="youtube.com"]') as HTMLIFrameElement;
         console.log('YouTube iframe found:', !!iframe);
-        
+
         if (iframe && iframe.contentWindow) {
           console.log('YouTube iframe has contentWindow');
           // YouTube Iframe API üzerinden kontrol deneyelim
@@ -289,119 +289,123 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
           ref={containerRef}
           className={cn("w-full rounded-lg overflow-hidden relative group", isFullscreen && "fixed inset-0 z-50 bg-black rounded-none", className)}
         >
-        <ReactPlayer
-          key={`player-${playerKey}-cc-${isCaptionsOn}`} // Key ile yeniden mount
-          ref={(player) => {
-            playerRef.current = player;
-            if (typeof ref === 'function') {
-              ref(player);
-            } else if (ref) {
-              ref.current = player;
-            }
-          }}
-          src={src}
-          width={isFullscreen ? "100vw" : width}
-          height={isFullscreen ? "100vh" : height}
-          controls={controls}
-          playing={isPlaying}
-          onPlay={handlePlay}
-          onPause={handlePause}
-          onEnded={handleEnded}
-          onReady={handleReady}
-          onProgress={handleProgress}
-          onSeeked={handleSeeked}
-          style={{
-            borderRadius: '8px',
-            overflow: 'hidden'
-          }}
-          config={{
-            youtube: {
-              disablekb: disableForwardSeek ? 1 : 0,
-              cc_load_policy: isCaptionsOn ? 1 : 0, // CC state'e göre
-              start: Math.floor(currentTime || 0), // Başlangıç saniyesi
-            } as any,
-          }}
-          {...props}
-        />
-        
-        {/* Custom Controls Overlay */}
-        {!controls && (
-          <div
-            className={`absolute inset-0 pointer-events-none ${isFullscreen ? 'z-[60]' : ''}`}
-          >
-            {/* Center Play/Pause Button */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              {!hasEnded && (
-                <button
-                  onClick={togglePlayPause}
-                  className={`bg-black/70 hover:bg-black/80 text-white rounded-full transition-all duration-300 hover:scale-110 pointer-events-auto z-10 ${
-                    isPlaying ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'
-                  } ${isFullscreen ? 'p-6' : 'p-4'}`}
-                  aria-label={isPlaying ? "Pause" : "Play"}
-                >
-                  {isPlaying ? (
-                    <Pause size={isFullscreen ? 48 : 32} />
-                  ) : (
-                    <Play size={isFullscreen ? 48 : 32} className="ml-1" />
-                  )}
-                </button>
-              )}
+          <ReactPlayer
+            key={`player-${playerKey}-cc-${isCaptionsOn}`} // Key ile yeniden mount
+            ref={(player) => {
+              playerRef.current = player;
+              if (typeof ref === 'function') {
+                ref(player);
+              } else if (ref) {
+                ref.current = player;
+              }
+            }}
+            src={src}
+            width={isFullscreen ? "100vw" : width}
+            height={isFullscreen ? "100vh" : height}
+            controls={controls}
+            playing={isPlaying}
+            onPlay={handlePlay}
+            onPause={handlePause}
+            onEnded={handleEnded}
+            onReady={handleReady}
+            onProgress={handleProgress}
+            onSeeked={handleSeeked}
+            style={{
+              borderRadius: '8px',
+              overflow: 'hidden'
+            }}
+            config={{
+              youtube: {
+                modestbranding: 1,                  // YouTube logosunu gizle
+                rel: 0,                             // Video sonunda ilgili videoları gösterme
+                controls: 0,                        // YouTube native kontrol barını gizle
+                fs: 1,                              // Fullscreen düğmesini aktif et
+                iv_load_policy: 3,                  // İçerik uyarılarını gizle
+                disablekb: disableForwardSeek ? 1 : 0,
+                cc_load_policy: isCaptionsOn ? 1 : 0, // CC state'e göre
+                start: Math.floor(currentTime || 0), // Başlangıç saniyesi
+              } as any,
+            }}
+            {...props}
+          />
 
-              {/* Replay Button */}
-              {hasEnded && (
+          {/* Custom Controls Overlay */}
+          {!controls && (
+            <div
+              className={`absolute inset-0 pointer-events-none ${isFullscreen ? 'z-[60]' : ''}`}
+            >
+              {/* Center Play/Pause Button */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                {!hasEnded && (
+                  <button
+                    onClick={togglePlayPause}
+                    className={`bg-black hover:bg-black text-white rounded-full transition-all duration-300 hover:scale-110 pointer-events-auto z-10 ${isPlaying ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'
+                      } p-5`}
+                    aria-label={isPlaying ? "Pause" : "Play"}
+                  >
+                    {isPlaying ? (
+                      <Pause size={isFullscreen ? 48 : 32} />
+                    ) : (
+                      <Play size={isFullscreen ? 48 : 32} className="ml-1" />
+                    )}
+                  </button>
+                )}
+
+                {/* Replay Button */}
+                {hasEnded && (
+                  <button
+                    onClick={handleReplay}
+                    className={`bg-black hover:bg-black text-white rounded-full transition-all duration-200 hover:scale-110 pointer-events-auto z-10 p-5`}
+                    aria-label="Replay"
+                  >
+                    <RotateCw size={isFullscreen ? 48 : 32} />
+                  </button>
+                )}
+              </div>
+
+              {/* Brand Logo Area - Right Bottom */}
+              <div style={{ position: 'absolute' }} className={`absolute rounded-lg flex items-center glass-border-2-no-overflow justify-center z-20 ${isFullscreen ? 'bottom-8 right-8 w-[150px] h-[50px]' : 'bottom-4 right-2 w-[150px] h-[50px]'}`}>
+                <img src="https://keepnetlabs.com/keepnet-logo.svg" alt="Keepnet Logo" className="w-full h-full object-contain p-2" />
+              </div>
+
+              {/* Control Buttons */}
+              <div className={`absolute flex gap-2 transition-opacity duration-300 opacity-0 group-hover:opacity-100 ${isFullscreen ? 'bottom-8 left-8' : 'bottom-4 left-4'}`}>
+                {/* YouTube CC Button */}
                 <button
-                  onClick={handleReplay}
-                  className={`bg-black/70 hover:bg-black/80 text-white rounded-full transition-all duration-200 hover:scale-110 pointer-events-auto z-10 ${
-                    isFullscreen ? 'p-6' : 'p-4'
-                  }`}
-                  aria-label="Replay"
+                  onClick={toggleCaptions}
+                  className={`bg-black/80 hover:bg-black/90 text-white rounded-md transition-all duration-300 pointer-events-auto z-10 min-w-[36px] min-h-[36px] flex items-center justify-center ${isFullscreen ? 'min-w-[48px] min-h-[48px]' : ''
+                    } ${isCaptionsOn ? 'ring-2 ring-white bg-white/20' : 'border border-white/30'}`}
+                  aria-label={isCaptionsOn ? "Hide captions" : "Show captions"}
+                  title="Captions (CC)"
                 >
-                  <RotateCw size={isFullscreen ? 48 : 32} />
+                  <span className={`font-bold tracking-tight ${isFullscreen ? 'text-sm' : 'text-xs'}`}>CC</span>
                 </button>
-              )}
+
+                {/* Transcript Button */}
+                {transcript.length > 0 && (
+                  <button
+                    onClick={toggleTranscript}
+                    className={`bg-black/80 hover:bg-black/90 text-white rounded-md transition-all duration-300 pointer-events-auto z-10 min-w-[36px] min-h-[36px] flex items-center justify-center ${isFullscreen ? 'min-w-[48px] min-h-[48px]' : ''
+                      } ${isTranscriptOpen ? 'ring-2 ring-white bg-white/20' : 'border border-white/30'}`}
+                    aria-label={isTranscriptOpen ? "Hide transcript" : "Show transcript"}
+                    title="Transcript"
+                  >
+                    <FileText size={isFullscreen ? 24 : 20} />
+                  </button>
+                )}
+
+                {/* Fullscreen Button */}
+                <button
+                  onClick={toggleFullscreen}
+                  className={`bg-black/80 hover:bg-black/90 text-white rounded-md transition-all duration-300 pointer-events-auto z-10 min-w-[36px] min-h-[36px] flex items-center justify-center ${isFullscreen ? 'min-w-[48px] min-h-[48px]' : ''
+                    } border border-white/30`}
+                  aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+                >
+                  {isFullscreen ? <Minimize size={isFullscreen ? 24 : 20} /> : <Maximize size={isFullscreen ? 24 : 20} />}
+                </button>
+              </div>
             </div>
-
-            {/* Control Buttons */}
-            <div className={`absolute flex gap-2 transition-opacity duration-300 opacity-0 group-hover:opacity-100 ${isFullscreen ? 'bottom-8 left-8' : 'bottom-4 left-4'}`}>
-              {/* YouTube CC Button */}
-              <button
-                onClick={toggleCaptions}
-                className={`bg-black/80 hover:bg-black/90 text-white rounded-md transition-all duration-300 pointer-events-auto z-10 min-w-[36px] min-h-[36px] flex items-center justify-center ${
-                  isFullscreen ? 'min-w-[48px] min-h-[48px]' : ''
-                } ${isCaptionsOn ? 'ring-2 ring-white bg-white/20' : 'border border-white/30'}`}
-                aria-label={isCaptionsOn ? "Hide captions" : "Show captions"}
-                title="Captions (CC)"
-              >
-                <span className={`font-bold tracking-tight ${isFullscreen ? 'text-sm' : 'text-xs'}`}>CC</span>
-              </button>
-
-              {/* Transcript Button */}
-              {transcript.length > 0 && (
-                <button
-                  onClick={toggleTranscript}
-                  className={`bg-black/80 hover:bg-black/90 text-white rounded-md transition-all duration-300 pointer-events-auto z-10 min-w-[36px] min-h-[36px] flex items-center justify-center ${
-                    isFullscreen ? 'min-w-[48px] min-h-[48px]' : ''
-                  } ${isTranscriptOpen ? 'ring-2 ring-white bg-white/20' : 'border border-white/30'}`}
-                  aria-label={isTranscriptOpen ? "Hide transcript" : "Show transcript"}
-                  title="Transcript"
-                >
-                  <FileText size={isFullscreen ? 24 : 20} />
-                </button>
-              )}
-
-              {/* Fullscreen Button */}
-              <button
-                onClick={toggleFullscreen}
-                className={`bg-black/80 hover:bg-black/90 text-white rounded-md transition-all duration-300 pointer-events-auto z-10 min-w-[36px] min-h-[36px] flex items-center justify-center ${
-                  isFullscreen ? 'min-w-[48px] min-h-[48px]' : ''
-                } border border-white/30`}
-                aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
-              >
-                {isFullscreen ? <Minimize size={isFullscreen ? 24 : 20} /> : <Maximize size={isFullscreen ? 24 : 20} />}
-              </button>
-            </div>
-          </div>
-        )}
+          )}
         </div>
 
         {/* Transcript Panel - Separate from video player like VideoPlayer.tsx */}
@@ -489,13 +493,12 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
                           handleTranscriptClick(item.start);
                         }
                       }}
-                      className={`w-full text-left p-4 transition-all duration-200 border-b border-slate-200/20 dark:border-slate-500/20 last:border-b-0 ${
-                        isActive
-                          ? 'bg-white/20 text-[#1C1C1E] dark:text-[#F2F2F7] border-l-4 border-blue-500'
-                          : isLocked
+                      className={`w-full text-left p-4 transition-all duration-200 border-b border-slate-200/20 dark:border-slate-500/20 last:border-b-0 ${isActive
+                        ? 'bg-white/20 text-[#1C1C1E] dark:text-[#F2F2F7] border-l-4 border-blue-500'
+                        : isLocked
                           ? 'text-[#1C1C1E]/40 dark:text-[#F2F2F7]/40 cursor-not-allowed bg-white/5'
                           : 'text-[#1C1C1E]/80 dark:text-[#F2F2F7]/80 hover:bg-white/10 hover:text-[#1C1C1E] dark:hover:text-[#F2F2F7] cursor-pointer'
-                      }`}
+                        }`}
                       aria-label={isLocked
                         ? `Locked: ${Math.floor(item.start / 60)}:${(item.start % 60).toFixed(0).padStart(2, '0')}: ${item.text}`
                         : `Go to ${Math.floor(item.start / 60)}:${(item.start % 60).toFixed(0).padStart(2, '0')}: ${item.text}`
@@ -505,11 +508,10 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
                       <div className="flex items-start gap-3">
                         <div className="flex items-center gap-2 min-w-[45px]">
                           <span
-                            className={`text-xs mt-1 font-mono ${
-                              isLocked
-                                ? 'text-[#1C1C1E]/40 dark:text-[#F2F2F7]/40'
-                                : 'text-[#1C1C1E]/60 dark:text-[#F2F2F7]/60'
-                            }`}
+                            className={`text-xs mt-1 font-mono ${isLocked
+                              ? 'text-[#1C1C1E]/40 dark:text-[#F2F2F7]/40'
+                              : 'text-[#1C1C1E]/60 dark:text-[#F2F2F7]/60'
+                              }`}
                             aria-label={`Timestamp: ${Math.floor(item.start / 60)} minutes ${(item.start % 60).toFixed(0)} seconds`}
                           >
                             {Math.floor(item.start / 60)}:{(item.start % 60).toFixed(0).padStart(2, '0')}
@@ -521,11 +523,10 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
                             />
                           )}
                         </div>
-                        <span className={`text-sm leading-relaxed flex-1 ${
-                          isLocked
-                            ? 'text-[#1C1C1E]/40 dark:text-[#F2F2F7]/40'
-                            : ''
-                        }`}>
+                        <span className={`text-sm leading-relaxed flex-1 ${isLocked
+                          ? 'text-[#1C1C1E]/40 dark:text-[#F2F2F7]/40'
+                          : ''
+                          }`}>
                           {item.text}
                         </span>
                       </div>

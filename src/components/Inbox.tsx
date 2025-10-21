@@ -517,6 +517,7 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
                       <FontWrapper>
                         {isEditMode ? (
                           <EditableText
+                            key={`editable-${selectedEmail.id}`}
                             configPath={`emails.${config.emails.findIndex(e => e.id === selectedEmail.id)}.content`}
                             richText={true}
                             className="w-full text-[#1C1C1E] dark:text-[#F2F2F7]"
