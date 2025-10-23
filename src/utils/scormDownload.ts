@@ -16,7 +16,7 @@ export const downloadSCORMPackage = () => {
     : 'Microlearning Course';
 
   // Construct the iframe source URL
-  const iframeSrc = `http://localhost:3000/?baseUrl=${encodeURIComponent(baseUrl)}&langUrl=${encodeURIComponent(langUrl)}&inboxUrl=${encodeURIComponent(inboxUrl)}`;
+  const iframeSrc = `https://microlearning.pages.dev/?baseUrl=${encodeURIComponent(baseUrl)}&langUrl=${encodeURIComponent(langUrl)}&inboxUrl=${encodeURIComponent(inboxUrl)}`;
 
   // SCORM 1.2 compliant HTML content
   const scormHTML = `<!DOCTYPE html>
@@ -282,7 +282,7 @@ export const downloadSCORMPackage = () => {
           try {
             return new URL(frame.src, location.href).origin;
           } catch (e) {
-            return "http://localhost:3000";
+            return "https://microlearning.pages.dev";
           }
         })();
         frame.addEventListener("load", function () {
