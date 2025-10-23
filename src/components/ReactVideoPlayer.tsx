@@ -41,6 +41,10 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
     disableForwardSeek = false,
     transcript = [],
     showTranscript = true,
+    onPlay,
+    onPause,
+    onEnded,
+    onProgress,
     ...props
   }, ref) => {
     const [lastTime, setLastTime] = React.useState(0);
@@ -53,6 +57,9 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
     const [playerKey, setPlayerKey] = React.useState(0); // Player yeniden mount için
     const playerRef = React.useRef<any>(null);
     const containerRef = React.useRef<HTMLDivElement>(null);
+    const lastTimeRef = React.useRef(0); // Ref ile callback yeniden oluşturmayı önle
+    const lastProgressTimeRef = React.useRef(0); // Son progress event zamanı
+    const lastProgressTimestampRef = React.useRef(0); // Son progress event'in gerçek zamanı
 
     // playing prop değiştiğinde state'i güncelle
     React.useEffect(() => {
@@ -61,8 +68,41 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
       }
     }, [playing]);
 
-    // YouTube Player ready olduğunu takip et
-    const [isPlayerReady, setIsPlayerReady] = React.useState(false);
+    // Interpolation: Progress eventleri arasında zamanı tahmin et
+    React.useEffect(() => {
+      let intervalId: NodeJS.Timeout | null = null;
+
+      const interpolateTime = () => {
+        if (isPlaying && lastProgressTimestampRef.current > 0) {
+          const now = Date.now();
+          const elapsedMs = now - lastProgressTimestampRef.current;
+          const elapsedSeconds = elapsedMs / 1000;
+
+          // Son progress'ten bu yana geçen süreyi ekle
+          const interpolatedTime = lastProgressTimeRef.current + elapsedSeconds;
+
+          setCurrentTime(interpolatedTime);
+
+          // ÖNEMLİ: lastTime ve lastTimeRef'i de güncelle
+          // Böylece transcript item'ları unlock olur
+          if (interpolatedTime > lastTimeRef.current) {
+            lastTimeRef.current = interpolatedTime;
+            setLastTime(interpolatedTime);
+          }
+        }
+      };
+
+      if (isPlaying) {
+        // Her 50ms'de interpolate et - yumuşak animasyon için
+        intervalId = setInterval(interpolateTime, 50);
+      }
+
+      return () => {
+        if (intervalId) {
+          clearInterval(intervalId);
+        }
+      };
+    }, [isPlaying]);
 
     const handleProgress = React.useCallback((state: any) => {
       // ReactPlayer progress object: { played, playedSeconds, loaded, loadedSeconds }
@@ -70,38 +110,44 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
 
       if (state && typeof state === 'object') {
         if ('playedSeconds' in state) {
-          // ReactPlayer format
           newTime = state.playedSeconds || 0;
         } else if (state.target && state.target.currentTime !== undefined) {
-          // HTML5 video event format
           newTime = state.target.currentTime || 0;
         }
       }
 
-      // Debug: console.log('Progress update - newTime:', newTime, 'lastTime:', lastTime);
+      // Interpolation için reference noktalarını güncelle
+      lastProgressTimeRef.current = newTime;
+      lastProgressTimestampRef.current = Date.now();
+
+      // Her zaman currentTime'ı güncelle
       setCurrentTime(newTime);
 
       // Sadece geçerli zaman varsa güncelle
       if (typeof newTime === 'number' && !isNaN(newTime) && newTime > 0) {
         if (disableForwardSeek) {
-          // Eğer kullanıcı ileri sardıysa, son izlenen zamana geri döndür
-          if (newTime > lastTime + 1) {
+          // Forward seek kontrolü
+          if (newTime > lastTimeRef.current + 1) {
             if (playerRef.current && playerRef.current.seekTo) {
-              playerRef.current.seekTo(lastTime);
+              playerRef.current.seekTo(lastTimeRef.current);
             }
             return;
           }
         }
 
-        // Her zaman lastTime'ı güncelle (transcript için gerekli)
-        setLastTime(newTime);
+        // ÖNEMLİ: lastTime sadece ARTARSA güncelle (maksimum izlenen süre)
+        // Geri seek yapıldığında küçük değerlerle güncellenmemeli
+        if (newTime > lastTimeRef.current) {
+          lastTimeRef.current = newTime;
+          setLastTime(newTime);
+        }
       }
 
-      // Orijinal onProgress callback'ini çağır
-      if (props.onProgress) {
-        props.onProgress(state);
+      // Orijinal callback
+      if (onProgress) {
+        onProgress(state);
       }
-    }, [disableForwardSeek, lastTime, props.onProgress]);
+    }, [disableForwardSeek, onProgress]);
 
     const handleSeeked = React.useCallback((event: any) => {
       // onSeeked eventini şimdilik basit tutalım
@@ -111,40 +157,30 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
     const handlePlay = React.useCallback(() => {
       setIsPlaying(true);
       setHasEnded(false);
-      if (props.onPlay) {
-        props.onPlay();
+      if (onPlay) {
+        onPlay();
       }
-    }, [props.onPlay]);
+    }, [onPlay]);
 
     const handlePause = React.useCallback(() => {
       setIsPlaying(false);
-      if (props.onPause) {
-        props.onPause();
+      // Pause olduğunda interpolation'u durdur
+      lastProgressTimestampRef.current = 0;
+      if (onPause) {
+        onPause();
       }
-    }, [props.onPause]);
+    }, [onPause]);
 
     const handleEnded = React.useCallback(() => {
       setIsPlaying(false);
       setHasEnded(true);
-      if (props.onEnded) {
-        props.onEnded();
+      if (onEnded) {
+        onEnded();
       }
-    }, [props.onEnded]);
+    }, [onEnded]);
 
     const handleReady = React.useCallback(() => {
-      console.log('=== Player Ready ===');
-      setIsPlayerReady(true);
-
-      // YouTube iframe'i direkt bulup kontrol et
-      setTimeout(() => {
-        const iframe = document.querySelector('iframe[src*="youtube.com"]') as HTMLIFrameElement;
-        console.log('YouTube iframe found:', !!iframe);
-
-        if (iframe && iframe.contentWindow) {
-          console.log('YouTube iframe has contentWindow');
-          // YouTube Iframe API üzerinden kontrol deneyelim
-        }
-      }, 2000);
+      // Player hazır - interpolation otomatik başlayacak (isPlaying true ise)
     }, []);
 
     const togglePlayPause = React.useCallback(() => {
@@ -153,8 +189,19 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
 
     const handleReplay = React.useCallback(() => {
       if (playerRef.current) {
-        playerRef.current.seekTo(0);
+        // Seek to 0 - api üzerinden
+        if (playerRef.current.api && typeof playerRef.current.api.seekTo === 'function') {
+          playerRef.current.api.seekTo(0);
+        } else if (typeof playerRef.current.seekTo === 'function') {
+          playerRef.current.seekTo(0);
+        }
+
+        // Tüm time reference'larını sıfırla
+        lastTimeRef.current = 0;
+        lastProgressTimeRef.current = 0;
+        lastProgressTimestampRef.current = 0;
         setLastTime(0);
+        setCurrentTime(0);
         setHasEnded(false);
         setIsPlaying(true);
       }
@@ -165,10 +212,6 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
     }, [isTranscriptOpen]);
 
     const toggleCaptions = React.useCallback(() => {
-      // Mevcut zamanı güvenli şekilde al
-      const savedTime = Math.max(0, Math.floor(currentTime || lastTime || 0));
-      console.log('CC button clicked! Saved time:', savedTime);
-
       // Önce state'leri güncelle
       setIsCaptionsOn(prevCC => !prevCC);
 
@@ -176,35 +219,51 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
       setTimeout(() => {
         setPlayerKey(prev => prev + 1);
       }, 100);
-    }, [isCaptionsOn, currentTime, lastTime]);
+    }, []);
 
     const handleTranscriptClick = React.useCallback((startTime: number) => {
       // Sadece izlenen süreyi geçmişse seek yapabilir
-      if (startTime <= lastTime && playerRef.current) {
+      if (startTime <= lastTimeRef.current && playerRef.current) {
         try {
-          console.log('Seeking to:', startTime, 'current lastTime:', lastTime);
+          // ReactPlayer'ın seekTo metodunu çağır - birden fazla yol dene
+          let seekSuccess = false;
 
-          // ReactPlayer'ın seekTo metodunu çağır - api property'si üzerinden
-          if (playerRef.current && playerRef.current.api && typeof playerRef.current.api.seekTo === 'function') {
+          // Method 1: api.seekTo (en yaygın)
+          if (playerRef.current.api && typeof playerRef.current.api.seekTo === 'function') {
             playerRef.current.api.seekTo(startTime);
-            setCurrentTime(startTime);
-            console.log('Seek successful to:', startTime);
-          } else if (playerRef.current && typeof playerRef.current.seekTo === 'function') {
-            // Fallback: direct seekTo method
-            playerRef.current.seekTo(startTime);
-            setCurrentTime(startTime);
-            console.log('Seek successful to:', startTime);
-          } else {
-            console.error('seekTo method not available, playerRef:', playerRef.current);
-            console.log('Available api methods:', playerRef.current?.api ? Object.getOwnPropertyNames(playerRef.current.api) : 'no api');
+            seekSuccess = true;
           }
+
+          // Method 2: Direct seekTo
+          if (!seekSuccess && typeof playerRef.current.seekTo === 'function') {
+            playerRef.current.seekTo(startTime, 'seconds');
+            seekSuccess = true;
+          }
+
+          // Method 3: getInternalPlayer
+          if (!seekSuccess && playerRef.current.getInternalPlayer) {
+            const internalPlayer = playerRef.current.getInternalPlayer();
+            if (internalPlayer && typeof internalPlayer.seekTo === 'function') {
+              internalPlayer.seekTo(startTime, true);
+              seekSuccess = true;
+            }
+          }
+
+          if (!seekSuccess) {
+            console.error('ReactVideoPlayer: No working seekTo method found');
+            return;
+          }
+
+          // ÖNEMLİ: Seek sonrası sadece currentTime ve interpolation reference'larını güncelle
+          // lastTime (maksimum izlenen süre) GÜNCELLENMEMELİ - transcript unlock durumu korunmalı
+          setCurrentTime(startTime);
+          lastProgressTimeRef.current = startTime;
+          lastProgressTimestampRef.current = Date.now();
         } catch (error) {
-          console.error('Error seeking to time:', error);
+          console.error('ReactVideoPlayer: Error seeking to time:', error);
         }
-      } else {
-        console.log('Seek rejected - startTime:', startTime, 'lastTime:', lastTime, 'playerRef:', !!playerRef.current);
       }
-    }, [lastTime]);
+    }, []);
 
     // Aktif transcript item'ini bul
     const activeTranscriptIndex = React.useMemo(() => {
@@ -364,7 +423,7 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
               </div>
 
               {/* Brand Logo Area - Right Bottom */}
-              <div style={{ position: 'absolute' }} className={`absolute rounded-lg flex items-center glass-border-2-no-overflow justify-center z-20 ${isFullscreen ? 'bottom-8 right-8 w-[150px] h-[50px]' : 'bottom-4 right-2 w-[150px] h-[50px]'}`}>
+              <div style={{ position: 'absolute' }} className={`absolute rounded-lg flex items-center glass-border-2-no-overflow justify-center z-20 ${isFullscreen ? 'bottom-4 right-2 w-[150px] h-[50px]' : 'bottom-4 right-2 w-[150px] h-[50px]'}`}>
                 <img src="https://keepnetlabs.com/keepnet-logo.svg" alt="Keepnet Logo" className="w-full h-full object-contain p-2" />
               </div>
 
@@ -488,7 +547,6 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
                   <div key={index} role="listitem">
                     <button
                       onClick={() => {
-                        console.log(`Clicked item ${index}: canAccess=${canAccess}, isLocked=${isLocked}, itemStart=${item.start}, lastTime=${lastTime}`);
                         if (canAccess) {
                           handleTranscriptClick(item.start);
                         }
