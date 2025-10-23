@@ -60,7 +60,12 @@ export const downloadSCORMPackage = () => {
   </head>
   <body>
     <div id="spinner" class="spinner"></div>
-    <iframe id="mlFrame" allowfullscreen title="Microlearning"></iframe>
+    <iframe 
+      id="mlFrame" 
+      allowfullscreen 
+      title="Microlearning"
+      allow="accelerometer; autoplay; camera; clipboard-write; encrypted-media; fullscreen; geolocation; gyroscope; magnetometer; microphone; midi; payment; picture-in-picture; usb; xr-spatial-tracking"
+    ></iframe>
 
     <script>
       // --- SCORM 1.2 popup-safe wrapper ---
