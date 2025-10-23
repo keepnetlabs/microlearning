@@ -29,7 +29,7 @@ export const normalizeBcp47Tag = (input: string): string => {
             const arr = (Intl as any).getCanonicalLocales(raw);
             if (arr && arr.length > 0) return arr[0];
         }
-    } catch {}
+    } catch { }
     try {
         // @ts-ignore
         if (typeof (Intl as any).Locale === "function") {
@@ -37,7 +37,7 @@ export const normalizeBcp47Tag = (input: string): string => {
             const loc = new (Intl as any).Locale(raw);
             return loc.toString();
         }
-    } catch {}
+    } catch { }
     const parts = raw.split("-");
     if (parts.length === 0) return raw.toLowerCase();
     const [language, ...rest] = parts;
@@ -345,6 +345,7 @@ export const languages = [
     { code: 'mi', name: 'Maori', flag: '🇳🇿' },
     { code: 'haw', name: 'Hawaiian', flag: '🇺🇸' },
     { code: 'ht', name: 'Haitian Creole', flag: '🇭🇹' },
+    { code: 'fr-ca', name: 'French (Canada)', flag: '🇨🇦' },
     { code: 'ceb', name: 'Cebuano', flag: '🇵🇭' },
     { code: 'mg', name: 'Malagasy', flag: '🇲🇬' },
     { code: 'so', name: 'Somali', flag: '🇸🇴' },

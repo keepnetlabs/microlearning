@@ -104,8 +104,8 @@ function ActionableContentSceneInternalCore({
 
     // If selectedLanguage is provided, update the URL to match the current language
     if (selectedLanguage) {
-      // Extract the primary language code (e.g., 'en' from 'en-US')
-      const langCode = selectedLanguage.toLowerCase().split('-')[0];
+      // Keep full language code (e.g., 'fr-CA' stays 'fr-ca')
+      const langCode = selectedLanguage.toLowerCase();
 
       // Replace the language part in the URL pattern
       // Pattern: /inbox/all/en -> /inbox/all/{langCode}

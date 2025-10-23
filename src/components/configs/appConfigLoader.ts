@@ -21,8 +21,8 @@ export const buildAppConfigFromBase = (
   language: string,
   contentOverride?: any
 ): any => {
-  // Dil kodunu normalize et (tr-TR -> tr)
-  const normalizedLang = language.toLowerCase().split('-')[0];
+  // Dil kodunu normalize et (sadece lowercase)
+  const normalizedLang = language.toLowerCase();
 
   // İçerik config'i uzaktan geldiyse onu kullan; yoksa base olduğu gibi kalsın
   const contentConfig = contentOverride;
@@ -186,7 +186,7 @@ export const loadAppConfigAsyncCombined = async (
   options?: { timeoutMs?: number; signal?: AbortSignal; useCacheFirst?: boolean }
 ): Promise<any> => {
   const useCacheFirst = options?.useCacheFirst ?? true;
-  const normalizedLang = language.toLowerCase().split('-')[0];
+  const normalizedLang = language.toLowerCase();
 
   let baseConfig: any | null = null;
   let langConfig: any | null = null;

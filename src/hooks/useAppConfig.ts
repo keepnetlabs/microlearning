@@ -62,7 +62,7 @@ export const useAppConfig = ({ testOverrides }: UseAppConfigOptions = {}) => {
       // During initial load: if template contains a concrete /lang/<code>, keep as-is;
       // otherwise support {lang} placeholder.
       const computeLangUrlInitial = (templateUrl: string, lang: string) => {
-        const normalized = lang.toLowerCase().split('-')[0];
+        const normalized = lang.toLowerCase();
         if (templateUrl.includes('{lang}')) {
           return templateUrl.replace('{lang}', normalized);
         }
@@ -96,7 +96,7 @@ export const useAppConfig = ({ testOverrides }: UseAppConfigOptions = {}) => {
       setIsConfigLoading(true);
       try {
         // Normalize language code
-        const normalized = newLanguage.toLowerCase().split('-')[0];
+        const normalized = newLanguage.toLowerCase();
         // Construct new language URL: baseUrl + /lang/{language}
         const newLangUrl = `${remoteBaseUrl}/lang/${normalized}`;
         const cfg = await loadAppConfigAsyncCombined(newLanguage, remoteBaseUrl, newLangUrl, { timeoutMs: 10000 });
