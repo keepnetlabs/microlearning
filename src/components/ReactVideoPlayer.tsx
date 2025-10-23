@@ -128,8 +128,8 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
         if (disableForwardSeek) {
           // Forward seek kontrolü
           if (newTime > lastTimeRef.current + 1) {
-            if (playerRef.current && playerRef.current.seekTo) {
-              playerRef.current.seekTo(lastTimeRef.current);
+            if (playerRef.current?.api?.seekTo) {
+              playerRef.current.api.seekTo(lastTimeRef.current);
             }
             return;
           }
@@ -148,11 +148,6 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
         onProgress(state);
       }
     }, [disableForwardSeek, onProgress]);
-
-    const handleSeeked = React.useCallback((event: any) => {
-      // onSeeked eventini şimdilik basit tutalım
-      // İleri sarma kontrolü daha çok onProgress'te yapılıyor
-    }, []);
 
     const handlePlay = React.useCallback(() => {
       setIsPlaying(true);
@@ -184,7 +179,26 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
     }, []);
 
     const togglePlayPause = React.useCallback(() => {
-      setIsPlaying(!isPlaying);
+      // Önce state'i güncelle
+      const newPlayingState = !isPlaying;
+      setIsPlaying(newPlayingState);
+
+      // iframe içinde autoplay policy için: direkt internal player'ı çağır
+      if (newPlayingState && playerRef.current) {
+        try {
+          // YouTube internal player'ı bul ve play yap
+          if (playerRef.current.api && typeof playerRef.current.api.playVideo === 'function') {
+            playerRef.current.api.playVideo();
+          } else if (playerRef.current.getInternalPlayer) {
+            const internalPlayer = playerRef.current.getInternalPlayer();
+            if (internalPlayer && typeof internalPlayer.playVideo === 'function') {
+              internalPlayer.playVideo();
+            }
+          }
+        } catch (error) {
+          console.error('ReactVideoPlayer: Error calling playVideo:', error);
+        }
+      }
     }, [isPlaying]);
 
     const handleReplay = React.useCallback(() => {
@@ -204,6 +218,13 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
         setCurrentTime(0);
         setHasEnded(false);
         setIsPlaying(true);
+
+        // iframe içinde autoplay policy için: direkt play yap
+        setTimeout(() => {
+          if (playerRef.current?.api && typeof playerRef.current.api.playVideo === 'function') {
+            playerRef.current.api.playVideo();
+          }
+        }, 100);
       }
     }, []);
 
@@ -368,7 +389,6 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
             onEnded={handleEnded}
             onReady={handleReady}
             onProgress={handleProgress}
-            onSeeked={handleSeeked}
             style={{
               borderRadius: '8px',
               overflow: 'hidden'
@@ -404,10 +424,25 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
               <div className="absolute inset-0 flex items-center justify-center">
                 {!hasEnded && (
                   <button
-                    onClick={togglePlayPause}
-                    className={`bg-black hover:bg-black text-white rounded-full transition-all duration-300 hover:scale-110 pointer-events-auto z-10 ${isPlaying ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      togglePlayPause();
+                    }}
+                    onTouchStart={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      togglePlayPause();
+                    }}
+                    onClick={(e) => {
+                      // onClick sadece backup - mouseDown ve touchStart çalışmazsa
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                    className={`bg-black hover:bg-black text-white rounded-full transition-all duration-300 hover:scale-110 pointer-events-auto z-[9999] ${isPlaying ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'
                       } p-5`}
                     aria-label={isPlaying ? "Pause" : "Play"}
+                    style={{ position: 'relative', zIndex: 9999 }}
                   >
                     {isPlaying ? (
                       <Pause size={isFullscreen ? 48 : 32} />
@@ -420,9 +455,24 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
                 {/* Replay Button */}
                 {hasEnded && (
                   <button
-                    onClick={handleReplay}
-                    className={`bg-black hover:bg-black text-white rounded-full transition-all duration-200 hover:scale-110 pointer-events-auto z-10 p-5`}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleReplay();
+                    }}
+                    onTouchStart={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleReplay();
+                    }}
+                    onClick={(e) => {
+                      // onClick sadece backup
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                    className={`bg-black hover:bg-black text-white rounded-full transition-all duration-200 hover:scale-110 pointer-events-auto z-[9999] p-5`}
                     aria-label="Replay"
+                    style={{ position: 'relative', zIndex: 9999 }}
                   >
                     <RotateCw size={isFullscreen ? 48 : 32} />
                   </button>
