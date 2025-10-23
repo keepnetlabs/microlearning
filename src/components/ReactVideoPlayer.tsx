@@ -383,6 +383,13 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
                 disablekb: disableForwardSeek ? 1 : 0,
                 cc_load_policy: isCaptionsOn ? 1 : 0, // CC state'e göre
                 start: Math.floor(currentTime || 0), // Başlangıç saniyesi
+                playerVars: {
+                  origin: window.location.origin,  // YouTube için origin belirt
+                },
+                embedOptions: {
+                  // iframe'e allow attribute ekle - tüm izinler (başka siteden embed için)
+                  allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen; magnetometer; microphone; camera; geolocation; payment; usb; midi; xr-spatial-tracking',
+                }
               } as any,
             }}
             {...props}
