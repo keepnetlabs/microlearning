@@ -20,12 +20,12 @@ export const EditModePanel: React.FC = () => {
     // Check if EditModePanel should be visible
     useEffect(() => {
         if (typeof window === 'undefined') return;
-        
+
         const checkPanelVisibility = () => {
             const urlParams = new URLSearchParams(window.location.search);
             const urlEditMode = urlParams.get('isEditMode') === 'true';
             const sessionActivated = sessionStorage.getItem('editModeActivatedInSession') === 'true';
-            
+
             if (urlEditMode) {
                 // If URL has edit mode, show panel and mark as activated in session
                 setShouldShowPanel(true);
@@ -45,19 +45,23 @@ export const EditModePanel: React.FC = () => {
         // Listen for URL changes
         window.addEventListener('popstate', checkPanelVisibility);
         window.addEventListener('hashchange', checkPanelVisibility);
-        
-        // Clear session storage on page unload
+
+        // Clear session storage and localStorage on page unload
         const handleBeforeUnload = () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const urlEditMode = urlParams.get('isEditMode') === 'true';
-            // Only clear if there's no URL parameter
-            if (!urlEditMode) {
+            // Üründen çıkarken her zaman temizle
+            try {
+                // sessionStorage'ı temizle
                 sessionStorage.removeItem('editModeActivatedInSession');
+
+                // localStorage'daki inboxState'i temizle
+                localStorage.removeItem('inboxState');
+            } catch (e) {
+                console.error('Error clearing storage:', e);
             }
         };
-        
+
         window.addEventListener('beforeunload', handleBeforeUnload);
-        
+
         return () => {
             window.removeEventListener('popstate', checkPanelVisibility);
             window.removeEventListener('hashchange', checkPanelVisibility);
@@ -82,7 +86,7 @@ export const EditModePanel: React.FC = () => {
 
         // Update URL without page reload
         window.history.replaceState({}, '', url.toString());
-        
+
         // Toggle edit mode after URL update
         toggleEditMode();
     };
