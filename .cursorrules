@@ -1,0 +1,173 @@
+# MicroLearning React Platform - Development Guidelines
+
+## Project Overview
+- TypeScript React application with scene-based microlearning architecture
+- SCORM API integration for learning tracking
+- Tailwind CSS + Framer Motion for styling and animations
+- Context API for state management, custom hooks for logic
+- Rich text editor (TinyMCE) integration
+
+## Core Expertise
+- TypeScript & React (functional components, hooks)
+- Tailwind CSS with responsive mobile-first design
+- Framer Motion animations
+- SCORM API integration and learning tracking
+- React Context API and custom hook patterns
+- Accessibility (a11y) and performance optimization
+
+## Code Style and Structure
+- Write concise, technical TypeScript code
+- Use functional and declarative patterns; avoid classes
+- Prefer modularization over code duplication
+- Use descriptive variable names with auxiliary verbs (isLoading, hasError, isEditing)
+- File structure: exported component → subcomponents → helpers → types
+
+## Naming Conventions
+- **Components:** kebab-case files (e.g., `rich-text-editor.tsx`, `edit-mode-panel.tsx`)
+- **Exports:** named exports for components
+- **Scene components:** `src/components/scenes/` (IntroScene.tsx, QuizScene.tsx)
+- **Common components:** `src/components/common/` (EditableText.tsx, FontWrapper.tsx)
+- **Hooks:** `use[Feature].ts` (useLanguage.ts, useEditMode.ts)
+- **Contexts:** `[Feature]Context.tsx` (EditModeContext.tsx, FontFamilyContext.tsx)
+- **Services:** `[Feature]Service.ts` (scormService.ts, scormDownload.ts)
+
+## TypeScript Usage
+- Use TypeScript for all code; prefer interfaces over types
+- Avoid enums; use maps and constants instead
+- Define all component props as interfaces
+- Type all parameters explicitly
+```typescript
+interface EditableTextProps {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+}
+
+export function EditableText({ value, onChange, placeholder = "" }: EditableTextProps) {
+  // implementation
+}
+```
+
+## Syntax and Formatting
+- Use `function` keyword for components and pure functions
+- Avoid unnecessary curly braces; use concise syntax
+- Keep components lean and focused
+- Use `const` for variables, arrow functions for callbacks
+- Declarative JSX with clear data flow
+
+## State Management
+- **Global state:** React Context API (EditModeContext, FontFamilyContext, GlobalEditModeContext)
+- **Local state:** useState for component-level state
+- **Optimizations:** useCallback for stable function references, useMemo for expensive computations
+- **Custom hooks:** expose context values and complex logic through hooks
+- Keep state as close to usage as possible
+
+Example hook pattern:
+```typescript
+export function useIsEditMode() {
+  const context = useContext(EditModeContext);
+  if (!context) throw new Error("useIsEditMode must be used within EditModeProvider");
+  return context;
+}
+```
+
+## UI, Styling, and Animations
+- **Styling:** Tailwind CSS with mobile-first responsive design
+- **Dark mode:** Use CSS media queries and `dark:` prefix
+- **Animations:** Framer Motion with defined variants for reusability
+- **Themes:** Support theme switching via context and CSS classes
+```typescript
+const fadeInVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.3 } },
+};
+```
+
+## Hooks and Custom Logic
+**Common hooks in this project:**
+- `useLanguage()` - Language and translations
+- `useIsEditMode()` - Edit mode state
+- `useFontFamily()` - Font family settings
+- `useDarkMode()` - Dark mode preference
+- `useIsIOS()` - iOS device detection
+- `useAppConfig()` - App configuration
+- `useThemeClasses()` - Theme-based CSS classes
+
+Hooks in `src/hooks/`, services in `src/services/`, utils in `src/utils/`
+
+## Scene Architecture
+- Each scene is a main component in `src/components/scenes/`
+- Scene-specific subcomponents in `src/components/scenes/{scene-name}/components/`
+- Reuse common components from `src/components/common/`
+- Use `EditModePanel` for edit mode UI
+- Export scenes with `React.memo` for performance
+
+Scenes: IntroScene, GoalScene, ScenarioScene, QuizScene, SurveyScene, SummaryScene, ActionableContentScene, NudgeScene
+
+## SCORM Integration
+- Use `scormService.ts` for SCORM API interactions
+- Track learning progress, completion status, and scores
+- Sync state with SCORM via useEffect
+- Handle SCORM errors gracefully with logger utility
+
+## Performance Optimization
+- Use `React.memo` for expensive scene components
+- Implement `useMemo` for computed values
+- Use `useCallback` for stable function references
+- Lazy load non-critical components with React.lazy and Suspense
+- Minimize re-renders with proper dependency arrays
+
+## Accessibility
+- Use semantic HTML elements and ARIA labels
+- Ensure keyboard navigation support
+- Test with screen readers
+- Adequate color contrast and alt text for images
+```typescript
+<button aria-label="Edit content" aria-pressed={isEditing} onClick={toggleEdit}>
+  Edit
+</button>
+```
+
+## Error Handling
+- Try-catch for async operations and SCORM API calls
+- Log errors using logger utility (not console.log)
+- Show user-friendly error messages via toast notifications
+- Use error boundaries for component crashes
+
+## File Organization
+```
+src/
+├── components/
+│   ├── common/          # Shared reusable components
+│   ├── scenes/          # Main scene components
+│   ├── ui/              # UI components and modals
+│   └── icons/
+├── hooks/               # Custom React hooks
+├── contexts/            # Context providers
+├── services/            # Business logic (scormService, etc.)
+├── utils/               # Utilities (constants, helpers)
+└── types/               # Type definitions
+```
+
+## Key Principles
+- ✅ All props typed with interfaces
+- ✅ Functional components with TypeScript
+- ✅ Tailwind CSS for all styling
+- ✅ No console.logs in production (use logger)
+- ✅ Performance optimizations (React.memo, useMemo, useCallback)
+- ✅ Accessibility standards met
+- ✅ Error handling implemented
+- ✅ DRY code (no duplication)
+- ✅ Proper module exports and organization
+- ✅ Maintain backward compatibility
+
+## Important Notes
+- Keep components small and focused
+- Document complex logic with comments
+- Use meaningful variable names
+- Always test before committing
+- Follow existing code patterns in the project
+- Avoid premature optimization
+
+## Resources
+React Docs: https://react.dev | TypeScript: https://www.typescriptlang.org/docs | Tailwind: https://tailwindcss.com/docs | Framer Motion: https://www.framer.com/motion | SCORM: https://scorm.com

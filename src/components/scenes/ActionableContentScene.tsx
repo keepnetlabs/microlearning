@@ -349,13 +349,6 @@ function ActionableContentSceneInternal(props: ActionableContentSceneProps & {
   const [configKey, setConfigKey] = useState(0);
   const [inboxConfigRef, setInboxConfigRef] = useState<{ current: InboxSceneConfig | null }>({ current: null });
 
-  // URL parameters for inbox API
-  const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-  const initialRemoteBaseUrl = normalizeUrlParam(urlParams?.get('baseUrl'));
-  const inboxUrl = normalizeUrlParam(urlParams?.get('inboxUrl'));
-  const langUrl = normalizeUrlParam(urlParams?.get('langUrl'));
-  const language = langUrl?.split('/')[1];
-
   // Detect language changes and force re-render
   useEffect(() => {
     setConfigKey(prev => prev + 1);
@@ -368,13 +361,6 @@ function ActionableContentSceneInternal(props: ActionableContentSceneProps & {
     }
   }, [inboxConfigRef]);
 
-  // Scene API URL (different from inbox API URL)
-  const sceneApiUrl = (() => {
-    const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-    const baseUrl = normalizeUrlParam(urlParams?.get('baseUrl')) || "https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001";
-    const langUrl = normalizeUrlParam(urlParams?.get('langUrl')) || "lang/en";
-    return joinUrls(baseUrl, langUrl);
-  })();
 
   return (
     <EditModeProvider

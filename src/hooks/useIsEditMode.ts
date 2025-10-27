@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 /**
  * Custom hook to check if edit mode is enabled via URL parameter

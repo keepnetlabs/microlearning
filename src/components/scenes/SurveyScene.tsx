@@ -72,7 +72,9 @@ export const SurveyScene = memo(function SurveyScene({
   };
 
   const state = surveyState || localState;
-  const setState = onSurveyStateChange || (() => { });
+
+  // Memoize setState to prevent dependency changes in useCallback hooks
+  const setState = useMemo(() => onSurveyStateChange || (() => { }), [onSurveyStateChange]);
 
   const { rating, feedback, selectedTopics, isSubmitting, isSubmitted } = state;
   const isMobile = useIsMobile();

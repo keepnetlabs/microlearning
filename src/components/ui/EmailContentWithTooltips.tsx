@@ -54,7 +54,6 @@ export const EmailContentWithPortalTooltips: React.FC<EmailContentWithPortalTool
   htmlContent,
   className = ''
 }) => {
-  const contentRef = useRef<HTMLDivElement>(null);
   const [tooltippedContent, setTooltippedContent] = React.useState<React.ReactNode>(null);
 
   useEffect(() => {

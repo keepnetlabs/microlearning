@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Edit3, Check, X } from 'lucide-react';
-import { useEditMode } from '../../contexts/EditModeContext';
+import { useOptionalEditMode } from '../../contexts/EditModeContext';
 import { RichTextEditor } from '../ui/RichTextEditor';
 
 
@@ -32,28 +32,16 @@ export const EditableText: React.FC<EditableTextProps> = ({
     onValidationError,
     as: Component = 'span'
 }) => {
-    // Optional edit mode - only use if EditModeProvider is available
-    let isEditMode = false;
-    let setEditingField: (field: string | null) => void = () => { };
-    let updateTempConfig: (path: string, value: any) => void = () => { };
-    let tempConfig: any = {};
-    let toggleEditMode: () => void = () => { };
-
-    try {
-        const editModeContext = useEditMode();
-        isEditMode = editModeContext.isEditMode;
-        setEditingField = editModeContext.setEditingField;
-        updateTempConfig = editModeContext.updateTempConfig;
-        tempConfig = editModeContext.tempConfig;
-        toggleEditMode = editModeContext.toggleEditMode;
-    } catch (error) {
-        // EditModeProvider not available, use defaults
-        isEditMode = false;
-        setEditingField = () => { };
-        updateTempConfig = () => { };
-        tempConfig = {};
-        toggleEditMode = () => { };
-    }
+    // Optional edit mode - safe hook (returns undefined outside provider)
+    const editModeContext = useOptionalEditMode();
+    const isEditMode = !!editModeContext?.isEditMode;
+    const setEditingFieldStable = useCallback((field: string | null) => {
+        editModeContext?.setEditingField(field);
+    }, [editModeContext]);
+    const updateTempConfigStable = useCallback((path: string, value: any) => {
+        editModeContext?.updateTempConfig(path, value);
+    }, [editModeContext]);
+    // toggleEditMode is available if needed in future, but unused here
 
     const [localValue, setLocalValue] = useState('');
     const [isEditing, setIsEditing] = useState(false);
@@ -63,7 +51,8 @@ export const EditableText: React.FC<EditableTextProps> = ({
     // Get current value from config path (memoized for performance)
     const currentValue = useMemo(() => {
         const keys = configPath.split('.');
-        let current = tempConfig;
+        const tmp: any = editModeContext?.tempConfig || {};
+        let current: any = tmp;
 
         for (const key of keys) {
             if (current && typeof current === 'object' && key in current) {
@@ -79,7 +68,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
         }
 
         return String(current || children || '');
-    }, [configPath, tempConfig, children]);
+    }, [configPath, editModeContext?.tempConfig, children]);
 
     useEffect(() => {
         if (isEditing && inputRef.current) {
@@ -95,13 +84,13 @@ export const EditableText: React.FC<EditableTextProps> = ({
 
         setLocalValue(currentValue);
         setIsEditing(true);
-        setEditingField(configPath);
+        setEditingFieldStable(configPath);
         setValidationError('');
-    }, [isEditMode, currentValue, configPath, setEditingField]);
+    }, [isEditMode, currentValue, configPath, setEditingFieldStable]);
 
     const handleSave = useCallback(() => {
         console.log('[EditableText] Save clicked for:', configPath, 'Value:', localValue);
-        
+
         // Validation
         if (validation && !validation(localValue)) {
             const error = 'Invalid input';
@@ -122,21 +111,21 @@ export const EditableText: React.FC<EditableTextProps> = ({
             return;
         }
 
-        updateTempConfig(configPath, localValue);
+        updateTempConfigStable(configPath, localValue);
         setIsEditing(false);
-        setEditingField(null);
+        setEditingFieldStable(null);
         setValidationError('');
-        
-    }, [validation, localValue, maxLength, onValidationError, updateTempConfig, configPath, setEditingField]);
+
+    }, [validation, localValue, maxLength, onValidationError, updateTempConfigStable, configPath, setEditingFieldStable]);
 
     const handleCancel = useCallback(() => {
         console.log('[EditableText] Cancel clicked for:', configPath);
         setLocalValue(currentValue);
         setIsEditing(false);
-        setEditingField(null);
+        setEditingFieldStable(null);
         setValidationError('');
-        
-    }, [currentValue, setEditingField, configPath]);
+
+    }, [currentValue, setEditingFieldStable, configPath]);
 
     const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !multiline && !richText) {
@@ -165,14 +154,14 @@ export const EditableText: React.FC<EditableTextProps> = ({
             hasAutoStarted.current = true;
             setLocalValue(currentValue);
             setIsEditing(true);
-            setEditingField(configPath);
+            setEditingFieldStable(configPath);
         }
 
         // Reset flag when edit mode changes to false
         if (!isEditMode) {
             hasAutoStarted.current = false;
         }
-    }, [isEditMode, currentValue, richText, configPath, setEditingField]);
+    }, [isEditMode, currentValue, richText, configPath, setEditingFieldStable]);
 
     // Global keyboard shortcuts for rich text editor
     useEffect(() => {
@@ -308,15 +297,15 @@ export const EditableText: React.FC<EditableTextProps> = ({
                     {/* Action buttons - Only for non-richText fields */}
                     {!richText && (
                         <div className="absolute -right-16 top-1/2 transform -translate-y-1/2 flex gap-1 z-20">
-                        <motion.div
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={handleSave}
-                            className="w-6 h-6 text-[#1C1C1E] dark:text-[#F2F2F7] glass-border-1 rounded-full flex items-center justify-center text-xs cursor-pointer"
-                            title="Save (Enter)"
-                        >
-                            <Check size={10} strokeWidth={3} />
-                        </motion.div>
+                            <motion.div
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                onClick={handleSave}
+                                className="w-6 h-6 text-[#1C1C1E] dark:text-[#F2F2F7] glass-border-1 rounded-full flex items-center justify-center text-xs cursor-pointer"
+                                title="Save (Enter)"
+                            >
+                                <Check size={10} strokeWidth={3} />
+                            </motion.div>
                             <motion.div
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}

@@ -101,6 +101,32 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
         }
     }, [onEditModeChange]);
 
+    // Restore View Mode state from sessionStorage to persist across scenes
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const savedViewMode = sessionStorage.getItem('isViewMode');
+            if (savedViewMode === 'true') {
+                setIsViewMode(true);
+                if (onViewModeChange) {
+                    onViewModeChange(true);
+                }
+            }
+        }
+    }, [onViewModeChange]);
+
+    // View Mode cleanup is centralized in App.tsx beforeunload handler
+
+    // Broadcast unsaved changes state to App for navigation guards
+    useEffect(() => {
+        try {
+            if (typeof window !== 'undefined' && sceneId) {
+                window.dispatchEvent(new CustomEvent('sceneUnsavedChanged', {
+                    detail: { sceneId, hasUnsavedChanges }
+                }));
+            }
+        } catch { }
+    }, [hasUnsavedChanges, sceneId]);
+
     const toggleEditMode = useCallback(() => {
         if (isEditMode && hasUnsavedChanges) {
             const confirmDiscard = window.confirm('You have unsaved changes. Do you want to discard them?');
@@ -115,6 +141,12 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
         // Edit mode açılırken View mode'u kapat
         if (newEditMode && isViewMode) {
             setIsViewMode(false);
+            // Persist view mode state across scenes
+            try {
+                if (typeof window !== 'undefined') {
+                    sessionStorage.setItem('isViewMode', 'false');
+                }
+            } catch { }
             if (onViewModeChange) {
                 onViewModeChange(false);
             }
@@ -129,6 +161,12 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
     const toggleViewMode = useCallback(() => {
         const newViewMode = !isViewMode;
         setIsViewMode(newViewMode);
+        // Persist view mode state across scenes
+        try {
+            if (typeof window !== 'undefined') {
+                sessionStorage.setItem('isViewMode', String(newViewMode));
+            }
+        } catch { }
 
         // View mode açılırken Edit mode'u kapat
         if (newViewMode && isEditMode) {
@@ -247,8 +285,20 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
         setBaseConfig(tempConfig); // Update base config with saved values
         // Force tempConfig update for immediate re-render with new reference
         setTempConfig((prev: any) => ({ ...prev }));
+
+        // Notify app-level config that this scene's config has been patched
+        try {
+            if (typeof window !== 'undefined' && sceneId) {
+                window.dispatchEvent(new CustomEvent('sceneConfigPatched', {
+                    detail: {
+                        sceneId,
+                        updatedConfig: tempConfig
+                    }
+                }));
+            }
+        } catch { }
         console.log('=== SAVE CHANGES COMPLETED ===');
-    }, [tempConfig, onSave, sceneId]);
+    }, [tempConfig, onSave, sceneId, apiUrl]);
 
     const discardChanges = useCallback(() => {
         setTempConfig(baseConfig);
@@ -283,4 +333,9 @@ export const useEditMode = () => {
         throw new Error('useEditMode must be used within an EditModeProvider');
     }
     return context;
+};
+
+// Optional variant for components that may render outside of provider
+export const useOptionalEditMode = () => {
+    return useContext(EditModeContext);
 };

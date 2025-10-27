@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createPortal } from 'react-dom';
-import { X, Download, FileText, Image, Video, Volume2, FileSpreadsheet, File } from 'lucide-react';
+import { X, FileText, Image, Video, Volume2, FileSpreadsheet, File } from 'lucide-react';
 import { FontWrapper } from '../common/FontWrapper';
 import { useIsMobile } from './use-mobile';
 import { EmailAttachment } from '../../data/inboxConfig';
@@ -256,10 +256,10 @@ export const AttachmentPreviewModal: React.FC<AttachmentPreviewModalProps> = ({
               </div>
               <div className="bg-white dark:bg-gray-800 rounded border p-4 font-mono text-sm">
                 <p className="text-gray-600 dark:text-gray-400">
-                  // File content would be displayed here
+                  File content would be displayed here
                 </p>
                 <p className="text-gray-600 dark:text-gray-400">
-                  // with syntax highlighting for code files
+                  with syntax highlighting for code files
                 </p>
               </div>
             </div>

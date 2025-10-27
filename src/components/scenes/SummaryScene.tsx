@@ -58,7 +58,7 @@ function SummarySceneContent({ config, completionData, sceneId, reducedMotion, d
     if (logger.hasErrors()) {
       setFinishError(currentConfig.texts?.finishErrorText || 'SCORM save failed. Please try again or contact support if the problem persists.');
     }
-  }, []);
+  }, [currentConfig.texts?.finishErrorText]);
 
   // Animation optimization helper - memoized
   const animationProps = useMemo(() => ({
@@ -1145,7 +1145,7 @@ function SummarySceneContent({ config, completionData, sceneId, reducedMotion, d
       </div>
 
       {/* Edit Mode Panel */}
-       <EditModePanel /> 
+      <EditModePanel />
 
       {/* Scientific Basis Info */}
       <ScientificBasisInfo

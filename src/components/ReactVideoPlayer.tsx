@@ -55,6 +55,7 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
     const [isCaptionsOn, setIsCaptionsOn] = React.useState(true); // YouTube CC durumu
     const [currentTime, setCurrentTime] = React.useState(0);
     const [playerKey, setPlayerKey] = React.useState(0); // Player yeniden mount için
+    const [showCustomControls, setShowCustomControls] = React.useState(false); // Custom button'ları göster (video başladıktan sonra)
     const playerRef = React.useRef<any>(null);
     const containerRef = React.useRef<HTMLDivElement>(null);
     const lastTimeRef = React.useRef(0); // Ref ile callback yeniden oluşturmayı önle
@@ -152,6 +153,8 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
     const handlePlay = React.useCallback(() => {
       setIsPlaying(true);
       setHasEnded(false);
+      // Video başladıktan sonra custom control'ü göster
+      setShowCustomControls(true);
       if (onPlay) {
         onPlay();
       }
@@ -415,8 +418,8 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
             {...props}
           />
 
-          {/* Custom Controls Overlay */}
-          {!controls && (
+          {/* Custom Controls Overlay - Video başladıktan sonra göster */}
+          {showCustomControls && (
             <div
               className={`absolute inset-0 pointer-events-none ${isFullscreen ? 'z-[60]' : ''}`}
             >

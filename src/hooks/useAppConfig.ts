@@ -88,6 +88,35 @@ export const useAppConfig = ({ testOverrides }: UseAppConfigOptions = {}) => {
     setThemeConfig(appConfig.theme || {});
   }, [appConfig]);
 
+  // Listen for per-scene config patches saved from EditModeProvider
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const custom = e as CustomEvent<{ sceneId: string; updatedConfig: any }>;
+      const detail = custom.detail;
+      if (!detail || !detail.sceneId || !detail.updatedConfig) return;
+      setAppConfig((prev: any) => {
+        if (!prev || !Array.isArray(prev.scenes)) return prev;
+        const idx = prev.scenes.findIndex((s: any) => String(s.scene_id) === String(detail.sceneId));
+        if (idx === -1) return prev;
+        const nextScenes = [...prev.scenes];
+        const scene = nextScenes[idx] || {};
+        nextScenes[idx] = {
+          ...scene,
+          metadata: { ...(scene.metadata || {}), ...detail.updatedConfig }
+        };
+        return { ...prev, scenes: nextScenes };
+      });
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('sceneConfigPatched', handler as EventListener);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('sceneConfigPatched', handler as EventListener);
+      }
+    };
+  }, []);
+
   // Language change handler
   const changeLanguage = useCallback(async (newLanguage: string) => {
     const remoteBaseUrl = remoteBaseUrlRef.current;

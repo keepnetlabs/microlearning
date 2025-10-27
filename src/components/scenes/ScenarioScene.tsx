@@ -243,7 +243,7 @@ export function ScenarioScene({
       const urlPatterns = [
         /^https?:\/\//,           // http:// veya https://
         /^\/\//,                  // // (protocol-relative)
-        /^\/[^\/]/,               // /path (absolute path)
+        /^\/[^/]/,               // /path (absolute path)
         /^\.\/|\/\./,             // ./path veya /./path (relative path)
         /^[a-zA-Z0-9-]+:\/\//,    // custom:// (custom protocols)
       ];

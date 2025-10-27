@@ -5,7 +5,7 @@ import { useIsMobile } from "./use-mobile";
 import { createPortal } from "react-dom";
 import { EditableText } from "../common/EditableText";
 import { MultiFieldEditor } from "../common/MultiFieldEditor";
-import { useEditMode } from "../../contexts/EditModeContext";
+import { useOptionalEditMode } from "../../contexts/EditModeContext";
 
 interface CallToActionProps {
   text?: string;
@@ -46,21 +46,14 @@ export function CallToAction({
 }: CallToActionProps) {
   const isMobile = useIsMobile();
 
-  // Optional edit mode - only use if EditModeProvider is available
-  let isEditMode = false;
-  let tempConfig: any = null;
-  let updateTempConfig: (path: string, value: any) => void = () => { };
-  try {
-    const editModeContext = useEditMode();
-    isEditMode = editModeContext.isEditMode;
-    tempConfig = editModeContext.tempConfig;
-    updateTempConfig = editModeContext.updateTempConfig;
-  } catch (error) {
-    // EditModeProvider not available, use default values
-    isEditMode = false;
-    tempConfig = null;
-    updateTempConfig = () => { };
-  }
+  // Optional edit mode - safe hook (returns undefined outside provider)
+  const editModeContext = useOptionalEditMode();
+  const isEditMode = !!editModeContext?.isEditMode;
+  const tempConfig: any = editModeContext?.tempConfig;
+  const updateTempConfigCtx = editModeContext?.updateTempConfig;
+  const updateTempConfig = useCallback((path: string, value: any) => {
+    if (updateTempConfigCtx) updateTempConfigCtx(path, value);
+  }, [updateTempConfigCtx]);
 
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const [spacerHeight, setSpacerHeight] = useState<number>(72);
@@ -133,7 +126,7 @@ export function CallToAction({
   // Prefer explicit props (text/mobile/desktop) when provided; otherwise use tempConfig
   const getCallToActionText = useCallback(() => {
     console.log('getCallToActionText - isEditMode:', isEditMode, 'fieldLabels:', fieldLabels, 'text:', text, 'tempConfig:', tempConfig);
-    
+
     // Special handling for ActionableContentScene in edit mode
     if (isEditMode && fieldLabels?.mobile === "Initial Text") {
       // Always show Initial Text ("Start Reporting") in edit mode for ActionableContentScene
@@ -175,7 +168,7 @@ export function CallToAction({
 
     // 4) Final fallback to props default
     return isMobile ? (mobileText || text || "Continue") : (desktopText || text || "Continue");
-  }, [text, mobileText, desktopText, noCheckMobile, isMobile, tempConfig?.callToActionText, tempConfig?.successCallToActionText, isEditMode, fieldLabels]);
+  }, [text, mobileText, desktopText, noCheckMobile, isMobile, tempConfig, isEditMode, fieldLabels]);
 
   const displayText = useMemo(() => getCallToActionText(), [getCallToActionText]);
 
@@ -266,7 +259,7 @@ export function CallToAction({
         >
           {isEditMode && (tempConfig?.callToActionText || fieldLabels?.mobile === "Initial Text") ? (
             <MultiFieldEditor
-              key={`editor-${isEditMode}-${JSON.stringify({cta: tempConfig?.callToActionText, success: tempConfig?.successCallToActionText})}-${isMobile}`}
+              key={`editor-${isEditMode}-${JSON.stringify({ cta: tempConfig?.callToActionText, success: tempConfig?.successCallToActionText })}-${isMobile}`}
               configPath={fieldLabels?.mobile === "Initial Text" ? "actionableTexts" : "callToActionText"}
               data={fieldLabels?.mobile === "Initial Text" ? {
                 mobile: tempConfig?.callToActionText || "Start Reporting",

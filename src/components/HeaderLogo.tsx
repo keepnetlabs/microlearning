@@ -2,7 +2,7 @@ import React, { useState, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Edit3, X } from "lucide-react";
 import ModalFooter from "./ui/ModalFooter";
-import { useEditMode } from "../contexts/EditModeContext";
+import { useOptionalEditMode } from "../contexts/EditModeContext";
 import { useGlobalEditMode } from "../contexts/GlobalEditModeContext";
 
 export function getHeaderLogoClassName(isMobile: boolean, isFirstOrLastScene: boolean): string {
@@ -53,18 +53,12 @@ const HeaderLogoContent: React.FC<HeaderLogoProps> = ({
   // Use global edit mode state
   const { isGlobalEditMode } = useGlobalEditMode();
 
-  // Optional local edit mode - only use if EditModeProvider is available
-  let localEditMode = false;
-  let tempConfig: HeaderLogoConfig = {};
-  try {
-    const editModeContext = useEditMode();
-    localEditMode = editModeContext.isEditMode;
-    tempConfig = editModeContext.tempConfig as HeaderLogoConfig;
-  } catch (error) {
-    // EditModeProvider not available, use defaults
-    localEditMode = false;
-    tempConfig = {};
-  }
+  // Optional local edit mode - safe hook (undefined outside provider)
+  const editModeContext = useOptionalEditMode();
+  const localEditMode = !!editModeContext?.isEditMode;
+  const tempConfig = useMemo<HeaderLogoConfig>(() => {
+    return (editModeContext?.tempConfig as HeaderLogoConfig) || {};
+  }, [editModeContext?.tempConfig]);
 
   // Use either global or local edit mode
   const isEditMode = isGlobalEditMode || localEditMode;

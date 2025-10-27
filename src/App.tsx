@@ -186,6 +186,8 @@ export default function App(props: AppProps = {}) {
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   const [showAchievementNotification, setShowAchievementNotification] = useState(false);
   const [shownAchievements, setShownAchievements] = useState<string[]>([]);
+  // Track unsaved changes per scene id
+  const unsavedBySceneRef = useRef<Map<string, boolean>>(new Map());
   // Removed lastAchievementCount - not needed for optimized logic
 
   // Removed quiz completion hint state and timer
@@ -437,8 +439,49 @@ export default function App(props: AppProps = {}) {
     };
   }, []);
 
+  // Listen unsaved changes from scenes
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const custom = e as CustomEvent<{ sceneId: string; hasUnsavedChanges: boolean }>;
+      const detail = custom.detail;
+      if (!detail) return;
+      unsavedBySceneRef.current.set(String(detail.sceneId), !!detail.hasUnsavedChanges);
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('sceneUnsavedChanged', handler as EventListener);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('sceneUnsavedChanged', handler as EventListener);
+      }
+    };
+  }, []);
+
+  // Global beforeunload cleanup: clear persisted View Mode state
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      try {
+        sessionStorage.removeItem('isViewMode');
+      } catch { }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+
   // ULTRA FAST MOBILE TRANSITIONS - NO LOADING DELAY
   const nextScene = useCallback(() => {
+    // Guard: warn if current scene has unsaved edits
+    const currentSceneId = (scenes[currentScene] as any)?.sceneId;
+    const hasUnsaved = currentSceneId ? unsavedBySceneRef.current.get(String(currentSceneId)) : false;
+    if (hasUnsaved) {
+      const confirmProceed = window.confirm('You have unsaved changes. Do you want to discard them?');
+      if (!confirmProceed) return;
+      // clear flag to avoid repeated prompts if user proceeds
+      if (currentSceneId) unsavedBySceneRef.current.set(String(currentSceneId), false);
+    }
     // Allow progression if quiz is completed or we're not on quiz scene
     if (currentScene === sceneIndices.quiz && !quizCompleted && !isEditMode) {
       return;
@@ -459,30 +502,26 @@ export default function App(props: AppProps = {}) {
         setVisitedScenes(prev => new Set([...prev, newScene]));
         awardPoints(currentScene);
       } else {
-        // Minimal delay only for desktop
         setIsLoading(true);
-        setTimeout(() => {
-          setDirection(1);
-          const newScene = currentScene + 1;
-          setCurrentScene(newScene);
-          setVisitedScenes(prev => new Set([...prev, newScene]));
-          awardPoints(currentScene);
-          setIsLoading(false);
-        }, testOverrides?.disableDelays ? 0 : 100); // Reduced from 250ms to 100ms
+        setDirection(1);
+        const newScene = currentScene + 1;
+        setCurrentScene(newScene);
+        setVisitedScenes(prev => new Set([...prev, newScene]));
+        awardPoints(currentScene);
+        setIsLoading(false);
       }
       scormService.saveMicrolearningProgress(currentScene + 1, { quizCompleted }, totalPoints || 0, scenes.length);
-
     }
   }, [
     currentScene,
     quizCompleted,
     isMobile,
-    scenes.length,
+    scenes,
     sceneIndices.quiz,
     awardPoints,
     trackSceneTime,
     totalPoints,
-    testOverrides?.disableDelays
+    isEditMode
   ]);
 
   // Ensure last scene (summary) also awards its points on arrival
@@ -493,6 +532,14 @@ export default function App(props: AppProps = {}) {
   }, [currentScene, sceneIndices.summary, awardPoints]);
 
   const prevScene = useCallback(() => {
+    // Guard: warn if current scene has unsaved edits
+    const currentSceneId = (scenes[currentScene] as any)?.sceneId;
+    const hasUnsaved = currentSceneId ? unsavedBySceneRef.current.get(String(currentSceneId)) : false;
+    if (hasUnsaved) {
+      const confirmProceed = window.confirm('You have unsaved changes. Do you want to discard them?');
+      if (!confirmProceed) return;
+      if (currentSceneId) unsavedBySceneRef.current.set(String(currentSceneId), false);
+    }
     if (currentScene > 0) {
       const newScene = currentScene - 1;
       try {
@@ -519,7 +566,7 @@ export default function App(props: AppProps = {}) {
     isMobile,
     quizCompleted,
     totalPoints,
-    scenes.length,
+    scenes,
     testOverrides?.disableDelays
   ]);
 
@@ -527,7 +574,7 @@ export default function App(props: AppProps = {}) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isEditMode) return; // Prevent navigation when edit mode is active
-      
+
       if (e.key === 'ArrowRight' && canProceedNext()) {
         nextScene();
       } else if (e.key === 'ArrowLeft' && currentScene > 0) {

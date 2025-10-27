@@ -8,6 +8,10 @@ interface RichTextEditorProps {
   height?: number;
   className?: string;
   disabled?: boolean;
+  // Optional URLs (string or array) to load as CSS inside the editor iframe
+  contentCssUrls?: string | string[];
+  // Optional raw CSS string to inject into the editor iframe head
+  extraContentStyle?: string;
 }
 
 export const RichTextEditor: React.FC<RichTextEditorProps> = ({
@@ -16,8 +20,14 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   placeholder = "Enter content...",
   height = 300,
   className = "",
-  disabled = false
+  disabled = false,
+  contentCssUrls,
+  extraContentStyle
 }) => {
+  const resolvedContentCss = Array.isArray(contentCssUrls)
+    ? contentCssUrls
+    : (contentCssUrls ? [contentCssUrls] : undefined);
+
   return (
     <div className={`rich-text-editor ${className} relative`}>
       <Editor
@@ -31,6 +41,8 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           suffix: '.min',
           height,
           menubar: false,
+          branding: false,
+          promotion: false,
           plugins: [
             'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview', 'anchor',
             'searchreplace', 'visualblocks', 'code', 'fullscreen', 'insertdatetime', 'media', 'table', 'help', 'wordcount'
@@ -43,7 +55,23 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           valid_elements: '*[*]',
           extended_valid_elements: '*[*]',
           forced_root_block: '',
-          content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 14px; }',
+          // Load external CSS files into the iframe (if provided)
+          content_css: resolvedContentCss,
+          content_css_cors: true,
+          content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 14px; } .tox-statusbar__branding { display: none !important; }',
+          setup: (editor) => {
+            editor.on('init', () => {
+              if (extraContentStyle) {
+                const doc = editor.getDoc();
+                if (doc) {
+                  const styleEl = doc.createElement('style');
+                  styleEl.type = 'text/css';
+                  styleEl.appendChild(doc.createTextNode(extraContentStyle));
+                  doc.head?.appendChild(styleEl);
+                }
+              }
+            });
+          }
         }}
       />
     </div>
