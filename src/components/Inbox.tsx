@@ -13,6 +13,7 @@ import { InboxSceneConfig, EmailData, EmailAttachment } from "../data/inboxConfi
 import { useEditMode } from "../contexts/EditModeContext";
 import { enhanceLinkTooltips } from "../utils/linkTooltip";
 import { EmailContentWithPortalTooltips } from "./ui/EmailContentWithTooltips";
+import { RichTextEditor } from "./ui/RichTextEditor";
 
 interface InboxProps {
   config: InboxSceneConfig;
@@ -74,6 +75,8 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [editingAttachment, setEditingAttachment] = useState<{ emailIndex: number; attIndex: number } | null>(null);
   const [showAttachmentEditModal, setShowAttachmentEditModal] = useState(false);
+  const [isEditingEmailContent, setIsEditingEmailContent] = useState(false);
+  const [emailEditorValue, setEmailEditorValue] = useState<string>('');
   let updateTempConfigFn: ((path: string, value: any) => void) | null = null;
   const isMobile = useIsMobile();
   const emailContentRef = useRef<HTMLDivElement>(null);
@@ -282,7 +285,15 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
     if (emailContentRef.current) {
       emailContentRef.current.scrollTop = 0;
     }
-  }, [onSelectedEmailIdChange, onEmailSelect]);
+    // Open inline editor by default when in edit mode
+    const email = config.emails.find(e => e.id === emailId);
+    if (email && (propIsEditMode ?? contextIsEditMode)) {
+      setEmailEditorValue(email.content || '');
+      setIsEditingEmailContent(true);
+    } else {
+      setIsEditingEmailContent(false);
+    }
+  }, [onSelectedEmailIdChange, onEmailSelect, config.emails, propIsEditMode, contextIsEditMode]);
 
   const handleEmailReport = useCallback((emailId: string) => {
     const email = config.emails.find(e => e.id === emailId);
@@ -516,15 +527,53 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
                     <div className="prose prose-sm max-w-none mb-6 prose-p:text-[#1C1C1E] dark:prose-p:text-[#F2F2F7] prose-p:mb-1 prose-div:mb-1 prose-strong:text-[#1C1C1E] dark:prose-strong:text-[#F2F2F7] prose-li:text-[#1C1C1E] dark:prose-li:text-[#F2F2F7] prose-a:text-[#1C1C1E] dark:prose-a:text-[#F2F2F7] email-content-container">
                       <FontWrapper>
                         {isEditMode ? (
-                          <EditableText
-                            key={`editable-${selectedEmail.id}`}
-                            configPath={`emails.${config.emails.findIndex(e => e.id === selectedEmail.id)}.content`}
-                            richText={true}
-                            className="w-full text-[#1C1C1E] dark:text-[#F2F2F7]"
-                            placeholder="Enter email content..."
-                          >
-                            {selectedEmail.content}
-                          </EditableText>
+                          <div>
+                            <div className="flex justify-end mb-2 gap-2">
+                              {isEditingEmailContent ? (
+                                <>
+                                  <button
+                                    className={`px-3 py-1 ${isEditMode ? 'glass-border-4-no-overflow' : 'glass-border-4'} rounded`}
+                                    onClick={() => {
+                                      const emailIndex = config.emails.findIndex(e => e.id === selectedEmail.id);
+                                      if (emailIndex >= 0 && updateTempConfigFn) {
+                                        updateTempConfigFn(`emails.${emailIndex}.content`, emailEditorValue);
+                                      }
+                                      setIsEditingEmailContent(false);
+                                    }}
+                                  >
+                                    Save
+                                  </button>
+                                  <button
+                                    className={`px-3 py-1 ${isEditMode ? 'glass-border-4-no-overflow' : 'glass-border-4'} rounded`}
+                                    onClick={() => setIsEditingEmailContent(false)}
+                                  >
+                                    Cancel
+                                  </button>
+                                </>
+                              ) : (
+                                <button
+                                  className={`p-2 ${isEditMode ? 'glass-border-4-no-overflow' : 'glass-border-4'} rounded-full`}
+                                  onClick={() => {
+                                    setEmailEditorValue(selectedEmail.content || '');
+                                    setIsEditingEmailContent(true);
+                                  }}
+                                  aria-label="Edit email content"
+                                >
+                                  <Edit3 className="w-4 h-4 text-[#1C1C1E] dark:text-[#F2F2F7]" />
+                                </button>
+                              )}
+                            </div>
+                            {isEditingEmailContent ? (
+                              <RichTextEditor
+                                value={emailEditorValue}
+                                onChange={setEmailEditorValue}
+                                height={300}
+                                className="w-full"
+                              />
+                            ) : (
+                              <EmailContentWithPortalTooltips htmlContent={enhanceLinkTooltips(selectedEmail.content)} />
+                            )}
+                          </div>
                         ) : (
                           <EmailContentWithPortalTooltips htmlContent={enhanceLinkTooltips(selectedEmail.content)} />
                         )}
@@ -701,17 +750,56 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
                   )}
 
                   {/* Email Content */}
-                  <div className="prose prose-sm max-w-none mb-6 prose-p:text-[#1C1C1E] dark:text-[#F2F2F7] prose-p:mb-1 prose-div:mb-1 prose-strong:text-[#1C1C1E] dark:prose-strong:text-[#F2F2F7] prose-li:text-[#1C1C1E] dark:prose-li:text-[#F2F2F7] prose-a:text-[#1C1C1E] dark:prose-a:text-[#F2F2F7] email-content-container">
+                  <div className="prose prose-sm max-w-none mb-6 prose-p:text-[#1C1C1E] dark:prose-p:text-[#F2F2F7] prose-p:mb-1 prose-div:mb-1 prose-strong:text-[#1C1C1E] dark:prose-strong:text-[#F2F2F7] prose-li:text-[#1C1C1E] dark:prose-li:text-[#F2F2F7] prose-a:text-[#1C1C1E] dark:prose-a:text-[#F2F2F7] email-content-container">
                     <FontWrapper>
                       {isEditMode ? (
-                        <EditableText
-                          configPath={`emails.${config.emails.findIndex(e => e.id === selectedEmail.id)}.content`}
-                          richText={true}
-                          className="w-full text-[#1C1C1E] dark:text-[#F2F2F7]"
-                          placeholder="Enter email content..."
-                        >
-                          {selectedEmail.content}
-                        </EditableText>
+                        <div>
+                          <div className="flex justify-end mb-2 gap-2">
+                            {isEditingEmailContent ? (
+                              <>
+                                <button
+                                  className={`px-3 py-1 ${isEditMode ? 'glass-border-4-no-overflow' : 'glass-border-4'} rounded`}
+                                  onClick={() => {
+                                    const emailIndex = config.emails.findIndex(e => e.id === selectedEmail.id);
+                                    if (emailIndex >= 0 && updateTempConfigFn) {
+                                      updateTempConfigFn(`emails.${emailIndex}.content`, emailEditorValue);
+                                    }
+                                    setIsEditingEmailContent(false);
+                                  }}
+                                >
+                                  Save
+                                </button>
+                                <button
+                                  className={`px-3 py-1 ${isEditMode ? 'glass-border-4-no-overflow' : 'glass-border-4'} rounded`}
+                                  onClick={() => setIsEditingEmailContent(false)}
+                                >
+                                  Cancel
+                                </button>
+                              </>
+                            ) : (
+                              <button
+                                className={`p-2 ${isEditMode ? 'glass-border-4-no-overflow' : 'glass-border-4'} text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors rounded-full`}
+                                onClick={() => {
+                                  setEmailEditorValue(selectedEmail.content || '');
+                                  setIsEditingEmailContent(true);
+                                }}
+                                aria-label="Edit email content"
+                              >
+                                <Edit3 className="w-4 h-4" />
+                              </button>
+                            )}
+                          </div>
+                          {isEditingEmailContent ? (
+                            <RichTextEditor
+                              value={emailEditorValue}
+                              onChange={setEmailEditorValue}
+                              height={300}
+                              className="w-full"
+                            />
+                          ) : (
+                            <EmailContentWithPortalTooltips htmlContent={enhanceLinkTooltips(selectedEmail.content)} />
+                          )}
+                        </div>
                       ) : (
                         <EmailContentWithPortalTooltips htmlContent={enhanceLinkTooltips(selectedEmail.content)} />
                       )}
@@ -794,6 +882,8 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
           title="Edit Attachment Content"
         />
       )}
+
+      {/* Inline editor handles email content editing; no extra modal needed */}
     </div>
   );
 }

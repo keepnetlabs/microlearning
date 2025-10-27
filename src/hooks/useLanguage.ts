@@ -4,7 +4,8 @@ import {
   getCountryCode,
   languages,
   normalizeBcp47Tag,
-  resolveSupportedLanguage
+  resolveSupportedLanguage,
+  formatLanguageLabel
 } from "../utils/languageUtils";
 
 interface TestOverrides {
@@ -52,10 +53,16 @@ export const useLanguage = ({
 
     return codes.map(code => {
       const metaCode = mapAvailabilityToLanguageCode(code);
-      const meta = languages.find(l => l.code.toLowerCase() === metaCode.toLowerCase());
+      // Prefer a regional variant from master list if availability provided only primary code
+      let lookupCode = metaCode;
+      if (!metaCode.includes("-")) {
+        const preferred = languages.find(l => l.code.split("-")[0].toLowerCase() === metaCode.toLowerCase());
+        if (preferred) lookupCode = preferred.code;
+      }
+      const meta = languages.find(l => l.code.toLowerCase() === lookupCode.toLowerCase());
       return {
-        code, // keep the original availability code for selection and API
-        name: meta?.name || code.toUpperCase(),
+        code, // keep original availability code for selection and API
+        name: meta?.name || formatLanguageLabel(lookupCode),
         flag: meta?.flag || "🏳️"
       };
     });
@@ -91,14 +98,33 @@ export const useLanguage = ({
 
   // Derived current language meta
   const currentLanguage = React.useMemo<LanguageMeta | null>(() => {
-    const source = availableLanguages.length > 0 ? availableLanguages : languages;
-    const exact = source.find(l => l.code === selectedLanguage);
-    if (exact) return exact as LanguageMeta;
-    const lower = source.find(l => l.code.toLowerCase() === selectedLanguage.toLowerCase());
-    if (lower) return lower as LanguageMeta;
-    const primary = selectedLanguage.split("-")[0].toLowerCase();
-    const primaryMatch = source.find(l => l.code.split("-")[0].toLowerCase() === primary);
-    return (primaryMatch as LanguageMeta) || (source[0] as LanguageMeta);
+    // Try to resolve metadata for the exact selectedLanguage using master list
+    const masterExact = languages.find(l => l.code.toLowerCase() === selectedLanguage.toLowerCase());
+
+    if (availableLanguages.length > 0) {
+      // If availability explicitly includes the selectedLanguage code, use it
+      const exactAvail = availableLanguages.find(l => l.code.toLowerCase() === selectedLanguage.toLowerCase());
+      if (exactAvail) return exactAvail as LanguageMeta;
+
+      // Otherwise, if master has metadata for the selectedLanguage (e.g., en-US while availability has only en),
+      // synthesize a meta that preserves the selectedLanguage code for UI
+      if (masterExact) {
+        return { code: selectedLanguage, name: masterExact.name, flag: masterExact.flag };
+      }
+
+      // Fallbacks within availability list
+      const source = availableLanguages;
+      const lower = source.find(l => l.code.toLowerCase() === selectedLanguage.toLowerCase());
+      if (lower) return lower as LanguageMeta;
+      const primary = selectedLanguage.split("-")[0].toLowerCase();
+      const primaryMatch = source.find(l => l.code.split("-")[0].toLowerCase() === primary);
+      if (primaryMatch) return primaryMatch as LanguageMeta;
+      return (source[0] as LanguageMeta) || null;
+    }
+
+    // No availability specified: use master list
+    if (masterExact) return { code: selectedLanguage, name: masterExact.name, flag: masterExact.flag };
+    return (languages[0] as LanguageMeta) || null;
   }, [selectedLanguage, availableLanguages]);
 
   // Filtered list based on search term
@@ -116,7 +142,7 @@ export const useLanguage = ({
       if (!allowed.has(newLanguage.toLowerCase())) return;
     }
     setSelectedLanguage(newLanguage);
-    try { localStorage.setItem("selected-language", newLanguage); } catch {}
+    try { localStorage.setItem("selected-language", newLanguage); } catch { }
     changeLanguage(newLanguage);
   }, [availableLanguages, changeLanguage]);
 

@@ -76,9 +76,18 @@ export const resolveSupportedLanguage = (tag: string, supportedCodes: string[], 
     const norm = normalizeBcp47Tag(tag);
     const normalizedAvailable = supportedCodes.map(c => normalizeBcp47Tag(c));
     const supportedSet = new Set(normalizedAvailable.map(c => c.toLowerCase()));
+    // If exact tag is supported, use it
+    if (supportedSet.has(norm.toLowerCase())) return norm;
+    // If a region was requested (e.g., en-US) but only primary (e.g., en) exists, preserve requested tag for UI
+    const parts = norm.split("-");
+    if (parts.length > 1) {
+        const primary = parts[0].toLowerCase();
+        const hasPrimary = normalizedAvailable.some(x => x.split('-')[0].toLowerCase() === primary);
+        const hasExact = normalizedAvailable.some(x => x.toLowerCase() === norm.toLowerCase());
+        if (hasPrimary && !hasExact) return norm;
+    }
     const candidates: string[] = [];
     // Build RFC 4647 Lookup candidates by truncating from the right
-    const parts = norm.split("-");
     for (let i = parts.length; i >= 1; i--) {
         candidates.push(parts.slice(0, i).join("-"));
     }
@@ -91,6 +100,11 @@ export const resolveSupportedLanguage = (tag: string, supportedCodes: string[], 
     }
     // Fallback to primary language match
     const primary = parts[0].toLowerCase();
+    // Special rule: prefer en-GB for generic 'en' if available
+    if (primary === 'en') {
+        const hasEnGb = normalizedAvailable.find(x => x.toLowerCase() === 'en-gb');
+        if (hasEnGb) return hasEnGb;
+    }
     const primaryHit = normalizedAvailable.find(x => x.split("-")[0].toLowerCase() === primary);
     if (primaryHit) return primaryHit;
     return fallback ? normalizeBcp47Tag(fallback) : normalizedAvailable[0];
@@ -105,7 +119,7 @@ export const getCountryCode = (languageCode: string): string => {
     // Otherwise, map primary language to a default country
     const languageToCountry: { [key: string]: string } = {
         'tr': 'TR',
-        'en': 'US',
+        'en': 'GB',
         'en-gb': 'GB',
         'gr': 'GR',
         'es': 'ES',
@@ -222,9 +236,40 @@ export const getCountryCode = (languageCode: string): string => {
 export const detectBrowserLanguage = () => {
     if (typeof window !== 'undefined') {
         const browserLang = navigator.language || navigator.languages?.[0] || 'tr';
-        return normalizeBcp47Tag(browserLang);
+        const normalized = normalizeBcp47Tag(browserLang);
+        // Prefer en-GB for generic 'en'
+        if (normalized.toLowerCase() === 'en') return 'en-GB';
+        return normalized;
     }
     return 'en';
+};
+
+// Format a BCP 47 language tag as "Language (Region)" using Intl when available
+export const formatLanguageLabel = (tag: string, locale: string = 'en'): string => {
+    if (!tag) return '';
+    const norm = normalizeBcp47Tag(tag);
+    const parts = norm.split('-');
+    const language = parts[0];
+    const region = extractRegionFromTag(norm);
+    try {
+        // @ts-ignore
+        const langNames = new (Intl as any).DisplayNames([locale], { type: 'language' });
+        // @ts-ignore
+        const regionNames = new (Intl as any).DisplayNames([locale], { type: 'region' });
+        const langLabel = langNames.of(language) || language;
+        const regionLabel = region ? (regionNames.of(region) || region) : '';
+        return regionLabel ? `${langLabel} (${regionLabel})` : langLabel;
+    } catch {
+        // Fallback simple mapping
+        const langMap: Record<string, string> = {
+            'en': 'English',
+            'en-GB': 'English (United Kingdom)',
+            'en-US': 'English (United States)',
+            'fr': 'French',
+            'fr-CA': 'French (Canada)'
+        };
+        return langMap[norm] || norm;
+    }
 };
 
 // Custom hook for mobile detection
@@ -248,112 +293,117 @@ export const useIsMobile = () => {
 
 // Complete list of supported languages
 export const languages = [
-    // European Languages (Most Used)
-    { code: 'en', name: 'English', flag: '🇺🇸' },
-    { code: 'en-GB', name: 'English (UK)', flag: '🇬🇧' },
-    { code: 'de', name: 'German', flag: '🇩🇪' },
-    { code: 'fr', name: 'French', flag: '🇫🇷' },
-    { code: 'es', name: 'Spanish', flag: '🇪🇸' },
-    { code: 'it', name: 'Italian', flag: '🇮🇹' },
-    { code: 'nl', name: 'Dutch', flag: '🇳🇱' },
-    { code: 'pl', name: 'Polish', flag: '🇵🇱' },
-    { code: 'pt', name: 'Portuguese', flag: '🇵🇹' },
-    { code: 'ru', name: 'Russian', flag: '🇷🇺' },
-    { code: 'sv', name: 'Swedish', flag: '🇸🇪' },
-    { code: 'da', name: 'Danish', flag: '🇩🇰' },
-    { code: 'no', name: 'Norwegian', flag: '🇳🇴' },
-    { code: 'fi', name: 'Finnish', flag: '🇫🇮' },
-    { code: 'cs', name: 'Czech', flag: '🇨🇿' },
-    { code: 'hu', name: 'Hungarian', flag: '🇭🇺' },
-    { code: 'ro', name: 'Romanian', flag: '🇷🇴' },
-    { code: 'bg', name: 'Bulgarian', flag: '🇧🇬' },
-    { code: 'hr', name: 'Croatian', flag: '🇭🇷' },
-    { code: 'sk', name: 'Slovak', flag: '🇸🇰' },
-    { code: 'sl', name: 'Slovenian', flag: '🇸🇮' },
-    { code: 'et', name: 'Estonian', flag: '🇪🇪' },
-    { code: 'lv', name: 'Latvian', flag: '🇱🇻' },
-    { code: 'lt', name: 'Lithuanian', flag: '🇱🇹' },
-    { code: 'el', name: 'Greek', flag: '🇬🇷' },
-    { code: 'mt', name: 'Maltese', flag: '🇲🇹' },
-    { code: 'ga', name: 'Irish', flag: '🇮🇪' },
-    { code: 'cy', name: 'Welsh', flag: '🇬🇧' },
-    { code: 'gd', name: 'Scots Gaelic', flag: '🏴󠁧󠁢󠁳󠁣󠁴󠁿' },
-    { code: 'eu', name: 'Basque', flag: '🇪🇸' },
-    { code: 'ca', name: 'Catalan', flag: '🇪🇸' },
-    { code: 'gl', name: 'Galician', flag: '🇪🇸' },
-    { code: 'sq', name: 'Albanian', flag: '🇦🇱' },
-    { code: 'be', name: 'Belarusian', flag: '🇧🇾' },
-    { code: 'bs', name: 'Bosnian', flag: '🇧🇦' },
-    { code: 'mk', name: 'Macedonian', flag: '🇲🇰' },
-    { code: 'sr', name: 'Serbian', flag: '🇷🇸' },
-    { code: 'uk', name: 'Ukrainian', flag: '🇺🇦' },
-    { code: 'hy', name: 'Armenian', flag: '🇦🇲' },
-    { code: 'ka', name: 'Georgian', flag: '🇬🇪' },
-    { code: 'az', name: 'Azerbaijani', flag: '🇦🇿' },
-    { code: 'tr', name: 'Turkish', flag: '🇹🇷' },
-    { code: 'is', name: 'Icelandic', flag: '🇮🇸' },
-    { code: 'lb', name: 'Luxembourgish', flag: '🇱🇺' },
-    { code: 'co', name: 'Corsican', flag: '🇫🇷' },
-    { code: 'fy', name: 'Frisian', flag: '🇳🇱' },
-    { code: 'la', name: 'Latin', flag: '🇻🇦' },
-    { code: 'eo', name: 'Esperanto', flag: '🌍' },
+    // Core languages with explicit regions for UX clarity
+    { code: 'en-GB', name: 'English (United Kingdom)', flag: '🇬🇧' },
+    { code: 'en-US', name: 'English (United States)', flag: '🇺🇸' },
+    { code: 'fr-FR', name: 'French (France)', flag: '🇫🇷' },
+    { code: 'fr-CA', name: 'French (Canada)', flag: '🇨🇦' },
+    { code: 'de-DE', name: 'German (Germany)', flag: '🇩🇪' },
+    { code: 'it-IT', name: 'Italian (Italy)', flag: '🇮🇹' },
+    { code: 'es-ES', name: 'Spanish (Spain)', flag: '🇪🇸' },
+    { code: 'es-MX', name: 'Spanish (Mexico)', flag: '🇲🇽' },
+    { code: 'pt-PT', name: 'Portuguese (Portugal)', flag: '🇵🇹' },
+    { code: 'pt-BR', name: 'Portuguese (Brazil)', flag: '🇧🇷' },
+    { code: 'nl-NL', name: 'Dutch (Netherlands)', flag: '🇳🇱' },
+    { code: 'pl-PL', name: 'Polish (Poland)', flag: '🇵🇱' },
+    { code: 'ru-RU', name: 'Russian (Russia)', flag: '🇷🇺' },
+    { code: 'tr-TR', name: 'Turkish (Turkey)', flag: '🇹🇷' },
 
-    // World's Most Spoken Languages
-    { code: 'zh', name: 'Chinese (Simplified)', flag: '🇨🇳' },
-    { code: 'zh-TW', name: 'Chinese (Traditional)', flag: '🇹🇼' },
-    { code: 'hi', name: 'Hindi', flag: '🇮🇳' },
-    { code: 'bn', name: 'Bengali', flag: '🇧🇩' },
-    { code: 'ur', name: 'Urdu', flag: '🇵🇰' },
-    { code: 'ar', name: 'Arabic', flag: '🇸🇦' },
-    { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
-    { code: 'ko', name: 'Korean', flag: '🇰🇷' },
-    { code: 'th', name: 'Thai', flag: '🇹🇭' },
-    { code: 'vi', name: 'Vietnamese', flag: '🇻🇳' },
-    { code: 'id', name: 'Indonesian', flag: '🇮🇩' },
-    { code: 'ms', name: 'Malay', flag: '🇲🇾' },
-    { code: 'tl', name: 'Filipino', flag: '🇵🇭' },
-    { code: 'jw', name: 'Javanese', flag: '🇮🇩' },
-    { code: 'su', name: 'Sundanese', flag: '🇮🇩' },
-    { code: 'ta', name: 'Tamil', flag: '🇮🇳' },
-    { code: 'te', name: 'Telugu', flag: '🇮🇳' },
-    { code: 'kn', name: 'Kannada', flag: '🇮🇳' },
-    { code: 'ml', name: 'Malayalam', flag: '🇮🇳' },
-    { code: 'mr', name: 'Marathi', flag: '🇮🇳' },
-    { code: 'gu', name: 'Gujarati', flag: '🇮🇳' },
-    { code: 'pa', name: 'Punjabi', flag: '🇮🇳' },
-    { code: 'si', name: 'Sinhala', flag: '🇱🇰' },
-    { code: 'my', name: 'Myanmar (Burmese)', flag: '🇲🇲' },
-    { code: 'km', name: 'Khmer', flag: '🇰🇭' },
-    { code: 'lo', name: 'Lao', flag: '🇱🇦' },
-    { code: 'ne', name: 'Nepali', flag: '🇳🇵' },
-    { code: 'sd', name: 'Sindhi', flag: '🇵🇰' },
-    { code: 'ps', name: 'Pashto', flag: '🇦🇫' },
-    { code: 'fa', name: 'Persian', flag: '🇮🇷' },
-    { code: 'he', name: 'Hebrew', flag: '🇮🇱' },
-    { code: 'yi', name: 'Yiddish', flag: '🇮🇱' },
-    { code: 'am', name: 'Amharic', flag: '🇪🇹' },
-    { code: 'sw', name: 'Swahili', flag: '🇰🇪' },
-    { code: 'ha', name: 'Hausa', flag: '🇳🇬' },
-    { code: 'yo', name: 'Yoruba', flag: '🇳🇬' },
-    { code: 'ig', name: 'Igbo', flag: '🇳🇬' },
-    { code: 'zu', name: 'Zulu', flag: '🇿🇦' },
-    { code: 'xh', name: 'Xhosa', flag: '🇿🇦' },
-    { code: 'af', name: 'Afrikaans', flag: '🇿🇦' },
-    { code: 'st', name: 'Sesotho', flag: '🇱🇸' },
-    { code: 'ny', name: 'Chichewa', flag: '🇲🇼' },
-    { code: 'sm', name: 'Samoan', flag: '🇼🇸' },
-    { code: 'mi', name: 'Maori', flag: '🇳🇿' },
-    { code: 'haw', name: 'Hawaiian', flag: '🇺🇸' },
-    { code: 'ht', name: 'Haitian Creole', flag: '🇭🇹' },
-    { code: 'fr-ca', name: 'French (Canada)', flag: '🇨🇦' },
-    { code: 'ceb', name: 'Cebuano', flag: '🇵🇭' },
-    { code: 'mg', name: 'Malagasy', flag: '🇲🇬' },
-    { code: 'so', name: 'Somali', flag: '🇸🇴' },
-    { code: 'ku', name: 'Kurdish (Kurmanji)', flag: '🇹🇷' },
-    { code: 'kk', name: 'Kazakh', flag: '🇰🇿' },
-    { code: 'ky', name: 'Kyrgyz', flag: '🇰🇬' },
-    { code: 'uz', name: 'Uzbek', flag: '🇺🇿' },
-    { code: 'tg', name: 'Tajik', flag: '🇹🇯' },
-    { code: 'mn', name: 'Mongolian', flag: '🇲🇳' },
-    { code: 'hmn', name: 'Hmong', flag: '🇱🇦' }
+    // Nordics & Baltics
+    { code: 'sv-SE', name: 'Swedish (Sweden)', flag: '🇸🇪' },
+    { code: 'da-DK', name: 'Danish (Denmark)', flag: '🇩🇰' },
+    { code: 'no-NO', name: 'Norwegian (Norway)', flag: '🇳🇴' },
+    { code: 'fi-FI', name: 'Finnish (Finland)', flag: '🇫🇮' },
+    { code: 'et-EE', name: 'Estonian (Estonia)', flag: '🇪🇪' },
+    { code: 'lv-LV', name: 'Latvian (Latvia)', flag: '🇱🇻' },
+    { code: 'lt-LT', name: 'Lithuanian (Lithuania)', flag: '🇱🇹' },
+
+    // Central & Eastern Europe
+    { code: 'cs-CZ', name: 'Czech (Czechia)', flag: '🇨🇿' },
+    { code: 'hu-HU', name: 'Hungarian (Hungary)', flag: '🇭🇺' },
+    { code: 'ro-RO', name: 'Romanian (Romania)', flag: '🇷🇴' },
+    { code: 'bg-BG', name: 'Bulgarian (Bulgaria)', flag: '🇧🇬' },
+    { code: 'hr-HR', name: 'Croatian (Croatia)', flag: '🇭🇷' },
+    { code: 'sk-SK', name: 'Slovak (Slovakia)', flag: '🇸🇰' },
+    { code: 'sl-SI', name: 'Slovenian (Slovenia)', flag: '🇸🇮' },
+    { code: 'el-GR', name: 'Greek (Greece)', flag: '🇬🇷' },
+
+    // East Asia
+    { code: 'zh-CN', name: 'Chinese (Simplified, China)', flag: '🇨🇳' },
+    { code: 'zh-TW', name: 'Chinese (Traditional, Taiwan)', flag: '🇹🇼' },
+    { code: 'ja-JP', name: 'Japanese (Japan)', flag: '🇯🇵' },
+    { code: 'ko-KR', name: 'Korean (South Korea)', flag: '🇰🇷' },
+
+    // South & Southeast Asia
+    { code: 'hi-IN', name: 'Hindi (India)', flag: '🇮🇳' },
+    { code: 'bn-BD', name: 'Bengali (Bangladesh)', flag: '🇧🇩' },
+    { code: 'ur-PK', name: 'Urdu (Pakistan)', flag: '🇵🇰' },
+    { code: 'th-TH', name: 'Thai (Thailand)', flag: '🇹🇭' },
+    { code: 'vi-VN', name: 'Vietnamese (Vietnam)', flag: '🇻🇳' },
+    { code: 'id-ID', name: 'Indonesian (Indonesia)', flag: '🇮🇩' },
+    { code: 'ms-MY', name: 'Malay (Malaysia)', flag: '🇲🇾' },
+    { code: 'tl-PH', name: 'Filipino (Philippines)', flag: '🇵🇭' },
+    { code: 'jv-ID', name: 'Javanese (Indonesia)', flag: '🇮🇩' },
+    { code: 'su-ID', name: 'Sundanese (Indonesia)', flag: '🇮🇩' },
+    { code: 'ta-IN', name: 'Tamil (India)', flag: '🇮🇳' },
+    { code: 'te-IN', name: 'Telugu (India)', flag: '🇮🇳' },
+    { code: 'kn-IN', name: 'Kannada (India)', flag: '🇮🇳' },
+    { code: 'ml-IN', name: 'Malayalam (India)', flag: '🇮🇳' },
+    { code: 'mr-IN', name: 'Marathi (India)', flag: '🇮🇳' },
+    { code: 'pa-IN', name: 'Punjabi (India)', flag: '🇮🇳' },
+    { code: 'si-LK', name: 'Sinhala (Sri Lanka)', flag: '🇱🇰' },
+    { code: 'my-MM', name: 'Burmese (Myanmar)', flag: '🇲🇲' },
+    { code: 'km-KH', name: 'Khmer (Cambodia)', flag: '🇰🇭' },
+    { code: 'lo-LA', name: 'Lao (Laos)', flag: '🇱🇦' },
+    { code: 'ne-NP', name: 'Nepali (Nepal)', flag: '🇳🇵' },
+
+    // Middle East & Africa
+    { code: 'ar-SA', name: 'Arabic (Saudi Arabia)', flag: '🇸🇦' },
+    { code: 'fa-IR', name: 'Persian (Iran)', flag: '🇮🇷' },
+    { code: 'he-IL', name: 'Hebrew (Israel)', flag: '🇮🇱' },
+    { code: 'am-ET', name: 'Amharic (Ethiopia)', flag: '🇪🇹' },
+    { code: 'sw-KE', name: 'Swahili (Kenya)', flag: '🇰🇪' },
+    { code: 'ha-NG', name: 'Hausa (Nigeria)', flag: '🇳🇬' },
+    { code: 'yo-NG', name: 'Yoruba (Nigeria)', flag: '🇳🇬' },
+    { code: 'ig-NG', name: 'Igbo (Nigeria)', flag: '🇳🇬' },
+    { code: 'zu-ZA', name: 'Zulu (South Africa)', flag: '🇿🇦' },
+    { code: 'xh-ZA', name: 'Xhosa (South Africa)', flag: '🇿🇦' },
+    { code: 'af-ZA', name: 'Afrikaans (South Africa)', flag: '🇿🇦' },
+    { code: 'st-LS', name: 'Sesotho (Lesotho)', flag: '🇱🇸' },
+    { code: 'so-SO', name: 'Somali (Somalia)', flag: '🇸🇴' },
+
+    // Other European/Adjacents
+    { code: 'is-IS', name: 'Icelandic (Iceland)', flag: '🇮🇸' },
+    { code: 'lb-LU', name: 'Luxembourgish (Luxembourg)', flag: '🇱🇺' },
+    { code: 'co-FR', name: 'Corsican (France)', flag: '🇫🇷' },
+    { code: 'fy-NL', name: 'Frisian (Netherlands)', flag: '🇳🇱' },
+    { code: 'ga-IE', name: 'Irish (Ireland)', flag: '🇮🇪' },
+    { code: 'cy-GB', name: 'Welsh (United Kingdom)', flag: '🇬🇧' },
+    { code: 'mt-MT', name: 'Maltese (Malta)', flag: '🇲🇹' },
+    { code: 'sq-AL', name: 'Albanian (Albania)', flag: '🇦🇱' },
+    { code: 'be-BY', name: 'Belarusian (Belarus)', flag: '🇧🇾' },
+    { code: 'bs-BA', name: 'Bosnian (Bosnia & Herzegovina)', flag: '🇧🇦' },
+    { code: 'mk-MK', name: 'Macedonian (North Macedonia)', flag: '🇲🇰' },
+    { code: 'sr-RS', name: 'Serbian (Serbia)', flag: '🇷🇸' },
+    { code: 'uk-UA', name: 'Ukrainian (Ukraine)', flag: '🇺🇦' },
+    { code: 'hy-AM', name: 'Armenian (Armenia)', flag: '🇦🇲' },
+    { code: 'ka-GE', name: 'Georgian (Georgia)', flag: '🇬🇪' },
+    { code: 'az-AZ', name: 'Azerbaijani (Azerbaijan)', flag: '🇦🇿' },
+
+    // Others & constructed
+    { code: 'la-VA', name: 'Latin (Vatican City)', flag: '🇻🇦' },
+    { code: 'eo', name: 'Esperanto', flag: '🌍' },
+    { code: 'ps-AF', name: 'Pashto (Afghanistan)', flag: '🇦🇫' },
+    { code: 'sd-PK', name: 'Sindhi (Pakistan)', flag: '🇵🇰' },
+    { code: 'ht-HT', name: 'Haitian Creole (Haiti)', flag: '🇭🇹' },
+    { code: 'sm-WS', name: 'Samoan (Samoa)', flag: '🇼🇸' },
+    { code: 'mi-NZ', name: 'Maori (New Zealand)', flag: '🇳🇿' },
+    { code: 'haw-US', name: 'Hawaiian (United States)', flag: '🇺🇸' },
+    { code: 'ceb-PH', name: 'Cebuano (Philippines)', flag: '🇵🇭' },
+    { code: 'mg-MG', name: 'Malagasy (Madagascar)', flag: '🇲🇬' }, { code: 'kk-KZ', name: 'Kazakh (Kazakhstan)', flag: '🇰🇿' },
+    { code: 'ky-KG', name: 'Kyrgyz (Kyrgyzstan)', flag: '🇰🇬' },
+    { code: 'uz-UZ', name: 'Uzbek (Uzbekistan)', flag: '🇺🇿' },
+    { code: 'tg-TJ', name: 'Tajik (Tajikistan)', flag: '🇹🇯' },
+    { code: 'mn-MN', name: 'Mongolian (Mongolia)', flag: '🇲🇳' },
+    { code: 'hmn-LA', name: 'Hmong (Laos)', flag: '🇱🇦' }
 ]; 

@@ -159,6 +159,15 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
                   aria-describedby="language-search-description"
                   role="searchbox"
                   onFocus={(e) => e.target.select()}
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  inputMode="search"
+                  name="language_search"
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-bwignore="true"
                 />
                 {/* Hidden description for search input */}
                 <div id="language-search-description" className="sr-only">
