@@ -12,6 +12,7 @@ interface EditModeContextType {
     saveChanges: () => void;
     discardChanges: () => void;
     hasUnsavedChanges: boolean;
+    commitTempLocally: () => void;
 }
 
 const EditModeContext = createContext<EditModeContextType | undefined>(undefined);
@@ -58,6 +59,29 @@ const setNestedValue = (obj: any, path: string, value: any) => {
 
     console.log('Final result:', result);
     return result;
+};
+
+// Read nested value helper
+const getNestedValue = (obj: any, path: string) => {
+    const keys = path.split('.');
+    let current = obj;
+    for (const key of keys) {
+        if (current && typeof current === 'object' && key in current) {
+            current = current[key];
+        } else {
+            return undefined;
+        }
+    }
+    return current;
+};
+
+const isDeepEqual = (a: any, b: any) => {
+    if (a === b) return true;
+    try {
+        return JSON.stringify(a) === JSON.stringify(b);
+    } catch {
+        return false;
+    }
 };
 
 interface EditModeProviderProps {
@@ -116,16 +140,16 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
 
     // View Mode cleanup is centralized in App.tsx beforeunload handler
 
-    // Broadcast unsaved changes state to App for navigation guards
+    // Broadcast unsaved state to App (include active editing as unsaved)
     useEffect(() => {
         try {
             if (typeof window !== 'undefined' && sceneId) {
                 window.dispatchEvent(new CustomEvent('sceneUnsavedChanged', {
-                    detail: { sceneId, hasUnsavedChanges }
+                    detail: { sceneId, hasUnsavedChanges: hasUnsavedChanges || !!editingField }
                 }));
             }
         } catch { }
-    }, [hasUnsavedChanges, sceneId]);
+    }, [hasUnsavedChanges, editingField, sceneId]);
 
     const toggleEditMode = useCallback(() => {
         if (isEditMode && hasUnsavedChanges) {
@@ -187,15 +211,18 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
         console.log('=== UPDATE TEMP CONFIG ===');
         console.log('Updating path:', path);
         console.log('New value:', value);
+        let didChange = false;
         setTempConfig((prev: any) => {
-            console.log('Previous tempConfig:', prev);
-            console.log('Previous highlights:', prev.highlights);
+            const prevVal = getNestedValue(prev, path);
+            if (isDeepEqual(prevVal, value)) {
+                console.log('No change detected at path, skipping update');
+                return prev;
+            }
             const updated = setNestedValue(prev, path, value);
-            console.log('Updated tempConfig:', updated);
-            console.log('Updated highlights:', updated.highlights);
+            didChange = true;
             return updated;
         });
-        setHasUnsavedChanges(true);
+        if (didChange) setHasUnsavedChanges(true);
     }, []);
 
     const saveChanges = useCallback(() => {
@@ -240,7 +267,7 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
                     })();
 
                     // Clean up double slashes in URL
-                    patchUrl = patchUrl.replace(/([^:]\/)\/+/g, '$1');
+                    patchUrl = patchUrl.replace(/([^:]\/)\/+/, '$1');
 
                     console.log('Sending PATCH to:', patchUrl);
                     console.log('Payload:', patchPayload);
@@ -285,15 +312,11 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
         setBaseConfig(tempConfig); // Update base config with saved values
         // Force tempConfig update for immediate re-render with new reference
         setTempConfig((prev: any) => ({ ...prev }));
-
-        // Notify app-level config that this scene's config has been patched
+        // Notify App to merge saved config into appConfig for immediate persistence between scenes
         try {
             if (typeof window !== 'undefined' && sceneId) {
                 window.dispatchEvent(new CustomEvent('sceneConfigPatched', {
-                    detail: {
-                        sceneId,
-                        updatedConfig: tempConfig
-                    }
+                    detail: { sceneId, updatedConfig: tempConfig }
                 }));
             }
         } catch { }
@@ -306,6 +329,12 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
         setEditingField(null);
     }, [baseConfig]);
 
+    const commitTempLocally = useCallback(() => {
+        // Mark current tempConfig as clean without sending to backend
+        setBaseConfig(tempConfig);
+        setHasUnsavedChanges(false);
+    }, [tempConfig]);
+
     const value: EditModeContextType = {
         isEditMode,
         isViewMode,
@@ -317,7 +346,8 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
         updateTempConfig,
         saveChanges,
         discardChanges,
-        hasUnsavedChanges
+        hasUnsavedChanges,
+        commitTempLocally
     };
 
     return (

@@ -481,12 +481,6 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
                   </button>
                 )}
               </div>
-
-              {/* Brand Logo Area - Right Bottom */}
-              <div style={{ position: 'absolute' }} className={`absolute rounded-lg flex items-center glass-border-2-no-overflow justify-center z-20 ${isFullscreen ? 'bottom-4 right-2 w-[150px] h-[50px]' : 'bottom-4 right-2 w-[150px] h-[50px]'}`}>
-                <img src="https://keepnetlabs.com/keepnet-logo.svg" alt="Keepnet Logo" className="w-full h-full object-contain p-2" />
-              </div>
-
               {/* Control Buttons */}
               <div className={`absolute flex gap-2 transition-opacity duration-300 opacity-0 group-hover:opacity-100 ${isFullscreen ? 'bottom-8 left-8' : 'bottom-4 left-4'}`}>
                 {/* YouTube CC Button */}
@@ -525,6 +519,10 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
               </div>
             </div>
           )}
+          {/* Brand Logo Area - Always visible */}
+          <div style={{ position: 'absolute' }} className={`absolute rounded-lg flex items-center glass-border-2-no-overflow justify-center z-30 ${isFullscreen ? 'bottom-4 right-2 w-[150px] h-[50px]' : 'bottom-4 right-2 w-[150px] h-[50px]'}`}>
+            <img src="https://keepnetlabs.com/keepnet-logo.svg" alt="Keepnet Logo" className="w-full h-full object-contain p-2" />
+          </div>
         </div>
 
         {/* Transcript Panel - Separate from video player like VideoPlayer.tsx */}

@@ -406,4 +406,4 @@ export const languages = [
     { code: 'tg-TJ', name: 'Tajik (Tajikistan)', flag: '🇹🇯' },
     { code: 'mn-MN', name: 'Mongolian (Mongolia)', flag: '🇲🇳' },
     { code: 'hmn-LA', name: 'Hmong (Laos)', flag: '🇱🇦' }
-]; 
+].map((l) => ({ ...l, code: l.code.toLowerCase() })); 

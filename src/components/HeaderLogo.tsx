@@ -6,7 +6,7 @@ import { useOptionalEditMode } from "../contexts/EditModeContext";
 import { useGlobalEditMode } from "../contexts/GlobalEditModeContext";
 
 export function getHeaderLogoClassName(isMobile: boolean, isFirstOrLastScene: boolean): string {
-  const baseLogoClasses = "relative z-10 h-8 sm:h-10 md:h-14 w-full object-contain md:w-auto p-1.5 sm:p-2";
+  const baseLogoClasses = "relative z-10 h-8 sm:h-10 lg:h-14 w-full object-contain md:w-auto p-1.5 sm:p-2";
   const maxWidthClass = isMobile ? (isFirstOrLastScene ? "max-w-[88px]" : "max-w-[56px]") : "";
   return `${baseLogoClasses} ${maxWidthClass}`.trim();
 }

@@ -586,6 +586,21 @@ export default function App(props: AppProps = {}) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [canProceedNext, nextScene, prevScene, currentScene, isEditMode]);
 
+  // Listen to preview panel navigation (mobile toolbar)
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const ev = e as CustomEvent<string>;
+      if (!ev || typeof ev.detail !== 'string') return;
+      if (ev.detail === 'next' && canProceedNext()) {
+        nextScene();
+      } else if (ev.detail === 'prev' && currentScene > 0) {
+        prevScene();
+      }
+    };
+    window.addEventListener('panelNavigate', handler as EventListener);
+    return () => window.removeEventListener('panelNavigate', handler as EventListener);
+  }, [canProceedNext, nextScene, prevScene, currentScene]);
+
 
   // Focus management moved into LanguageSelector
 
@@ -779,7 +794,8 @@ export default function App(props: AppProps = {}) {
               // Hardware acceleration for better mobile performance
               transform: 'translateZ(0)',
               willChange: 'transform',
-              ...fontStyles.primary
+              ...fontStyles.primary,
+              paddingBottom: isMobile && isEditMode ? 'calc(80px + env(safe-area-inset-bottom))' : undefined
             }}
             data-testid="app-root"
             onTouchStart={handleTouchStart}

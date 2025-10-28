@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Save, RotateCcw, Edit3, Eye, EyeOff, Download } from 'lucide-react';
 import { useEditMode } from '../../contexts/EditModeContext';
 import { downloadSCORMPackage } from '../../utils/scormDownload';
+import { useIsMobile } from '../ui/use-mobile';
 
 export const EditModePanel: React.FC = () => {
     const [shouldShowPanel, setShouldShowPanel] = useState(false);
@@ -16,6 +17,7 @@ export const EditModePanel: React.FC = () => {
         discardChanges,
         hasUnsavedChanges
     } = useEditMode();
+    const isMobile = useIsMobile();
 
     // Check if EditModePanel should be visible
     useEffect(() => {
@@ -91,16 +93,68 @@ export const EditModePanel: React.FC = () => {
         toggleEditMode();
     };
 
+    // Force-disable edit on mobile if needed
+    useEffect(() => {
+        if (isMobile && isEditMode === false) {
+            // nothing
+        }
+    }, [isMobile, isEditMode]);
+
     // Don't render panel if it shouldn't be shown
     if (!shouldShowPanel) {
         return null;
     }
 
+    // Mobile preview toolbar: only show Prev/Next when edit mode is active
+    if (isMobile) {
+        if (!isEditMode) return null;
+        return createPortal(
+            <motion.div
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="fixed inset-x-0 bottom-0 z-[2147483647] pointer-events-auto"
+                style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+            >
+                <div className="mx-3 mb-3 rounded-2xl glass-border-2 backdrop-blur-xl px-3 py-2">
+                    <div className="flex items-center justify-between gap-2">
+                        {/* Prev */}
+                        <motion.button
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.97 }}
+                            onClick={() => {
+                                try { window.dispatchEvent(new CustomEvent('panelNavigate', { detail: 'prev' })); } catch { }
+                            }}
+                            className="flex-1 py-2 rounded-full glass-border-1 text-[#1C1C1E] dark:text-[#F2F2F7]"
+                            aria-label="Previous scene"
+                        >
+                            Prev
+                        </motion.button>
+
+                        {/* Next */}
+                        <motion.button
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.97 }}
+                            onClick={() => {
+                                try { window.dispatchEvent(new CustomEvent('panelNavigate', { detail: 'next' })); } catch { }
+                            }}
+                            className="flex-1 py-2 rounded-full glass-border-1 text-[#1C1C1E] dark:text-[#F2F2F7]"
+                            aria-label="Next scene"
+                        >
+                            Next
+                        </motion.button>
+                    </div>
+                </div>
+            </motion.div>,
+            document.body
+        );
+    }
+
+    // Desktop layout (unchanged)
     return createPortal(
         <motion.div
             initial={{ opacity: 0, scale: 0.8, y: 100 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            className="fixed bottom-6 right-6 z-[9999] pointer-events-auto"
+            className="fixed bottom-6 right-6 z-[2147483647] pointer-events-auto"
             style={{ pointerEvents: 'auto' }}
         >
             <div className="glass-border-2 p-4 backdrop-blur-xl">
