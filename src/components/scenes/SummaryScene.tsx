@@ -27,6 +27,33 @@ import { ScientificBasisInfo } from "../common/ScientificBasisInfo";
 import { logger } from "../../utils/logger";
 import { useIsMobile } from "../ui/use-mobile";
 import { scormService } from "../../utils/scormService";
+
+const DEFAULT_CERTIFICATE_LEARNER = "Valued Learner";
+const DEFAULT_CERTIFICATE_TRAINING = "Microlearning Training";
+
+function formatLearnerName(rawName?: string): string {
+  if (!rawName) return "";
+  const trimmed = rawName.trim();
+  if (!trimmed) return "";
+  if (trimmed.includes(',')) {
+    const parts = trimmed.split(',').map(part => part.trim()).filter(Boolean);
+    if (parts.length >= 2) {
+      const [last, first, ...rest] = parts;
+      return [first, rest.join(' ').trim(), last].filter(Boolean).join(' ').trim();
+    }
+  }
+  return trimmed;
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 interface SummarySceneProps {
   config: SummarySceneConfig;
   completionData?: {
@@ -34,10 +61,12 @@ interface SummarySceneProps {
     timeSpent: string;
     completionDate: string;
   };
+  trainingTitle?: string;
+  learnerName?: string;
 }
 
 // Inner component that uses the EditModeContext
-function SummarySceneContent({ config, completionData, sceneId, reducedMotion, disableDelays }: SummarySceneProps & { sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean }) {
+function SummarySceneContent({ config, completionData, sceneId, reducedMotion, disableDelays, trainingTitle, learnerName }: SummarySceneProps & { sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean }) {
   const [showCertificate, setShowCertificate] = useState(false);
   const [hasDownloadedCertificate, setHasDownloadedCertificate] = useState(false);
   const [showConfetti, setShowConfetti] = useState(true);
@@ -46,6 +75,48 @@ function SummarySceneContent({ config, completionData, sceneId, reducedMotion, d
   const [isFinished, setIsFinished] = useState(false);
   const [finishError, setFinishError] = useState<string | null>(null);
   const isMobile = useIsMobile();
+  const [studentName, setStudentName] = useState(() => formatLearnerName(learnerName));
+
+  useEffect(() => {
+    if (learnerName && learnerName.trim()) {
+      setStudentName(formatLearnerName(learnerName));
+      return;
+    }
+    const info = scormService.getStudentInfo?.();
+    if (info?.name) {
+      setStudentName(formatLearnerName(info.name));
+    }
+  }, [learnerName]);
+
+  useEffect(() => {
+    if (studentName) return;
+    if (typeof window === 'undefined') return;
+    const timer = window.setTimeout(() => {
+      const info = scormService.getStudentInfo?.();
+      if (info?.name) {
+        setStudentName(formatLearnerName(info.name));
+      }
+    }, 1000);
+    return () => window.clearTimeout(timer);
+  }, [studentName]);
+
+  const resolvedTrainingTitle = useMemo(() => {
+    if (trainingTitle && trainingTitle.trim()) {
+      return trainingTitle.trim();
+    }
+    const configTitle = (config as any)?.title;
+    if (typeof configTitle === 'string' && configTitle.trim()) {
+      return configTitle.trim();
+    }
+    const completionTitle = config.texts?.completionTitle;
+    if (completionTitle && completionTitle.trim()) {
+      return completionTitle.trim();
+    }
+    return DEFAULT_CERTIFICATE_TRAINING;
+  }, [trainingTitle, config]);
+
+  const certificateLearnerName = studentName || DEFAULT_CERTIFICATE_LEARNER;
+  const certificateTrainingName = resolvedTrainingTitle || DEFAULT_CERTIFICATE_TRAINING;
 
   // Get edit mode context
   const { isEditMode: currentEditMode, tempConfig } = useEditMode();
@@ -295,10 +366,10 @@ function SummarySceneContent({ config, completionData, sceneId, reducedMotion, d
     </div>
     <div class="title">Certificate Of Completion</div>
     <div class="subtitle">This certificate is awarded to</div>
-    <div class="name">John Doe</div>
+    <div class="name">${escapeHtml(certificateLearnerName)}</div>
     <div class="divider"></div>
     <div class="training-info">for successful completion of</div>
-    <div class="training-name">SMS Phishing Protection Training</div>
+    <div class="training-name">${escapeHtml(certificateTrainingName)}</div>
     <div class="completion-date">on ${new Date().toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
@@ -321,7 +392,7 @@ function SummarySceneContent({ config, completionData, sceneId, reducedMotion, d
     URL.revokeObjectURL(url);
     setShowCertificate(false);
     setHasDownloadedCertificate(true);
-  }, [hasDownloadedCertificate]);
+  }, [hasDownloadedCertificate, certificateLearnerName, certificateTrainingName]);
 
   // Confetti component
   const ConfettiPiece = ({ delay = 0, color = "blue" }) => (

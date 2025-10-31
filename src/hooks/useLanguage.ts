@@ -33,6 +33,17 @@ export const useLanguage = ({
   testOverrides,
   changeLanguage
 }: UseLanguageOptions) => {
+  const initialLanguageFromUrl = React.useMemo(() => {
+    const langUrlRaw = normalizeUrlParam(urlParams?.get("langUrl"));
+    if (langUrlRaw && langUrlRaw.startsWith("lang/")) {
+      const langCode = langUrlRaw.split("/")[1];
+      if (langCode) {
+        return normalizeBcp47Tag(langCode);
+      }
+    }
+    return null;
+  }, [urlParams, normalizeUrlParam]);
+
   // Derive available languages from remote microlearning metadata
   const availableLanguages: LanguageMeta[] = React.useMemo(() => {
     const codes = Array.isArray(appConfig?.microlearning_metadata?.language_availability)
@@ -51,7 +62,7 @@ export const useLanguage = ({
       }
     };
 
-    return codes.map(code => {
+    const mapped = codes.map(code => {
       const metaCode = mapAvailabilityToLanguageCode(code);
       // Prefer a regional variant from master list if availability provided only primary code
       let lookupCode = metaCode;
@@ -66,7 +77,22 @@ export const useLanguage = ({
         flag: meta?.flag || "🏳️"
       };
     });
-  }, [appConfig]);
+
+    if (initialLanguageFromUrl) {
+      const normalizedTarget = normalizeBcp47Tag(initialLanguageFromUrl).toLowerCase();
+      const hasLanguage = mapped.some(lang => normalizeBcp47Tag(lang.code).toLowerCase() === normalizedTarget);
+      if (!hasLanguage) {
+        const master = languages.find(l => l.code.toLowerCase() === normalizedTarget);
+        mapped.unshift({
+          code: initialLanguageFromUrl,
+          name: master?.name || formatLanguageLabel(initialLanguageFromUrl),
+          flag: master?.flag || "🏳️"
+        });
+      }
+    }
+
+    return mapped;
+  }, [appConfig, initialLanguageFromUrl]);
 
   // Dropdown and search state
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = React.useState(false);
@@ -74,17 +100,23 @@ export const useLanguage = ({
   const dropdownRef = React.useRef<HTMLDivElement>(null);
 
   // Initialize selected language from URL langUrl, localStorage, test override or browser language
-  const [selectedLanguage, setSelectedLanguage] = React.useState<string>(() => {
-    const saved = typeof window !== "undefined" ? localStorage.getItem("selected-language") : undefined;
-    const langUrl = normalizeUrlParam(urlParams?.get("langUrl"));
-    if (langUrl && langUrl.startsWith("lang/")) {
-      const langFromUrl = langUrl.split("/")[1];
-      if (langFromUrl) {
-        return normalizeBcp47Tag(langFromUrl);
+  const initialSelectedLanguage = React.useMemo(() => {
+    if (initialLanguageFromUrl) {
+      return initialLanguageFromUrl;
+    }
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("selected-language");
+      if (stored) {
+        return normalizeBcp47Tag(stored);
       }
     }
-    return normalizeBcp47Tag(saved || testOverrides?.language || detectBrowserLanguage());
-  });
+    if (testOverrides?.language) {
+      return normalizeBcp47Tag(testOverrides.language);
+    }
+    return normalizeBcp47Tag(detectBrowserLanguage());
+  }, [initialLanguageFromUrl, testOverrides?.language]);
+
+  const [selectedLanguage, setSelectedLanguage] = React.useState<string>(initialSelectedLanguage);
 
   // Ensure selectedLanguage is valid when availability is known
   React.useEffect(() => {

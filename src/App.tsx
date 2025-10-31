@@ -170,6 +170,7 @@ export default function App(props: AppProps = {}) {
   const [direction, setDirection] = useState(0);
   // language state moved to useLanguage
   const [resumeApplied, setResumeApplied] = useState(false);
+  const [studentInfo, setStudentInfo] = useState<{ id: string; name: string }>({ id: '', name: '' });
 
   // language handlers and ui state moved to useLanguage
   const [quizCompleted, setQuizCompleted] = useState(false);
@@ -432,9 +433,30 @@ export default function App(props: AppProps = {}) {
 
   // Component mount/unmount: initialize/cleanup SCORM (run once)
   useEffect(() => {
-    scormService.initializeMicrolearning();
+    const initResult = scormService.initializeMicrolearning();
+    if (initResult?.studentInfo) {
+      setStudentInfo({
+        id: initResult.studentInfo.id || '',
+        name: initResult.studentInfo.name || ''
+      });
+    }
+
     setSceneStartTimes(prev => new Map(prev.set(0, Date.now())));
+
+    let syncTimer: number | undefined;
+    if (typeof window !== 'undefined') {
+      syncTimer = window.setTimeout(() => {
+        const info = scormService.getStudentInfo?.();
+        if (info) {
+          setStudentInfo({ id: info.id || '', name: info.name || '' });
+        }
+      }, 800);
+    }
+
     return () => {
+      if (typeof window !== 'undefined' && typeof syncTimer === 'number') {
+        window.clearTimeout(syncTimer);
+      }
       destroySCORMService();
     };
   }, []);
@@ -1039,6 +1061,8 @@ export default function App(props: AppProps = {}) {
                                 surveyState={currentScene === sceneIndices.survey ? surveyState : undefined}
                                 onSurveyStateChange={currentScene === sceneIndices.survey ? setSurveyState : undefined}
                                 completionData={currentScene === sceneIndices.summary ? completionData : undefined}
+                                trainingTitle={currentScene === sceneIndices.summary ? appTitle : undefined}
+                                learnerName={currentScene === sceneIndices.summary ? studentInfo.name : undefined}
                                 onInboxCompleted={currentSceneConfig?.scene_type === 'actionable_content' ? handleInboxCompleted : undefined}
                                 onVideoCompleted={currentSceneConfig?.scene_type === 'scenario' ? handleVideoCompleted : undefined}
                                 isVideoCompleted={currentSceneConfig?.scene_type === 'scenario' ? videoCompleted : undefined}
