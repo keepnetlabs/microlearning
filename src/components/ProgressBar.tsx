@@ -178,8 +178,8 @@ export function ProgressBar({
   const normalizedTotal = Math.max(totalScenes - 1, 1);
   const normalizedCurrent = Math.max(Math.min(currentScene - 1, normalizedTotal), 0);
   const progress = (normalizedCurrent / normalizedTotal) * 100;
-  const finalConfig = { 
-    ...defaultConfig, 
+  const finalConfig = {
+    ...defaultConfig,
     ...config,
     startLabel: startLabel ?? defaultConfig.startLabel,
     completedLabel: completedLabel ?? defaultConfig.completedLabel,
@@ -229,7 +229,7 @@ export function ProgressBar({
               className="absolute z-20"
               style={{
                 top: '50%',
-                transform: 'translate(50%, -50%)',
+                transform: isRTL ? 'translate(-50%, -50%)' : 'translate(50%, -50%)',
                 marginTop: '-1px'
               }}
             >
@@ -270,13 +270,15 @@ export function ProgressBar({
             {/* INDUSTRY STANDARD LIQUID GLASS PROGRESS FILL */}
             <motion.div
               className="relative h-full overflow-hidden"
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
+              initial={{ scaleX: reducedMotion ? progress / 100 : 0 }}
+              animate={{ scaleX: progress / 100 }}
               transition={fillTransition}
               style={{
                 // CLEAN INDUSTRY STANDARD PROGRESS FILL - Apple/Google style
                 background: "rgba(242, 242, 247, 0.10)",
-                borderRadius: '4px'
+                borderRadius: '4px',
+                transformOrigin: isRTL ? 'right center' : 'left center',
+                width: '100%'
               }}
             >
               {/* Enhanced flowing animation with liquid glass effect */}
@@ -355,7 +357,7 @@ export function ProgressBar({
               className="absolute z-20"
               style={{
                 top: '50%',
-                transform: 'translate(50%, -50%)',
+                transform: isRTL ? 'translate(-50%, -50%)' : 'translate(50%, -50%)',
                 marginTop: '-1px'
               }}
             >
@@ -397,13 +399,15 @@ export function ProgressBar({
             {/* INDUSTRY STANDARD LIQUID GLASS PROGRESS FILL */}
             <motion.div
               className="relative h-full overflow-hidden"
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
+              initial={{ scaleX: reducedMotion ? progress / 100 : 0 }}
+              animate={{ scaleX: progress / 100 }}
               transition={{ duration: 1.2, ease: "easeOut", type: "spring", stiffness: 80 }}
               style={{
                 // CLEAN INDUSTRY STANDARD PROGRESS FILL - Apple/Google style
                 background: "rgba(255, 255, 255, 0.2)",
-                borderRadius: '4px'
+                borderRadius: '4px',
+                transformOrigin: isRTL ? 'right center' : 'left center',
+                width: '100%'
               }}
             >
 
