@@ -8,10 +8,14 @@ interface NavButtonProps {
   label?: string;
   isDarkMode?: boolean;
   dataTestId?: string;
+  isRTL?: boolean;
 }
 
-export function NavButton({ direction, onClick, disabled, label, isDarkMode = false, dataTestId }: NavButtonProps) {
-  const Icon = direction === "prev" ? ChevronLeft : ChevronRight;
+export function NavButton({ direction, onClick, disabled, label, isDarkMode = false, dataTestId, isRTL = false }: NavButtonProps) {
+  // In RTL mode, flip the icon direction
+  const Icon = isRTL
+    ? (direction === "prev" ? ChevronRight : ChevronLeft)
+    : (direction === "prev" ? ChevronLeft : ChevronRight);
 
   return (
     <motion.button

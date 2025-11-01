@@ -881,6 +881,7 @@ export default function App(props: AppProps = {}) {
                         completedLabel={themeConfig.texts?.completedLabel}
                         progressLabel={themeConfig.texts?.progressLabel}
                         ariaLabel="Training progress"
+                        isRTL={isRTL}
                       />
                     </div>
                   </div>
@@ -938,16 +939,34 @@ export default function App(props: AppProps = {}) {
             {/* Navigation Area - Optimized spacing */}
             <main className="flex-1 relative sm:flex sm:items-center" role="main" aria-label={appConfig.theme?.ariaTexts?.contentLabel || "Training content area"}>
               {/* Left Navigation - Hidden on mobile and only show when active */}
-              {currentScene > 0 && (
-                <div className="absolute left-2 sm:left-4 z-30 top-1/2 transform -translate-y-1/2 hidden md:block" data-testid="nav-prev">
-                  <MemoizedNavButton
-                    direction="prev"
-                    onClick={prevScene}
-                    disabled={false}
-                    label="Önceki bölüm"
-                    isDarkMode={isDarkMode}
-                  />
-                </div>
+              {isRTL ? (
+                // RTL: Left side = Next button
+                currentScene < scenes.length - 1 && (
+                  <div className="absolute left-2 sm:left-4 z-30 top-1/2 transform -translate-y-1/2 hidden md:block" data-testid="nav-next">
+                    <MemoizedNavButton
+                      direction="next"
+                      onClick={nextScene}
+                      disabled={!canProceedNext()}
+                      label={themeConfig.texts?.nextSection}
+                      isDarkMode={isDarkMode}
+                      isRTL={isRTL}
+                    />
+                  </div>
+                )
+              ) : (
+                // LTR: Left side = Prev button
+                currentScene > 0 && (
+                  <div className="absolute left-2 sm:left-4 z-30 top-1/2 transform -translate-y-1/2 hidden md:block" data-testid="nav-prev">
+                    <MemoizedNavButton
+                      direction="prev"
+                      onClick={prevScene}
+                      disabled={false}
+                      label="Önceki bölüm"
+                      isDarkMode={isDarkMode}
+                      isRTL={isRTL}
+                    />
+                  </div>
+                )
               )}
               {/* APPLE VISIONOS FLOATING GLASS CARD - Enhanced prominence with darker background */}
               <div className="flex-1 mx-2 sm:mx-4 md:mx-16 lg:mx-20 xl:mx-24 sm:my-3 md:my-6 sm:flex sm:items-center sm:justify-center">
@@ -1093,16 +1112,34 @@ export default function App(props: AppProps = {}) {
               </div>
 
               {/* Right Navigation - Hidden on mobile and on last scene */}
-              {currentScene < scenes.length - 1 && (
-                <div className="absolute right-2 sm:right-4 z-30 top-1/2 transform -translate-y-1/2 hidden md:block" data-testid="nav-next">
-                  <MemoizedNavButton
-                    direction="next"
-                    onClick={nextScene}
-                    disabled={!canProceedNext()}
-                    label={themeConfig.texts?.nextSection}
-                    isDarkMode={isDarkMode}
-                  />
-                </div>
+              {isRTL ? (
+                // RTL: Right side = Prev button
+                currentScene > 0 && (
+                  <div className="absolute right-2 sm:right-4 z-30 top-1/2 transform -translate-y-1/2 hidden md:block" data-testid="nav-prev">
+                    <MemoizedNavButton
+                      direction="prev"
+                      onClick={prevScene}
+                      disabled={false}
+                      label="Önceki bölüm"
+                      isDarkMode={isDarkMode}
+                      isRTL={isRTL}
+                    />
+                  </div>
+                )
+              ) : (
+                // LTR: Right side = Next button
+                currentScene < scenes.length - 1 && (
+                  <div className="absolute right-2 sm:right-4 z-30 top-1/2 transform -translate-y-1/2 hidden md:block" data-testid="nav-next">
+                    <MemoizedNavButton
+                      direction="next"
+                      onClick={nextScene}
+                      disabled={!canProceedNext()}
+                      label={themeConfig.texts?.nextSection}
+                      isDarkMode={isDarkMode}
+                      isRTL={isRTL}
+                    />
+                  </div>
+                )
               )}
               {/* ULTRA RESPONSIVE Mobile Touch Gesture Layer */}
               <div

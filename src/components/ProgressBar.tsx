@@ -67,6 +67,7 @@ interface ProgressBarProps {
   completedLabel?: string;
   progressLabel?: string;
   ariaLabel?: string;
+  isRTL?: boolean;
 }
 
 const defaultConfig: ProgressBarConfig = {
@@ -159,17 +160,18 @@ const defaultConfig: ProgressBarConfig = {
   ariaLabel: 'Eğitim ilerlemesi'
 };
 
-export function ProgressBar({ 
-  currentScene, 
-  totalScenes, 
-  language = 'en', 
-  config = {}, 
-  dataTestId, 
+export function ProgressBar({
+  currentScene,
+  totalScenes,
+  language = 'en',
+  config = {},
+  dataTestId,
   reducedMotion = false,
   startLabel,
   completedLabel,
   progressLabel,
-  ariaLabel
+  ariaLabel,
+  isRTL = false
 }: ProgressBarProps) {
   // Calculate progress so that the first scene (Intro) starts at 0%
   // `currentScene` is expected as 1-based (App passes `currentScene + 1`)
@@ -218,13 +220,16 @@ export function ProgressBar({
               animate={{
                 opacity: 1,
                 scale: 1,
-                left: `calc(${progress}% - 8px)`
+                ...(isRTL
+                  ? { right: `calc(${progress}% - 8px)` }
+                  : { left: `calc(${progress}% - 8px)` }
+                )
               }}
               transition={tooltipTransition}
               className="absolute z-20"
               style={{
                 top: '50%',
-                transform: 'translate(-50%, -50%)',
+                transform: 'translate(50%, -50%)',
                 marginTop: '-1px'
               }}
             >
@@ -277,15 +282,18 @@ export function ProgressBar({
               {/* Enhanced flowing animation with liquid glass effect */}
               <motion.div
                 className="absolute inset-0"
-                animate={reducedMotion ? undefined : { x: ['-100%', '200%'], opacity: [0, 0.6, 0] }}
+                animate={reducedMotion ? undefined : (isRTL
+                  ? { x: ['200%', '-100%'], opacity: [0, 0.6, 0] }
+                  : { x: ['-100%', '200%'], opacity: [0, 0.6, 0] }
+                )}
                 transition={flowingTransition}
                 style={{
                   width: '150%',
-                  background: `linear-gradient(90deg, 
-                    transparent 0%, 
-                    rgba(255, 255, 255, 0.40) 30%, 
-                    rgba(255, 255, 255, 0.60) 50%, 
-                    rgba(255, 255, 255, 0.40) 70%, 
+                  background: `linear-gradient(${isRTL ? '270deg' : '90deg'},
+                    transparent 0%,
+                    rgba(255, 255, 255, 0.40) 30%,
+                    rgba(255, 255, 255, 0.60) 50%,
+                    rgba(255, 255, 255, 0.40) 70%,
                     transparent 100%
                   )`,
                   mixBlendMode: 'overlay',
@@ -297,9 +305,9 @@ export function ProgressBar({
               <div
                 className="absolute top-0 left-0 right-0 h-1/2 pointer-events-none"
                 style={{
-                  background: `linear-gradient(180deg, 
-                    rgba(255, 255, 255, 0.50) 0%, 
-                    rgba(255, 255, 255, 0.25) 30%, 
+                  background: `linear-gradient(180deg,
+                    rgba(255, 255, 255, 0.50) 0%,
+                    rgba(255, 255, 255, 0.25) 30%,
                     transparent 70%
                   )`,
                   mixBlendMode: 'soft-light',
@@ -332,7 +340,10 @@ export function ProgressBar({
               animate={{
                 opacity: 1,
                 scale: 1,
-                left: `calc(${progress}% - 8px)`
+                ...(isRTL
+                  ? { right: `calc(${progress}% - 8px)` }
+                  : { left: `calc(${progress}% - 8px)` }
+                )
               }}
               transition={{
                 duration: 0.8,
@@ -344,7 +355,7 @@ export function ProgressBar({
               className="absolute z-20"
               style={{
                 top: '50%',
-                transform: 'translate(-50%, -50%)',
+                transform: 'translate(50%, -50%)',
                 marginTop: '-1px'
               }}
             >
@@ -399,15 +410,18 @@ export function ProgressBar({
               {/* Enhanced flowing animation with liquid glass effect */}
               <motion.div
                 className="absolute inset-0"
-                animate={reducedMotion ? undefined : { x: ['-100%', '200%'], opacity: [0, 0.6, 0] }}
+                animate={reducedMotion ? undefined : (isRTL
+                  ? { x: ['200%', '-100%'], opacity: [0, 0.6, 0] }
+                  : { x: ['-100%', '200%'], opacity: [0, 0.6, 0] }
+                )}
                 transition={flowingTransition}
                 style={{
                   width: '150%',
-                  background: `linear-gradient(90deg, 
-                    transparent 0%, 
-                    rgba(255, 255, 255, 0.40) 30%, 
-                    rgba(255, 255, 255, 0.60) 50%, 
-                    rgba(255, 255, 255, 0.40) 70%, 
+                  background: `linear-gradient(${isRTL ? '270deg' : '90deg'},
+                    transparent 0%,
+                    rgba(255, 255, 255, 0.40) 30%,
+                    rgba(255, 255, 255, 0.60) 50%,
+                    rgba(255, 255, 255, 0.40) 70%,
                     transparent 100%
                   )`,
                   mixBlendMode: 'overlay',
@@ -419,9 +433,9 @@ export function ProgressBar({
               <div
                 className="absolute top-0 left-0 right-0 h-1/2 pointer-events-none"
                 style={{
-                  background: `linear-gradient(180deg, 
-                    rgba(255, 255, 255, 0.50) 0%, 
-                    rgba(255, 255, 255, 0.25) 30%, 
+                  background: `linear-gradient(180deg,
+                    rgba(255, 255, 255, 0.50) 0%,
+                    rgba(255, 255, 255, 0.25) 30%,
                     transparent 70%
                   )`,
                   mixBlendMode: 'soft-light',
