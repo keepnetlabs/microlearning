@@ -339,7 +339,13 @@
       "urgentLabel": "Dringend",
       "pointsLabel": "Punkte",
       "timeLabel": "Zeit",
-      "completionLabel": "Abschluss"
+      "completionLabel": "Abschluss",
+      "certificateTitle": "Abschlussbeleg",
+      "certificateAwardedText": "Dieses Zertifikat wird hiermit verliehen",
+      "certificateCompletionText": "zum erfolgreichen Abschluss von",
+      "certificateDateText": "am",
+      "downloadTrainingLogsText": "Schulungsprotokolle Herunterladen",
+      "retryText": "Erneut Versuchen"
     },
     "immediateActions": [
       {

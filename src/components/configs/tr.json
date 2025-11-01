@@ -371,7 +371,13 @@
       "urgentLabel": "Acil",
       "pointsLabel": "Puanlar",
       "timeLabel": "Süre",
-      "completionLabel": "Tamamlama"
+      "completionLabel": "Tamamlama",
+      "certificateTitle": "Tamamlama Sertifikası",
+      "certificateAwardedText": "Bu sertifika aşağıdaki kişiye verilmektedir",
+      "certificateCompletionText": "başarılı bir şekilde şunun tamamlanması için",
+      "certificateDateText": "tarihinde",
+      "downloadTrainingLogsText": "Eğitim Loglarını İndir",
+      "retryText": "Tekrar Dene"
     },
     "key_message": [
       "Tamamladın",

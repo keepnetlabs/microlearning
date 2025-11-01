@@ -339,7 +339,13 @@
       "urgentLabel": "Urgent",
       "pointsLabel": "Points",
       "timeLabel": "Temps",
-      "completionLabel": "Completion"
+      "completionLabel": "Completion",
+      "certificateTitle": "Certificat d'Accomplissement",
+      "certificateAwardedText": "Ce certificat est décerné à",
+      "certificateCompletionText": "pour la réussite de la formation",
+      "certificateDateText": "le",
+      "downloadTrainingLogsText": "Télécharger les Journaux de Formation",
+      "retryText": "Réessayer"
     },
     "immediateActions": [
       {

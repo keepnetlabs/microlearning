@@ -5,7 +5,8 @@ import {
   languages,
   normalizeBcp47Tag,
   resolveSupportedLanguage,
-  formatLanguageLabel
+  formatLanguageLabel,
+  isRTLLanguage
 } from "../utils/languageUtils";
 
 interface TestOverrides {
@@ -208,6 +209,9 @@ export const useLanguage = ({
     setIsLanguageDropdownOpen(prev => !prev);
   }, []);
 
+  // Derived RTL state
+  const isRTL = React.useMemo(() => isRTLLanguage(selectedLanguage), [selectedLanguage]);
+
   return {
     // state
     selectedLanguage,
@@ -217,6 +221,7 @@ export const useLanguage = ({
     languageSearchTerm,
     filteredLanguages,
     dropdownRef,
+    isRTL,
 
     // actions
     setIsLanguageDropdownOpen,

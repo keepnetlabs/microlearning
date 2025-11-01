@@ -369,6 +369,28 @@
       "Use the report button"
     ]
   },
+  "code-review": {
+    "title": "Review the code for risks",
+    "subtitle": "Identify logic errors and security vulnerabilities",
+    "description": "The snippet below contains at least one insecure practice. Highlight the issue and explain how you would mitigate it.",
+    "helperText": "Look for missing validation, unsafe DOM access, or unescaped output.",
+    "successHelperText": "Great job! Note what you found and continue to the next step.",
+    "callToActionText": "Review before continuing",
+    "successCallToActionText": "Continue",
+    "checkButtonLabel": "Run Security Check",
+    "checkStatusTexts": {
+      "checking": "Analyzing the snippet…",
+      "success": "No critical issues detected. You can continue.",
+      "error": "We spotted risky patterns. Fix them and run the check again."
+    },
+    "ariaTexts": {
+      "mainLabel": "Code review exercise",
+      "mainDescription": "Interactive code block for manual review",
+      "codeRegionLabel": "Code block",
+      "codeRegionDescription": "Editable code snippet to inspect",
+      "checkButtonLabel": "Check code"
+    }
+  },
   "8": {
     "iconName": "trophy",
     "texts": {
@@ -389,7 +411,13 @@
       "urgentLabel": "Urgent",
       "pointsLabel": "Points",
       "timeLabel": "Time",
-      "completionLabel": "Completion"
+      "completionLabel": "Completion",
+      "certificateTitle": "Certificate of Completion",
+      "certificateAwardedText": "This certificate is awarded to",
+      "certificateCompletionText": "for successful completion of",
+      "certificateDateText": "on",
+      "downloadTrainingLogsText": "Download Training Logs",
+      "retryText": "Try Again"
     },
     "immediateActions": [
       {

@@ -36,11 +36,6 @@ export function ScientificBasisInfo({ config, sceneType }: ScientificBasisInfoPr
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] mb-2 flex flex-wrap items-baseline gap-2">
               Scientific Basis
-              {sceneType && (
-                <span className="text-sm font-normal text-[#1C1C1E]/60 dark:text-[#F2F2F7]/60 capitalize">
-                  ({sceneType} Scene)
-                </span>
-              )}
             </h3>
             <div className="max-h-[40vh] overflow-y-auto pr-1 text-sm leading-relaxed text-[#1C1C1E]/80 dark:text-[#F2F2F7]/80">
               {scientificBasis}

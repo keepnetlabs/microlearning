@@ -546,6 +546,41 @@
       }
     },
     {
+      "scene_id": "code-review",
+      "metadata": {
+        "scene_type": "code_review",
+        "points": 25,
+        "hasAchievementNotification": false,
+        "behavioral_science_principle": ["Active Analysis", "Secure Coding"],
+        "title": "Review This Code Snippet",
+        "subtitle": "Spot insecure patterns before release",
+        "description": "Analyse the snippet and identify risky practices or missing controls before handing it over to QA.",
+        "codeSnippet": {
+          "language": "javascript",
+          "content": "function fetchUser(id) {\n  return fetch(`/api/user/${id}`)\n    .then((response) => response.json());\n}\n\nfunction renderProfile(user) {\n  document.getElementById(\"profile\").innerHTML = user.bio;\n}\n\nfetchUser(window.location.search.slice(4))\n  .then(renderProfile);",
+          "showLineNumbers": true,
+          "automaticLayout": true
+        },
+        "helperText": "Pay attention to user-controlled inputs and DOM updates without sanitisation.",
+        "successHelperText": "Looks good! Record your observations and continue.",
+        "callToActionText": "Review before continuing",
+        "successCallToActionText": "Continue",
+        "checkButtonLabel": "Run Security Check",
+        "checkStatusTexts": {
+          "checking": "Analyzing the snippet…",
+          "success": "Code looks safe. You can continue.",
+          "error": "We spotted issues. Fix them and re-run the check."
+        },
+        "ariaTexts": {
+          "mainLabel": "Code review exercise",
+          "mainDescription": "Interactive code snippet for secure coding practice",
+          "codeRegionLabel": "Code snippet editor",
+          "codeRegionDescription": "JavaScript example loading and rendering user data",
+          "checkButtonLabel": "Check code"
+        }
+      }
+    },
+    {
       "scene_id": "8",
       "metadata": {
         "scene_type": "summary",

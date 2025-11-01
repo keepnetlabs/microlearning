@@ -1,0 +1,22 @@
+export const SUPPORTED_LANGUAGES = [
+    "javascript",
+    "typescript",
+    "python",
+    "go",
+    "rust",
+    "c",
+    "cpp",
+    "csharp",
+    "java",
+    "json",
+    "html",
+    "css",
+    "scss",
+    "less",
+    "markdown",
+    "sql",
+    "yaml",
+    "xml",
+    "shell",
+    "powershell"
+];

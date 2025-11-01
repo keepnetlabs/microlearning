@@ -5,6 +5,10 @@ module.exports = {
     "./App.tsx"
   ],
   darkMode: 'class',
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en', 'ar', 'he', 'fa', 'ur'],
+  },
   safelist: [
     // Essential theme colors only
     {

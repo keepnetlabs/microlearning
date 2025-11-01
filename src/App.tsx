@@ -21,6 +21,8 @@ import { QuizScene } from "./components/scenes/QuizScene";
 import { SurveyScene } from "./components/scenes/SurveyScene";
 import { SummaryScene } from "./components/scenes/SummaryScene";
 import { NudgeScene } from "./components/scenes/NudgeScene";
+import { CodeReviewScene } from "./components/scenes/CodeReviewScene";
+//import { CodeReviewSceneConfig } from "./components/scenes/code-review/types";
 import { useIsMobile } from "./utils/languageUtils";
 import { useFontFamily } from "./hooks/useFontFamily";
 import { useAppConfig } from "./hooks/useAppConfig";
@@ -47,6 +49,7 @@ const MemoizedQuizScene = React.memo(QuizScene);
 const MemoizedSurveyScene = React.memo(SurveyScene);
 const MemoizedNudgeScene = React.memo(NudgeScene);
 const MemoizedSummaryScene = React.memo(SummaryScene);
+const MemoizedCodeReviewScene = React.memo(CodeReviewScene);
 
 interface AppProps {
   initialScene?: number;
@@ -84,6 +87,7 @@ export default function App(props: AppProps = {}) {
     goal: MemoizedGoalScene,
     scenario: MemoizedScenarioScene,
     actionable_content: MemoizedActionableContentScene,
+    code_review: MemoizedCodeReviewScene,
     quiz: MemoizedQuizScene,
     survey: MemoizedSurveyScene,
     summary: MemoizedSummaryScene,
@@ -127,7 +131,8 @@ export default function App(props: AppProps = {}) {
     setLanguageSearchTerm,
     onDropdownToggle,
     handleLanguageChange,
-    getCountryCode
+    getCountryCode,
+    isRTL
   } = useLanguage({ appConfig, urlParams, normalizeUrlParam, testOverrides, changeLanguage });
 
   // Helper function to get scene index by type
@@ -812,6 +817,7 @@ export default function App(props: AppProps = {}) {
         <FontFamilyProvider fontFamilyConfig={themeConfig.fontFamily}>
           <div
             className={cssClasses.mainContainer}
+            dir={isRTL ? "rtl" : "ltr"}
             style={{
               // Hardware acceleration for better mobile performance
               transform: 'translateZ(0)',

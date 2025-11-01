@@ -1,0 +1,445 @@
+{
+  "app": {
+    "texts": {
+      "loading": "טוען…",
+      "languageNotFound": "שפה לא נמצאה",
+      "scrollHint": "גלול למטה",
+      "nextSection": "סעיף הבא",
+      "achievementNotification": "השגה נפתחה 🎉",
+      "closeNotification": "סגור הודעה",
+      "startLabel": "התחלה",
+      "completedLabel": "הושלם",
+      "progressLabel": "הושלם",
+      "points": "נקודות",
+      "popularLanguages": "שפות פופולריות",
+      "toggleButtonLightMode": "עבור למצב בהיר",
+      "toggleButtonDarkMode": "עבור למצב אפל",
+      "hintTitle": "ערכת נושא בהירה/אפלה",
+      "hintDescription": "השתמש בסמל הירח/שמש בפינה הימנית העליונה כדי לשנות את הערכת שלך",
+      "surveySubmittedToast": "תודה על המשוב שלך!"
+    },
+    "ariaTexts": {
+      "appLabel": "אימון מודעות דיוג",
+      "appDescription": "עוזר לך להכיר דיוג ולדווח על כך בבטחה. דיוג אינטראקטיבי עם תרחישים, סימולציות וחידונים.",
+      "loadingLabel": "תוכן טוען",
+      "headerLabel": "כותרת האפליקציה",
+      "logoLabel": "לוגו האפליקציה",
+      "progressLabel": "התקדמות האימון",
+      "pointsLabel": "סה\"כ נקודות שהורויו",
+      "pointsDescription": "נקודות שנצברו",
+      "themeToggleDescription": "עבור בין ערכות נושא בהירות לאפלות",
+      "languageSelectorLabel": "בחיר שפה",
+      "languageSelectorDescription": "בחר את השפה המועדפת עליך לאפליקציה",
+      "languageListLabel": "שפות זמינות",
+      "languageListDescription": "רשימת שפות זמינות",
+      "languageSearchDescription": "חפש לפי שם שפה או קוד מדינה",
+      "contentLabel": "תוכן הדרכה",
+      "contentDescription": "אזור גלילה עם מודולי למידה אינטראקטיביים",
+      "achievementLabel": "הודעת השגה",
+      "quizCompletionLabel": "רמז השלמת חידון",
+      "scrollToTopLabel": "גלול לראש"
+    }
+  },
+  "1": {
+    "iconName": "mail-warning",
+    "title": "עצור התקפות דיוג",
+    "subtitle": "למד להכיר ולדווח על הודעות דוא\"ל חשודות בבטחה",
+    "sectionTitle": "מה ההדרכה הזו תעזור לך:",
+    "highlights": [
+      {
+        "iconName": "alert-triangle",
+        "text": "דע שהתקפות דיוג נפוצות"
+      },
+      {
+        "iconName": "users",
+        "text": "זכור שכל אחד יכול להיות יעד"
+      },
+      {
+        "iconName": "shield-check",
+        "text": "ראה איך צעדים פשוטים מורידים סיכון"
+      }
+    ],
+    "key_message": [
+      "דיוג נפוץ",
+      "כל אחד יכול להיות יעד",
+      "פעולות קטנות מורידות סיכון"
+    ],
+    "duration": "~5 דקות",
+    "level": "מתחיל",
+    "callToActionText": {
+      "mobile": "החלק להתחלה",
+      "desktop": "לחץ להתחלה"
+    },
+    "texts": {
+      "sceneLabel": "סצנת הקדמה",
+      "sceneDescription": "התחלה מהירה למודעות דיוג",
+      "iconLabel": "סמל אזהרה לזיהוי דיוג",
+      "titleLabel": "כותרת הדרכה",
+      "subtitleLabel": "הקדמת הדרכה",
+      "cardLabel": "כרטיס סקירה כללית למידה",
+      "cardDescription": "מה ההדרכה הזו תעזור לך",
+      "highlightItemLabel": "מטרת למידה",
+      "statsLabel": "פרטי הדרכה",
+      "durationLabel": "זמן השלמה",
+      "levelLabel": "רמת קושי",
+      "ctaLabel": "התחל הדרכה",
+      "sparkleLabel": "אנימציה דקורטיבית"
+    }
+  },
+  "2": {
+    "iconName": "target",
+    "title": "מטרת הביטחון שלך",
+    "subtitle": "בפעם הבאה שתראה הודעה דוא\"ל חשודה, תעצור ותדווח",
+    "callToActionText": "המשך",
+    "goals": [
+      {
+        "iconName": "alert-triangle",
+        "title": "הכר הודעות דוא\"ל חשודות",
+        "subtitle": "עצור וחשוב",
+        "description": "עוזר לך לעצור ולחשוב כשמשהו נראה חריג."
+      },
+      {
+        "iconName": "shield-check",
+        "title": "קבל את ההחלטה הנכונה",
+        "subtitle": "פעולה בטוחה",
+        "description": "עוזר לך להימנע מקישורים מסוכנים ולאמת קבצים מצורפים לפני פתיחה."
+      },
+      {
+        "iconName": "flag",
+        "title": "דווח בבטחה",
+        "subtitle": "כפתור דיווח",
+        "description": "עוזר לך להשתמש בכפתור דיווח כדי שצוות ה-IT יוכל לפעול במהירות."
+      }
+    ],
+    "key_message": [
+      "הכר הודעה דוא\"ל חשודה",
+      "אל תלחץ על קישורים או תפתח קבצים מצורפים לא ידועים",
+      "השתמש בכפתור דיווח"
+    ],
+    "texts": {}
+  },
+  "3": {
+    "iconName": "monitor-play",
+    "title": "סיפור דיוג אמיתי",
+    "subtitle": "טעות יקרה של מנהל DevOps",
+    "callToActionText": "המשך",
+    "key_message": ["מקרה אמיתי", "זיהוי דיוג", "למה דיווח חשוב"],
+    "video": {
+      "src": "https://customer-0lll6yc8omc23rbm.cloudflarestream.com/5fdb12ff1436c991f50b698a02e2faa1/manifest/video.m3u8",
+      "poster": null,
+      "disableForwardSeek": false,
+      "showTranscript": true,
+      "transcriptTitle": "תמלול",
+      "transcriptLanguage": "English",
+      "transcript": "00:00:04.400 security is always a top priority but an\n00:00:07.919 experience I had last month made me\n00:00:10.400 change my behavior one day during my\n00:00:13.120 lunch break I received an email that\n00:00:15.639 looked like it was from the finance\n00:00:17.439 department it asked me to approve an\n00:00:20.039 invoice something felt off the invoice\n00:00:23.320 number was strange and there were a few\n00:00:25.519 grammar mistakes thanks to my cyber\n00:00:28.279 security training I quickly realized it\n00:00:30.679 was a phishing attempt I thought someone\n00:00:33.879 might fall for this but instead of\n00:00:36.239 reporting it I moved on with my work\n00:00:38.760 assuming it will catch it anyway a week\n00:00:42.079 later our company announced a phishing\n00:00:44.840 attack has led to a data breach exposing\n00:00:47.680 customer information the email I had ignored was\n00:00:51.559 part of that attack if I had reported it\n00:00:54.719 the whole crisis might have been avoided\n00:00:57.600 after the breach the company held a\n00:00:59.600 meeting the IT team explained how the attack\n00:01:03.199 happened and the damage it caused not\n00:01:05.880 just reputational harm but also\n00:01:08.320 financial loss I was shocked and felt\n00:01:11.280 guilty a simple secure reporting\n00:01:14.119 behavior could have made all the\n00:01:16.439 difference here's what I learned from\n00:01:18.439 this experience don't assume someone\n00:01:21.320 else will report it just do it if\n00:01:24.119 everyone thinks the same way nothing\n00:01:26.439 gets done we all share the\n00:01:28.560 responsibility know your company's\n00:01:30.960 reporting process if you're unsure ask it there are always tools to make\n00:01:37.439 reporting easier never underestimate\n00:01:40.399 phishing attacks even one fake email can\n00:01:43.439 put the entire company at risk after\n00:01:46.560 this incident I realized that combating\n00:01:49.079 cyber attacks is only possible when\n00:01:51.439 everyone practices secure\n00:01:53.640 behaviors identifying a phishing email\n00:01:56.520 isn't enough you have to take action\n00:02:00.000 but"
+    },
+    "texts": {
+      "transcriptLoading": "טוען תמלול…",
+      "ctaLocked": "צפה כדי להמשיך",
+      "ctaUnlocked": "המשך"
+    },
+    "ariaTexts": {
+      "mainLabel": "וידאו תרחיש",
+      "mainDescription": "סיפור קצר של מקרה דיוג אמיתי",
+      "loadingLabel": "טוען תמלול",
+      "errorLabel": "לא ניתן היה לטעון את התמלול",
+      "videoPlayerLabel": "נגן תרחיש",
+      "mobileHintLabel": "חוויה הטובה ביותר עם אודיו"
+    }
+  },
+  "4": {
+    "iconName": "mail-check",
+    "title": "תרגול זיהוי דיוג",
+    "subtitle": "בדוק הודעות דוא\"ל, זהה איומים ודווח בבטחה",
+    "callToActionText": "המשך",
+    "key_message": ["בדוק את ההודעה", "אל תלחץ על קישורים", "לחץ על דיווח"],
+    "actions": [
+      {
+        "iconName": "mail",
+        "title": "בדוק את ההודעה",
+        "description": "בדוק את השולח, את הנושא ותוכן לפני שתוכל לפעול.",
+        "tip": "כתובות אתרים שלא תואמות בקשות דחופות הן סימני אזהרה נפוצים."
+      },
+      {
+        "iconName": "alert-triangle",
+        "title": "הימנע מלחיצה",
+        "description": "הימנע מלחיצה על קישורים חשודים או פתיחת קבצים מצורפים לא ידועים.",
+        "tip": "הצף על קישורים כדי לראות לאן הם הולכים."
+      },
+      {
+        "iconName": "flag",
+        "title": "לחץ על דיווח",
+        "description": "אם זה נראה חשוד, השתמש בכפתור דיווח כדי שה-IT יוכל לחקור.",
+        "tip": "השתמש ב-'דיווח דיוג' ב-Outlook או Gmail."
+      }
+    ],
+    "tipConfig": {
+      "iconName": "info"
+    },
+    "texts": {
+      "mobileHint": "💡 פתח את ההודעה. אם זה נראה חשוד, לחץ על דיווח.",
+      "feedbackCorrect": "✅ עבודה טובה - דיווח עוזר להגן על כולם.",
+      "feedbackWrong": "⚠️ לא בדיוק - הודעה זו נראית בטוחה. נסה שוב."
+    }
+  },
+  "5": {
+    "iconName": "brain",
+    "title": "בדוק את הידע שלך",
+    "subtitle": "קבל את ההחלטה הנכונה כשחשוב ביותר",
+    "callToActionText": "תשובה כדי להמשיך",
+    "quizCompletionCallToActionText": "המשך",
+    "key_message": [
+      "ענה על השאלות",
+      "בדוק את הידע שלך",
+      "בנה את ההרגל הנכון"
+    ],
+    "questions": {
+      "totalCount": 2,
+      "maxAttempts": 2,
+      "list": [
+        {
+          "id": "report-invoice",
+          "type": "multiple_choice",
+          "title": "דוא\"ל אישור חשבונית עם קישור",
+          "description": "אתה מקבל דוא\"ל אישור חשבונית בלתי צפוי מ-\"כספים\". שם השולח נראה נכון, אך התצוגה המקדימה של הקישור מציגה תחום שלא תואם. מה הצעד הבטוח ביותר הבא?",
+          "options": [
+            {
+              "id": "click",
+              "text": "פתח את הקישור כדי לבדוק את החשבונית",
+              "isCorrect": false
+            },
+            {
+              "id": "reply",
+              "text": "השב לשולח כדי לשאול אם זה אמיתי",
+              "isCorrect": false
+            },
+            {
+              "id": "report",
+              "text": "השתמש בכפתור דיווח כדי שה-IT יוכל לחקור",
+              "isCorrect": true
+            },
+            {
+              "id": "forward",
+              "text": "העבר אותו לעמית לדעה שנייה",
+              "isCorrect": false
+            }
+          ],
+          "explanation": "שימוש בכפתור דיווח עוזר לצוות האבטחה לפעול במהירות ולהגן על אחרים. הימנע מלחיצה על קישורים או תשובה להודעות דוא\"ל חשודות."
+        },
+        {
+          "id": "delete-vs-report",
+          "type": "true_false",
+          "title": "מחק או דווח?",
+          "statement": "אם הודעה דוא\"ל נראית חשודה, מחיקתה מספיקה.",
+          "correctAnswer": false,
+          "options": {
+            "true": { "label": "נכון", "icon": "check" },
+            "false": { "label": "שקר", "icon": "x" }
+          },
+          "explanation": "הדיווח עוזר ל-IT לזהות התקפות רחבות יותר, להזהיר עמיתים ולהסיר הודעות דומות מתיבות הכניסה. מחיקה רק עוזרת לך."
+        }
+      ]
+    },
+    "texts": {
+      "question": "שאלה",
+      "nextQuestion": "שאלה הבאה",
+      "nextSlide": "שקף הבא",
+      "retryQuestion": "נסה שוב",
+      "quizCompleted": "חידון הושלם 🎉",
+      "correctAnswer": "נכון - עבודה טובה 🎉",
+      "wrongAnswer": "✖ לא בדיוק",
+      "attemptsLeft": "ניסיונות נותרים",
+      "noAttemptsLeft": "אין ניסיונות נותרים",
+      "checkAnswer": "בדוק תשובה",
+      "evaluating": "בודק…",
+      "completeEvaluation": "סיים סקירה",
+      "mobileInstructions": "📱 סלולר: בחר את הפריט, ואז לחץ על קטגוריה",
+      "desktopInstructions": "🖥️ שולחן עבודה: גרור פריטים לקטגוריות",
+      "options": "אפשרויות",
+      "categories": "קטגוריות",
+      "tapHere": "לחץ כאן",
+      "checkAnswerButton": "בדוק תשובה",
+      "explanation": "הסבר",
+      "tips": "💡 טיפים",
+      "mobileHint": "💡 קרא את השאלה בעיון לפני שתענה",
+      "previousQuestion": "שאלה קודמת",
+      "quizCompletionHint": "השלם את החידון כדי להמשיך",
+      "achievementNotification": "השגה נפתחה 🎉",
+      "scrollHint": "גלול למטה",
+      "nextSection": "סעיף הבא",
+      "loading": "טוען…",
+      "questionLoading": "טוען שאלה…",
+      "transcriptLoading": "טוען תמלול…",
+      "closeNotification": "סגור הודעה",
+      "languageNotFound": "שפה לא נמצאה"
+    },
+    "ariaTexts": {
+      "mainLabel": "ממשק חידון",
+      "mainDescription": "חידון אינטראקטיבי עם סוגי שאלות מרובים ותגובה בזמן אמת",
+      "headerLabel": "כותרת החידון",
+      "questionLabel": "תוכן שאלה",
+      "questionDescription": "שאלה נוכחית עם אפשרויות תשובה",
+      "multipleChoiceLabel": "אפשרויות בחירה מרובה",
+      "multipleChoiceDescription": "בחר תשובה אחת מהאפשרויות הזמינות",
+      "trueFalseLabel": "אפשרויות נכון או שקר",
+      "trueFalseDescription": "בחר נכון או שקר לההצהרה",
+      "multiSelectLabel": "אפשרויות בחירה מרובה",
+      "multiSelectDescription": "בחר יותר מתשובה נכונה אחת",
+      "sliderLabel": "שאלת סולם גלילה",
+      "sliderDescription": "דרג את התשובה שלך באמצעות הגלילה",
+      "dragDropLabel": "קטגוריות גרירה והשמה",
+      "dragDropDescription": "גרור פריטים לקטגוריות או לחץ לבחירה",
+      "optionsLabel": "אפשרויות זמינות",
+      "categoriesLabel": "קטגוריות",
+      "resultPanelLabel": "פנל תוצאה והסבר",
+      "resultPanelDescription": "משוב על התשובה שלך עם הסבר וטיפים",
+      "explanationLabel": "סעיף הסבר",
+      "tipsLabel": "טיפים מועילים",
+      "navigationLabel": "ניווט שאלה",
+      "previousQuestionLabel": "עבור לשאלה קודמת",
+      "nextQuestionLabel": "עבור לשאלה הבאה",
+      "retryQuestionLabel": "נסה שאלה זו שוב",
+      "checkAnswerLabel": "בדוק את התשובה שלך",
+      "correctAnswerLabel": "תשובה נכונה",
+      "incorrectAnswerLabel": "לא בדיוק",
+      "attemptsLeftLabel": "ניסיונות נותרים",
+      "noAttemptsLeftLabel": "אין ניסיונות נותרים",
+      "quizCompletedLabel": "חידון הושלם בהצלחה",
+      "mobileHintLabel": "רמז שימוש בסלולר",
+      "mobileInstructionsLabel": "הוראות סלולריות",
+      "desktopInstructionsLabel": "הוראות שולחן עבודה",
+      "tapHereLabel": "לחץ כאן כדי למקם את הפריט",
+      "clearCategoryLabel": "נקה קטגוריה",
+      "removeItemLabel": "הסר פריט"
+    }
+  },
+  "6": {
+    "iconName": "list-checks",
+    "title": "שתף את החוויה שלך",
+    "subtitle": "עזור לנו לשפר את חוויית ההדרכה שלך",
+    "texts": {
+      "ratingQuestion": "כמה בטוח אתה מרגיש לגבי אבטחת דוא\"ל כעת?",
+      "topicsQuestion": "באילו תחומים היית רוצה עוד תרגול או דוגמאות?",
+      "feedbackQuestion": "משוב נוסף כדי לעזור לנו לשפר?",
+      "feedbackPlaceholder": "הקלד את המחשבות שלך כאן…",
+      "submitButton": "שלח",
+      "submittingText": "שולח…",
+      "submittedText": "נשלח",
+      "ratingRequiredText": "בחר דירוג לפני השלח.",
+      "dataSecurityNotice": "התשובות שלך אנונימיות ומוגנות.",
+      "successTitle": "תודה",
+      "successMessage1": "תודה על המשוב שלך.",
+      "successMessage2": "הדירוג שלך יעזור לנו לשפר את ההדרכה הזו.",
+      "successMessage3": "המשך לבנות מודעות ביטחונית.",
+      "thankYouMessage": "להישאר בטוח."
+    },
+    "ariaTexts": {
+      "mainLabel": "טופס ביטחון ומשוב",
+      "successDescription": "הטופס הוגש בהצלחה. תודה על הקלט שלך.",
+      "successRegionLabel": "הודעת הצלחה",
+      "successIconLabel": "סמל סימן",
+      "formDescription": "דירוג ביטחון, נושאים לשיפור ואזור טקסט חופשי.",
+      "headerLabel": "כותרת הטופס",
+      "formContentDescription": "דירוג כוכבים, בחירות נושא וקלט טקסט",
+      "ratingDescription": "בחר את רמת הביטחון שלך לגבי אבטחת דוא\"ל",
+      "starLabel": "כוכב",
+      "topicsDescription": "בחר נושאים שאתה רוצה יותר תרגול",
+      "topicLabel": "תיבת בחירה נושא",
+      "feedbackDescription": "אזור טקסט להערות נוספות",
+      "feedbackLabel": "שדה משוב",
+      "submitSectionLabel": "סעיף הגשה",
+      "submittingLabel": "מצב שליחה",
+      "submitLabel": "כפתור שלח",
+      "securityNoticeLabel": "הערה פרטיות נתונים"
+    },
+    "topics": ["אינדיקטורים של דוא\"ל חשוד", "שימוש בכפתור דיווח"]
+  },
+  "7": {
+    "iconName": "repeat",
+    "subtitle": "תוכנית הפעולה שלך כדי להישאר בטוח מדיוג",
+    "callToActionText": "המשך",
+    "texts": {
+      "title": "תוכנית פעולה",
+      "subtitle": "בפעם הבאה שנראית הודעה דוא\"ל חשודה, תעשה זאת:",
+      "actionsTitle": "הצעדים הבאים שלך"
+    },
+    "key_message": [
+      "הכר הודעה דוא\"ל חשודה",
+      "אל תלחץ על קישורים או תפתח קבצים מצורפים לא ידועים",
+      "השתמש בכפתור דיווח"
+    ]
+  },
+  "code-review": {
+    "title": "בדוק את הקוד לסיכונים",
+    "subtitle": "זהה שגיאות לוגיקה וחולשות אבטחה",
+    "description": "הקטע שלהלן מכיל לפחות תרגול אחד לא מאובטח. הדגש את הבעיה והסבר כיצד היית מפחית אותה.",
+    "helperText": "חפש אימות חסר, גישה בלתי בטוחה לـ DOM, או פלט שלא הופך.",
+    "successHelperText": "עבודה טובה! שים לב למה מצאת והמשך לצעד הבא.",
+    "callToActionText": "בדוק לפני המשך",
+    "successCallToActionText": "המשך",
+    "checkButtonLabel": "הפעל בדיקת אבטחה",
+    "checkStatusTexts": {
+      "checking": "ניתוח קטע…",
+      "success": "לא זוהו בעיות קריטיות. אתה יכול להמשיך.",
+      "error": "גילינו דפוסים מסוכנים. תקן אותם והפעל את הבדיקה שוב."
+    },
+    "ariaTexts": {
+      "mainLabel": "תרגיל סקירת קוד",
+      "mainDescription": "בלוק קוד אינטראקטיבי לסקירה ידנית",
+      "codeRegionLabel": "בלוק קוד",
+      "codeRegionDescription": "קטע קוד ניתן לעריכה לבדיקה",
+      "checkButtonLabel": "בדוק קוד"
+    }
+  },
+  "8": {
+    "iconName": "trophy",
+    "texts": {
+      "completionTitle": "עבודה טובה - השלמת את ההדרכה",
+      "completionSubtitle": "רעננת את מודעות הדיוג שלך",
+      "achievementsTitle": "ההישגים שלך",
+      "actionPlanTitle": "צעדים הבאים",
+      "resourcesTitle": "משאבים נוספים",
+      "motivationalTitle": "היה עירני",
+      "motivationalMessage": "השלמת ההדרכה הזו עוזרת להגן על הארגון שלך.",
+      "saveAndFinish": "שמור וסיים",
+      "savingText": "שומר…",
+      "finishedText": "שמור. אתה יכול עכשיו לסגור חלון זה.",
+      "finishErrorText": "חיבור LMS נכשל. שתף את הקבצים עם צוות ה-IT שלך.",
+      "downloadButton": "הוריד אישור",
+      "downloadingText": "מוריד…",
+      "downloadedText": "הורד",
+      "urgentLabel": "דחוף",
+      "pointsLabel": "נקודות",
+      "timeLabel": "זמן",
+      "completionLabel": "השלמה",
+      "certificateTitle": "אישור השלמה",
+      "certificateAwardedText": "אישור זה ניתן ל",
+      "certificateCompletionText": "להשלמה מוצלחת של",
+      "certificateDateText": "בתאריך",
+      "downloadTrainingLogsText": "הוריד יומני הדרכה",
+      "retryText": "נסה שוב"
+    },
+    "immediateActions": [
+      {
+        "title": "עשה עכשיו",
+        "description": "השתמש בכפתור דיווח בפעם הבאה שמשהו נראה חשוד"
+      },
+      {
+        "title": "השבוע הזה",
+        "description": "עודד את הצוות שלך לדווח על דוא\"ל חשודים"
+      }
+    ],
+    "key_message": [
+      "הדרכה הושלמה",
+      "החל את מה שתרגלת",
+      "שתף ועודד אחרים"
+    ],
+    "resources": [
+      {
+        "title": "הנחיית דיוג של NCSC",
+        "type": "URL",
+        "url": "https://www.ncsc.gov.uk/collection/phishing-scams"
+      }
+    ]
+  }
+}

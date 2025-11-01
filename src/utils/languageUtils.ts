@@ -272,6 +272,14 @@ export const formatLanguageLabel = (tag: string, locale: string = 'en'): string 
     }
 };
 
+// Helper function to check if a language is RTL (Right-to-Left)
+export const isRTLLanguage = (languageCode: string): boolean => {
+    if (!languageCode) return false;
+    const code = String(languageCode).toLowerCase().split('-')[0];
+    const rtlLanguages = ['ar', 'he', 'fa', 'ur', 'yi', 'ji', 'iw', 'ps', 'sd', 'ug', 'dv'];
+    return rtlLanguages.includes(code);
+};
+
 // Custom hook for mobile detection
 export const useIsMobile = () => {
     const MOBILE_BREAKPOINT = 1024;

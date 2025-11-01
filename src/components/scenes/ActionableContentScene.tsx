@@ -7,6 +7,7 @@ import { CallToAction } from "../ui/CallToAction";
 import { EditModeProvider, useEditMode } from "../../contexts/EditModeContext";
 import { EditableText } from "../common/EditableText";
 import { EditModePanel } from "../common/EditModePanel";
+import { ScientificBasisInfo } from "../common/ScientificBasisInfo";
 import { deepMerge } from "../../utils/deepMerge";
 import { Inbox } from "../Inbox";
 import { InboxSceneConfig } from "../../data/inboxConfig";
@@ -47,14 +48,12 @@ function ActionableContentSceneInternalCore({
   onNextSlide,
   onInboxCompleted,
   sceneId,
-  reducedMotion,
   selectedLanguage,
   onInboxConfigUpdate
 }: ActionableContentSceneProps & {
   onNextSlide?: () => void;
   onInboxCompleted?: (completed: boolean) => void;
   sceneId?: string | number;
-  reducedMotion?: boolean;
   selectedLanguage?: string;
   onInboxConfigUpdate?: (updatedConfig: any) => void;
 }) {
@@ -343,7 +342,6 @@ function ActionableContentSceneInternal(props: ActionableContentSceneProps & {
   onNextSlide?: () => void;
   onInboxCompleted?: (completed: boolean) => void;
   sceneId?: string | number;
-  reducedMotion?: boolean;
   selectedLanguage?: string;
 }) {
   const [configKey, setConfigKey] = useState(0);
@@ -377,6 +375,10 @@ function ActionableContentSceneInternal(props: ActionableContentSceneProps & {
         {...props}
         onInboxConfigUpdate={(config) => setInboxConfigRef({ current: config })}
       />
+      <ScientificBasisInfo
+        config={props.config as any}
+        sceneType={(props.config as any)?.scene_type || 'actionable_content'}
+      />
     </EditModeProvider>
   );
 }
@@ -386,7 +388,6 @@ export function ActionableContentScene(props: ActionableContentSceneProps & {
   onNextSlide?: () => void;
   onInboxCompleted?: (completed: boolean) => void;
   sceneId?: string | number;
-  reducedMotion?: boolean;
   selectedLanguage?: string;
 }) {
   return <ActionableContentSceneInternal {...props} />;

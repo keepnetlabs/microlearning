@@ -256,13 +256,19 @@ function SummarySceneContent({ config, completionData, sceneId, reducedMotion, d
     if (hasDownloadedCertificate) return;
     setShowCertificate(true);
 
+    // Get certificate texts from config with fallbacks
+    const certificateTitle = currentConfig.texts?.certificateTitle || "Certificate of Completion";
+    const certificateAwardedText = currentConfig.texts?.certificateAwardedText || "This certificate is awarded to";
+    const certificateCompletionText = currentConfig.texts?.certificateCompletionText || "for successful completion of";
+    const certificateDateText = currentConfig.texts?.certificateDateText || "on";
+
     // Generate certificate HTML
     const certificateHTML = `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Certificate of Completion</title>
+  <title>${escapeHtml(certificateTitle)}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -364,13 +370,13 @@ function SummarySceneContent({ config, completionData, sceneId, reducedMotion, d
     <div class="logo-section">
       <img src="https://keepnetlabs.com/keepnet-logo.svg" alt="Keepnet Labs" class="logo">
     </div>
-    <div class="title">Certificate Of Completion</div>
-    <div class="subtitle">This certificate is awarded to</div>
+    <div class="title">${escapeHtml(certificateTitle)}</div>
+    <div class="subtitle">${escapeHtml(certificateAwardedText)}</div>
     <div class="name">${escapeHtml(certificateLearnerName)}</div>
     <div class="divider"></div>
-    <div class="training-info">for successful completion of</div>
+    <div class="training-info">${escapeHtml(certificateCompletionText)}</div>
     <div class="training-name">${escapeHtml(certificateTrainingName)}</div>
-    <div class="completion-date">on ${new Date().toLocaleDateString('en-US', {
+    <div class="completion-date">${escapeHtml(certificateDateText)} ${new Date().toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'

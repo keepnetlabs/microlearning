@@ -539,6 +539,40 @@
       }
     },
     {
+      "scene_id": "code-review",
+      "metadata": {
+        "scene_type": "code_review",
+        "points": 25,
+        "behavioral_science_principle": ["Etkin Analiz", "Güvenli Kod"],
+        "title": "Kod Parçasını İncele",
+        "subtitle": "Yayın öncesinde riskli desenleri yakala",
+        "description": "Aşağıdaki kodda güvenlik açığı oluşturabilecek noktaları tespit edip nasıl iyileştireceğini not et.",
+        "codeSnippet": {
+          "language": "javascript",
+          "content": "function fetchUser(id) {\n  return fetch(`/api/user/${id}`)\n    .then((response) => response.json());\n}\n\nfunction renderProfile(user) {\n  document.getElementById(\"profile\").innerHTML = user.bio;\n}\n\nfetchUser(window.location.search.slice(4))\n  .then(renderProfile);",
+          "showLineNumbers": true,
+          "automaticLayout": true
+        },
+        "helperText": "Kullanıcı girdilerinin doğrulanması ve DOM'a yazmadan önce içerik temizliği gibi güvenlik kontrollerini düşün.",
+        "successHelperText": "Harika! Gözlemlerini not al ve devam et.",
+        "callToActionText": "Kontrol etmeden devam etme",
+        "successCallToActionText": "Devam et",
+        "checkButtonLabel": "Güvenlik Kontrolü Yap",
+        "checkStatusTexts": {
+          "checking": "Kod analiz ediliyor…",
+          "success": "Riskli bir desen bulunmadı. Devam edebilirsin.",
+          "error": "Potansiyel riskler tespit edildi. Düzelt ve tekrar dene."
+        },
+        "ariaTexts": {
+          "mainLabel": "Kod inceleme sahnesi",
+          "mainDescription": "Güvenli kod pratiği için etkileşimli kod alanı",
+          "codeRegionLabel": "Kod düzenleyici",
+          "codeRegionDescription": "Kullanıcı verisini alan ve ekrana basan JavaScript örneği",
+          "checkButtonLabel": "Kodu kontrol et"
+        }
+      }
+    },
+    {
       "scene_id": "8",
       "metadata": {
         "scene_type": "summary",
