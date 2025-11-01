@@ -22,7 +22,7 @@ export const GoalCard = memo(({ goal, index, isEditMode }: {
         >
             <div className="relative z-10">
                 <header className="flex items-center mb-3">
-                    <div className={`p-2 sm:p-2.5 ${isEditMode ? 'glass-border-4-no-overflow' : 'glass-border-4'} rounded-xl mr-3 transition-all duration-300 ease-out group-hover:scale-105`} aria-hidden="true">
+                    <div className={`p-2 sm:p-2.5 ${isEditMode ? 'glass-border-4-no-overflow' : 'glass-border-4'} rounded-xl ltr:mr-3 transition-all duration-300 ease-out group-hover:scale-105 rtl:ml-3`} aria-hidden="true">
                         <Icon size={16} className={'relative z-10 transition-all duration-300 ease-out group-hover:scale-105 text-[#1C1C1E] dark:text-[#F2F2F7]'} aria-hidden="true" />
                     </div>
                     <div className="flex flex-col items-start">
@@ -33,7 +33,7 @@ export const GoalCard = memo(({ goal, index, isEditMode }: {
                         </motion.h3>
                     </div>
                 </header>
-                <div id={`goal-description-${index}`} className="text-sm text-left text-[#1C1C1E] dark:text-[#F2F2F7] leading-relaxed transition-colors duration-300 ease-out">
+                <div id={`goal-description-${index}`} className="text-sm text-left text-[#1C1C1E] dark:text-[#F2F2F7] leading-relaxed transition-colors duration-300 ease-out rtl:text-right">
                     <EditableText configPath={`goals.${index}.description`} placeholder="Enter goal description..." maxLength={300} multiline={true} as="span">
                         {goal.description}
                     </EditableText>

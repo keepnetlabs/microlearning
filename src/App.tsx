@@ -859,9 +859,9 @@ export default function App(props: AppProps = {}) {
             >
               <div className={cssClasses.headerContent}>
                 {/* Header Layout - Logo Left, Progress Center, Controls Right */}
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between" style={{ direction: 'ltr' }} >
                   {/* Left - Logo */}
-                  <HeaderLogo
+                  < HeaderLogo
                     isMobile={isMobile}
                     isFirstOrLastScene={isFirstOrLastScene}
                     isDarkMode={isDarkMode}
@@ -1223,7 +1223,7 @@ export default function App(props: AppProps = {}) {
             <Toaster />
           </div>
         </FontFamilyProvider>
-      </GlobalEditModeProvider>
-    </MotionConfig>
+      </GlobalEditModeProvider >
+    </MotionConfig >
   );
 }

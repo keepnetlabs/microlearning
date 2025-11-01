@@ -214,10 +214,10 @@ export const SurveyScene = memo(function SurveyScene({
       onSave={handleSave}
       onEditModeChange={setIsInEditMode}
     >
-       <EditModePanel /> 
-      <ScientificBasisInfo 
-        config={currentConfig} 
-        sceneType={(currentConfig as any)?.scene_type || 'survey'} 
+      <EditModePanel />
+      <ScientificBasisInfo
+        config={currentConfig}
+        sceneType={(currentConfig as any)?.scene_type || 'survey'}
       />
       <FontWrapper>
         <main
@@ -336,13 +336,13 @@ export const SurveyScene = memo(function SurveyScene({
                   aria-labelledby="rating-question"
                   aria-describedby="rating-description"
                 >
-                  {ratingStars.map(({ star, isActive, key, ariaLabel }) => (
+                  {ratingStars.map(({ star, isActive, key, ariaLabel }, index) => (
                     <motion.button
                       key={key}
                       whileHover={{ scale: !isSubmitted ? 1.1 : 1 }}
                       whileTap={{ scale: !isSubmitted ? 0.9 : 1 }}
                       onClick={() => handleRatingChange(star)}
-                      className={`p-2 transition-all ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} ${isSubmitted ? 'cursor-not-allowed opacity-70' : ''}`}
+                      className={`p-2 transition-all ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} ${isSubmitted ? 'cursor-not-allowed opacity-70' : ''} ${index === 0 ? 'rtl:ml-2' : ''}`}
                       disabled={isSubmitted}
                       style={{ touchAction: 'manipulation' }}
                       role="radio"
@@ -441,7 +441,7 @@ export const SurveyScene = memo(function SurveyScene({
                           )}
                         </div>
                       </div>
-                      <span className={`group-hover:text-[#1C1C1E] dark:group-hover:text-white transition-colors text-left flex-1 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
+                      <span className={`group-hover:text-[#1C1C1E] dark:group-hover:text-white transition-colors text-left flex-1 text-[#1C1C1E] dark:text-[#F2F2F7] rtl:text-right rtl:mr-3`}>
                         <EditableText
                           configPath={`topics.${index}`}
                           placeholder="Enter topic text..."
