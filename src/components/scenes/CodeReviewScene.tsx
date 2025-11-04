@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Editor from "@monaco-editor/react";
-import { motion } from "framer-motion";
+import * as LucideIcons from "lucide-react";
+import { LucideIcon } from "lucide-react";
 import { FontWrapper } from "../common/FontWrapper";
+import { useIsMobile } from "../ui/use-mobile";
 import { EditableText } from "../common/EditableText";
 import { EditModePanel } from "../common/EditModePanel";
 import { EditModeProvider, useEditMode } from "../../contexts/EditModeContext";
@@ -10,12 +12,25 @@ import { logger } from "../../utils/logger";
 import { CallToAction } from "../ui/CallToAction";
 import { CodeReviewTextsModal } from "./code-review/code-review-texts-modal";
 import { CodeReviewSceneConfig, CodeReviewSceneProps } from "./code-review/types";
-import { Edit3, LucideLoader2 } from "lucide-react";
+import { Edit3, Loader2 } from "lucide-react";
 import { SUPPORTED_LANGUAGES } from "./code-review/constants";
 
 const DEFAULT_CONTAINER_CLASS = "w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-6";
 const DEFAULT_EDITOR_HEIGHT = 420;
-const DEFAULT_CHECK_LABEL = "Run Security Check";
+
+const getIconComponent = (iconName: string): LucideIcon => {
+    const camelCaseName = iconName
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join('');
+
+    if (camelCaseName in LucideIcons) {
+        return LucideIcons[camelCaseName as keyof typeof LucideIcons] as LucideIcon;
+    }
+
+    console.warn(`Icon "${iconName}" not found, using default icon`);
+    return LucideIcons.HelpCircle;
+};
 
 const getThemeFromDocument = (): "light" | "vs-dark" | "hc-black" => {
     if (typeof document === "undefined") {
@@ -32,10 +47,44 @@ function CodeReviewSceneContent({
     reducedMotion
 }: CodeReviewSceneProps) {
     const { isEditMode, tempConfig, updateTempConfig } = useEditMode();
+    const isMobile = useIsMobile();
 
     const currentConfig: CodeReviewSceneConfig = useMemo(() => {
         return deepMerge(config, tempConfig || {});
     }, [config, tempConfig]);
+
+    // Extract icon for cleaner dependency array
+    const icon = useMemo(() => (currentConfig as any)?.icon, [currentConfig]);
+
+    // Memoize icon component
+    const sceneIconComponent = useMemo(() => {
+        if (!icon) return null;
+
+        if (icon.component) {
+            const SceneIcon = icon.component;
+            return (
+                <div className="mb-1 sm:mb-2 p-3 glass-border-3">
+                    <SceneIcon
+                        size={icon.size || 40}
+                        className="text-[#1C1C1E] dark:text-[#F2F2F7]"
+                        aria-hidden="true"
+                    />
+                </div>
+            );
+        } else if (icon.sceneIconName) {
+            const SceneIcon = getIconComponent(icon.sceneIconName);
+            return (
+                <div className="mb-1 sm:mb-2 p-3 glass-border-3">
+                    <SceneIcon
+                        size={icon.size || 40}
+                        className="text-[#1C1C1E] dark:text-[#F2F2F7]"
+                        aria-hidden="true"
+                    />
+                </div>
+            );
+        }
+        return null;
+    }, [icon]);
 
     const [computedTheme, setComputedTheme] = useState<"light" | "vs-dark" | "hc-black">(() => getThemeFromDocument());
     const [checkStatus, setCheckStatus] = useState<"idle" | "checking" | "success" | "error">("idle");
@@ -59,12 +108,10 @@ function CodeReviewSceneContent({
     const [editorValue, setEditorValue] = useState(codeContent);
     const editorHeight = currentConfig.layout?.editorHeight ?? DEFAULT_EDITOR_HEIGHT;
     const containerClassName = currentConfig.layout?.containerClassName ?? DEFAULT_CONTAINER_CLASS;
-    const checkLabel = currentConfig.checkButtonLabel || DEFAULT_CHECK_LABEL;
     const ariaMainLabel = currentConfig.ariaTexts?.mainLabel || "Code review scene";
     const ariaMainDescription = currentConfig.ariaTexts?.mainDescription || "Interactive code review exercise";
     const ariaCodeRegionLabel = currentConfig.ariaTexts?.codeRegionLabel || "Code snippet";
     const ariaCodeRegionDescription = currentConfig.ariaTexts?.codeRegionDescription || "Review the provided code";
-    const ariaCheckLabel = currentConfig.checkButtonAriaLabel || currentConfig.ariaTexts?.checkButtonLabel || checkLabel;
 
     const defaultStatusTexts = useMemo(() => ({
         checking: "Analyzing code…",
@@ -80,8 +127,17 @@ function CodeReviewSceneContent({
     const isChecking = checkStatus === "checking";
     const isSuccess = checkStatus === "success";
 
-    const initialCtaText = currentConfig.callToActionText || "Review the snippet";
-    const successCtaText = currentConfig.successCallToActionText || "Continue";
+    // Handle CTA text as string or object (from edit mode)
+    const getCtaText = (config: any): string => {
+        if (!config) return "";
+        if (typeof config === 'string') return config;
+        if (typeof config === 'object' && config.desktop) return config.desktop;
+        if (typeof config === 'object' && config.mobile) return config.mobile;
+        return "";
+    };
+
+    const initialCtaText = getCtaText(currentConfig.callToActionText) || "Review before continuing";
+    const successCtaText = getCtaText(currentConfig.successCallToActionText) || "Continue";
     const activeCtaText = isSuccess ? successCtaText : initialCtaText;
 
     const helperTextFallback = currentConfig.helperText || "Look for missing validation, unsafe DOM access, or unescaped output.";
@@ -124,49 +180,57 @@ function CodeReviewSceneContent({
         setCheckStatus("checking");
 
         try {
-            let handlerResult: unknown = undefined;
-            if (onCheckCode) {
-                const result = onCheckCode(editorValue, editorLanguage);
-                handlerResult = await Promise.resolve(result as unknown);
-            } else {
-                logger.push({
-                    level: "warn",
-                    code: "CODE_REVIEW_NO_HANDLER",
-                    message: "Code review check button clicked without handler",
-                    detail: { sceneId, language: editorLanguage }
-                });
-            }
+            const originalCode = codeSnippet?.content || "";
+            const issueType = (currentConfig as any)?.issueType || "Code Security Issue";
 
-            const didSucceed = handlerResult === undefined ? true : handlerResult !== false;
+            const payload = {
+                issueType,
+                originalCode,
+                fixedCode: editorValue,
+                language: editorLanguage
+            };
 
-            if (didSucceed) {
+            console.log("[CodeReview] Sending validation request:", payload);
+
+            // Call validation endpoint
+            const response = await fetch("http://localhost:4111/code-review-validate", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            console.log("[CodeReview] Response status:", response.status);
+
+            const result = await response.json();
+
+            console.log("[CodeReview] Validation result:", result);
+
+            if (result.success && result.data?.isCorrect) {
+                console.log("[CodeReview] ✅ Code is correct!");
                 setCheckStatus("success");
             } else {
+                console.log("[CodeReview] ❌ Code has issues:", result.data?.feedback);
                 setCheckStatus("error");
             }
         } catch (error) {
+            console.error("[CodeReview] Validation error:", error);
             logger.push({
                 level: "error",
-                code: "CODE_REVIEW_CHECK_FAILED",
+                code: "CODE_REVIEW_VALIDATION_FAILED",
                 message: "Code review validation failed",
                 detail: error
             });
             setCheckStatus("error");
         }
-    }, [editorValue, editorLanguage, onCheckCode, sceneId]);
+    }, [editorValue, editorLanguage, codeSnippet, currentConfig]);
 
     const handleNextClick = useCallback(() => {
         if (checkStatus !== "success") return;
         onNextSlide?.();
     }, [checkStatus, onNextSlide]);
 
-    const statusMessage = checkStatus === "checking"
-        ? checkingMessage
-        : checkStatus === "success"
-            ? successStatusMessage
-            : checkStatus === "error"
-                ? errorStatusMessage
-                : undefined;
 
     const handleTextsSave = useCallback((nextValues: {
         helperText: string;
@@ -197,37 +261,33 @@ function CodeReviewSceneContent({
                     {ariaMainDescription}
                 </div>
 
-                <header className="flex flex-col gap-3 text-center">
-                    <motion.h1
+                <header className="flex flex-col text-center">
+                    {!isMobile && (
+                        <div className="flex items-center justify-center" aria-hidden="true">
+                            {sceneIconComponent}
+                        </div>
+                    )}
+                    <h1
                         className="project-title"
-                        initial={{ opacity: 0, y: 16 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: reducedMotion ? 0 : 0.4 }}
                     >
                         <EditableText configPath="title" placeholder="Enter title" as="span" maxLength={120}>
                             {currentConfig.title || "Code Review Challenge"}
                         </EditableText>
-                    </motion.h1>
+                    </h1>
 
                     {currentConfig.subtitle && (
-                        <motion.p
+                        <p
                             className="project-subtitle"
-                            initial={{ opacity: 0, y: 12 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: reducedMotion ? 0 : 0.4, delay: reducedMotion ? 0 : 0.1 }}
                         >
                             <EditableText configPath="subtitle" placeholder="Enter subtitle" as="span" maxLength={200}>
                                 {currentConfig.subtitle}
                             </EditableText>
-                        </motion.p>
+                        </p>
                     )}
 
                     {currentConfig.description && (
-                        <motion.p
+                        <p
                             className="text-base sm:text-lg text-[#1C1C1E] dark:text-[#F2F2F7] max-w-3xl mx-auto"
-                            initial={{ opacity: 0, y: 12 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: reducedMotion ? 0 : 0.4, delay: reducedMotion ? 0 : 0.2 }}
                         >
                             <EditableText
                                 configPath="description"
@@ -238,7 +298,7 @@ function CodeReviewSceneContent({
                             >
                                 {currentConfig.description}
                             </EditableText>
-                        </motion.p>
+                        </p>
                     )}
                 </header>
 
@@ -251,10 +311,7 @@ function CodeReviewSceneContent({
                         {ariaCodeRegionDescription}
                     </div>
 
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                        <div className="text-sm font-medium text-[#1C1C1E] dark:text-[#F2F2F7] uppercase tracking-wide">
-                            {editorLanguage}
-                        </div>
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">    
                         {isEditMode ? (
                             <label className="flex items-center gap-2 text-xs text-[#1C1C1E]/80 dark:text-[#F2F2F7]/80">
                                 <span>Language:</span>
@@ -277,10 +334,7 @@ function CodeReviewSceneContent({
                         )}
                     </div>
 
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: reducedMotion ? 0 : 0.4, delay: reducedMotion ? 0 : 0.15 }}
+                    <div
                         className="rounded-lg border border-[#1C1C1E]/10 dark:border-[#F2F2F7]/10 shadow-lg overflow-hidden bg-white/60 dark:bg-[#1C1C1E]/60 backdrop-blur"
                     >
                         <Editor
@@ -292,7 +346,7 @@ function CodeReviewSceneContent({
                             theme={editorTheme}
                             options={editorOptions}
                         />
-                    </motion.div>
+                    </div>
 
                     {activeHelperText && (
                         <div className="text-sm text-[#1C1C1E]/80 dark:text-[#F2F2F7]/80">
@@ -316,49 +370,16 @@ function CodeReviewSceneContent({
                     )}
                 </section>
 
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="flex flex-col gap-3 sm:max-w-md">
-                        <motion.button
-                            type="button"
-                            onClick={handleCheckClick}
-                            disabled={!editorValue.trim() || isChecking}
-                            aria-label={ariaCheckLabel}
-                            className={`group relative inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-medium focus:outline-none glass-border-3 transition ${(!editorValue.trim() || isChecking) ? "opacity-60 cursor-not-allowed" : "hover:shadow-xl"}`}
-                            whileHover={(!isChecking && editorValue.trim()) ? { scale: 1.02 } : undefined}
-                            whileTap={(!isChecking && editorValue.trim()) ? { scale: 0.98 } : undefined}
-                        >
-                            <span className="absolute inset-0 rounded-full bg-white/15 dark:bg-white/10 opacity-0 transition group-hover:opacity-100" aria-hidden="true" />
-                            <span className={`relative inline-flex items-center ${isChecking ? "gap-0" : "gap-2"} text-[#1C1C1E] dark:text-[#F2F2F7]`}>
-                                {isChecking ? (
-                                    <>
-                                        <LucideLoader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                                    </>
-                                ) : (
-                                    <span>{checkLabel}</span>
-                                )}
-                            </span>
-                        </motion.button>
-                        {statusMessage && (
-                            <p
-                                className={`text-sm ${checkStatus === "error" ? "text-red-600 dark:text-red-400" : "text-[#1C1C1E]/80 dark:text-[#F2F2F7]/80"}`}
-                                role="status"
-                                aria-live="polite"
-                            >
-                                {statusMessage}
-                            </p>
-                        )}
-                    </div>
-
-                    <div className="flex-1">
-                        <CallToAction
-                            text={activeCtaText}
-                            onClick={handleNextClick}
-                            disabled={!isSuccess}
-                            dataTestId="cta-code-review"
-                            reducedMotion={reducedMotion}
-                            fieldLabels={{ mobile: "Initial Text", desktop: "Success Text" }}
-                        />
-                    </div>
+                <div className="flex flex-col gap-4">
+                    <CallToAction
+                        text={activeCtaText}
+                        onClick={isSuccess ? handleNextClick : handleCheckClick}
+                        disabled={!editorValue.trim() || isChecking}
+                        dataTestId="cta-code-review"
+                        reducedMotion={reducedMotion}
+                        fieldLabels={{ mobile: "Initial Text", desktop: "Success Text" }}
+                        icon={isChecking ? <Loader2 className="animate-spin" size={18} /> : undefined}
+                    />
                 </div>
 
                 <CodeReviewTextsModal
@@ -378,20 +399,30 @@ function CodeReviewSceneContent({
 
 export function CodeReviewScene({ config, onNextSlide, onCheckCode, sceneId, reducedMotion }: CodeReviewSceneProps) {
     const [configKey, setConfigKey] = useState(0);
+    const [editChanges, setEditChanges] = useState<Partial<CodeReviewSceneConfig>>({});
 
     useEffect(() => {
         setConfigKey((prev) => prev + 1);
     }, [config.title, config.subtitle, config.language, config.codeSnippet?.language]);
 
+    const handleSave = useCallback((newConfig: any) => {
+        setEditChanges(newConfig);
+    }, []);
+
+    const currentConfig = useMemo(() => {
+        return deepMerge(config, editChanges);
+    }, [config, editChanges]);
+
     return (
         <EditModeProvider
             key={configKey}
-            initialConfig={config}
+            initialConfig={currentConfig}
             sceneId={sceneId?.toString()}
+            onSave={handleSave}
         >
             <EditModePanel />
             <CodeReviewSceneContent
-                config={config}
+                config={currentConfig}
                 onNextSlide={onNextSlide}
                 onCheckCode={onCheckCode}
                 sceneId={sceneId}

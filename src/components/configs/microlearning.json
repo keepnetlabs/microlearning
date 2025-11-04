@@ -371,32 +371,11 @@
       "metadata": {
         "scene_type": "code_review",
         "points": 15,
-        "duration_seconds": 120,
-        "hasAchievementNotification": false,
+        "duration_seconds": 60,
+        "hasAchievementNotification": true,
         "scientific_basis": "Code Review – Active Analysis + Secure Coding: Encourages critical thinking and secure design review habits.",
-        "title": "Review This Code Snippet",
-        "subtitle": "Spot the security issue before it reaches production",
-        "description": "Analyze the code and note any potential bugs or vulnerabilities before shipping to users.",
-        "codeSnippet": {
-          "language": "javascript",
-          "content": "function fetchUser(id) {\n  return fetch(`/api/user/${id}`)\n    .then((response) => response.json());\n}\n\nfunction renderProfile(user) {\n  document.getElementById(\"profile\").innerHTML = user.bio;\n}\n\nfetchUser(window.location.search.slice(4))\n  .then(renderProfile);"
-        },
-        "helperText": "AI-assisted secure code review will be available soon. Until then, document issues you identify manually.",
-        "successHelperText": "Looks good! Document what you found and continue.",
-        "callToActionText": "Review before continuing",
-        "successCallToActionText": "Continue",
-        "checkButtonLabel": "Run Security Check",
-        "checkStatusTexts": {
-          "checking": "Analyzing the snippet…",
-          "success": "Code looks good. You're clear to continue.",
-          "error": "Potential issues detected. Mitigate them and try again."
-        },
-        "ariaTexts": {
-          "mainLabel": "Code review scene",
-          "mainDescription": "Code snippet with potential security flaws to evaluate",
-          "codeRegionLabel": "Code snippet editor",
-          "codeRegionDescription": "JavaScript code containing fetch and direct DOM rendering",
-          "checkButtonLabel": "Check code"
+        "icon": {
+          "sceneIconName": "code-review"
         }
       }
     },
