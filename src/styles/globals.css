@@ -542,3 +542,7 @@ html {
 .dark .transcript-row-hover:hover {
   background-color: rgba(71, 85, 105, 0.4);
 }
+
+body.comment-mode-active [data-comment-surface="true"] {
+  cursor: crosshair;
+}

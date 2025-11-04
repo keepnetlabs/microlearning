@@ -555,6 +555,7 @@
         "title": "Review This Code Snippet",
         "subtitle": "Spot insecure patterns before release",
         "description": "Analyse the snippet and identify risky practices or missing controls before handing it over to QA.",
+        "issueType": "XSS (Cross-Site Scripting)",
         "codeSnippet": {
           "language": "javascript",
           "content": "function fetchUser(id) {\n  return fetch(`/api/user/${id}`)\n    .then((response) => response.json());\n}\n\nfunction renderProfile(user) {\n  document.getElementById(\"profile\").innerHTML = user.bio;\n}\n\nfetchUser(window.location.search.slice(4))\n  .then(renderProfile);",

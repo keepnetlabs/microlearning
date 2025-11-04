@@ -10,6 +10,7 @@ import { ScientificBasisInfo } from "../common/ScientificBasisInfo";
 import { useIsMobile } from "../ui/use-mobile";
 import { CallToAction } from "../ui/CallToAction";
 import { deepMerge } from "../../utils/deepMerge";
+import { CommentPinsOverlay } from "../ui/comment-pins-overlay";
 
 interface NudgeSceneProps {
   config: NudgeSceneConfig;
@@ -99,13 +100,13 @@ export const NudgeScene = memo(function NudgeScene({ config, onNextSlide, sceneI
       onSave={handleSave}
       onEditModeChange={setIsInEditMode}
     >
-      <EditModePanel />
+      <EditModePanel sceneId={sceneId} sceneLabel={(currentConfig as any)?.title} />
       <ScientificBasisInfo
         config={currentConfig}
         sceneType={(currentConfig as any)?.scene_type || 'nudge'}
       />
       <FontWrapper>
-        <div className="flex flex-col items-center justify-center h-full" data-scene-type={(config as any)?.scene_type || 'nudge'} data-scene-id={sceneId as any}>
+        <div className="relative flex flex-col items-center justify-center h-full" data-scene-type={(config as any)?.scene_type || 'nudge'} data-scene-id={sceneId as any} data-comment-surface="true">
           {!isMobile && <div className="mb-4 relative">
             <div className={`relative p-3 ${isInEditMode ? 'glass-border-3-no-overflow' : 'glass-border-3'}`}>
               <IconComponent
@@ -184,6 +185,7 @@ export const NudgeScene = memo(function NudgeScene({ config, onNextSlide, sceneI
               onClick={onNextSlide}
             />
           )}
+          <CommentPinsOverlay sceneId={sceneId} />
         </div>
       </FontWrapper>
     </EditModeProvider>

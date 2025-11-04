@@ -12,6 +12,7 @@ import { useIsMobile } from "../ui/use-mobile";
 import { CallToAction } from "../ui/CallToAction";
 import { deepMerge } from "../../utils/deepMerge";
 import { useGlobalEditMode } from "../../contexts/GlobalEditModeContext";
+import { CommentPinsOverlay } from "../ui/comment-pins-overlay";
 import {
   DEFAULT_PARTICLES,
   DEFAULT_SPARKLES,
@@ -233,7 +234,7 @@ export const IntroScene = React.memo(({
         setGlobalEditMode(editMode);
       }}
     >
-      <FontWrapper variant="primary" className={containerClassName} data-scene-type={(config as any)?.scene_type || 'intro'} data-scene-id={sceneId as any} data-testid="scene-intro">
+      <FontWrapper variant="primary" className={`${containerClassName} relative`} data-scene-type={(config as any)?.scene_type || 'intro'} data-scene-id={sceneId as any} data-testid="scene-intro" data-comment-surface="true">
         {/* Apple-style Background Sparkles - Balanced */}
         {sparkles?.enabled && (
           <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
@@ -467,8 +468,9 @@ export const IntroScene = React.memo(({
             />
           )
         }
+        <CommentPinsOverlay sceneId={sceneId} />
       </FontWrapper>
-      <EditModePanel />
+      <EditModePanel sceneId={sceneId} sceneLabel={(currentConfig as any)?.title} />
       <ScientificBasisInfo
         config={currentConfig}
         sceneType={(config as any)?.scene_type || 'intro'}

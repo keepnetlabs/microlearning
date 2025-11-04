@@ -27,6 +27,7 @@ import { ScientificBasisInfo } from "../common/ScientificBasisInfo";
 import { logger } from "../../utils/logger";
 import { useIsMobile } from "../ui/use-mobile";
 import { scormService } from "../../utils/scormService";
+import { CommentPinsOverlay } from "../ui/comment-pins-overlay";
 
 const DEFAULT_CERTIFICATE_LEARNER = "Valued Learner";
 const DEFAULT_CERTIFICATE_TRAINING = "Microlearning Training";
@@ -436,7 +437,7 @@ function SummarySceneContent({ config, completionData, sceneId, reducedMotion, d
 
   return (
     <FontWrapper>
-      <div className={`flex flex-col items-center justify-start h-full px-1.5 py-2 sm:px-6 overflow-y-auto relative`} data-scene-type={(currentConfig as any)?.scene_type || 'summary'} data-scene-id={sceneId as any} data-testid="scene-summary">
+      <div className={`flex flex-col items-center justify-start h-full px-1.5 py-2 sm:px-6 overflow-y-auto relative`} data-scene-type={(currentConfig as any)?.scene_type || 'summary'} data-scene-id={sceneId as any} data-testid="scene-summary" data-comment-surface="true">
         {/* Confetti Animation */}
         <AnimatePresence>
           {showConfetti && (
@@ -1221,8 +1222,10 @@ function SummarySceneContent({ config, completionData, sceneId, reducedMotion, d
         </motion.div>
       </div>
 
+      <CommentPinsOverlay sceneId={sceneId} />
+
       {/* Edit Mode Panel */}
-      <EditModePanel />
+      <EditModePanel sceneId={sceneId} sceneLabel={(currentConfig as any)?.title} />
 
       {/* Scientific Basis Info */}
       <ScientificBasisInfo

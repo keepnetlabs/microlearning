@@ -10,6 +10,7 @@ import { ScientificBasisInfo } from "../common/ScientificBasisInfo";
 import { scormService } from "../../utils/scormService";
 import { useIsMobile } from "../ui/use-mobile";
 import { deepMerge } from "../../utils/deepMerge";
+import { CommentPinsOverlay } from "../ui/comment-pins-overlay";
 import { useState, useEffect, useMemo, useCallback, memo } from "react";
 
 interface SurveyState {
@@ -214,20 +215,21 @@ export const SurveyScene = memo(function SurveyScene({
       onSave={handleSave}
       onEditModeChange={setIsInEditMode}
     >
-      <EditModePanel />
+      <EditModePanel sceneId={sceneId} sceneLabel={(currentConfig as any)?.title} />
       <ScientificBasisInfo
         config={currentConfig}
         sceneType={(currentConfig as any)?.scene_type || 'survey'}
       />
       <FontWrapper>
         <main
-          className="flex flex-col items-center justify-center h-full sm:px-6"
+          className="relative flex flex-col items-center justify-center h-full sm:px-6"
           role="main"
           aria-label={config.texts?.mainLabel || config.ariaTexts?.mainLabel || "Survey form"}
           aria-describedby="survey-description"
           data-scene-type={(config as any)?.scene_type || 'survey'}
           data-scene-id={sceneId as any}
           data-testid="scene-survey"
+          data-comment-surface="true"
         >
           <div
             id="survey-description"
@@ -591,6 +593,7 @@ export const SurveyScene = memo(function SurveyScene({
             </div>
           </motion.div>
 
+          <CommentPinsOverlay sceneId={sceneId} />
         </main>
       </FontWrapper>
     </EditModeProvider>

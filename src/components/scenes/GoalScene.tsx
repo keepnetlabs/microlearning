@@ -11,6 +11,7 @@ import { deepMerge } from "../../utils/deepMerge";
 import { GoalCard } from "./goal/components";
 import { getIconComponent } from "./goal/utils/icons";
 import { GoalSceneConfig } from "./goal/types";
+import { CommentPinsOverlay } from "../ui/comment-pins-overlay";
 
 // Default values moved outside component to prevent recreation
 const DEFAULT_CONTAINER_CLASS = "flex flex-col items-center justify-center h-full text-center";
@@ -110,19 +111,20 @@ export const GoalScene = memo(({
       onSave={handleSave}
       onEditModeChange={setIsInEditMode}
     >
-      <EditModePanel />
+      <EditModePanel sceneId={sceneId} sceneLabel={(currentConfig as any)?.title} />
       <ScientificBasisInfo
         config={currentConfig}
         sceneType={(currentConfig as any)?.scene_type || 'goal'}
       />
       <FontWrapper>
         <main
-          className={containerClassName}
+          className={`${containerClassName} relative`}
           role="main"
           aria-labelledby="goal-scene-title"
           data-scene-type={(config as any)?.scene_type || 'goal'}
           data-scene-id={sceneId as any}
           data-testid="scene-goal"
+          data-comment-surface="true"
         >
           {!isMobile && (
             <div className={`mb-1 sm:mb-2 p-3 ${currentEditMode ? 'glass-border-3-no-overflow' : 'glass-border-3'} relative`}>
@@ -194,6 +196,7 @@ export const GoalScene = memo(({
             />
           )}
 
+          <CommentPinsOverlay sceneId={sceneId} />
         </main>
       </FontWrapper>
     </EditModeProvider>

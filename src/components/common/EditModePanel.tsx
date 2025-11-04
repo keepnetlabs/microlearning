@@ -1,13 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Save, RotateCcw, Edit3, Eye, EyeOff, Download } from 'lucide-react';
+import { Save, RotateCcw, Edit3, Eye, EyeOff, Download, MessageSquareMore } from 'lucide-react';
 import { useEditMode } from '../../contexts/EditModeContext';
 import { downloadSCORMPackage } from '../../utils/scormDownload';
 import { useIsMobile } from '../ui/use-mobile';
+import { CommentPanel } from '../ui/comment-panel';
+import { useOptionalComments } from '../../contexts/CommentsContext';
 
-export const EditModePanel: React.FC = () => {
+interface EditModePanelProps {
+    sceneId?: string | number;
+    sceneLabel?: string;
+}
+
+export function EditModePanel({ sceneId, sceneLabel }: EditModePanelProps) {
     const [shouldShowPanel, setShouldShowPanel] = useState(false);
+    const [isCommentsOpen, setIsCommentsOpen] = useState(false);
     const {
         isEditMode,
         isViewMode,
@@ -18,6 +26,72 @@ export const EditModePanel: React.FC = () => {
         hasUnsavedChanges
     } = useEditMode();
     const isMobile = useIsMobile();
+    const commentsContext = useOptionalComments();
+    const normalizedSceneId = useMemo(() => sceneId?.toString() ?? null, [sceneId]);
+
+    const toggleCommentsPanel = useCallback((nextState?: boolean, options?: { enableComposer?: boolean }) => {
+        setIsCommentsOpen((prev) => {
+            const desired = typeof nextState === 'boolean' ? nextState : !prev;
+            if (commentsContext) {
+                const enableComposer = options?.enableComposer ?? desired;
+                commentsContext.setCommentMode(enableComposer);
+                if (!enableComposer || !desired) {
+                    commentsContext.cancelComposer();
+                    commentsContext.closeCommentPopover();
+                }
+                if (desired && !enableComposer) {
+                    commentsContext.closeCommentPopover();
+                }
+                if (desired && normalizedSceneId) {
+                    commentsContext.setActiveSceneId(normalizedSceneId);
+                }
+            }
+            return desired;
+        });
+    }, [commentsContext, normalizedSceneId]);
+
+    useEffect(() => {
+        if (isCommentsOpen && normalizedSceneId) {
+            commentsContext?.setActiveSceneId(normalizedSceneId);
+        }
+    }, [commentsContext, isCommentsOpen, normalizedSceneId]);
+
+    useEffect(() => {
+        if (!isEditMode) {
+            setIsCommentsOpen(false);
+            commentsContext?.setCommentMode(false);
+            commentsContext?.cancelComposer();
+        }
+    }, [commentsContext, isEditMode]);
+
+    useEffect(() => {
+        if (!commentsContext) {
+            setIsCommentsOpen(false);
+        }
+    }, [commentsContext]);
+
+    useEffect(() => {
+        if (!commentsContext) {
+            return;
+        }
+
+        const handleOpenPanel = (event: Event) => {
+            const detail = (event as CustomEvent<{ commentId?: string; sceneId?: string }>).detail || {};
+            const targetSceneId = detail.sceneId ?? normalizedSceneId ?? null;
+            if (targetSceneId) {
+                commentsContext.setActiveSceneId(targetSceneId);
+            }
+            if (typeof detail.commentId === 'string') {
+                commentsContext.setActiveCommentId(detail.commentId);
+            }
+            toggleCommentsPanel(true, { enableComposer: false });
+        };
+
+        window.addEventListener('scene-comment-open-panel', handleOpenPanel);
+        return () => {
+            window.removeEventListener('scene-comment-open-panel', handleOpenPanel);
+        };
+    }, [commentsContext, normalizedSceneId, toggleCommentsPanel]);
 
     // Check if EditModePanel should be visible
     useEffect(() => {
@@ -109,42 +183,68 @@ export const EditModePanel: React.FC = () => {
     if (isMobile) {
         if (!isEditMode) return null;
         return createPortal(
-            <motion.div
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="fixed inset-x-0 bottom-0 z-[2147483647] pointer-events-auto"
-                style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
-            >
-                <div className="mx-3 mb-3 rounded-2xl glass-border-2 backdrop-blur-xl px-3 py-2">
-                    <div className="flex items-center justify-between gap-2">
-                        {/* Prev */}
-                        <motion.button
-                            whileHover={{ scale: 1.03 }}
-                            whileTap={{ scale: 0.97 }}
-                            onClick={() => {
-                                try { window.dispatchEvent(new CustomEvent('panelNavigate', { detail: 'prev' })); } catch { }
-                            }}
-                            className="flex-1 py-2 rounded-full glass-border-1 text-[#1C1C1E] dark:text-[#F2F2F7]"
-                            aria-label="Previous scene"
-                        >
-                            Prev
-                        </motion.button>
+            <>
+                <motion.div
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="fixed inset-x-0 bottom-0 z-[2147483647] pointer-events-auto"
+                    style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+                    data-comment-ignore="true"
+                >
+                    <div className="mx-3 mb-3 rounded-2xl glass-border-2 backdrop-blur-xl px-3 py-2">
+                        <div className="flex items-center justify-between gap-2">
+                            {/* Prev */}
+                            <motion.button
+                                whileHover={{ scale: 1.03 }}
+                                whileTap={{ scale: 0.97 }}
+                                onClick={() => {
+                                    try { window.dispatchEvent(new CustomEvent('panelNavigate', { detail: 'prev' })); } catch { }
+                                }}
+                                className="flex-1 py-2 rounded-full glass-border-1 text-[#1C1C1E] dark:text-[#F2F2F7]"
+                                aria-label="Previous scene"
+                            >
+                                Prev
+                            </motion.button>
 
-                        {/* Next */}
-                        <motion.button
-                            whileHover={{ scale: 1.03 }}
-                            whileTap={{ scale: 0.97 }}
-                            onClick={() => {
-                                try { window.dispatchEvent(new CustomEvent('panelNavigate', { detail: 'next' })); } catch { }
-                            }}
-                            className="flex-1 py-2 rounded-full glass-border-1 text-[#1C1C1E] dark:text-[#F2F2F7]"
-                            aria-label="Next scene"
-                        >
-                            Next
-                        </motion.button>
+                            {commentsContext && (
+                                <motion.button
+                                    whileHover={{ scale: 1.03 }}
+                                    whileTap={{ scale: 0.97 }}
+                                    onClick={() => toggleCommentsPanel()}
+                                    className={`flex h-full flex-1 items-center justify-center gap-2 rounded-full glass-border-1 text-[#1C1C1E] transition-all dark:text-[#F2F2F7] ${isCommentsOpen ? 'bg-sky-500/10' : ''}`}
+                                    aria-pressed={isCommentsOpen}
+                                    aria-label="Toggle comments"
+                                >
+                                    <MessageSquareMore size={16} />
+                                    Comments
+                                </motion.button>
+                            )}
+
+                            {/* Next */}
+                            <motion.button
+                                whileHover={{ scale: 1.03 }}
+                                whileTap={{ scale: 0.97 }}
+                                onClick={() => {
+                                    try { window.dispatchEvent(new CustomEvent('panelNavigate', { detail: 'next' })); } catch { }
+                                }}
+                                className="flex-1 py-2 rounded-full glass-border-1 text-[#1C1C1E] dark:text-[#F2F2F7]"
+                                aria-label="Next scene"
+                            >
+                                Next
+                            </motion.button>
+                        </div>
                     </div>
-                </div>
-            </motion.div>,
+                </motion.div>
+                {commentsContext && (
+                    <CommentPanel
+                        isOpen={isCommentsOpen}
+                        onClose={() => toggleCommentsPanel(false)}
+                        sceneId={normalizedSceneId ?? undefined}
+                        sceneLabel={sceneLabel}
+                        anchor="right"
+                    />
+                )}
+            </>,
             document.body
         );
     }
@@ -156,6 +256,7 @@ export const EditModePanel: React.FC = () => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             className="fixed bottom-6 right-6 z-[2147483647] pointer-events-auto"
             style={{ pointerEvents: 'auto' }}
+            data-comment-ignore="true"
         >
             <div className="glass-border-2 p-4 backdrop-blur-xl">
                 <div className="flex items-center gap-3">
@@ -173,6 +274,22 @@ export const EditModePanel: React.FC = () => {
                         <Edit3 size={16} />
                         {isEditMode ? 'Exit Edit' : 'Enter Edit'}
                     </motion.button>
+
+                    {/* Comment Button */}
+                    {isEditMode && commentsContext && (
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => toggleCommentsPanel()}
+                            className={`flex items-center gap-2 px-4 py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer text-[#1C1C1E] dark:text-[#F2F2F7] ${isCommentsOpen ? 'bg-sky-500/10' : ''}`}
+                            aria-pressed={isCommentsOpen}
+                            style={{ pointerEvents: 'auto', cursor: 'pointer' }}
+                            title="Open comments"
+                        >
+                            <MessageSquareMore size={16} />
+                            Comments
+                        </motion.button>
+                    )}
 
                     {/* Download SCORM Button */}
                     <motion.button
@@ -277,7 +394,16 @@ export const EditModePanel: React.FC = () => {
                     )}
                 </AnimatePresence>
             </div>
+            {commentsContext && (
+                <CommentPanel
+                    isOpen={isCommentsOpen}
+                    onClose={() => toggleCommentsPanel(false)}
+                    sceneId={normalizedSceneId ?? undefined}
+                    sceneLabel={sceneLabel}
+                    anchor="right"
+                />
+            )}
         </motion.div>,
         document.body
     );
-};
+}

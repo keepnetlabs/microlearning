@@ -12,6 +12,7 @@ import { deepMerge } from "../../utils/deepMerge";
 import { Inbox } from "../Inbox";
 import { InboxSceneConfig } from "../../data/inboxConfig";
 import { ActionableContentSceneProps } from "./actionable/types";
+import { CommentPinsOverlay } from "../ui/comment-pins-overlay";
 
 const getIconComponent = (iconName: string): LucideIcon => {
   // İkon adını camelCase'e çevir (örn: "book-open" -> "BookOpen")
@@ -206,13 +207,14 @@ function ActionableContentSceneInternalCore({
   return (
     <FontWrapper key={`actionable-content-${selectedLanguage}`}>
       <main
-        className={defaultContainerClassName}
+        className={`${defaultContainerClassName} relative`}
         role="main"
         aria-label={ariaTexts?.mainLabel || "Actionable Content"}
         aria-describedby="actionable-content-description"
         data-scene-type={(config as any)?.scene_type || 'actionable_content'}
         data-scene-id={sceneId as any}
         data-testid="scene-actionable"
+        data-comment-surface="true"
       >
         <div
           id="actionable-content-description"
@@ -332,6 +334,7 @@ function ActionableContentSceneInternalCore({
           />
         )}
 
+        <CommentPinsOverlay sceneId={sceneId} />
       </main>
     </FontWrapper>
   );
@@ -370,7 +373,7 @@ function ActionableContentSceneInternal(props: ActionableContentSceneProps & {
         handleInboxConfigUpdate(updatedConfig);
       }}
     >
-      <EditModePanel />
+      <EditModePanel sceneId={props.sceneId} sceneLabel={(props.config as any)?.title} />
       <ActionableContentSceneInternalCore
         {...props}
         onInboxConfigUpdate={(config) => setInboxConfigRef({ current: config })}

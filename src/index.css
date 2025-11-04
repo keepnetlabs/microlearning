@@ -817,3 +817,6 @@
 .project-subtitle {
   @apply text-base sm:text-lg md:text-xl text-[#1C1C1E] dark:text-[#F2F2F7] text-center mt-2 sm:mt-3 mb-5 font-medium leading-relaxed;
 }
+.glass-border-2-hide-before-z-index::before {
+  z-index: -1 !important;
+}

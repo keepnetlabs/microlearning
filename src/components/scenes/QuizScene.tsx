@@ -26,6 +26,7 @@ import { scormService } from "../../utils/scormService";
 import { logger } from "../../utils/logger";
 import { deepMerge } from "../../utils/deepMerge";
 import { useIsEditMode } from "../../hooks/useIsEditMode";
+import { CommentPinsOverlay } from "../ui/comment-pins-overlay";
 
 // Performance optimization - Move constants outside component to prevent recreation
 
@@ -2347,18 +2348,19 @@ export const QuizScene = React.memo(function QuizScene({
         onSave={handleSave}
         onEditModeChange={setIsInEditMode}
       >
-         <EditModePanel />
+        <EditModePanel sceneId={sceneId} sceneLabel={(currentConfig as any)?.title} />
         <ScientificBasisInfo
           config={currentConfig}
           sceneType={(currentConfig as any)?.scene_type || 'quiz'}
         />
         <FontWrapper>
-          <div className="flex items-center justify-center h-full">
+          <div className="relative flex items-center justify-center h-full" data-comment-surface="true">
             <div className="text-center p-8">
               <p className="text-[#1C1C1E] dark:text-[#F2F2F7]">
                 {questionLoadingText}
               </p>
             </div>
+            <CommentPinsOverlay sceneId={sceneId} />
           </div>
         </FontWrapper>
       </EditModeProvider>
@@ -2373,7 +2375,7 @@ export const QuizScene = React.memo(function QuizScene({
       onSave={handleSave}
       onEditModeChange={setIsInEditMode}
     >
-      <EditModePanel /> 
+      <EditModePanel sceneId={sceneId} sceneLabel={(currentConfig as any)?.title} />
       <ScientificBasisInfo
         config={currentConfig}
         sceneType={(currentConfig as any)?.scene_type || 'quiz'}
@@ -2401,6 +2403,7 @@ export const QuizScene = React.memo(function QuizScene({
           aria-describedby="quiz-description"
           tabIndex={-1}
           data-testid="scene-quiz"
+          data-comment-surface="true"
         >
           <div
             id="quiz-description"
@@ -2836,6 +2839,7 @@ export const QuizScene = React.memo(function QuizScene({
           />
 
         </div>
+        <CommentPinsOverlay sceneId={sceneId} />
       </FontWrapper>
     </EditModeProvider>
   );

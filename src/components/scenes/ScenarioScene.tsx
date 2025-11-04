@@ -13,6 +13,7 @@ import { useIsMobile } from "../ui/use-mobile";
 import { CallToAction } from "../ui/CallToAction";
 import { deepMerge } from "../../utils/deepMerge";
 import { useIsEditMode } from "../../hooks/useIsEditMode";
+import { CommentPinsOverlay } from "../ui/comment-pins-overlay";
 
 export interface TranscriptRow {
   start: number;
@@ -348,14 +349,14 @@ export function ScenarioScene({
       onSave={handleSave}
       onEditModeChange={setIsInEditMode}
     >
-      <EditModePanel />
+      <EditModePanel sceneId={sceneId} sceneLabel={(currentConfig as any)?.title} />
       <ScientificBasisInfo
         config={currentConfig}
         sceneType={(currentConfig as any)?.scene_type || 'scenario'}
       />
       <FontWrapper>
         <main
-          className={memoizedValues.containerClassName}
+          className={`${memoizedValues.containerClassName} relative`}
           role="main"
           aria-labelledby="scenario-scene-title"
           aria-describedby="scenario-scene-description"
@@ -363,6 +364,7 @@ export function ScenarioScene({
           data-scene-type={currentConfig as any ? (currentConfig as any).scene_type || 'scenario' : 'scenario'}
           data-scene-id={sceneId as any}
           data-testid="scene-scenario"
+          data-comment-surface="true"
         >
           {/* Header Icon */}
           {!isMobile && (<motion.div
@@ -540,6 +542,7 @@ export function ScenarioScene({
             />
           )}
 
+          <CommentPinsOverlay sceneId={sceneId} />
         </main>
       </FontWrapper>
     </EditModeProvider>

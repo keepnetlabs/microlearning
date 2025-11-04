@@ -14,6 +14,7 @@ import { CodeReviewTextsModal } from "./code-review/code-review-texts-modal";
 import { CodeReviewSceneConfig, CodeReviewSceneProps } from "./code-review/types";
 import { Edit3, Loader2 } from "lucide-react";
 import { SUPPORTED_LANGUAGES } from "./code-review/constants";
+import { CommentPinsOverlay } from "../ui/comment-pins-overlay";
 
 const DEFAULT_CONTAINER_CLASS = "w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-6";
 const DEFAULT_EDITOR_HEIGHT = 420;
@@ -102,12 +103,14 @@ function CodeReviewSceneContent({
         return () => observer.disconnect();
     }, []);
 
-    const codeSnippet = currentConfig.codeSnippet || { content: "", language: currentConfig.language };
+    const codeSnippet = useMemo(() => {
+        return currentConfig.codeSnippet || { content: "", language: currentConfig.language };
+    }, [currentConfig.codeSnippet, currentConfig.language]);
     const editorLanguage = (codeSnippet?.language || currentConfig.language || "javascript").toLowerCase();
     const codeContent = codeSnippet?.content ?? "";
     const [editorValue, setEditorValue] = useState(codeContent);
     const editorHeight = currentConfig.layout?.editorHeight ?? DEFAULT_EDITOR_HEIGHT;
-    const containerClassName = currentConfig.layout?.containerClassName ?? DEFAULT_CONTAINER_CLASS;
+    const containerClassName = `${currentConfig.layout?.containerClassName ?? DEFAULT_CONTAINER_CLASS} relative`;
     const ariaMainLabel = currentConfig.ariaTexts?.mainLabel || "Code review scene";
     const ariaMainDescription = currentConfig.ariaTexts?.mainDescription || "Interactive code review exercise";
     const ariaCodeRegionLabel = currentConfig.ariaTexts?.codeRegionLabel || "Code snippet";
@@ -255,6 +258,7 @@ function CodeReviewSceneContent({
                 data-scene-type={(currentConfig as any)?.scene_type || "code_review"}
                 data-scene-id={sceneId as any}
                 data-testid="scene-code-review"
+                data-comment-surface="true"
                 className={containerClassName}
             >
                 <div className="sr-only" id={sceneId ? `code-review-description-${sceneId}` : undefined}>
@@ -311,7 +315,7 @@ function CodeReviewSceneContent({
                         {ariaCodeRegionDescription}
                     </div>
 
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">    
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                         {isEditMode ? (
                             <label className="flex items-center gap-2 text-xs text-[#1C1C1E]/80 dark:text-[#F2F2F7]/80">
                                 <span>Language:</span>
@@ -392,6 +396,7 @@ function CodeReviewSceneContent({
                     errorText={errorStatusMessage}
                     onSave={handleTextsSave}
                 />
+                <CommentPinsOverlay sceneId={sceneId} />
             </main>
         </FontWrapper>
     );
@@ -420,7 +425,7 @@ export function CodeReviewScene({ config, onNextSlide, onCheckCode, sceneId, red
             sceneId={sceneId?.toString()}
             onSave={handleSave}
         >
-            <EditModePanel />
+            <EditModePanel sceneId={sceneId} sceneLabel={(currentConfig as any)?.title} />
             <CodeReviewSceneContent
                 config={currentConfig}
                 onNextSlide={onNextSlide}
