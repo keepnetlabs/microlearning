@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
-import { MessageCircle, Send, X } from "lucide-react";
+import { MessageCircle, Send, X, CheckCircle2 } from "lucide-react";
 import { useOptionalComments } from "../../contexts/CommentsContext";
 import { CommentThread } from "../../types/comments";
 
@@ -10,6 +10,7 @@ interface CommentPinsOverlayProps {
 }
 
 const CARD_OFFSET = 16;
+const PIN_VERTICAL_OFFSET = 16;
 
 function getInitials(name: string) {
     const trimmed = name.trim();
@@ -44,7 +45,7 @@ interface CommentPopoverProps {
 
 function CommentPopover({ thread, anchor, replyDraft, onReplyChange, onReplySubmit, onClose, onViewInPanel }: CommentPopoverProps) {
     const cardRef = React.useRef<HTMLDivElement | null>(null);
-    const [position, setPosition] = useState(() => ({ x: anchor.x + CARD_OFFSET, y: anchor.y + CARD_OFFSET }));
+    const [position, setPosition] = useState(() => ({ x: anchor.x, y: anchor.y + PIN_VERTICAL_OFFSET }));
 
     const renderCommentBubble = useCallback((
         message: string,
@@ -82,20 +83,17 @@ function CommentPopover({ thread, anchor, replyDraft, onReplyChange, onReplySubm
             const rect = cardRef.current.getBoundingClientRect();
             const { innerWidth, innerHeight } = window;
 
-            let nextX = anchor.x + CARD_OFFSET;
-            let nextY = anchor.y + CARD_OFFSET;
+            let nextX = anchor.x - rect.width / 2;
+            let nextY = anchor.y + PIN_VERTICAL_OFFSET;
 
-            if (nextX + rect.width + CARD_OFFSET > innerWidth) {
-                nextX = innerWidth - rect.width - CARD_OFFSET;
-            }
-            if (nextY + rect.height + CARD_OFFSET > innerHeight) {
-                nextY = innerHeight - rect.height - CARD_OFFSET;
-            }
+            const maxX = innerWidth - rect.width - CARD_OFFSET;
+            const maxY = innerHeight - rect.height - CARD_OFFSET;
 
-            nextX = Math.max(CARD_OFFSET, nextX);
-            nextY = Math.max(CARD_OFFSET, nextY);
+            nextX = Math.min(Math.max(CARD_OFFSET, nextX), Math.max(CARD_OFFSET, maxX));
+            nextY = Math.min(Math.max(CARD_OFFSET, nextY), Math.max(CARD_OFFSET, maxY));
 
             setPosition({ x: nextX, y: nextY });
+
         };
 
         adjustPosition();
@@ -122,15 +120,14 @@ function CommentPopover({ thread, anchor, replyDraft, onReplyChange, onReplySubm
             data-comment-popover="true"
         >
             <div ref={cardRef} className="relative w-[320px] rounded-2xl glass-border-2 glass-border-2-hide-before-z-index bg-white/96 p-4 shadow-2xl backdrop-blur-xl dark:bg-[#111013]/96">
-                <div className="absolute left-10 -top-3 h-6 w-6 rotate-45 rounded-lg bg-white/95 shadow-md dark:bg-[#111013]/95" aria-hidden="true" />
-                <div className="relative pt-1">
+                <div className="relative pt-3">
                     <button
                         type="button"
                         onClick={(event) => {
                             event.stopPropagation();
                             onClose();
                         }}
-                        className="absolute right-1 top-1 rounded-full p-1.5 text-[#1C1C1E]/50 transition hover:bg-[#1C1C1E]/10 hover:text-[#1C1C1E] dark:text-[#F2F2F7]/50 dark:hover:bg-[#F2F2F7]/10 dark:hover:text-[#F2F2F7]"
+                        className="absolute right-1 -top-1 rounded-full p-1.5 text-[#1C1C1E]/50 transition hover:bg-[#1C1C1E]/10 hover:text-[#1C1C1E] dark:text-[#F2F2F7]/50 dark:hover:bg-[#F2F2F7]/10 dark:hover:text-[#F2F2F7]"
                         aria-label="Close comment preview"
                     >
                         <X size={14} />
@@ -284,6 +281,13 @@ export function CommentPinsOverlay({ sceneId }: CommentPinsOverlayProps) {
                     }
                     const count = thread.replies.length + 1;
                     const isActive = commentsContext.activePopoverCommentId === thread.id;
+                    const isResolved = thread.status === "resolved";
+                    const inactiveClass = isResolved
+                        ? "border border-white/70 bg-emerald-500/15 text-emerald-700 shadow-md dark:border-white/10 dark:bg-emerald-500/20 dark:text-emerald-300"
+                        : "border border-white/70 bg-sky-500/15 text-sky-600 shadow-md dark:border-white/10 dark:bg-sky-500/20 dark:text-sky-300";
+                    const activeClass = isResolved
+                        ? "bg-emerald-600 text-white ring-2 ring-white dark:ring-white/40"
+                        : "bg-sky-600 text-white ring-2 ring-white dark:ring-white/40";
 
                     return (
                         <div
@@ -293,14 +297,14 @@ export function CommentPinsOverlay({ sceneId }: CommentPinsOverlayProps) {
                         >
                             <button
                                 type="button"
-                                className={`pointer-events-auto -translate-x-1/2 -translate-y-1/2 rounded-full px-2.5 py-1.5 shadow-lg transition ${isActive ? "bg-sky-600 text-white ring-2 ring-white dark:ring-sky-300" : "bg-white text-[#1C1C1E] dark:bg-[#1C1C1E] dark:text-[#F2F2F7]"}`}
+                                className={`pointer-events-auto -translate-x-1/2 -translate-y-1/2 rounded-full px-2.5 py-1.5 shadow-lg transition ${isActive ? activeClass : inactiveClass}`}
                                 onClick={() => handlePinClick(thread.id)}
                                 data-comment-ignore="true"
                                 data-comment-pin-button="true"
                                 aria-label={`Open comment thread (${count} messages)`}
                             >
                                 <span className="flex items-center gap-1 text-xs font-semibold">
-                                    <MessageCircle size={14} />
+                                    {isResolved ? <CheckCircle2 size={14} /> : <MessageCircle size={14} />}
                                     {count}
                                 </span>
                             </button>

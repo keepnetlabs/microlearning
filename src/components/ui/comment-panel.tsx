@@ -16,6 +16,8 @@ interface CommentPanelProps {
     sceneId?: string | number;
     sceneLabel?: string;
     anchor?: "left" | "right";
+    forceProfileEdit?: boolean;
+    onForceProfileConsumed?: () => void;
 }
 
 interface ThreadCardProps {
@@ -73,10 +75,9 @@ function ThreadCard({
     }, [onReplySubmit, replyDraft, thread.id, onReplyDraftChange]);
 
     const toggleStatusLabel = thread.status === "open" ? "Mark as resolved" : "Reopen";
-
     return (
         <article
-            className={`rounded-xl border border-white/15 dark:border-white/10 bg-white/70 dark:bg-[#1C1C1E]/70 backdrop-blur px-3 py-3 transition focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-sky-400 ${isActive ? "ring-2 ring-sky-400" : ""}`}
+            className={`rounded-xl border border-[#1C1C1E]/10 dark:border-white/5 bg-white/90 dark:bg-[#111013]/90 px-3 py-3 transition ${isActive ? "outline outline-2 outline-sky-400" : ""}`}
             tabIndex={-1}
             aria-label={`Comment by ${thread.author.name}`}
         >
@@ -106,11 +107,6 @@ function ThreadCard({
                 </button>
             </header>
 
-            {thread.targetLabel && (
-                <div className="mt-2 rounded-lg bg-sky-500/10 px-2 py-1 text-xs font-medium text-sky-600 dark:text-sky-300">
-                    {thread.targetLabel}
-                </div>
-            )}
 
             <p className="mt-3 text-sm leading-relaxed text-[#1C1C1E] dark:text-[#F2F2F7]">
                 {thread.message}
@@ -120,7 +116,7 @@ function ThreadCard({
                 {thread.replies.map((reply) => (
                     <div key={reply.id} className="flex gap-2 pl-2">
                         <CornerDownRight size={16} className="mt-1 text-sky-500/70" />
-                        <div className="flex-1 rounded-lg bg-[#1C1C1E]/5 dark:bg-[#F2F2F7]/10 px-3 py-2">
+                        <div className="flex-1 rounded-lg bg-[#1C1C1E]/5 px-3 py-2 dark:bg-white/10">
                             <div className="flex items-center justify-between">
                                 <span className="text-xs font-semibold text-[#1C1C1E] dark:text-[#F2F2F7]">
                                     {reply.author.name}
@@ -147,7 +143,7 @@ function ThreadCard({
                     onChange={(event) => onReplyDraftChange(event.target.value)}
                     placeholder="Write a reply"
                     rows={2}
-                    className="w-full resize-none rounded-lg border border-white/20 bg-white/60 px-3 py-2 text-sm text-[#1C1C1E] placeholder:text-[#1C1C1E]/40 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400 dark:border-white/10 dark:bg-[#1C1C1E]/60 dark:text-[#F2F2F7] dark:placeholder:text-[#F2F2F7]/50"
+                    className="w-full resize-none rounded-lg border border-[#1C1C1E]/10 bg-white/80 px-3 py-2 text-sm text-[#1C1C1E] placeholder:text-[#1C1C1E]/40 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400 dark:border-white/10 dark:bg-[#1C1C1E]/70 dark:text-[#F2F2F7] dark:placeholder:text-[#F2F2F7]/50"
                 />
                 <div className="mt-2 flex items-center justify-between">
                     <button
@@ -155,12 +151,12 @@ function ThreadCard({
                         className="text-xs font-medium text-sky-600 hover:underline dark:text-sky-300"
                         onClick={() => onActivate(thread.id)}
                     >
-                        Jump to pin
+                        Open on canvas
                     </button>
                     <button
                         type="submit"
                         disabled={!replyDraft.trim()}
-                        className="inline-flex items-center rounded-lg bg-sky-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="inline-flex items-center gap-1 rounded-lg bg-sky-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         Reply
                     </button>
@@ -174,44 +170,65 @@ export function CommentPanel({
     isOpen,
     onClose,
     sceneId,
-    sceneLabel,
-    anchor = "right"
+    anchor = "right",
+    forceProfileEdit = false,
+    onForceProfileConsumed
 }: CommentPanelProps) {
     const normalizedSceneId = useMemo(() => sceneId?.toString() ?? null, [sceneId]);
     const isMobile = useIsMobile();
     const {
         threads,
         activeCommentId,
-        createSceneComment,
         replyToComment,
         toggleCommentStatus,
         setActiveCommentId,
         setActiveSceneId,
         openCommentPopover,
-        closeCommentPopover
+        closeCommentPopover,
+        currentAuthor,
+        setCurrentAuthor
     } = useSceneComments(normalizedSceneId ?? undefined);
 
     useEffect(() => {
         if (!isOpen) {
             closeCommentPopover();
+            setIsEditingProfile(false);
         }
     }, [isOpen, closeCommentPopover]);
 
-    const [commentDraft, setCommentDraft] = useState("");
+    useEffect(() => {
+        if (forceProfileEdit) {
+            setIsEditingProfile(true);
+            onForceProfileConsumed?.();
+        }
+    }, [forceProfileEdit, onForceProfileConsumed]);
+
     const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
+    const [isEditingProfile, setIsEditingProfile] = useState(() => currentAuthor.name === "Editor");
+    const [profileName, setProfileName] = useState(currentAuthor.name);
 
     const sortedThreads = useMemo(() => {
         return [...threads].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     }, [threads]);
 
-    const handleCommentSubmit = useCallback((event: FormEvent<HTMLFormElement>) => {
+    useEffect(() => {
+        setProfileName(currentAuthor.name);
+    }, [currentAuthor.name]);
+
+    const handleProfileSubmit = useCallback((event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        if (!normalizedSceneId || !commentDraft.trim()) {
+        const trimmed = profileName.trim();
+        if (!trimmed) {
             return;
         }
-        createSceneComment(commentDraft.trim());
-        setCommentDraft("");
-    }, [commentDraft, createSceneComment, normalizedSceneId]);
+        setCurrentAuthor({
+            id: currentAuthor.id,
+            name: trimmed,
+            avatarUrl: currentAuthor.avatarUrl ?? null,
+            accentColor: currentAuthor.accentColor
+        });
+        setIsEditingProfile(false);
+    }, [currentAuthor, profileName, setCurrentAuthor]);
 
     const handleReplyUpdate = useCallback((commentId: string, value: string) => {
         setReplyDrafts((prev) => ({
@@ -267,38 +284,86 @@ export function CommentPanel({
                     aria-label="Scene comments"
                     data-comment-ignore="true"
                 >
-                    <div className="glass-border-2 glass-border-2-hide-before-z-index flex max-h-[80vh] flex-col overflow-hidden rounded-3xl bg-white/90 p-4 shadow-2xl backdrop-blur-xl dark:bg-[#111013]/90" data-comment-ignore="true">
+                    <div className="glass-border-2 glass-border-2-hide-before-z-index flex max-h-[80vh] flex-col overflow-hidden rounded-3xl bg-white/96 p-4 shadow-2xl backdrop-blur-2xl dark:bg-[#0F0F11]/96" data-comment-ignore="true">
                         <header className="flex items-center justify-between gap-3">
                             <div className="flex items-center gap-2">
                                 <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-sky-500/20 text-sky-600 dark:text-sky-300">
                                     <MessageSquareMore size={18} />
                                 </span>
-                                <div className="flex flex-col">
-                                    <span className="text-sm font-semibold text-[#1C1C1E] dark:text-[#F2F2F7]">
-                                        Comments
-                                    </span>
-                                    {sceneLabel ? (
-                                        <span className="text-xs text-[#1C1C1E]/70 dark:text-[#F2F2F7]/60">
-                                            {sceneLabel}
-                                        </span>
-                                    ) : (
-                                        normalizedSceneId && (
-                                            <span className="text-xs text-[#1C1C1E]/50 dark:text-[#F2F2F7]/50">
-                                                Scene ID: {normalizedSceneId}
-                                            </span>
-                                        )
-                                    )}
-                                </div>
+                                <span className="text-sm font-semibold text-[#1C1C1E] dark:text-[#F2F2F7]">
+                                    Comments
+                                </span>
                             </div>
-                            <button
-                                type="button"
-                                onClick={onClose}
-                                className="rounded-full p-2 text-[#1C1C1E]/60 transition hover:bg-[#1C1C1E]/5 hover:text-[#1C1C1E] dark:text-[#F2F2F7]/60 dark:hover:bg-[#F2F2F7]/10 dark:hover:text-[#F2F2F7]"
-                                aria-label="Close comments panel"
-                            >
-                                <X size={16} />
-                            </button>
+                            <div className="flex items-center gap-1.5">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setProfileName(currentAuthor.name);
+                                        setIsEditingProfile((prev) => !prev);
+                                    }}
+                                    className="rounded-full px-2.5 py-1 text-xs font-medium text-sky-600 transition hover:bg-sky-500/10 dark:text-sky-300 dark:hover:bg-sky-500/20"
+                                >
+                                    {isEditingProfile ? "Close" : "Set name"}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={onClose}
+                                    className="rounded-full p-2 text-[#1C1C1E]/60 transition hover:bg-[#1C1C1E]/5 hover:text-[#1C1C1E] dark:text-[#F2F2F7]/60 dark:hover:bg-[#F2F2F7]/10 dark:hover:text-[#F2F2F7]"
+                                    aria-label="Close comments panel"
+                                >
+                                    <X size={16} />
+                                </button>
+                            </div>
                         </header>
+
+                        {isEditingProfile && (
+                            <form
+                                onSubmit={handleProfileSubmit}
+                                className="mt-3 rounded-2xl border border-[#1C1C1E]/10 bg-white/85 p-3 shadow-sm dark:border-white/10 dark:bg-[#111013]/85"
+                                data-comment-ignore="true"
+                            >
+                                <label htmlFor="comment-profile-name" className="text-xs font-semibold uppercase tracking-wide text-[#1C1C1E]/60 dark:text-[#F2F2F7]/60">
+                                    Display name
+                                </label>
+                                <input
+                                    id="comment-profile-name"
+                                    value={profileName}
+                                    onChange={(event) => setProfileName(event.target.value)}
+                                    placeholder="Your name"
+                                    autoFocus
+                                    className="mt-2 w-full rounded-lg border border-[#1C1C1E]/10 bg-white px-3 py-2 text-sm text-[#1C1C1E] placeholder:text-[#1C1C1E]/40 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400 dark:border-white/10 dark:bg-[#1C1C1E]/70 dark:text-[#F2F2F7] dark:placeholder:text-[#F2F2F7]/40"
+                                />
+                                <div className="mt-3 flex justify-end gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setIsEditingProfile(false);
+                                            setProfileName(currentAuthor.name);
+                                        }}
+                                        className="rounded-full px-3 py-1.5 text-xs font-semibold text-[#1C1C1E]/60 transition hover:bg-[#1C1C1E]/5 hover:text-[#1C1C1E] dark:text-[#F2F2F7]/60 dark:hover:bg-[#F2F2F7]/10 dark:hover:text-[#F2F2F7]"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={!profileName.trim()}
+                                        className="inline-flex items-center gap-2 rounded-full bg-sky-600 px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-60"
+                                    >
+                                        Save
+                                    </button>
+                                </div>
+                            </form>
+                        )}
+                        {!isEditingProfile && (
+                            <div className="mt-3 flex items-center gap-2 text-xs text-[#1C1C1E]/60 dark:text-[#F2F2F7]/60">
+                                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-sky-500/15 text-[11px] font-semibold text-sky-600 dark:text-sky-300">
+                                    {currentAuthor.initials ?? initialsFromName(currentAuthor.name)}
+                                </div>
+                                <span>
+                                    Commenting as <span className="font-semibold text-[#1C1C1E] dark:text-[#F2F2F7]">{currentAuthor.name}</span>
+                                </span>
+                            </div>
+                        )}
 
                         <div className="mt-4 flex-1 space-y-3 overflow-y-auto pr-1">
                             {sortedThreads.length === 0 ? (
@@ -326,31 +391,6 @@ export function CommentPanel({
                                 ))
                             )}
                         </div>
-
-                        <form onSubmit={handleCommentSubmit} className="mt-4" aria-disabled={!normalizedSceneId}>
-                            <label htmlFor="comment-draft" className="sr-only">
-                                Add a comment
-                            </label>
-                            <textarea
-                                id="comment-draft"
-                                value={commentDraft}
-                                onChange={(event) => setCommentDraft(event.target.value)}
-                                placeholder={normalizedSceneId ? "Leave a comment" : "Comments unavailable for this scene"}
-                                rows={3}
-                                disabled={!normalizedSceneId}
-                                className="w-full resize-none rounded-xl border border-white/20 bg-white/70 px-3 py-2 text-sm text-[#1C1C1E] placeholder:text-[#1C1C1E]/40 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:bg-[#1C1C1E]/70 dark:text-[#F2F2F7] dark:placeholder:text-[#F2F2F7]/50"
-                            />
-                            <div className="mt-3 flex items-center justify-end">
-                                <button
-                                    type="submit"
-                                    disabled={!normalizedSceneId || !commentDraft.trim()}
-                                    className="inline-flex items-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-60"
-                                >
-                                    <MessageSquareMore size={16} />
-                                    Add comment
-                                </button>
-                            </div>
-                        </form>
                     </div>
                 </motion.aside>
             )}

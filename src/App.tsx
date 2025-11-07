@@ -842,10 +842,12 @@ export default function App(props: AppProps = {}) {
     };
   }, [appConfig]);
 
+  const commentNamespace = (appConfig as any)?.microlearning_id;
+
   return (
     <MotionConfig reducedMotion={reducedMotionSetting}>
       <GlobalEditModeProvider>
-        <CommentsProvider currentAuthor={commentAuthor}>
+        <CommentsProvider currentAuthor={commentAuthor} sceneNamespace={typeof commentNamespace === "string" ? commentNamespace : undefined}>
           <FontFamilyProvider fontFamilyConfig={themeConfig.fontFamily}>
             <div
               className={cssClasses.mainContainer}

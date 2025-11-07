@@ -6,6 +6,7 @@
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
     "@radix-ui/react-slider": "^1.2.3",
+    "@supabase/supabase-js": "^2.79.0",
     "@tinymce/tinymce-react": "^6.3.0",
     "@types/jszip": "^3.4.0",
     "@types/node": "^20.0.0",

@@ -8,6 +8,7 @@ import {
     CommentStatus,
     CommentThread
 } from "../types/comments";
+import { commentsService } from "../services/commentsService";
 
 interface CommentComposerInit {
     sceneId: string;
@@ -42,7 +43,8 @@ interface CommentsContextValue {
     beginComposer: (init: CommentComposerInit) => void;
     cancelComposer: () => void;
     submitComposer: (message: string, authorOverride?: CommentAuthor) => CommentThread | null;
-    currentAuthor?: CommentAuthor;
+    currentAuthor: CommentAuthor;
+    setCurrentAuthor: (author: CommentAuthor) => void;
     activePopoverCommentId: string | null;
     openCommentPopover: (commentId: string, sceneId?: string | null) => void;
     closeCommentPopover: () => void;
@@ -52,9 +54,33 @@ interface CommentsProviderProps {
     children: React.ReactNode;
     initialThreads?: CommentThread[];
     currentAuthor?: CommentAuthor;
+    sceneNamespace?: string;
 }
 
 const CommentsContext = createContext<CommentsContextValue | undefined>(undefined);
+
+const STORAGE_KEY = "ml.commentUser";
+
+const computeInitials = (name: string) => {
+    const trimmed = name.trim();
+    if (!trimmed) return "";
+    const parts = trimmed.split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return "";
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return `${parts[0][0] ?? ""}${parts[parts.length - 1][0] ?? ""}`.toUpperCase();
+};
+
+const normalizeAuthor = (author?: Partial<CommentAuthor>): CommentAuthor => {
+    const name = author?.name?.trim() || "Editor";
+    const baseId = author?.id || `local-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "editor"}`;
+    return {
+        id: baseId,
+        name,
+        initials: author?.initials ?? computeInitials(name),
+        avatarUrl: author?.avatarUrl ?? null,
+        accentColor: author?.accentColor
+    };
+};
 
 function generateId() {
     if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -72,20 +98,126 @@ function withTimestamp<T extends object>(entity: T): T & { createdAt: string; up
     };
 }
 
-export function CommentsProvider({ children, initialThreads = [], currentAuthor }: CommentsProviderProps) {
+export function CommentsProvider({ children, initialThreads = [], currentAuthor, sceneNamespace }: CommentsProviderProps) {
+    const [currentAuthorState, setCurrentAuthorState] = useState<CommentAuthor>(() => normalizeAuthor(currentAuthor));
     const [threads, setThreads] = useState<CommentThread[]>(() => initialThreads);
     const [activeCommentId, setActiveCommentId] = useState<string | null>(null);
     const [activeSceneId, setActiveSceneId] = useState<string | null>(null);
     const [isCommentMode, setIsCommentMode] = useState(false);
     const [composerState, setComposerState] = useState<CommentComposerState | null>(null);
     const [activePopoverCommentId, setActivePopoverCommentId] = useState<string | null>(null);
+    const isRemoteEnabled = commentsService.isEnabled();
+    const normalizedNamespace = useMemo(() => (sceneNamespace?.trim() ?? ""), [sceneNamespace]);
+    const hasNamespace = normalizedNamespace.length > 0;
+
+    const namespaceSceneId = useCallback((baseSceneId: string | null | undefined) => {
+        const base = baseSceneId == null ? "" : String(baseSceneId);
+        if (!hasNamespace) {
+            return base;
+        }
+        if (!base) {
+            return normalizedNamespace;
+        }
+        return `${normalizedNamespace}/${base}`;
+    }, [hasNamespace, normalizedNamespace]);
+
+    const denamespaceSceneId = useCallback((storedSceneId: string | null | undefined): string | null => {
+        if (!storedSceneId) {
+            return hasNamespace ? "" : (storedSceneId ?? "");
+        }
+        if (!hasNamespace) {
+            return storedSceneId;
+        }
+        const value = String(storedSceneId);
+        const prefix = `${normalizedNamespace}/`;
+        if (value === normalizedNamespace) {
+            return "";
+        }
+        if (value.startsWith(prefix)) {
+            return value.slice(prefix.length);
+        }
+        return null;
+    }, [hasNamespace, normalizedNamespace]);
+
+    useEffect(() => {
+        if (typeof window === "undefined") {
+            setCurrentAuthorState(normalizeAuthor(currentAuthor));
+            return;
+        }
+        try {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                setCurrentAuthorState(normalizeAuthor(parsed));
+                return;
+            }
+        } catch {
+            // ignore parse errors
+        }
+        setCurrentAuthorState(normalizeAuthor(currentAuthor));
+    }, [currentAuthor]);
+
+    const setCurrentAuthor = useCallback((author: CommentAuthor) => {
+        const normalized = normalizeAuthor(author);
+        setCurrentAuthorState(normalized);
+        if (typeof window !== "undefined") {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                    id: normalized.id,
+                    name: normalized.name,
+                    initials: normalized.initials,
+                    avatarUrl: normalized.avatarUrl,
+                    accentColor: normalized.accentColor
+                }));
+            } catch {
+                // ignore storage errors
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!isRemoteEnabled) {
+            return;
+        }
+
+        let cancelled = false;
+        commentsService.listThreadsByNamespace(hasNamespace ? normalizedNamespace : undefined).then((remoteThreads) => {
+            if (cancelled || !remoteThreads) {
+                return;
+            }
+            const normalizedThreads = remoteThreads.map((thread) => {
+                const baseSceneId = denamespaceSceneId(thread.sceneId);
+                if (baseSceneId === null) {
+                    return null;
+                }
+                return {
+                    ...thread,
+                    sceneId: baseSceneId
+                };
+            }).filter(Boolean) as CommentThread[];
+
+            if (normalizedThreads.length === 0) {
+                if (initialThreads.length > 0) {
+                    setThreads((prev) => (prev.length > 0 ? prev : initialThreads));
+                }
+                return;
+            }
+            setThreads(normalizedThreads);
+        }).catch(() => {
+            // fetch errors already logged inside service
+        });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [denamespaceSceneId, hasNamespace, initialThreads, isRemoteEnabled, normalizedNamespace]);
 
     const getSceneThreads = useCallback((sceneId: string) => {
         return threads.filter((thread) => thread.sceneId === sceneId);
     }, [threads]);
 
     const createComment = useCallback((input: CommentInput, authorOverride?: CommentAuthor) => {
-        const author = authorOverride ?? currentAuthor;
+        const author = authorOverride ?? currentAuthorState;
         if (!author) {
             throw new Error("CommentsProvider: createComment requires an author");
         }
@@ -105,11 +237,27 @@ export function CommentsProvider({ children, initialThreads = [], currentAuthor 
         setThreads((prev) => [newThread, ...prev]);
         setActiveCommentId(newThread.id);
         setActiveSceneId(input.sceneId);
+
+        if (isRemoteEnabled) {
+            const remoteSceneId = namespaceSceneId(input.sceneId);
+            void commentsService.insertThread({
+                ...input,
+                sceneId: remoteSceneId,
+                id: newThread.id,
+                author,
+                createdAt: newThread.createdAt,
+                updatedAt: newThread.updatedAt,
+                position: newThread.position ?? undefined
+            }).catch(() => {
+                // errors logged in service
+            });
+        }
+
         return newThread;
-    }, [currentAuthor]);
+    }, [currentAuthorState, isRemoteEnabled, namespaceSceneId]);
 
     const replyToComment = useCallback((input: CommentReplyInput, authorOverride?: CommentAuthor) => {
-        const author = authorOverride ?? currentAuthor;
+        const author = authorOverride ?? currentAuthorState;
         if (!author) {
             throw new Error("CommentsProvider: replyToComment requires an author");
         }
@@ -135,30 +283,56 @@ export function CommentsProvider({ children, initialThreads = [], currentAuthor 
         }));
 
         if (createdReply) {
+            const replyRecord: CommentReply = createdReply;
             setActiveCommentId(input.commentId);
+            if (isRemoteEnabled) {
+                const replyPayload = {
+                    ...input,
+                    id: replyRecord.id,
+                    author,
+                    createdAt: replyRecord.createdAt,
+                    updatedAt: replyRecord.updatedAt
+                };
+                void commentsService.insertReply(replyPayload).catch(() => {
+                    // errors logged in service
+                });
+            }
         }
         return createdReply;
-    }, [currentAuthor]);
+    }, [currentAuthorState, isRemoteEnabled]);
 
     const toggleCommentStatus = useCallback((commentId: string, nextStatus?: CommentStatus) => {
+        let updatedStatus: CommentStatus | null = null;
         setThreads((prev) => prev.map((thread) => {
             if (thread.id !== commentId) {
                 return thread;
             }
             const status: CommentStatus = nextStatus ?? (thread.status === "open" ? "resolved" : "open");
+            updatedStatus = status;
             return {
                 ...thread,
                 status,
                 updatedAt: new Date().toISOString()
             };
         }));
-    }, []);
+
+        if (isRemoteEnabled && updatedStatus) {
+            void commentsService.updateThreadStatus(commentId, updatedStatus).catch(() => {
+                // errors logged in service
+            });
+        }
+    }, [isRemoteEnabled]);
 
     const deleteComment = useCallback((commentId: string) => {
         setThreads((prev) => prev.filter((thread) => thread.id !== commentId));
         setActiveCommentId((prev) => (prev === commentId ? null : prev));
         setActivePopoverCommentId((prev) => (prev === commentId ? null : prev));
-    }, []);
+        if (isRemoteEnabled) {
+            void commentsService.deleteThread(commentId).catch(() => {
+                // errors logged in service
+            });
+        }
+    }, [isRemoteEnabled]);
 
     const updateCommentMessage = useCallback((commentId: string, message: string) => {
         setThreads((prev) => prev.map((thread) => {
@@ -171,7 +345,12 @@ export function CommentsProvider({ children, initialThreads = [], currentAuthor 
                 updatedAt: new Date().toISOString()
             };
         }));
-    }, []);
+        if (isRemoteEnabled) {
+            void commentsService.updateThreadMessage(commentId, message).catch(() => {
+                // errors logged in service
+            });
+        }
+    }, [isRemoteEnabled]);
 
     const updateReplyMessage = useCallback((replyId: string, message: string) => {
         setThreads((prev) => prev.map((thread) => {
@@ -188,7 +367,12 @@ export function CommentsProvider({ children, initialThreads = [], currentAuthor 
                 } : reply)
             };
         }));
-    }, []);
+        if (isRemoteEnabled) {
+            void commentsService.updateReplyMessage(replyId, message).catch(() => {
+                // errors logged in service
+            });
+        }
+    }, [isRemoteEnabled]);
 
     const deleteReply = useCallback((replyId: string) => {
         setThreads((prev) => prev.map((thread) => {
@@ -202,7 +386,12 @@ export function CommentsProvider({ children, initialThreads = [], currentAuthor 
                 updatedAt: new Date().toISOString()
             };
         }));
-    }, []);
+        if (isRemoteEnabled) {
+            void commentsService.deleteReply(replyId).catch(() => {
+                // errors logged in service
+            });
+        }
+    }, [isRemoteEnabled]);
 
     const setCommentMode = useCallback((next: boolean) => {
         setIsCommentMode(next);
@@ -377,7 +566,8 @@ export function CommentsProvider({ children, initialThreads = [], currentAuthor 
         beginComposer,
         cancelComposer,
         submitComposer,
-        currentAuthor,
+        currentAuthor: currentAuthorState,
+        setCurrentAuthor,
         activePopoverCommentId,
         openCommentPopover,
         closeCommentPopover
@@ -399,7 +589,8 @@ export function CommentsProvider({ children, initialThreads = [], currentAuthor 
         beginComposer,
         cancelComposer,
         submitComposer,
-        currentAuthor,
+        currentAuthorState,
+        setCurrentAuthor,
         activePopoverCommentId,
         openCommentPopover,
         closeCommentPopover
@@ -459,7 +650,9 @@ export function useSceneComments(sceneId?: string) {
         setActiveSceneId: context.setActiveSceneId,
         activePopoverCommentId: context.activePopoverCommentId,
         openCommentPopover: context.openCommentPopover,
-        closeCommentPopover: context.closeCommentPopover
+        closeCommentPopover: context.closeCommentPopover,
+        currentAuthor: context.currentAuthor,
+        setCurrentAuthor: context.setCurrentAuthor
     };
 }
 

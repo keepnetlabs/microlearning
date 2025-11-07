@@ -84,10 +84,23 @@ export function CommentComposerOverlay() {
         commentsContext?.cancelComposer();
     }, [commentsContext]);
 
+    const handleOpenProfile = useCallback(() => {
+        if (!composerState) {
+            return;
+        }
+        window.dispatchEvent(new CustomEvent("scene-comment-open-panel", {
+            detail: {
+                sceneId: composerState.sceneId,
+                forceProfile: true
+            }
+        }));
+    }, [composerState]);
+
     const maxCharacters = 1000;
     const remainingCharacters = Math.max(0, maxCharacters - message.length);
     const authorName = commentsContext?.currentAuthor?.name || "You";
     const authorInitials = commentsContext?.currentAuthor?.initials || getInitials(authorName);
+    const needsProfile = !commentsContext?.currentAuthor || commentsContext.currentAuthor.name === "Editor";
 
     useEffect(() => {
         if (!composerState) {
@@ -147,6 +160,19 @@ export function CommentComposerOverlay() {
                                 <X size={14} />
                             </button>
                         </div>
+                        {needsProfile && (
+                            <div className="mt-3 flex items-center justify-between rounded-lg border border-dashed border-[#1C1C1E]/20 bg-[#F2F4FF] px-3 py-2 text-[11px] text-[#1C1C1E]/70 dark:border-white/20 dark:bg-[#1A2333] dark:text-[#F2F2F7]/70">
+                                <span>Set your display name to personalize comments.</span>
+                                <button
+                                    type="button"
+                                    onClick={handleOpenProfile}
+                                    className="text-xs font-semibold text-sky-600 underline-offset-2 hover:underline dark:text-sky-300"
+                                    data-comment-ignore="true"
+                                >
+                                    Set name
+                                </button>
+                            </div>
+                        )}
                         <div className="mt-3">
                             <label htmlFor="comment-composer-textarea" className="sr-only">
                                 Comment

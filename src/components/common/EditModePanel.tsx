@@ -16,6 +16,7 @@ interface EditModePanelProps {
 export function EditModePanel({ sceneId, sceneLabel }: EditModePanelProps) {
     const [shouldShowPanel, setShouldShowPanel] = useState(false);
     const [isCommentsOpen, setIsCommentsOpen] = useState(false);
+    const [shouldForceProfileEdit, setShouldForceProfileEdit] = useState(false);
     const {
         isEditMode,
         isViewMode,
@@ -45,6 +46,9 @@ export function EditModePanel({ sceneId, sceneLabel }: EditModePanelProps) {
                 if (desired && normalizedSceneId) {
                     commentsContext.setActiveSceneId(normalizedSceneId);
                 }
+            }
+            if (!desired) {
+                setShouldForceProfileEdit(false);
             }
             return desired;
         });
@@ -76,13 +80,16 @@ export function EditModePanel({ sceneId, sceneLabel }: EditModePanelProps) {
         }
 
         const handleOpenPanel = (event: Event) => {
-            const detail = (event as CustomEvent<{ commentId?: string; sceneId?: string }>).detail || {};
+            const detail = (event as CustomEvent<{ commentId?: string; sceneId?: string; forceProfile?: boolean }>).detail || {};
             const targetSceneId = detail.sceneId ?? normalizedSceneId ?? null;
             if (targetSceneId) {
                 commentsContext.setActiveSceneId(targetSceneId);
             }
             if (typeof detail.commentId === 'string') {
                 commentsContext.setActiveCommentId(detail.commentId);
+            }
+            if (detail.forceProfile) {
+                setShouldForceProfileEdit(true);
             }
             toggleCommentsPanel(true, { enableComposer: false });
         };
@@ -91,7 +98,7 @@ export function EditModePanel({ sceneId, sceneLabel }: EditModePanelProps) {
         return () => {
             window.removeEventListener('scene-comment-open-panel', handleOpenPanel);
         };
-    }, [commentsContext, normalizedSceneId, toggleCommentsPanel]);
+    }, [commentsContext, normalizedSceneId, toggleCommentsPanel, setShouldForceProfileEdit]);
 
     // Check if EditModePanel should be visible
     useEffect(() => {
@@ -242,6 +249,8 @@ export function EditModePanel({ sceneId, sceneLabel }: EditModePanelProps) {
                         sceneId={normalizedSceneId ?? undefined}
                         sceneLabel={sceneLabel}
                         anchor="right"
+                        forceProfileEdit={shouldForceProfileEdit}
+                        onForceProfileConsumed={() => setShouldForceProfileEdit(false)}
                     />
                 )}
             </>,
@@ -401,6 +410,8 @@ export function EditModePanel({ sceneId, sceneLabel }: EditModePanelProps) {
                     sceneId={normalizedSceneId ?? undefined}
                     sceneLabel={sceneLabel}
                     anchor="right"
+                    forceProfileEdit={shouldForceProfileEdit}
+                    onForceProfileConsumed={() => setShouldForceProfileEdit(false)}
                 />
             )}
         </motion.div>,
