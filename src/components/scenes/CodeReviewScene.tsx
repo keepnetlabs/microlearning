@@ -210,7 +210,7 @@ function CodeReviewSceneContent({
             console.log("[CodeReview] Sending validation request:", payload);
 
             // Call validation endpoint
-            const response = await fetch("http://localhost:4111/code-review-validate", {
+            const response = await fetch("https://agentic-ally.keepnet-labs-ltd-business-profile4086.workers.dev/code-review-validate", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
