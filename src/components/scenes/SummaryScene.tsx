@@ -253,15 +253,15 @@ function SummarySceneContent({ config, completionData, sceneId, reducedMotion, d
     }
   }, [isFinishing, isFinished, currentConfig.texts?.finishErrorText, tryCloseWindow]);
 
+  // Get certificate texts from config with fallbacks (outside useCallback to avoid dependency issues)
+  const certificateTitle = currentConfig.texts?.certificateTitle || "Certificate of Completion";
+  const certificateAwardedText = currentConfig.texts?.certificateAwardedText || "This certificate is awarded to";
+  const certificateCompletionText = currentConfig.texts?.certificateCompletionText || "for successful completion of";
+  const certificateDateText = currentConfig.texts?.certificateDateText || "on";
+
   const handleDownloadCertificate = useCallback(() => {
     if (hasDownloadedCertificate) return;
     setShowCertificate(true);
-
-    // Get certificate texts from config with fallbacks
-    const certificateTitle = currentConfig.texts?.certificateTitle || "Certificate of Completion";
-    const certificateAwardedText = currentConfig.texts?.certificateAwardedText || "This certificate is awarded to";
-    const certificateCompletionText = currentConfig.texts?.certificateCompletionText || "for successful completion of";
-    const certificateDateText = currentConfig.texts?.certificateDateText || "on";
 
     // Generate certificate HTML
     const certificateHTML = `
@@ -399,7 +399,7 @@ function SummarySceneContent({ config, completionData, sceneId, reducedMotion, d
     URL.revokeObjectURL(url);
     setShowCertificate(false);
     setHasDownloadedCertificate(true);
-  }, [hasDownloadedCertificate, certificateLearnerName, certificateTrainingName]);
+  }, [hasDownloadedCertificate, certificateLearnerName, certificateTrainingName, certificateTitle, certificateAwardedText, certificateCompletionText, certificateDateText]);
 
   // Confetti component
   const ConfettiPiece = ({ delay = 0, color = "blue" }) => (
