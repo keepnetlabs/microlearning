@@ -49,17 +49,26 @@ src/
 ## Key Components and Architecture
 
 ### Scene System
-The platform uses 8 main scenes for different learning content types:
+The platform uses 8+ main scenes for different learning content types:
 - **IntroScene** - Introduction with stats and animations
 - **GoalScene** - Learning goals display
 - **ScenarioScene** - Scenario-based content with video
 - **ActionableContentScene** - Actionable learning content
+- **CodeReviewScene** - Code review validation with AI feedback and hints
 - **QuizScene** - Quiz with slider-based questions
 - **NudgeScene** - Quick tips and nudges
 - **SurveyScene** - Surveys and feedback
 - **SummaryScene** - Content summary and takeaways
 
 Each scene is wrapped with `React.memo` for performance and uses `EditModePanel` for editing capabilities.
+
+**CodeReviewScene Features:**
+- Backend validation API integration (http://localhost:4111/code-review-validate)
+- Glassy-style feedback/hint UI with glass-border classes
+- Real-time validation feedback with success/error icons
+- Hint badge for learning tips
+- Prevents scene progression until validation succeeds (unless in edit mode)
+- Passes `outputLanguage` (app language) to backend alongside code language
 
 ### Edit Mode Context
 The `EditModeContext` manages edit mode state globally:
@@ -88,6 +97,11 @@ Reusable components in `src/components/common/`:
 - **EditModeContext** - Edit mode toggle
 - **FontFamilyContext** - Font family selection
 - **GlobalEditModeContext** - Global edit mode (optional)
+- **App.tsx Scene Completion States:**
+  - `quizCompleted` - Quiz validation status
+  - `inboxCompleted` - Actionable content completion
+  - `videoCompleted` - Scenario video completion
+  - `codeReviewValidated` - Code review validation status (prevents next button unless success)
 
 ### Hooks for State Access
 ```typescript
@@ -171,6 +185,15 @@ if (scormService.isInitialized()) {
 5. Add import in `App.tsx`
 6. Export with memo: `export const NewScene = React.memo(...)`
 
+### Working with CodeReviewScene
+1. Scene validates code via backend API at `http://localhost:4111/code-review-validate`
+2. Payload includes: `issueType`, `originalCode`, `fixedCode`, `language`, `outputLanguage`
+3. Backend returns: `success`, `data.isCorrect`, `data.feedback`, `data.hint`
+4. Use `onValidationStatusChange` callback to notify App.tsx of validation status
+5. Next button disabled until validation succeeds (unless edit mode)
+6. UI shows glassy-style feedback box with icon (✅/❌) and separate hint badge (💡)
+7. Reset validation when code or language changes via `useEffect`
+
 ### Editing Content
 1. Access `EditModePanel` via `useIsEditMode()` context
 2. Use `EditableText` for text content
@@ -204,7 +227,32 @@ if (scormService.isInitialized()) {
 
 **Performance issues:** Use React DevTools Profiler; check for unnecessary re-renders; apply memo/useMemo/useCallback.
 
-## Cleanup Notes (Recent Refactoring)
+**Code Review validation not working:**
+- Ensure backend API is running on http://localhost:4111/code-review-validate
+- Check payload includes `language` (code language) and `outputLanguage` (app language)
+- Verify response includes `success`, `data.isCorrect`, `data.feedback`, and `data.hint` fields
+- CodeReviewScene must call `onValidationStatusChange` callback to update App.tsx state
+- Edit mode bypasses validation (allows progression without success)
+
+## Recent Updates
+
+### CodeReviewScene Enhancement (Latest)
+**Added:**
+- Backend validation API integration for code review
+- Real-time feedback UI with glassy-style design
+- Hint badge for learning tips
+- Scene progression guard - next button disabled until validation succeeds
+- `onValidationStatusChange` callback to parent App.tsx
+- `outputLanguage` payload field for app language tracking
+- Validation state reset on code/language changes
+- Error handling with fallback messages
+
+**Files Modified:**
+- `src/components/scenes/CodeReviewScene.tsx` - Added validation logic, UI feedback, hints
+- `src/components/scenes/code-review/types.ts` - Added `onValidationStatusChange` prop
+- `src/App.tsx` - Added `codeReviewValidated` state, validation check in `canProceedNext()`
+
+## Cleanup Notes (Previous Refactoring)
 
 **Removed:**
 - 26 unused Radix UI packages

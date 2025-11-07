@@ -39,6 +39,8 @@ interface CommentsContextValue {
     getSceneThreads: (sceneId: string) => CommentThread[];
     isCommentMode: boolean;
     setCommentMode: (next: boolean) => void;
+    isPanelOpen: boolean;
+    setPanelOpen: (open: boolean) => void;
     composerState: CommentComposerState | null;
     beginComposer: (init: CommentComposerInit) => void;
     cancelComposer: () => void;
@@ -104,6 +106,8 @@ export function CommentsProvider({ children, initialThreads = [], currentAuthor,
     const [activeCommentId, setActiveCommentId] = useState<string | null>(null);
     const [activeSceneId, setActiveSceneId] = useState<string | null>(null);
     const [isCommentMode, setIsCommentMode] = useState(false);
+    const [isPanelOpen, setIsPanelOpen] = useState(false);
+    const [hasFetchedRemote, setHasFetchedRemote] = useState(false);
     const [composerState, setComposerState] = useState<CommentComposerState | null>(null);
     const [activePopoverCommentId, setActivePopoverCommentId] = useState<string | null>(null);
     const isRemoteEnabled = commentsService.isEnabled();
@@ -176,13 +180,23 @@ export function CommentsProvider({ children, initialThreads = [], currentAuthor,
     }, []);
 
     useEffect(() => {
-        if (!isRemoteEnabled) {
+        setHasFetchedRemote(false);
+    }, [isRemoteEnabled, normalizedNamespace]);
+
+    useEffect(() => {
+        if (!isRemoteEnabled || hasFetchedRemote) {
+            return;
+        }
+        if (!isPanelOpen && !isCommentMode && !activePopoverCommentId) {
             return;
         }
 
         let cancelled = false;
         commentsService.listThreadsByNamespace(hasNamespace ? normalizedNamespace : undefined).then((remoteThreads) => {
             if (cancelled || !remoteThreads) {
+                if (!cancelled) {
+                    setHasFetchedRemote(true);
+                }
                 return;
             }
             const normalizedThreads = remoteThreads.map((thread) => {
@@ -200,17 +214,22 @@ export function CommentsProvider({ children, initialThreads = [], currentAuthor,
                 if (initialThreads.length > 0) {
                     setThreads((prev) => (prev.length > 0 ? prev : initialThreads));
                 }
+                setHasFetchedRemote(true);
                 return;
             }
             setThreads(normalizedThreads);
+            setHasFetchedRemote(true);
         }).catch(() => {
             // fetch errors already logged inside service
+            if (!cancelled) {
+                setHasFetchedRemote(true);
+            }
         });
 
         return () => {
             cancelled = true;
         };
-    }, [denamespaceSceneId, hasNamespace, initialThreads, isRemoteEnabled, normalizedNamespace]);
+    }, [activePopoverCommentId, denamespaceSceneId, hasFetchedRemote, hasNamespace, initialThreads, isCommentMode, isPanelOpen, isRemoteEnabled, normalizedNamespace]);
 
     const getSceneThreads = useCallback((sceneId: string) => {
         return threads.filter((thread) => thread.sceneId === sceneId);
@@ -403,6 +422,13 @@ export function CommentsProvider({ children, initialThreads = [], currentAuthor,
         }
     }, []);
 
+    const setPanelOpen = useCallback((open: boolean) => {
+        setIsPanelOpen(open);
+        if (!open) {
+            setActivePopoverCommentId(null);
+        }
+    }, []);
+
     const beginComposer = useCallback((init: CommentComposerInit) => {
         const normalizedSceneId = init.sceneId;
         setComposerState({
@@ -562,6 +588,8 @@ export function CommentsProvider({ children, initialThreads = [], currentAuthor,
         getSceneThreads,
         isCommentMode,
         setCommentMode,
+        isPanelOpen,
+        setPanelOpen,
         composerState,
         beginComposer,
         cancelComposer,
@@ -585,6 +613,8 @@ export function CommentsProvider({ children, initialThreads = [], currentAuthor,
         getSceneThreads,
         isCommentMode,
         setCommentMode,
+        isPanelOpen,
+        setPanelOpen,
         composerState,
         beginComposer,
         cancelComposer,

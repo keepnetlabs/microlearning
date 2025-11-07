@@ -12,7 +12,7 @@ import { logger } from "../../utils/logger";
 import { CallToAction } from "../ui/CallToAction";
 import { CodeReviewTextsModal } from "./code-review/code-review-texts-modal";
 import { CodeReviewSceneConfig, CodeReviewSceneProps } from "./code-review/types";
-import { Edit3, Loader2 } from "lucide-react";
+import { Edit3, Loader2, CheckCircle, XCircle, Lightbulb } from "lucide-react";
 import { SUPPORTED_LANGUAGES } from "./code-review/constants";
 import { CommentPinsOverlay } from "../ui/comment-pins-overlay";
 
@@ -43,7 +43,7 @@ const getThemeFromDocument = (): "light" | "vs-dark" | "hc-black" => {
 function CodeReviewSceneContent({
     config,
     onNextSlide,
-    onCheckCode,
+    onValidationStatusChange,
     sceneId,
     reducedMotion
 }: CodeReviewSceneProps) {
@@ -90,6 +90,8 @@ function CodeReviewSceneContent({
     const [computedTheme, setComputedTheme] = useState<"light" | "vs-dark" | "hc-black">(() => getThemeFromDocument());
     const [checkStatus, setCheckStatus] = useState<"idle" | "checking" | "success" | "error">("idle");
     const [showTextsModal, setShowTextsModal] = useState(false);
+    const [validationFeedback, setValidationFeedback] = useState<string>("");
+    const [validationHint, setValidationHint] = useState<string>("");
 
     useEffect(() => {
         if (typeof document === "undefined") {
@@ -102,6 +104,11 @@ function CodeReviewSceneContent({
         observer.observe(root, { attributes: true, attributeFilter: ["class"] });
         return () => observer.disconnect();
     }, []);
+
+    // Notify parent about validation status
+    useEffect(() => {
+        onValidationStatusChange?.(checkStatus === "success");
+    }, [checkStatus, onValidationStatusChange]);
 
     const codeSnippet = useMemo(() => {
         return currentConfig.codeSnippet || { content: "", language: currentConfig.language };
@@ -173,6 +180,8 @@ function CodeReviewSceneContent({
 
     useEffect(() => {
         setCheckStatus("idle");
+        setValidationFeedback("");
+        setValidationHint("");
     }, [editorValue, editorLanguage]);
 
     const handleCheckClick = useCallback(async () => {
@@ -185,12 +194,17 @@ function CodeReviewSceneContent({
         try {
             const originalCode = codeSnippet?.content || "";
             const issueType = (currentConfig as any)?.issueType || "Code Security Issue";
+            const appLanguage = typeof window !== 'undefined'
+                ? localStorage.getItem('selected-language') || 'en-US'
+                : 'en-US';
 
             const payload = {
                 issueType,
                 originalCode,
+
                 fixedCode: editorValue,
-                language: editorLanguage
+                language: editorLanguage,
+                outputLanguage: appLanguage
             };
 
             console.log("[CodeReview] Sending validation request:", payload);
@@ -212,9 +226,13 @@ function CodeReviewSceneContent({
 
             if (result.success && result.data?.isCorrect) {
                 console.log("[CodeReview] ✅ Code is correct!");
+                setValidationFeedback(result.data?.feedback || successStatusMessage);
+                setValidationHint(result.data?.hint || "");
                 setCheckStatus("success");
             } else {
                 console.log("[CodeReview] ❌ Code has issues:", result.data?.feedback);
+                setValidationFeedback(result.data?.feedback || errorStatusMessage);
+                setValidationHint(result.data?.hint || "");
                 setCheckStatus("error");
             }
         } catch (error) {
@@ -225,9 +243,11 @@ function CodeReviewSceneContent({
                 message: "Code review validation failed",
                 detail: error
             });
+            setValidationFeedback("Validation error. Please try again.");
+            setValidationHint("");
             setCheckStatus("error");
         }
-    }, [editorValue, editorLanguage, codeSnippet, currentConfig]);
+    }, [editorValue, editorLanguage, codeSnippet, currentConfig, successStatusMessage, errorStatusMessage]);
 
     const handleNextClick = useCallback(() => {
         if (checkStatus !== "success") return;
@@ -352,8 +372,44 @@ function CodeReviewSceneContent({
                         />
                     </div>
 
-                    {activeHelperText && (
-                        <div className="text-sm text-[#1C1C1E]/80 dark:text-[#F2F2F7]/80">
+                    {checkStatus !== "idle" && (
+                        <div className="space-y-3">
+                            {/* Feedback with icon */}
+                            {validationFeedback && (
+                                <div className={`p-4 glass-border-3 flex items-start gap-3 ${checkStatus === "success"
+                                    ? "bg-green-50/20 dark:bg-green-950/15"
+                                    : "bg-red-50/20 dark:bg-red-950/15"
+                                    }`}>
+                                    <div className="flex-shrink-0 mt-0.5">
+                                        {checkStatus === "success" ? (
+                                            <CheckCircle className="text-green-600 dark:text-green-400" size={20} />
+                                        ) : (
+                                            <XCircle className="text-red-600 dark:text-red-400" size={20} />
+                                        )}
+                                    </div>
+                                    <p className="text-sm leading-relaxed text-[#1C1C1E] dark:text-[#F2F2F7]">
+                                        {validationFeedback}
+                                    </p>
+                                </div>
+                            )}
+
+                            {/* Hint Badge */}
+                            {validationHint && (
+                                <div className="p-3 glass-border-4 bg-blue-50/20 dark:bg-blue-950/15 flex items-start gap-2">
+                                    <Lightbulb className="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-1" size={18} />
+                                    <div>
+                                        <p className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] leading-relaxed">
+                                            {validationHint}
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Default helper text when idle */}
+                    {checkStatus === "idle" && activeHelperText && (
+                        <div className="p-3 glass-border-3">
                             <div className="flex items-center gap-2">
                                 <span className="text-sm text-[#1C1C1E]/80 dark:text-[#F2F2F7]/80 whitespace-pre-line">
                                     {activeHelperText}
@@ -402,7 +458,7 @@ function CodeReviewSceneContent({
     );
 }
 
-export function CodeReviewScene({ config, onNextSlide, onCheckCode, sceneId, reducedMotion }: CodeReviewSceneProps) {
+export function CodeReviewScene({ config, onNextSlide, onCheckCode, onValidationStatusChange, sceneId, reducedMotion }: CodeReviewSceneProps) {
     const [configKey, setConfigKey] = useState(0);
     const [editChanges, setEditChanges] = useState<Partial<CodeReviewSceneConfig>>({});
 
@@ -430,6 +486,7 @@ export function CodeReviewScene({ config, onNextSlide, onCheckCode, sceneId, red
                 config={currentConfig}
                 onNextSlide={onNextSlide}
                 onCheckCode={onCheckCode}
+                onValidationStatusChange={onValidationStatusChange}
                 sceneId={sceneId}
                 reducedMotion={reducedMotion}
             />

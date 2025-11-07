@@ -50,6 +50,7 @@ export interface CodeReviewSceneProps {
     config: CodeReviewSceneConfig;
     onNextSlide?: () => void;
     onCheckCode?: (code: string, language?: string) => boolean | void | Promise<boolean | void>;
+    onValidationStatusChange?: (isValid: boolean) => void;
     sceneId?: string | number;
     reducedMotion?: boolean;
 }

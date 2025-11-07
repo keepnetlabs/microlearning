@@ -35,6 +35,7 @@ export function EditModePanel({ sceneId, sceneLabel }: EditModePanelProps) {
             const desired = typeof nextState === 'boolean' ? nextState : !prev;
             if (commentsContext) {
                 const enableComposer = options?.enableComposer ?? desired;
+                commentsContext.setPanelOpen(desired);
                 commentsContext.setCommentMode(enableComposer);
                 if (!enableComposer || !desired) {
                     commentsContext.cancelComposer();
@@ -65,6 +66,7 @@ export function EditModePanel({ sceneId, sceneLabel }: EditModePanelProps) {
             setIsCommentsOpen(false);
             commentsContext?.setCommentMode(false);
             commentsContext?.cancelComposer();
+            commentsContext?.setPanelOpen(false);
         }
     }, [commentsContext, isEditMode]);
 
@@ -213,7 +215,7 @@ export function EditModePanel({ sceneId, sceneLabel }: EditModePanelProps) {
                                 Prev
                             </motion.button>
 
-                            {commentsContext && (
+                            {false && commentsContext && (
                                 <motion.button
                                     whileHover={{ scale: 1.03 }}
                                     whileTap={{ scale: 0.97 }}
@@ -242,7 +244,7 @@ export function EditModePanel({ sceneId, sceneLabel }: EditModePanelProps) {
                         </div>
                     </div>
                 </motion.div>
-                {commentsContext && (
+                {false && commentsContext && (
                     <CommentPanel
                         isOpen={isCommentsOpen}
                         onClose={() => toggleCommentsPanel(false)}
@@ -285,7 +287,7 @@ export function EditModePanel({ sceneId, sceneLabel }: EditModePanelProps) {
                     </motion.button>
 
                     {/* Comment Button */}
-                    {isEditMode && commentsContext && (
+                    {false && isEditMode && commentsContext && (
                         <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
@@ -403,7 +405,7 @@ export function EditModePanel({ sceneId, sceneLabel }: EditModePanelProps) {
                     )}
                 </AnimatePresence>
             </div>
-            {commentsContext && (
+            {false && commentsContext && (
                 <CommentPanel
                     isOpen={isCommentsOpen}
                     onClose={() => toggleCommentsPanel(false)}

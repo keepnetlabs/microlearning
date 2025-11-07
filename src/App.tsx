@@ -201,6 +201,7 @@ export default function App(props: AppProps = {}) {
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [inboxCompleted, setInboxCompleted] = useState(false);
   const [videoCompleted, setVideoCompleted] = useState(false);
+  const [codeReviewValidated, setCodeReviewValidated] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [totalPoints, setTotalPoints] = useState(0);
@@ -399,8 +400,12 @@ export default function App(props: AppProps = {}) {
     if (currentSceneConfig?.scene_type === 'scenario') {
       return videoCompleted;
     }
+    // Check if current scene is code_review
+    if (currentSceneConfig?.scene_type === 'code_review') {
+      return codeReviewValidated;
+    }
     return currentScene < scenes.length - 1;
-  }, [isEditMode, currentScene, quizCompleted, inboxCompleted, videoCompleted, sceneIndices.quiz, scenes]);
+  }, [isEditMode, currentScene, quizCompleted, inboxCompleted, videoCompleted, codeReviewValidated, sceneIndices.quiz, scenes]);
 
   // Optimized scene timing tracking
   const trackSceneTime = useCallback((sceneIndex: number) => {
@@ -616,6 +621,11 @@ export default function App(props: AppProps = {}) {
     scenes,
     testOverrides?.disableDelays
   ]);
+
+  // Reset code review validation when scene changes
+  useEffect(() => {
+    setCodeReviewValidated(false);
+  }, [currentScene]);
 
   // Keyboard navigation (Escape handling lives in useLanguage)
   useEffect(() => {
@@ -1126,6 +1136,7 @@ export default function App(props: AppProps = {}) {
                                   onVideoCompleted={currentSceneConfig?.scene_type === 'scenario' ? handleVideoCompleted : undefined}
                                   isVideoCompleted={currentSceneConfig?.scene_type === 'scenario' ? videoCompleted : undefined}
                                   onIsVideoCompletedChange={currentSceneConfig?.scene_type === 'scenario' ? setVideoCompleted : undefined}
+                                  onValidationStatusChange={currentSceneConfig?.scene_type === 'code_review' ? setCodeReviewValidated : undefined}
                                   onNextSlide={nextScene}
                                   reducedMotion={reducedMotionBool}
                                   disableDelays={disableDelaysBool}
