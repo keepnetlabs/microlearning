@@ -44,6 +44,7 @@ function CodeReviewSceneContent({
     config,
     onNextSlide,
     onValidationStatusChange,
+    selectedLanguage,
     sceneId,
     reducedMotion
 }: CodeReviewSceneProps) {
@@ -194,9 +195,7 @@ function CodeReviewSceneContent({
         try {
             const originalCode = codeSnippet?.content || "";
             const issueType = (currentConfig as any)?.issueType || "Code Security Issue";
-            const appLanguage = typeof window !== 'undefined'
-                ? localStorage.getItem('selected-language') || 'en-US'
-                : 'en-US';
+            const appLanguage = selectedLanguage || 'en-US';
 
             const payload = {
                 issueType,
@@ -247,7 +246,7 @@ function CodeReviewSceneContent({
             setValidationHint("");
             setCheckStatus("error");
         }
-    }, [editorValue, editorLanguage, codeSnippet, currentConfig, successStatusMessage, errorStatusMessage]);
+    }, [editorValue, editorLanguage, codeSnippet, currentConfig, successStatusMessage, errorStatusMessage, selectedLanguage]);
 
     const handleNextClick = useCallback(() => {
         if (checkStatus !== "success") return;
@@ -458,7 +457,7 @@ function CodeReviewSceneContent({
     );
 }
 
-export function CodeReviewScene({ config, onNextSlide, onCheckCode, onValidationStatusChange, sceneId, reducedMotion }: CodeReviewSceneProps) {
+export function CodeReviewScene({ config, onNextSlide, onCheckCode, onValidationStatusChange, selectedLanguage, sceneId, reducedMotion }: CodeReviewSceneProps) {
     const [configKey, setConfigKey] = useState(0);
     const [editChanges, setEditChanges] = useState<Partial<CodeReviewSceneConfig>>({});
 
@@ -487,6 +486,7 @@ export function CodeReviewScene({ config, onNextSlide, onCheckCode, onValidation
                 onNextSlide={onNextSlide}
                 onCheckCode={onCheckCode}
                 onValidationStatusChange={onValidationStatusChange}
+                selectedLanguage={selectedLanguage}
                 sceneId={sceneId}
                 reducedMotion={reducedMotion}
             />
