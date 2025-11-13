@@ -268,20 +268,6 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
                                 Prev
                             </motion.button>
 
-                            {commentsContext && (
-                                <motion.button
-                                    whileHover={{ scale: 1.03 }}
-                                    whileTap={{ scale: 0.97 }}
-                                    onClick={() => toggleCommentsPanel()}
-                                    className={`flex h-full flex-1 items-center justify-center gap-2 rounded-full glass-border-1 text-[#1C1C1E] transition-all dark:text-[#F2F2F7] ${isCommentsOpen ? 'bg-sky-500/10' : ''}`}
-                                    aria-pressed={isCommentsOpen}
-                                    aria-label="Toggle comments"
-                                >
-                                    <MessageSquareMore size={16} />
-                                    Comments
-                                </motion.button>
-                            )}
-
                             {/* Next */}
                             <motion.button
                                 whileHover={{ scale: 1.03 }}
