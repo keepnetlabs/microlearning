@@ -436,6 +436,7 @@ interface QuizSceneProps {
 
 export const QuizScene = React.memo(function QuizScene({
   config,
+  appConfig,
   onQuizCompleted,
   onNextSlide,
   isVisible,
@@ -464,7 +465,7 @@ export const QuizScene = React.memo(function QuizScene({
   sceneId,
   reducedMotion,
   disableDelays,
-}: QuizSceneProps & { sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean }) {
+}: QuizSceneProps & { appConfig?: any; sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean }) {
   // Destructure ariaTexts from config for accessibility
   const { ariaTexts } = config || {};
 
@@ -2348,7 +2349,7 @@ export const QuizScene = React.memo(function QuizScene({
         onSave={handleSave}
         onEditModeChange={setIsInEditMode}
       >
-        <EditModePanel sceneId={sceneId} sceneLabel={(currentConfig as any)?.title} />
+        <EditModePanel sceneId={sceneId} sceneLabel={(currentConfig as any)?.title} appConfig={appConfig} />
         <ScientificBasisInfo
           config={currentConfig}
           sceneType={(currentConfig as any)?.scene_type || 'quiz'}

@@ -342,6 +342,7 @@ function ActionableContentSceneInternalCore({
 
 // Wrapper component with EditModeProvider
 function ActionableContentSceneInternal(props: ActionableContentSceneProps & {
+  appConfig?: any;
   onNextSlide?: () => void;
   onInboxCompleted?: (completed: boolean) => void;
   sceneId?: string | number;
@@ -373,7 +374,7 @@ function ActionableContentSceneInternal(props: ActionableContentSceneProps & {
         handleInboxConfigUpdate(updatedConfig);
       }}
     >
-      <EditModePanel sceneId={props.sceneId} sceneLabel={(props.config as any)?.title} />
+      <EditModePanel sceneId={props.sceneId} sceneLabel={(props.config as any)?.title} appConfig={props.appConfig} />
       <ActionableContentSceneInternalCore
         {...props}
         onInboxConfigUpdate={(config) => setInboxConfigRef({ current: config })}

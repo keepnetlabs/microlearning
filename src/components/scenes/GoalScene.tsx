@@ -24,10 +24,11 @@ const DEFAULT_MAX_WIDTH = "max-w-md w-full";
 
 export const GoalScene = memo(({
   config,
+  appConfig,
   onNextSlide,
   sceneId,
   reducedMotion
-}: { config: GoalSceneConfig; onNextSlide?: () => void; sceneId?: string | number; reducedMotion?: boolean; }) => {
+}: { config: GoalSceneConfig; appConfig?: any; onNextSlide?: () => void; sceneId?: string | number; reducedMotion?: boolean; }) => {
 
   // State for edit changes and edit mode tracking
   const [editChanges, setEditChanges] = useState<Partial<GoalSceneConfig>>({});
@@ -111,7 +112,7 @@ export const GoalScene = memo(({
       onSave={handleSave}
       onEditModeChange={setIsInEditMode}
     >
-      <EditModePanel sceneId={sceneId} sceneLabel={(currentConfig as any)?.title} />
+      <EditModePanel sceneId={sceneId} sceneLabel={(currentConfig as any)?.title} appConfig={appConfig} />
       <ScientificBasisInfo
         config={currentConfig}
         sceneType={(currentConfig as any)?.scene_type || 'goal'}

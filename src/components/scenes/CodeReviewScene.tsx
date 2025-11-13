@@ -457,7 +457,7 @@ function CodeReviewSceneContent({
     );
 }
 
-export function CodeReviewScene({ config, onNextSlide, onCheckCode, onValidationStatusChange, selectedLanguage, sceneId, reducedMotion }: CodeReviewSceneProps) {
+export function CodeReviewScene({ config, appConfig, onNextSlide, onCheckCode, onValidationStatusChange, selectedLanguage, sceneId, reducedMotion }: CodeReviewSceneProps & { appConfig?: any }) {
     const [configKey, setConfigKey] = useState(0);
     const [editChanges, setEditChanges] = useState<Partial<CodeReviewSceneConfig>>({});
 
@@ -480,7 +480,7 @@ export function CodeReviewScene({ config, onNextSlide, onCheckCode, onValidation
             sceneId={sceneId?.toString()}
             onSave={handleSave}
         >
-            <EditModePanel sceneId={sceneId} sceneLabel={(currentConfig as any)?.title} />
+            <EditModePanel sceneId={sceneId} sceneLabel={(currentConfig as any)?.title} appConfig={appConfig} />
             <CodeReviewSceneContent
                 config={currentConfig}
                 onNextSlide={onNextSlide}

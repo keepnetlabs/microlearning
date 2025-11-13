@@ -3,6 +3,17 @@
 
 import JSZip from 'jszip';
 
+// Helper function to generate SCORM HTML content
+export const generateSCORMHTML = (baseUrl: string, courseTitle: string): string => {
+  const iframeSrc = `https://microlearning.pages.dev/?baseUrl=${encodeURIComponent(baseUrl)}`;
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" /><title>Microlearning</title><style>html,body,iframe{height:100%;width:100%;margin:0;padding:0;border:0;}.spinner{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;}.spinner:after{content:"";width:28px;height:28px;border-radius:50%;border:3px solid #999;border-top-color:transparent;animation:spin 1s linear infinite;}@keyframes spin{to{transform:rotate(360deg);}}</style></head><body><div id="spinner" class="spinner"></div><iframe id="mlFrame" allowfullscreen title="Microlearning" allow="accelerometer; autoplay; camera; clipboard-write; encrypted-media; fullscreen; geolocation; gyroscope; magnetometer; microphone; midi; payment; picture-in-picture; usb; xr-spatial-tracking"></iframe><script>var API=null;function tryInitOnce(){if(!API)API=locateAPI();if(!API)return false;try{var r=API.LMSInitialize("");return r==="true"||r===true;}catch(e){return false;}}function locateAPI(){return null;}(async function init(){var frame=document.getElementById("mlFrame");frame.src="${iframeSrc}";frame.addEventListener("load",function(){document.getElementById("spinner")?.remove();});})();</script></body></html>`;
+};
+
+// Helper function to generate SCORM manifest XML
+export const generateSCORMManifest = (courseTitle: string): string => {
+  return `<?xml version="1.0" encoding="UTF-8"?><manifest identifier="com.example.microlearning" version="1.0" xmlns="http://www.imsglobal.org/xsd/imscp_rootv1p1p2" xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imscp_rootv1p1p2 imscp_rootv1p1p2.xsd http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd"><metadata><schema>ADL SCORM</schema><schemaversion>1.2</schemaversion></metadata><organizations default="org1"><organization identifier="org1"><title>${courseTitle}</title><item identifier="item1" identifierref="res1" isvisible="true"><title>${courseTitle} SCO</title></item></organization></organizations><resources><resource identifier="res1" type="webcontent" adlcp:scormtype="sco" href="index.html"><file href="index.html"/></resource></resources></manifest>`;
+};
+
 export const downloadSCORMPackage = () => {
   // Get current URL parameters
   const urlParams = new URLSearchParams(window.location.search);
@@ -588,17 +599,23 @@ export const downloadSCORMPackage = () => {
   createSCORMZipPackage(scormHTML, imsmanifestXML, courseTitle);
 };
 
-// Function to create ZIP package with HTML and XML files
+// Function to create ZIP package with HTML and XML files (returns blob)
+export const createSCORMZipBlob = async (htmlContent: string, xmlContent: string, courseTitle: string): Promise<Blob> => {
+  const zip = new JSZip();
+
+  // Add files to ZIP
+  zip.file('index.html', htmlContent);
+  zip.file('imsmanifest.xml', xmlContent);
+
+  // Generate ZIP file
+  const content = await zip.generateAsync({ type: 'blob' });
+  return content;
+};
+
+// Function to create and download ZIP package
 const createSCORMZipPackage = async (htmlContent: string, xmlContent: string, courseTitle: string) => {
   try {
-    const zip = new JSZip();
-
-    // Add files to ZIP
-    zip.file('index.html', htmlContent);
-    zip.file('imsmanifest.xml', xmlContent);
-
-    // Generate ZIP file
-    const content = await zip.generateAsync({ type: 'blob' });
+    const content = await createSCORMZipBlob(htmlContent, xmlContent, courseTitle);
 
     // Create download link
     const url = URL.createObjectURL(content);

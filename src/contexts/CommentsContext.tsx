@@ -466,7 +466,7 @@ export function CommentsProvider({ children, initialThreads = [], currentAuthor,
             setActiveSceneId(sceneId);
         }
         setActiveCommentId(commentId);
-        setIsCommentMode(false);
+        // Don't disable comment mode when opening popover - user should still be able to add comments
         setComposerState(null);
         setActivePopoverCommentId(commentId);
     }, []);

@@ -67,7 +67,7 @@ interface SummarySceneProps {
 }
 
 // Inner component that uses the EditModeContext
-function SummarySceneContent({ config, completionData, sceneId, reducedMotion, disableDelays, trainingTitle, learnerName }: SummarySceneProps & { sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean }) {
+function SummarySceneContent({ config, appConfig, completionData, sceneId, reducedMotion, disableDelays, trainingTitle, learnerName }: SummarySceneProps & { appConfig?: any; sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean }) {
   const [showCertificate, setShowCertificate] = useState(false);
   const [hasDownloadedCertificate, setHasDownloadedCertificate] = useState(false);
   const [showConfetti, setShowConfetti] = useState(true);
@@ -1225,7 +1225,7 @@ function SummarySceneContent({ config, completionData, sceneId, reducedMotion, d
       <CommentPinsOverlay sceneId={sceneId} />
 
       {/* Edit Mode Panel */}
-      <EditModePanel sceneId={sceneId} sceneLabel={(currentConfig as any)?.title} />
+      <EditModePanel sceneId={sceneId} sceneLabel={(currentConfig as any)?.title} appConfig={appConfig} />
 
       {/* Scientific Basis Info */}
       <ScientificBasisInfo
@@ -1237,7 +1237,7 @@ function SummarySceneContent({ config, completionData, sceneId, reducedMotion, d
 }
 
 // Main export component with EditModeProvider
-export function SummaryScene(props: SummarySceneProps & { sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean }) {
+export function SummaryScene(props: SummarySceneProps & { appConfig?: any; sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean }) {
   return (
     <EditModeProvider
       key={JSON.stringify(props.config?.texts || {})}

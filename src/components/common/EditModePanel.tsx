@@ -1,9 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Save, RotateCcw, Edit3, Eye, EyeOff, Download, MessageSquareMore } from 'lucide-react';
+import { Save, RotateCcw, Edit3, Eye, EyeOff, Download, MessageSquareMore, Upload } from 'lucide-react';
 import { useEditMode } from '../../contexts/EditModeContext';
 import { downloadSCORMPackage } from '../../utils/scormDownload';
+import { useUploadTraining } from '../../hooks/useUploadTraining';
 import { useIsMobile } from '../ui/use-mobile';
 import { CommentPanel } from '../ui/comment-panel';
 import { useOptionalComments } from '../../contexts/CommentsContext';
@@ -11,9 +12,10 @@ import { useOptionalComments } from '../../contexts/CommentsContext';
 interface EditModePanelProps {
     sceneId?: string | number;
     sceneLabel?: string;
+    appConfig?: any;
 }
 
-export function EditModePanel({ sceneId, sceneLabel }: EditModePanelProps) {
+export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelProps) {
     const [shouldShowPanel, setShouldShowPanel] = useState(false);
     const [isCommentsOpen, setIsCommentsOpen] = useState(false);
     const [shouldForceProfileEdit, setShouldForceProfileEdit] = useState(false);
@@ -29,6 +31,7 @@ export function EditModePanel({ sceneId, sceneLabel }: EditModePanelProps) {
     const isMobile = useIsMobile();
     const commentsContext = useOptionalComments();
     const normalizedSceneId = useMemo(() => sceneId?.toString() ?? null, [sceneId]);
+    const { uploadTraining } = useUploadTraining();
 
     const toggleCommentsPanel = useCallback((nextState?: boolean, options?: { enableComposer?: boolean }) => {
         setIsCommentsOpen((prev) => {
@@ -183,6 +186,56 @@ export function EditModePanel({ sceneId, sceneLabel }: EditModePanelProps) {
         }
     }, [isMobile, isEditMode]);
 
+    // Handle Upload SCORM
+    const handleUpload = useCallback(async () => {
+        try {
+            // Get params from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const accessToken = urlParams.get('accessToken');
+            const baseUrl = urlParams.get('baseUrl');
+
+            console.log('Upload clicked');
+            console.log('AccessToken:', accessToken);
+            console.log('BaseUrl:', baseUrl);
+            console.log('AppConfig:', appConfig);
+
+            if (!accessToken) {
+                console.error('accessToken not found in URL');
+                alert('accessToken not found in URL');
+                return;
+            }
+
+            if (!baseUrl) {
+                console.error('baseUrl not found in URL');
+                alert('baseUrl not found in URL');
+                return;
+            }
+
+            if (!appConfig) {
+                console.error('appConfig not available');
+                alert('appConfig not available');
+                return;
+            }
+
+            // Call the upload training hook
+            const result = await uploadTraining({
+                appConfig,
+                accessToken,
+                baseUrl
+            });
+
+            if (result.success) {
+                alert(result.message);
+            } else {
+                alert('Error: ' + result.error);
+            }
+
+        } catch (error) {
+            console.error('Upload error:', error);
+            alert('Error during upload: ' + (error instanceof Error ? error.message : 'Unknown error'));
+        }
+    }, [appConfig, uploadTraining]);
+
     // Don't render panel if it shouldn't be shown
     if (!shouldShowPanel) {
         return null;
@@ -215,7 +268,7 @@ export function EditModePanel({ sceneId, sceneLabel }: EditModePanelProps) {
                                 Prev
                             </motion.button>
 
-                            {false && commentsContext && (
+                            {commentsContext && (
                                 <motion.button
                                     whileHover={{ scale: 1.03 }}
                                     whileTap={{ scale: 0.97 }}
@@ -244,7 +297,7 @@ export function EditModePanel({ sceneId, sceneLabel }: EditModePanelProps) {
                         </div>
                     </div>
                 </motion.div>
-                {false && commentsContext && (
+                {commentsContext && (
                     <CommentPanel
                         isOpen={isCommentsOpen}
                         onClose={() => toggleCommentsPanel(false)}
@@ -287,7 +340,7 @@ export function EditModePanel({ sceneId, sceneLabel }: EditModePanelProps) {
                     </motion.button>
 
                     {/* Comment Button */}
-                    {false && isEditMode && commentsContext && (
+                    {isEditMode && commentsContext && (
                         <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
@@ -313,6 +366,19 @@ export function EditModePanel({ sceneId, sceneLabel }: EditModePanelProps) {
                     >
                         <Download size={16} />
                         Download SCORM
+                    </motion.button>
+
+                    {/* Upload SCORM Button */}
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={handleUpload}
+                        className="flex items-center gap-2 px-4 py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer text-[#1C1C1E] dark:text-[#F2F2F7]"
+                        style={{ pointerEvents: 'auto', cursor: 'pointer' }}
+                        title="Upload SCORM package"
+                    >
+                        <Upload size={16} />
+                        Upload
                     </motion.button>
 
                     {/* View Mode Toggle */}
@@ -405,7 +471,7 @@ export function EditModePanel({ sceneId, sceneLabel }: EditModePanelProps) {
                     )}
                 </AnimatePresence>
             </div>
-            {false && commentsContext && (
+            {commentsContext && (
                 <CommentPanel
                     isOpen={isCommentsOpen}
                     onClose={() => toggleCommentsPanel(false)}

@@ -17,7 +17,7 @@ interface NudgeSceneProps {
   onNextSlide?: () => void;
 }
 
-export const NudgeScene = memo(function NudgeScene({ config, onNextSlide, sceneId }: NudgeSceneProps & { sceneId?: string | number }) {
+export const NudgeScene = memo(function NudgeScene({ config, appConfig, onNextSlide, sceneId }: NudgeSceneProps & { appConfig?: any; sceneId?: string | number }) {
 
   // State for edit changes and edit mode tracking
   const [editChanges, setEditChanges] = useState<Partial<NudgeSceneConfig>>({});
@@ -100,7 +100,7 @@ export const NudgeScene = memo(function NudgeScene({ config, onNextSlide, sceneI
       onSave={handleSave}
       onEditModeChange={setIsInEditMode}
     >
-      <EditModePanel sceneId={sceneId} sceneLabel={(currentConfig as any)?.title} />
+      <EditModePanel sceneId={sceneId} sceneLabel={(currentConfig as any)?.title} appConfig={appConfig} />
       <ScientificBasisInfo
         config={currentConfig}
         sceneType={(currentConfig as any)?.scene_type || 'nudge'}

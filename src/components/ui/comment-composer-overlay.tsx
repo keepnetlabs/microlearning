@@ -139,10 +139,10 @@ export function CommentComposerOverlay() {
                     data-comment-ignore="true"
                     ref={cardRef}
                 >
-                    <div className="w-[260px] rounded-2xl glass-border-2 glass-border-2-hide-before-z-index bg-white/95 p-4 shadow-2xl backdrop-blur-xl dark:bg-[#111013]/95">
+                    <div className="w-[260px] rounded-2xl glass-border-2 glass-border-2-hide-before-z-index p-4">
                         <div className="flex items-center justify-between gap-2">
                             <div className="flex items-center gap-2">
-                                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-sky-600 text-xs font-semibold uppercase text-white dark:bg-sky-500">
+                                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full glass-border-0 text-xs font-semibold uppercase text-[#1C1C1E] dark:text-[#F2F2F7]">
                                     {authorInitials || "Y"}
                                 </span>
                                 <div className="flex flex-col">
@@ -157,7 +157,7 @@ export function CommentComposerOverlay() {
                                 className="rounded-full p-1.5 text-[#1C1C1E]/50 transition hover:bg-[#1C1C1E]/10 hover:text-[#1C1C1E] dark:text-[#F2F2F7]/50 dark:hover:bg-[#F2F2F7]/10 dark:hover:text-[#F2F2F7]"
                                 aria-label="Cancel comment"
                             >
-                                <X size={14} />
+                                <X size={16} />
                             </button>
                         </div>
                         {needsProfile && (
@@ -185,7 +185,7 @@ export function CommentComposerOverlay() {
                                 placeholder="Write your comment... (@ to mention)"
                                 rows={4}
                                 maxLength={maxCharacters}
-                                className="w-full resize-none rounded-xl border border-white/20 bg-white/80 px-3 py-2 text-sm text-[#1C1C1E] placeholder:text-[#1C1C1E]/40 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400 dark:border-white/10 dark:bg-[#1C1C1E]/80 dark:text-[#F2F2F7] dark:placeholder:text-[#F2F2F7]/50"
+                                className="w-full resize-none rounded-xl glass-border-2 px-3 py-2 text-sm text-[#1C1C1E] placeholder:text-[#1C1C1E]/40 dark:text-[#F2F2F7] dark:placeholder:text-[#F2F2F7]/50"
                                 data-comment-ignore="true"
                             />
                             <div className="mt-1 flex items-center justify-between text-[11px] text-[#1C1C1E]/50 dark:text-[#F2F2F7]/50">
@@ -205,7 +205,7 @@ export function CommentComposerOverlay() {
                                 type="button"
                                 onClick={handleSubmit}
                                 disabled={!message.trim()}
-                                className="inline-flex items-center gap-1.5 rounded-full bg-sky-600 px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-60"
+                                className="inline-flex items-center gap-1.5 rounded-full glass-border-4 px-3.5 py-1.5 text-xs font-semibold transition text-[#1C1C1E] dark:text-[#F2F2F7] disabled:cursor-not-allowed disabled:opacity-60"
                                 data-comment-ignore="true"
                             >
                                 <Send size={14} />

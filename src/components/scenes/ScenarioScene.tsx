@@ -167,6 +167,7 @@ interface ScenarioSceneProps {
 
 export function ScenarioScene({
   config,
+  appConfig,
   onNextSlide,
   onVideoCompleted,
   sceneId,
@@ -175,6 +176,7 @@ export function ScenarioScene({
   isVideoCompleted: controlledIsVideoCompleted,
   onIsVideoCompletedChange
 }: ScenarioSceneProps & {
+  appConfig?: any;
   onNextSlide?: () => void;
   onVideoCompleted?: (completed: boolean) => void;
   sceneId?: string | number;
@@ -349,7 +351,7 @@ export function ScenarioScene({
       onSave={handleSave}
       onEditModeChange={setIsInEditMode}
     >
-      <EditModePanel sceneId={sceneId} sceneLabel={(currentConfig as any)?.title} />
+      <EditModePanel sceneId={sceneId} sceneLabel={(currentConfig as any)?.title} appConfig={appConfig} />
       <ScientificBasisInfo
         config={currentConfig}
         sceneType={(currentConfig as any)?.scene_type || 'scenario'}

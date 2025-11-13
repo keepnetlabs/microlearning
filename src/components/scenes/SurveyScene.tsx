@@ -30,13 +30,14 @@ interface SurveySceneProps {
 
 export const SurveyScene = memo(function SurveyScene({
   config,
+  appConfig,
   onSurveySubmitted,
   surveyState,
   onSurveyStateChange,
   sceneId,
   reducedMotion,
   disableDelays
-}: SurveySceneProps & { sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean }) {
+}: SurveySceneProps & { appConfig?: any; sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean }) {
 
   // State for edit changes and edit mode tracking
   const [editChanges, setEditChanges] = useState<Partial<SurveySceneConfig>>({});
@@ -215,7 +216,7 @@ export const SurveyScene = memo(function SurveyScene({
       onSave={handleSave}
       onEditModeChange={setIsInEditMode}
     >
-      <EditModePanel sceneId={sceneId} sceneLabel={(currentConfig as any)?.title} />
+      <EditModePanel sceneId={sceneId} sceneLabel={(currentConfig as any)?.title} appConfig={appConfig} />
       <ScientificBasisInfo
         config={currentConfig}
         sceneType={(currentConfig as any)?.scene_type || 'survey'}

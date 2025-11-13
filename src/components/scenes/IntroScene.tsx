@@ -48,11 +48,12 @@ const getIconComponent = (iconName: string): LucideIcon => {
 
 export const IntroScene = React.memo(({
   config,
+  appConfig,
   onNextSlide,
   sceneId,
   reducedMotion,
   disableDelays
-}: { config: IntroSceneConfig; onNextSlide?: () => void; sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean; }) => {
+}: { config: IntroSceneConfig; appConfig?: any; onNextSlide?: () => void; sceneId?: string | number; reducedMotion?: boolean; disableDelays?: boolean; }) => {
 
   // Global edit mode context
   const { setGlobalEditMode } = useGlobalEditMode();
@@ -470,7 +471,7 @@ export const IntroScene = React.memo(({
         }
         <CommentPinsOverlay sceneId={sceneId} />
       </FontWrapper>
-      <EditModePanel sceneId={sceneId} sceneLabel={(currentConfig as any)?.title} />
+      <EditModePanel sceneId={sceneId} sceneLabel={(currentConfig as any)?.title} appConfig={appConfig} />
       <ScientificBasisInfo
         config={currentConfig}
         sceneType={(config as any)?.scene_type || 'intro'}

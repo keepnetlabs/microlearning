@@ -1125,6 +1125,7 @@ export default function App(props: AppProps = {}) {
                               {/* Other scenes */}
                               {hasScenes && currentScene !== sceneIndices.quiz && currentSceneConfig && (
                                 <CurrentSceneComponent config={currentSceneConfig}
+                                  appConfig={appConfig}
                                   sceneId={(scenes[currentScene] as any)?.sceneId}
                                   onSurveySubmitted={handleSurveySubmitted}
                                   surveyState={currentScene === sceneIndices.survey ? surveyState : undefined}
