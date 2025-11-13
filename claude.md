@@ -234,6 +234,7 @@ if (scormService.isInitialized()) {
 - CodeReviewScene must call `onValidationStatusChange` callback to update App.tsx state
 - Edit mode bypasses validation (allows progression without success)
 
+
 ## Recent Updates
 
 ### CodeReviewScene Enhancement (Latest)
