@@ -10,7 +10,7 @@ interface UploadTrainingParams {
 }
 
 // Helper function to parse JWT token and extract company ID
-const parseJWT = (token: string): { companyId?: string; [key: string]: any } => {
+const parseJWT = (token: string): { companyId?: string;[key: string]: any } => {
   try {
     const parts = token.split('.');
     if (parts.length !== 3) {
@@ -33,10 +33,10 @@ const getLanguageResourceId = (appConfig: any): string => {
   try {
     // Get language code from appConfig - try different possible field names
     const languageCode = appConfig?.language_code ||
-                         appConfig?.languageCode ||
-                         appConfig?.language ||
-                         appConfig?.selectedLanguage ||
-                         'en';
+      appConfig?.languageCode ||
+      appConfig?.language ||
+      appConfig?.selectedLanguage ||
+      'en';
 
     // Find matching language in languages array
     const language = languages.find(
@@ -74,18 +74,19 @@ export const useUploadTraining = () => {
     // Static API key
     const apiKey = 'apikey';
 
-    // Clean category and targetAudience
-    const category = (appConfig?.category || 'TravelSecurity').trim().replace(/\s+/g, '');
-    const rolesInput = appConfig?.roles || 'AllEmployees';
+    // Clean category, targetAudience, and description
+    const category = (appConfig?.microlearning_metadata?.category || 'TravelSecurity').trim().replace(/\s+/g, '');
+    const rolesInput = appConfig?.microlearning_metadata?.role_relevance || 'AllEmployees';
     const targetAudience = Array.isArray(rolesInput)
       ? rolesInput.join('').replace(/\s+/g, '')
       : (rolesInput || 'AllEmployees').toString().trim().replace(/\s+/g, '');
+    const description = appConfig?.microlearning_metadata?.description?.trim() || 'Microlearning training module';
 
     try {
       // Step 1: Create training draft
       const trainingDraftPayload = {
         name: appConfig?.microlearning_metadata?.title || 'Untitled Training',
-        description: appConfig?.microlearning_metadata?.description || '',
+        description: description,
         category: category,
         targetAudience: targetAudience,
         availableForRequests: [
@@ -102,7 +103,7 @@ export const useUploadTraining = () => {
 
       console.log('Training draft payload:', trainingDraftPayload);
 
-      const draftEndpoint = `${baseApiUrl}/api/trainings/draft`;
+      const draftEndpoint = `${baseApiUrl}/trainings/draft`;
       console.log('Draft endpoint:', draftEndpoint);
 
       const draftResponse = await fetch(draftEndpoint, {
@@ -156,7 +157,7 @@ export const useUploadTraining = () => {
       formData.append('languageId', languageResourceId);
       formData.append('vendorId', 'db0b6e2d-d878-4794-9263-84649a7528c8');
 
-      const uploadContentEndpoint = `${baseApiUrl}/api/trainings/${resourceId}/upload-content`;
+      const uploadContentEndpoint = `${baseApiUrl}/trainings/${resourceId}/upload-content`;
       console.log('Upload content endpoint:', uploadContentEndpoint);
 
       const uploadResponse = await fetch(uploadContentEndpoint, {
@@ -183,7 +184,7 @@ export const useUploadTraining = () => {
       const metadataPayload = new FormData();
       metadataPayload.append('coverImage', 'null');
       metadataPayload.append('trainingDetail.name', appConfig?.microlearning_metadata?.title || 'Untitled Training');
-      metadataPayload.append('trainingDetail.description', appConfig?.microlearning_metadata?.description || '');
+      metadataPayload.append('trainingDetail.description', description);
       metadataPayload.append('trainingDetail.category', category);
       metadataPayload.append('trainingDetail.targetAudience', targetAudience);
       metadataPayload.append('trainingDetail.hasQuiz', 'false');
@@ -192,7 +193,7 @@ export const useUploadTraining = () => {
       metadataPayload.append('trainingDetail.availableForRequests[0].type', 'MyCompanyOnly');
       metadataPayload.append('trainingDetail.availableForRequests[0].resourceId', 'null');
 
-      const metadataEndpoint = `${baseApiUrl}/api/trainings/${resourceId}`;
+      const metadataEndpoint = `${baseApiUrl}/trainings/${resourceId}`;
       console.log('Metadata endpoint:', metadataEndpoint);
 
       const metadataResponse = await fetch(metadataEndpoint, {

@@ -19,6 +19,9 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
     const [shouldShowPanel, setShouldShowPanel] = useState(false);
     const [isCommentsOpen, setIsCommentsOpen] = useState(false);
     const [shouldForceProfileEdit, setShouldForceProfileEdit] = useState(false);
+    const [isUploadConfirmOpen, setIsUploadConfirmOpen] = useState(false);
+    const [isUploadCompleted, setIsUploadCompleted] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
     const {
         isEditMode,
         isViewMode,
@@ -125,6 +128,10 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
                 // If URL doesn't have edit mode and wasn't activated in this session, hide panel
                 setShouldShowPanel(false);
             }
+
+            // Reset upload state on page load
+            setIsUploadCompleted(false);
+            setIsUploading(false);
         };
 
         // Check on mount
@@ -186,34 +193,53 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
         }
     }, [isMobile, isEditMode]);
 
-    // Handle Upload SCORM
-    const handleUpload = useCallback(async () => {
+    // Show Upload confirmation dialog
+    const handleUploadClick = useCallback(() => {
+        setIsUploadConfirmOpen(true);
+    }, []);
+
+    // Handle Upload SCORM (actual upload)
+    const handleUploadConfirm = useCallback(async () => {
+        setIsUploading(true);
+
         try {
             // Get params from URL
             const urlParams = new URLSearchParams(window.location.search);
             const accessToken = urlParams.get('accessToken');
             const baseUrl = urlParams.get('baseUrl');
+            const baseApiUrl = urlParams.get('baseApiUrl') || baseUrl;
 
-            console.log('Upload clicked');
+            console.log('Upload confirmed');
             console.log('AccessToken:', accessToken);
             console.log('BaseUrl:', baseUrl);
+            console.log('BaseApiUrl:', baseApiUrl);
             console.log('AppConfig:', appConfig);
 
             if (!accessToken) {
                 console.error('accessToken not found in URL');
                 alert('accessToken not found in URL');
+                setIsUploading(false);
                 return;
             }
 
             if (!baseUrl) {
                 console.error('baseUrl not found in URL');
                 alert('baseUrl not found in URL');
+                setIsUploading(false);
+                return;
+            }
+
+            if (!baseApiUrl) {
+                console.error('baseApiUrl not found in URL');
+                alert('baseApiUrl not found in URL');
+                setIsUploading(false);
                 return;
             }
 
             if (!appConfig) {
                 console.error('appConfig not available');
                 alert('appConfig not available');
+                setIsUploading(false);
                 return;
             }
 
@@ -221,18 +247,24 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
             const result = await uploadTraining({
                 appConfig,
                 accessToken,
+                baseApiUrl,
                 baseUrl
             });
 
             if (result.success) {
+                setIsUploadCompleted(true);
+                setIsUploading(false);
                 alert(result.message);
+                setIsUploadConfirmOpen(false);
             } else {
                 alert('Error: ' + result.error);
+                setIsUploading(false);
             }
 
         } catch (error) {
             console.error('Upload error:', error);
             alert('Error during upload: ' + (error instanceof Error ? error.message : 'Unknown error'));
+            setIsUploading(false);
         }
     }, [appConfig, uploadTraining]);
 
@@ -356,15 +388,19 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
 
                     {/* Upload SCORM Button */}
                     <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.97 }}
-                        onClick={handleUpload}
-                        className="flex items-center gap-2 px-4 py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer text-[#1C1C1E] dark:text-[#F2F2F7]"
-                        style={{ pointerEvents: 'auto', cursor: 'pointer' }}
-                        title="Upload SCORM package"
+                        whileHover={!isUploadCompleted && !isUploading ? { scale: 1.05 } : {}}
+                        whileTap={!isUploadCompleted && !isUploading ? { scale: 0.97 } : {}}
+                        onClick={handleUploadClick}
+                        disabled={isUploadCompleted || isUploading}
+                        className={`flex items-center gap-2 px-4 py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer ${isUploadCompleted || isUploading
+                            ? 'opacity-50 cursor-not-allowed text-[#1C1C1E]/50 dark:text-[#F2F2F7]/50'
+                            : 'text-[#1C1C1E] dark:text-[#F2F2F7]'
+                            }`}
+                        style={{ pointerEvents: isUploadCompleted || isUploading ? 'none' : 'auto' }}
+                        title={isUploadCompleted ? 'Upload already completed' : isUploading ? 'Uploading...' : 'Upload SCORM package'}
                     >
                         <Upload size={16} />
-                        Upload
+                        {isUploading ? 'Uploading...' : isUploadCompleted ? 'Uploaded' : 'Upload'}
                     </motion.button>
 
                     {/* View Mode Toggle */}
@@ -468,6 +504,61 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
                     onForceProfileConsumed={() => setShouldForceProfileEdit(false)}
                 />
             )}
+
+            {/* Upload Confirmation Dialog */}
+            <AnimatePresence>
+                {isUploadConfirmOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/50 z-[2147483646] flex items-center justify-center"
+                        onClick={() => setIsUploadConfirmOpen(false)}
+                        data-comment-ignore="true"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.95, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.95, y: 20 }}
+                            className="rounded-2xl  max-w-sm mx-4 p-6 glass-border-2 glass-border-2-hide-before-z-index"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <h2 className="text-xl font-semibold text-[#1C1C1E] dark:text-[#F2F2F7] mb-2">
+                                Confirm Upload
+                            </h2>
+                            <p className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] mb-6">
+                                Ready to finalize? Ensure all edits and localizations are complete. This action is permanent and cannot be reversed.
+                            </p>
+                            <div className="flex gap-3 justify-end">
+                                <motion.button
+                                    whileHover={isUploading ? {} : { scale: 1.02 }}
+                                    whileTap={isUploading ? {} : { scale: 0.98 }}
+                                    onClick={() => setIsUploadConfirmOpen(false)}
+                                    disabled={isUploading}
+                                    className={`px-4 py-2 rounded-lg glass-border-1 font-medium ${isUploading
+                                        ? 'opacity-50 cursor-not-allowed'
+                                        : 'text-[#1C1C1E] dark:text-[#F2F2F7]'
+                                        }`}
+                                >
+                                    Cancel
+                                </motion.button>
+                                <motion.button
+                                    whileHover={isUploading ? {} : { scale: 1.02 }}
+                                    whileTap={isUploading ? {} : { scale: 0.98 }}
+                                    onClick={handleUploadConfirm}
+                                    disabled={isUploading}
+                                    className={`px-4 py-2 rounded-lg glass-border-2 glass-border-2-hide-before-z-index font-medium transition-all ${isUploading
+                                        ? 'text-[#1C1C1E]/50 dark:text-[#F2F2F7]/50 cursor-not-allowed opacity-75'
+                                        : 'text-[#1C1C1E] dark:text-[#F2F2F7]'
+                                        }`}
+                                >
+                                    {isUploading ? 'Uploading...' : 'Upload'}
+                                </motion.button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </motion.div>,
         document.body
     );
