@@ -166,7 +166,7 @@ export function CommentComposerOverlay() {
                                 <button
                                     type="button"
                                     onClick={handleOpenProfile}
-                                    className="text-xs font-semibold text-[#1C1C1E] underline-offset-2 hover:underline glass-border-4 dark:text-[#F2F2F7]"
+                                    className="text-xs font-semibold text-[#1C1C1E] min-w-[] underline-offset-2 hover:underline dark:text-[#F2F2F7]"
                                     data-comment-ignore="true"
                                 >
                                     Set name
