@@ -5,6 +5,7 @@ import { languages } from '../components/api/languages';
 interface UploadTrainingParams {
   appConfig: any;
   accessToken: string;
+  baseApiUrl: string;
   baseUrl: string;
 }
 
@@ -64,7 +65,7 @@ const getLanguageResourceId = (appConfig: any): string => {
 
 export const useUploadTraining = () => {
   const uploadTraining = useCallback(async (params: UploadTrainingParams) => {
-    const { appConfig, accessToken, baseUrl } = params;
+    const { appConfig, accessToken, baseApiUrl, baseUrl } = params;
 
     // Parse JWT token to extract company ID
     const tokenPayload = parseJWT(accessToken);
@@ -73,13 +74,20 @@ export const useUploadTraining = () => {
     // Static API key
     const apiKey = 'apikey';
 
+    // Clean category and targetAudience
+    const category = (appConfig?.category || 'TravelSecurity').trim().replace(/\s+/g, '');
+    const rolesInput = appConfig?.roles || 'AllEmployees';
+    const targetAudience = Array.isArray(rolesInput)
+      ? rolesInput.join('').replace(/\s+/g, '')
+      : (rolesInput || 'AllEmployees').toString().trim().replace(/\s+/g, '');
+
     try {
       // Step 1: Create training draft
       const trainingDraftPayload = {
         name: appConfig?.microlearning_metadata?.title || 'Untitled Training',
         description: appConfig?.microlearning_metadata?.description || '',
-        category: appConfig?.category || 'TravelSecurity',
-        targetAudience: appConfig?.targetAudience || 'AllEmployees',
+        category: category,
+        targetAudience: targetAudience,
         availableForRequests: [
           {
             id: 'MyCompanyOnly',
@@ -94,7 +102,7 @@ export const useUploadTraining = () => {
 
       console.log('Training draft payload:', trainingDraftPayload);
 
-      const draftEndpoint = `${baseUrl}/api/trainings/draft`;
+      const draftEndpoint = `${baseApiUrl}/api/trainings/draft`;
       console.log('Draft endpoint:', draftEndpoint);
 
       const draftResponse = await fetch(draftEndpoint, {
@@ -148,7 +156,7 @@ export const useUploadTraining = () => {
       formData.append('languageId', languageResourceId);
       formData.append('vendorId', 'db0b6e2d-d878-4794-9263-84649a7528c8');
 
-      const uploadContentEndpoint = `${baseUrl}/api/trainings/${resourceId}/upload-content`;
+      const uploadContentEndpoint = `${baseApiUrl}/api/trainings/${resourceId}/upload-content`;
       console.log('Upload content endpoint:', uploadContentEndpoint);
 
       const uploadResponse = await fetch(uploadContentEndpoint, {
@@ -176,15 +184,15 @@ export const useUploadTraining = () => {
       metadataPayload.append('coverImage', 'null');
       metadataPayload.append('trainingDetail.name', appConfig?.microlearning_metadata?.title || 'Untitled Training');
       metadataPayload.append('trainingDetail.description', appConfig?.microlearning_metadata?.description || '');
-      metadataPayload.append('trainingDetail.category', appConfig?.category || 'RemoteWorkingSecurity');
-      metadataPayload.append('trainingDetail.targetAudience', appConfig?.targetAudience || 'AllEmployees');
+      metadataPayload.append('trainingDetail.category', category);
+      metadataPayload.append('trainingDetail.targetAudience', targetAudience);
       metadataPayload.append('trainingDetail.hasQuiz', 'false');
       metadataPayload.append('trainingDetail.type', 'SCORM12');
       metadataPayload.append('trainingDetail.vendorId', 'db0b6e2d-d878-4794-9263-84649a7528c8');
       metadataPayload.append('trainingDetail.availableForRequests[0].type', 'MyCompanyOnly');
       metadataPayload.append('trainingDetail.availableForRequests[0].resourceId', 'null');
 
-      const metadataEndpoint = `${baseUrl}/api/trainings/${resourceId}`;
+      const metadataEndpoint = `${baseApiUrl}/api/trainings/${resourceId}`;
       console.log('Metadata endpoint:', metadataEndpoint);
 
       const metadataResponse = await fetch(metadataEndpoint, {
