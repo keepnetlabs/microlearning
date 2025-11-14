@@ -39,7 +39,7 @@ const getLanguageResourceId = (appConfig: any): string => {
       'en';
 
     // Find matching language in languages array
-    const language = languages.find(
+    const language = languages.data.find(
       (lang: any) =>
         lang.code === languageCode ||
         lang.isoCode === languageCode ||
@@ -47,19 +47,19 @@ const getLanguageResourceId = (appConfig: any): string => {
         lang.name?.toLowerCase() === languageCode?.toLowerCase()
     );
 
-    if (language?.resourceId) {
-      console.log(`Found language resourceId: ${language.resourceId} for code: ${languageCode}`);
-      return language.resourceId;
+    if (language?.id) {
+      console.log(`Found language id: ${language.id} for code: ${languageCode}`);
+      return language.id;
     }
 
     // Default fallback - English
-    const englishLang = languages.find((lang: any) => lang.code === '0');
+    const englishLang = languages.data.find((lang: any) => lang.code === '0');
     console.warn(`Language code ${languageCode} not found, using English default`);
-    return englishLang?.resourceId || '862249c19aad';
+    return englishLang?.id || '2b1583d7-d76b-45ac-b5a5-fe58d00c70ff';
   } catch (error) {
     console.error('Error getting language resourceId:', error);
     // Default English resourceId
-    return '862249c19aad';
+    return '2b1583d7-d76b-45ac-b5a5-fe58d00c70ff';
   }
 };
 
