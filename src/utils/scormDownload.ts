@@ -10,7 +10,7 @@ export const generateSCORMHTML = (baseUrl: string, courseTitle: string, langUrl?
   if (langUrl) qs.set("langUrl", langUrl);
   if (inboxUrl) qs.set("inboxUrl", inboxUrl);
   const iframeSrc = `https://microlearning.pages.dev/?${qs.toString()}`;
-  return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" /><title>${courseTitle}</title><style>html,body,iframe{height:100%;width:100%;margin:0;padding:0;border:0;}.spinner{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;}.spinner:after{content:"";width:28px;height:28px;border-radius:50%;border:3px solid #999;border-top-color:transparent;animation:spin 1s linear infinite;}@keyframes spin{to{transform:rotate(360deg);}}</style></head><body><div id="spinner" class="spinner"></div><iframe id="mlFrame" allowfullscreen title="${courseTitle}" allow="accelerometer; autoplay; camera; clipboard-write; encrypted-media; fullscreen; geolocation; gyroscope; magnetometer; microphone; midi; payment; picture-in-picture; usb; xr-spatial-tracking"></iframe><script>var API=null;function tryInitOnce(){if(!API)API=locateAPI();if(!API)return false;try{var r=API.LMSInitialize("");return r==="true"||r===true;}catch(e){return false;}}function locateAPI(){return null;}(async function init(){var frame=document.getElementById("mlFrame");frame.src="${iframeSrc}";frame.addEventListener("load",function(){document.getElementById("spinner")?.remove();});})();</script></body></html>`;
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" /><title>${courseTitle}</title><style>html,body,iframe{height:100%;width:100%;margin:0;padding:0;border:0;}.spinner{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;}.spinner:after{content:"";width:28px;height:28px;border-radius:50%;border:3px solid #999;border-top-color:transparent;animation:spin 1s linear infinite;}@keyframes spin{to{transform:rotate(360deg);}}</style></head><body><div id="spinner" class="spinner"></div><iframe id="mlFrame" allowfullscreen title="${courseTitle}" allow="accelerometer; autoplay; camera; clipboard-write; encrypted-media; fullscreen; geolocation; gyroscope; magnetometer; microphone; midi; payment; picture-in-picture; usb; xr-spatial-tracking"></iframe><script>var API=null;function tryInitOnce(){if(!API)API=locateAPI();if(!API)return false;try{var r=API.LMSInitialize("");return r==="true"||r===true;}catch(e){return false;}}function locateAPI(){return null;}(async function init(){var frame=document.getElementById("mlFrame");var src="${iframeSrc}";try{if(window.parent&&window.parent.location){var parentParams=new URLSearchParams(window.parent.location.search);if(parentParams.get("isPreview")==="true"){src+=(src.indexOf("?")>-1?"&":"?")+"isPreview=true";}}}catch(e){}frame.src=src;frame.addEventListener("load",function(){document.getElementById("spinner")?.remove();});})();</script></body></html>`;
 };
 
 // Helper function to generate SCORM manifest XML
@@ -298,7 +298,16 @@ export const downloadSCORMPackage = () => {
         } catch {}
 
         var frame = document.getElementById("mlFrame");
-        frame.src = "${iframeSrc}";
+        var src = "${iframeSrc}";
+        try {
+          if(window.parent && window.parent.location){
+            var parentParams = new URLSearchParams(window.parent.location.search);
+            if(parentParams.get("isPreview") === "true"){
+              src += (src.indexOf("?") > -1 ? "&" : "?") + "isPreview=true";
+            }
+          }
+        } catch(e) {}
+        frame.src = src;
         var childOrigin = (function () {
           try {
             return new URL(frame.src, location.href).origin;
