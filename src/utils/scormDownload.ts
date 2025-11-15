@@ -10,37 +10,17 @@ export const generateSCORMHTML = (baseUrl: string, courseTitle: string, langUrl?
   if (langUrl) qs.set("langUrl", langUrl);
   if (inboxUrl) qs.set("inboxUrl", inboxUrl);
   const iframeSrc = `https://microlearning.pages.dev/?${qs.toString()}`;
-  return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" /><title>${courseTitle}</title><style>html,body,iframe{height:100%;width:100%;margin:0;padding:0;border:0;}.spinner{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;}.spinner:after{content:"";width:28px;height:28px;border-radius:50%;border:3px solid #999;border-top-color:transparent;animation:spin 1s linear infinite;}@keyframes spin{to{transform:rotate(360deg);}}</style></head><body><div id="spinner" class="spinner"></div><iframe id="mlFrame" allowfullscreen title="${courseTitle}" allow="accelerometer; autoplay; camera; clipboard-write; encrypted-media; fullscreen; geolocation; gyroscope; magnetometer; microphone; midi; payment; picture-in-picture; usb; xr-spatial-tracking"></iframe><script>var API=null;function tryInitOnce(){if(!API)API=locateAPI();if(!API)return false;try{var r=API.LMSInitialize("");return r==="true"||r===true;}catch(e){return false;}}function locateAPI(){return null;}(async function init(){var frame=document.getElementById("mlFrame");var src="${iframeSrc}";try{if(window.parent&&window.parent.location){var parentParams=new URLSearchParams(window.parent.location.search);if(parentParams.get("isPreview")==="true"){src+=(src.indexOf("?")>-1?"&":"?")+"isPreview=true";}}}catch(e){}frame.src=src;frame.addEventListener("load",function(){document.getElementById("spinner")?.remove();});})();</script></body></html>`;
+  return generateSCORMHTMLTemplate(iframeSrc, courseTitle);
 };
 
-// Helper function to generate SCORM manifest XML
-export const generateSCORMManifest = (courseTitle: string): string => {
-  const uniqueId = `com.keepnet.microlearning.${Date.now()}`;
-  return `<?xml version="1.0" encoding="UTF-8"?><manifest identifier="${uniqueId}" version="1.0" xmlns="http://www.imsglobal.org/xsd/imscp_rootv1p1p2" xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imscp_rootv1p1p2 imscp_rootv1p1p2.xsd http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd"><metadata><schema>ADL SCORM</schema><schemaversion>1.2</schemaversion></metadata><organizations default="org1"><organization identifier="org1"><title>${courseTitle}</title><item identifier="item1" identifierref="res1" isvisible="true"><title>${courseTitle} SCO</title></item></organization></organizations><resources><resource identifier="res1" type="webcontent" adlcp:scormtype="sco" href="index.html"><file href="index.html"/></resource></resources></manifest>`;
-};
-
-export const downloadSCORMPackage = () => {
-  // Get current URL parameters
-  const urlParams = new URLSearchParams(window.location.search);
-  const baseUrl = urlParams.get('baseUrl') || 'https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001';
-  const langUrl = urlParams.get('langUrl') || 'lang/en';
-  const inboxUrl = urlParams.get('inboxUrl') || 'inbox/all';
-
-  // Extract course title from baseUrl or use default
-  const courseTitle = baseUrl.includes('/microlearning/')
-    ? baseUrl.split('/microlearning/')[1]?.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Microlearning Course'
-    : 'Microlearning Course';
-
-  // Construct the iframe source URL
-  const iframeSrc = `https://microlearning.pages.dev/?baseUrl=${encodeURIComponent(baseUrl)}&langUrl=${encodeURIComponent(langUrl)}&inboxUrl=${encodeURIComponent(inboxUrl)}`;
-
-  // SCORM 1.2 compliant HTML content
-  const scormHTML = `<!DOCTYPE html>
+// Helper function to generate the full SCORM 1.2 HTML template with complete API wrapper
+const generateSCORMHTMLTemplate = (iframeSrc: string, courseTitle: string): string => {
+  return `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Microlearning</title>
+    <title>${courseTitle}</title>
     <style>
       html,
       body,
@@ -577,6 +557,31 @@ export const downloadSCORMPackage = () => {
          </script>
    </body>
  </html>`;
+};
+
+// Helper function to generate SCORM manifest XML
+export const generateSCORMManifest = (courseTitle: string): string => {
+  const uniqueId = `com.keepnet.microlearning.${Date.now()}`;
+  return `<?xml version="1.0" encoding="UTF-8"?><manifest identifier="${uniqueId}" version="1.0" xmlns="http://www.imsglobal.org/xsd/imscp_rootv1p1p2" xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imscp_rootv1p1p2 imscp_rootv1p1p2.xsd http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd"><metadata><schema>ADL SCORM</schema><schemaversion>1.2</schemaversion></metadata><organizations default="org1"><organization identifier="org1"><title>${courseTitle}</title><item identifier="item1" identifierref="res1" isvisible="true"><title>${courseTitle} SCO</title></item></organization></organizations><resources><resource identifier="res1" type="webcontent" adlcp:scormtype="sco" href="index.html"><file href="index.html"/></resource></resources></manifest>`;
+};
+
+export const downloadSCORMPackage = () => {
+  // Get current URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const baseUrl = urlParams.get('baseUrl') || 'https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001';
+  const langUrl = urlParams.get('langUrl') || 'lang/en';
+  const inboxUrl = urlParams.get('inboxUrl') || 'inbox/all';
+
+  // Extract course title from baseUrl or use default
+  const courseTitle = baseUrl.includes('/microlearning/')
+    ? baseUrl.split('/microlearning/')[1]?.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Microlearning Course'
+    : 'Microlearning Course';
+
+  // Construct the iframe source URL
+  const iframeSrc = `https://microlearning.pages.dev/?baseUrl=${encodeURIComponent(baseUrl)}&langUrl=${encodeURIComponent(langUrl)}&inboxUrl=${encodeURIComponent(inboxUrl)}`;
+
+  // SCORM 1.2 compliant HTML content
+  const scormHTML = generateSCORMHTMLTemplate(iframeSrc, courseTitle);
 
   // SCORM 1.2 compliant imsmanifest.xml content
   const uniqueId = `com.keepnet.microlearning.${Date.now()}`;
