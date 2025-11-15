@@ -9,7 +9,7 @@ import {
     User,
     X
 } from "lucide-react";
-import { useSceneComments } from "../../contexts/CommentsContext";
+import { useSceneComments, useComments } from "../../contexts/CommentsContext";
 import { CommentThread } from "../../types/comments";
 import { useIsMobile } from "./use-mobile";
 
@@ -101,8 +101,8 @@ function ThreadCard({
                 <button
                     type="button"
                     className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium transition ${thread.status === "resolved"
-                        ? "glass-border-2 bg-[#1C1C1E]/5 dark:bg-[#F2F2F7]/5 text-[#1C1C1E]/80 dark:text-[#F2F2F7]/80"
-                        : "glass-border-2 bg-[#1C1C1E]/10 dark:bg-[#F2F2F7]/10 text-[#1C1C1E] dark:text-[#F2F2F7]"
+                        ? "glass-border-2 text-[#1C1C1E] dark:text-[#F2F2F7]"
+                        : "glass-border-2 text-[#1C1C1E] dark:text-[#F2F2F7]"
                         } hover:bg-[#1C1C1E]/10 dark:hover:bg-[#F2F2F7]/10`}
                     onClick={() => onToggleStatus(thread.id)}
                     aria-pressed={thread.status === "resolved"}
@@ -126,7 +126,7 @@ function ThreadCard({
                 {thread.replies.map((reply) => (
                     <div key={reply.id} className="flex gap-2 pl-2">
                         <CornerDownRight size={16} className="mt-1 text-[#1C1C1E] dark:text-[#F2F2F7]" />
-                        <div className="flex-1 rounded-lg bg-[#1C1C1E]/5 px-3 py-2 dark:bg-white/10">
+                        <div className="flex-1 rounded-lg glass-border-3 px-3 py-2 ">
                             <div className="flex items-center justify-between">
                                 <span className="text-xs font-semibold text-[#1C1C1E] dark:text-[#F2F2F7]">
                                     {reply.author.name}
@@ -200,6 +200,7 @@ export function CommentPanel({
         currentAuthor,
         setCurrentAuthor
     } = useSceneComments(normalizedSceneId ?? undefined);
+    const { setCommentMode } = useComments();
 
     useEffect(() => {
         if (!isOpen) {
@@ -240,7 +241,9 @@ export function CommentPanel({
             accentColor: currentAuthor.accentColor
         });
         setIsEditingProfile(false);
-    }, [currentAuthor, profileName, setCurrentAuthor]);
+        // Enable comment mode after setting name so user can immediately add comments
+        setCommentMode(true);
+    }, [currentAuthor, profileName, setCurrentAuthor, setCommentMode]);
 
     const handleReplyUpdate = useCallback((commentId: string, value: string) => {
         setReplyDrafts((prev) => ({

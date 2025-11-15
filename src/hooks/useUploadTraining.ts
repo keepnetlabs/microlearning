@@ -218,7 +218,7 @@ export const useUploadTraining = () => {
       return {
         success: true,
         resourceId,
-        message: 'Training created, SCORM uploaded, and metadata updated successfully!'
+        message: `Training "${courseTitle}" has been successfully uploaded to the platform.`
       };
 
     } catch (error) {

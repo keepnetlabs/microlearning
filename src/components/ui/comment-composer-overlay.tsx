@@ -161,12 +161,12 @@ export function CommentComposerOverlay() {
                             </button>
                         </div>
                         {needsProfile && (
-                            <div className="mt-3 flex items-center justify-between rounded-lg border border-dashed border-[#1C1C1E]/20 bg-[#F2F4FF] px-3 py-2 text-[11px] text-[#1C1C1E] dark:text-[#F2F2F7]">
+                            <div className="mt-3 flex items-center justify-between rounded-lg border border-dashed border-[#1C1C1E]/20 px-3 py-2 text-[11px] text-[#1C1C1E] dark:text-[#F2F2F7]">
                                 <span>Set your display name to personalize comments.</span>
                                 <button
                                     type="button"
                                     onClick={handleOpenProfile}
-                                    className="text-xs font-semibold text-[#1C1C1E] min-w-[] underline-offset-2 hover:underline dark:text-[#F2F2F7]"
+                                    className="text-xs font-semibold text-[#1C1C1E] min-w-[56px] underline-offset-2 hover:underline dark:text-[#F2F2F7]"
                                     data-comment-ignore="true"
                                 >
                                     Set name

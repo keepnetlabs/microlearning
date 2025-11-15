@@ -53,7 +53,7 @@ function CommentPopover({ thread, anchor, replyDraft, onReplyChange, onReplySubm
         initials: string,
         timestamp?: string
     ) => (
-        <div className="rounded-2xl bg-[#1C1C1E]/5 px-3 py-2 text-xs text-[#1C1C1E] dark:bg-[#F2F2F7]/10 dark:text-[#F2F2F7]">
+        <div className="rounded-2xl glass-border-3 px-3 py-2 text-xs text-[#1C1C1E] dark:text-[#F2F2F7]">
             <div className="flex items-start gap-2">
                 <span className="mt-0.5 inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full glass-border-0 text-[11px] font-semibold uppercase text-[#1C1C1E] dark:text-[#F2F2F7]">
                     {initials}

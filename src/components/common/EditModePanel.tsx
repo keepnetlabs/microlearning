@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Save, RotateCcw, Edit3, Eye, EyeOff, Download, MessageSquareMore, Upload } from 'lucide-react';
@@ -17,7 +17,6 @@ interface EditModePanelProps {
 
 export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelProps) {
     const [shouldShowPanel, setShouldShowPanel] = useState(false);
-    const [isCommentsOpen, setIsCommentsOpen] = useState(false);
     const [shouldForceProfileEdit, setShouldForceProfileEdit] = useState(false);
     const [isUploadConfirmOpen, setIsUploadConfirmOpen] = useState(false);
     const [isUploadCompleted, setIsUploadCompleted] = useState(false);
@@ -35,52 +34,50 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
     const commentsContext = useOptionalComments();
     const normalizedSceneId = useMemo(() => sceneId?.toString() ?? null, [sceneId]);
     const { uploadTraining } = useUploadTraining();
+    const prevEditModeRef = useRef<boolean>(false);
 
     const toggleCommentsPanel = useCallback((nextState?: boolean, options?: { enableComposer?: boolean }) => {
-        setIsCommentsOpen((prev) => {
-            const desired = typeof nextState === 'boolean' ? nextState : !prev;
-            if (commentsContext) {
-                const enableComposer = options?.enableComposer ?? desired;
-                commentsContext.setPanelOpen(desired);
-                commentsContext.setCommentMode(enableComposer);
-                if (!enableComposer || !desired) {
-                    commentsContext.cancelComposer();
-                    commentsContext.closeCommentPopover();
-                }
-                if (desired && !enableComposer) {
-                    commentsContext.closeCommentPopover();
-                }
-                if (desired && normalizedSceneId) {
-                    commentsContext.setActiveSceneId(normalizedSceneId);
-                }
-            }
-            if (!desired) {
-                setShouldForceProfileEdit(false);
-            }
-            return desired;
-        });
+        if (!commentsContext) return;
+
+        const desired = typeof nextState === 'boolean' ? nextState : !commentsContext.isPanelOpen;
+        const enableComposer = options?.enableComposer ?? desired;
+
+        commentsContext.setPanelOpen(desired);
+        commentsContext.setCommentMode(enableComposer);
+
+        if (!enableComposer || !desired) {
+            commentsContext.cancelComposer();
+            commentsContext.closeCommentPopover();
+        }
+
+        if (desired && !enableComposer) {
+            commentsContext.closeCommentPopover();
+        }
+
+        if (desired && normalizedSceneId) {
+            commentsContext.setActiveSceneId(normalizedSceneId);
+        }
+
+        if (!desired) {
+            setShouldForceProfileEdit(false);
+        }
     }, [commentsContext, normalizedSceneId]);
 
     useEffect(() => {
-        if (isCommentsOpen && normalizedSceneId) {
-            commentsContext?.setActiveSceneId(normalizedSceneId);
+        if (commentsContext?.isPanelOpen && normalizedSceneId) {
+            commentsContext.setActiveSceneId(normalizedSceneId);
         }
-    }, [commentsContext, isCommentsOpen, normalizedSceneId]);
+    }, [commentsContext, normalizedSceneId]);
 
     useEffect(() => {
-        if (!isEditMode) {
-            setIsCommentsOpen(false);
-            commentsContext?.setCommentMode(false);
-            commentsContext?.cancelComposer();
-            commentsContext?.setPanelOpen(false);
+        // Only close panel when exiting edit mode (true -> false transition)
+        if (prevEditModeRef.current && !isEditMode && commentsContext) {
+            commentsContext.setCommentMode(false);
+            commentsContext.cancelComposer();
+            commentsContext.setPanelOpen(false);
         }
+        prevEditModeRef.current = isEditMode;
     }, [commentsContext, isEditMode]);
-
-    useEffect(() => {
-        if (!commentsContext) {
-            setIsCommentsOpen(false);
-        }
-    }, [commentsContext]);
 
     useEffect(() => {
         if (!commentsContext) {
@@ -317,7 +314,7 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
                 </motion.div>
                 {commentsContext && (
                     <CommentPanel
-                        isOpen={isCommentsOpen}
+                        isOpen={commentsContext.isPanelOpen}
                         onClose={() => toggleCommentsPanel(false)}
                         sceneId={normalizedSceneId ?? undefined}
                         sceneLabel={sceneLabel}
@@ -363,8 +360,8 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => toggleCommentsPanel()}
-                            className={`flex items-center gap-2 px-4 py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer text-[#1C1C1E] dark:text-[#F2F2F7] ${isCommentsOpen ? 'bg-sky-500/10' : ''}`}
-                            aria-pressed={isCommentsOpen}
+                            className={`flex items-center gap-2 px-4 py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer text-[#1C1C1E] dark:text-[#F2F2F7] ${commentsContext.isPanelOpen ? 'bg-sky-500/10' : ''}`}
+                            aria-pressed={commentsContext.isPanelOpen}
                             style={{ pointerEvents: 'auto', cursor: 'pointer' }}
                             title="Open comments"
                         >
@@ -495,7 +492,7 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
             </div>
             {commentsContext && (
                 <CommentPanel
-                    isOpen={isCommentsOpen}
+                    isOpen={commentsContext.isPanelOpen}
                     onClose={() => toggleCommentsPanel(false)}
                     sceneId={normalizedSceneId ?? undefined}
                     sceneLabel={sceneLabel}
@@ -527,7 +524,7 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
                                 Confirm Upload
                             </h2>
                             <p className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] mb-6">
-                                Ready to finalize? Ensure all edits and localizations are complete. This action is permanent and cannot be reversed.
+                                This will upload your training content to the platform. Please review all changes and localizations before proceeding. This action is permanent and cannot be reversed.
                             </p>
                             <div className="flex gap-3 justify-end">
                                 <motion.button
