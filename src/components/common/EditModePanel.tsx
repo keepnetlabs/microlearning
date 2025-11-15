@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Save, RotateCcw, Edit3, Eye, EyeOff, Download, MessageSquareMore, Upload } from 'lucide-react';
 import { useEditMode } from '../../contexts/EditModeContext';
+import { useGlobalEditMode } from '../../contexts/GlobalEditModeContext';
 import { downloadSCORMPackage } from '../../utils/scormDownload';
 import { useUploadTraining } from '../../hooks/useUploadTraining';
 import { useIsMobile } from '../ui/use-mobile';
@@ -35,6 +36,7 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
     const normalizedSceneId = useMemo(() => sceneId?.toString() ?? null, [sceneId]);
     const { uploadTraining } = useUploadTraining();
     const prevEditModeRef = useRef<boolean>(false);
+    const { isPreviewMode } = useGlobalEditMode();
 
     const toggleCommentsPanel = useCallback((nextState?: boolean, options?: { enableComposer?: boolean }) => {
         if (!commentsContext) return;
@@ -265,8 +267,8 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
         }
     }, [appConfig, uploadTraining]);
 
-    // Don't render panel if it shouldn't be shown
-    if (!shouldShowPanel) {
+    // Don't render panel if it shouldn't be shown OR if in preview mode
+    if (!shouldShowPanel || isPreviewMode) {
         return null;
     }
 

@@ -4,11 +4,17 @@ interface GlobalEditModeContextType {
     isGlobalEditMode: boolean;
     toggleGlobalEditMode: () => void;
     setGlobalEditMode: (isEditMode: boolean) => void;
+    isPreviewMode: boolean;
 }
 
 const GlobalEditModeContext = createContext<GlobalEditModeContextType | undefined>(undefined);
 
-export const GlobalEditModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+interface GlobalEditModeProviderProps {
+    children: React.ReactNode;
+    isPreviewMode?: boolean;
+}
+
+export const GlobalEditModeProvider: React.FC<GlobalEditModeProviderProps> = ({ children, isPreviewMode = false }) => {
     const [isGlobalEditMode, setIsGlobalEditMode] = useState(false);
 
     const toggleGlobalEditMode = useCallback(() => {
@@ -22,7 +28,8 @@ export const GlobalEditModeProvider: React.FC<{ children: React.ReactNode }> = (
     const value: GlobalEditModeContextType = {
         isGlobalEditMode,
         toggleGlobalEditMode,
-        setGlobalEditMode
+        setGlobalEditMode,
+        isPreviewMode
     };
 
     return (
@@ -39,7 +46,8 @@ export const useGlobalEditMode = () => {
         return {
             isGlobalEditMode: false,
             toggleGlobalEditMode: () => {},
-            setGlobalEditMode: () => {}
+            setGlobalEditMode: () => {},
+            isPreviewMode: false
         };
     }
     return context;

@@ -139,8 +139,13 @@ export const useUploadTraining = () => {
       // Step 3: Create SCORM package
       const courseTitle = appConfig?.microlearning_metadata?.title || 'Microlearning Course';
 
+      // Get URL parameters for SCORM
+      const scormUrlParams = new URLSearchParams(window.location.search);
+      const langUrl = scormUrlParams.get('langUrl') || 'lang/en';
+      const inboxUrl = scormUrlParams.get('inboxUrl') || 'inbox/all';
+
       console.log('Generating SCORM HTML...');
-      const scormHTML = generateSCORMHTML(baseUrl, courseTitle);
+      const scormHTML = generateSCORMHTML(baseUrl, courseTitle, langUrl, inboxUrl);
 
       console.log('Generating SCORM manifest...');
       const imsmanifestXML = generateSCORMManifest(courseTitle);

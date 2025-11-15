@@ -90,6 +90,13 @@ export default function App(props: AppProps = {}) {
   // Edit mode state
   const isEditMode = useIsEditMode();
 
+  // Preview mode state (from URL)
+  const isPreviewMode = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    const params = new URLSearchParams(window.location.search);
+    return params.get('isPreview') === 'true';
+  }, []);
+
   // Use custom hook for app config management
   const {
     appConfig,
@@ -383,8 +390,8 @@ export default function App(props: AppProps = {}) {
   // Language filtering handled by useLanguage
 
   const canProceedNext = useCallback(() => {
-    // If in edit mode, allow navigation without restrictions
-    if (isEditMode) {
+    // If in preview mode or edit mode, allow navigation without restrictions
+    if (isPreviewMode || isEditMode) {
       return currentScene < scenes.length - 1;
     }
 
@@ -405,7 +412,7 @@ export default function App(props: AppProps = {}) {
       return codeReviewValidated;
     }
     return currentScene < scenes.length - 1;
-  }, [isEditMode, currentScene, quizCompleted, inboxCompleted, videoCompleted, codeReviewValidated, sceneIndices.quiz, scenes]);
+  }, [isPreviewMode, isEditMode, currentScene, quizCompleted, inboxCompleted, videoCompleted, codeReviewValidated, sceneIndices.quiz, scenes]);
 
   // Optimized scene timing tracking
   const trackSceneTime = useCallback((sceneIndex: number) => {
@@ -534,8 +541,8 @@ export default function App(props: AppProps = {}) {
       // clear flag to avoid repeated prompts if user proceeds
       if (currentSceneId) unsavedBySceneRef.current.set(String(currentSceneId), false);
     }
-    // Allow progression if quiz is completed or we're not on quiz scene
-    if (currentScene === sceneIndices.quiz && !quizCompleted && !isEditMode) {
+    // Allow progression if quiz is completed or we're not on quiz scene (bypass in preview mode)
+    if (currentScene === sceneIndices.quiz && !quizCompleted && !isEditMode && !isPreviewMode) {
       return;
     }
 
@@ -573,7 +580,8 @@ export default function App(props: AppProps = {}) {
     awardPoints,
     trackSceneTime,
     totalPoints,
-    isEditMode
+    isEditMode,
+    isPreviewMode
   ]);
 
   // Ensure last scene (summary) also awards its points on arrival
@@ -856,7 +864,7 @@ export default function App(props: AppProps = {}) {
 
   return (
     <MotionConfig reducedMotion={reducedMotionSetting}>
-      <GlobalEditModeProvider>
+      <GlobalEditModeProvider isPreviewMode={isPreviewMode}>
         <CommentsProvider currentAuthor={commentAuthor} sceneNamespace={typeof commentNamespace === "string" ? commentNamespace : undefined}>
           <FontFamilyProvider fontFamilyConfig={themeConfig.fontFamily}>
             <div
