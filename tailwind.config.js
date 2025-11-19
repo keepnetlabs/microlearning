@@ -35,6 +35,11 @@ module.exports = {
     'bg-gradient-orange',
     'bg-gradient-light-blue',
     'bg-gradient-pink',
+    'bg-gradient-teal',
+    'bg-gradient-indigo',
+    'bg-gradient-emerald',
+    'bg-gradient-violet',
+    'bg-gradient-amber',
     // Glass border classes
     'glass-border-0',
     'glass-border-1',
@@ -87,7 +92,12 @@ module.exports = {
         'gradient-yellow':'linear-gradient(106deg, #E8E04F 0%, #B4960D 100%)',
         'gradient-light-yellow':'linear-gradient(106deg, rgba(255, 236, 179, 0.30) 0%, rgba(255, 204, 0, 0.30) 100%)',
         'gradient-orange':'linear-gradient(106deg, #E8AB4F 0%, #B47F0D 100%)',
-        'gradient-pink':'linear-gradient(106deg, rgba(255, 99, 71, 0.30) 0%, rgba(255, 59, 48, 0.30) 100%)'
+        'gradient-pink':'linear-gradient(106deg, rgba(255, 99, 71, 0.30) 0%, rgba(255, 59, 48, 0.30) 100%)',
+        'gradient-teal': 'linear-gradient(106deg, #76D7D4 0%, #31A59A 100%)',
+        'gradient-indigo': 'linear-gradient(106deg, #6366F1 0%, #4F46E5 100%)',
+        'gradient-emerald': 'linear-gradient(106deg, #6FD764 0%, #2B9D3F 100%)',
+        'gradient-violet': 'linear-gradient(106deg, #A78BFA 0%, #7C3AED 100%)',
+        'gradient-amber': 'linear-gradient(106deg, #FCD34D 0%, #D97706 100%)'
       }
     },
   },
