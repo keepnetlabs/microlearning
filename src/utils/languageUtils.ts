@@ -105,6 +105,16 @@ export const resolveSupportedLanguage = (tag: string, supportedCodes: string[], 
         const hasEnGb = normalizedAvailable.find(x => x.toLowerCase() === 'en-gb');
         if (hasEnGb) return hasEnGb;
     }
+    // Special rule: for "tl", check both "tl" and "tl-PH" in supported codes
+    if (primary === 'tl') {
+        const hasTlPh = normalizedAvailable.find(x => x.toLowerCase() === 'tl-ph');
+        if (hasTlPh) return hasTlPh;
+        const hasTl = normalizedAvailable.find(x => x.toLowerCase() === 'tl');
+        if (hasTl) return hasTl;
+        // Also check original supportedCodes for "tl"
+        const originalTl = supportedCodes.find(c => normalizeBcp47Tag(c).toLowerCase() === 'tl');
+        if (originalTl) return normalizeBcp47Tag(originalTl);
+    }
     const primaryHit = normalizedAvailable.find(x => x.split("-")[0].toLowerCase() === primary);
     if (primaryHit) return primaryHit;
     return fallback ? normalizeBcp47Tag(fallback) : normalizedAvailable[0];

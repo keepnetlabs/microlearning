@@ -125,6 +125,11 @@ export const useLanguage = ({
   React.useEffect(() => {
     if (availableLanguages.length === 0) return;
     const supported = availableLanguages.map(l => l.code);
+    // Special case: if "tl" is selected and "tl" is in supported languages, keep it
+    const selectedLower = selectedLanguage.toLowerCase();
+    if ((selectedLower === 'tl' || selectedLower === 'tl-ph') && supported.some(c => c.toLowerCase() === 'tl')) {
+      return; // Keep "tl" as is
+    }
     const resolved = resolveSupportedLanguage(selectedLanguage, supported, availableLanguages[0]?.code);
     if (resolved && resolved !== selectedLanguage) {
       setSelectedLanguage(resolved);
