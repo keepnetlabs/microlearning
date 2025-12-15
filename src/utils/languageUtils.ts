@@ -109,15 +109,24 @@ export const resolveSupportedLanguage = (tag: string, supportedCodes: string[], 
     }
     // Special rule: for "tl" or "fil", check "tl", "tl-PH", "fil", "fil-PH"
     if (primary === 'tl' || primary === 'fil') {
+        // Try strict tl-PH first
         const hasTlPh = normalizedAvailable.find(x => x.toLowerCase() === 'tl-ph');
         if (hasTlPh) return hasTlPh;
+
+        // Try exact tl
         const hasTl = normalizedAvailable.find(x => x.toLowerCase() === 'tl');
         if (hasTl) return hasTl;
+
+        // Try exact fil
         const hasFil = normalizedAvailable.find(x => x.toLowerCase() === 'fil');
         if (hasFil) return hasFil;
-        // Also check original supportedCodes for "tl"
-        const originalTl = supportedCodes.find(c => normalizeBcp47Tag(c).toLowerCase() === 'tl');
-        if (originalTl) return normalizeBcp47Tag(originalTl);
+
+        // Fallback: Find ANY code that starts with 'tl' or 'fil' in supported codes
+        const fuzzyTl = supportedCodes.find(c => {
+            const p = normalizeBcp47Tag(c).split('-')[0].toLowerCase();
+            return p === 'tl' || p === 'fil';
+        });
+        if (fuzzyTl) return normalizeBcp47Tag(fuzzyTl);
     }
     const primaryHit = normalizedAvailable.find(x => x.split("-")[0].toLowerCase() === primary);
     if (primaryHit) return primaryHit;
@@ -385,6 +394,7 @@ export const languages = [
     { code: 'id-ID', name: 'Indonesian (Indonesia)', flag: '🇮🇩' },
     { code: 'ms-MY', name: 'Malay (Malaysia)', flag: '🇲🇾' },
     { code: 'tl-PH', name: 'Filipino (Philippines)', flag: '🇵🇭' },
+    { code: 'fil-PH', name: 'Filipino (Philippines)', flag: '🇵🇭' }, // Added alias for consistency
     { code: 'jv-ID', name: 'Javanese (Indonesia)', flag: '🇮🇩' },
     { code: 'su-ID', name: 'Sundanese (Indonesia)', flag: '🇮🇩' },
     { code: 'ta-IN', name: 'Tamil (India)', flag: '🇮🇳' },

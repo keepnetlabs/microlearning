@@ -54,14 +54,11 @@ export const useLanguage = ({
 
     const mapAvailabilityToLanguageCode = (code: string): string => {
       switch (code.toLowerCase()) {
-        case "gr":
-          return "el";
-        case "en-uk":
-          return "en-GB";
-        case "tl":
-          return "tl-PH"; // Map "tl" to "tl-PH" to ensure correct display name
-        default:
-          return normalizeBcp47Tag(code);
+        case "gr": return "el";
+        case "en-uk": return "en-GB";
+        case "tl": return "tl-PH";
+        case "fil": return "tl-PH"; // Map fil -> tl-PH directly
+        default: return normalizeBcp47Tag(code);
       }
     };
 
@@ -83,10 +80,18 @@ export const useLanguage = ({
 
     if (initialLanguageFromUrl) {
       const normalizedTarget = normalizeBcp47Tag(initialLanguageFromUrl).toLowerCase();
-      const hasLanguage = mapped.some(lang => normalizeBcp47Tag(lang.code).toLowerCase() === normalizedTarget);
+      // Check if URL language is already in mapped list (handling strict or fuzzy/primary match)
+      const hasLanguage = mapped.some(lang => {
+        const lCode = normalizeBcp47Tag(lang.code).toLowerCase();
+        // Exact match OR primary code match (e.g. tl vs tl-PH)
+        return lCode === normalizedTarget || lCode.split('-')[0] === normalizedTarget.split('-')[0];
+      });
+
       if (!hasLanguage) {
+        // Fallback: try to find a regional variant (e.g. tl -> tl-PH) or primary match from MASTER list
         let master = languages.find(l => l.code.toLowerCase() === normalizedTarget);
         if (!master && !normalizedTarget.includes("-")) {
+          // Try primary match
           master = languages.find(l => l.code.split("-")[0].toLowerCase() === normalizedTarget);
         }
 
@@ -108,18 +113,12 @@ export const useLanguage = ({
 
   // Initialize selected language from URL langUrl, localStorage, test override or browser language
   const initialSelectedLanguage = React.useMemo(() => {
-    if (initialLanguageFromUrl) {
-      return initialLanguageFromUrl;
-    }
+    if (initialLanguageFromUrl) return initialLanguageFromUrl;
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("selected-language");
-      if (stored) {
-        return normalizeBcp47Tag(stored);
-      }
+      if (stored) return normalizeBcp47Tag(stored);
     }
-    if (testOverrides?.language) {
-      return normalizeBcp47Tag(testOverrides.language);
-    }
+    if (testOverrides?.language) return normalizeBcp47Tag(testOverrides.language);
     return normalizeBcp47Tag(detectBrowserLanguage());
   }, [initialLanguageFromUrl, testOverrides?.language]);
 
@@ -128,45 +127,67 @@ export const useLanguage = ({
   // Ensure selectedLanguage is valid when availability is known
   React.useEffect(() => {
     if (availableLanguages.length === 0) return;
+
     const supported = availableLanguages.map(l => l.code);
     const resolved = resolveSupportedLanguage(selectedLanguage, supported, availableLanguages[0]?.code);
-    if (resolved && resolved !== selectedLanguage) {
+
+    // Only update if resolved is different AND semantically different (ignore simple casing or primary match)
+    if (resolved && normalizeBcp47Tag(resolved) !== normalizeBcp47Tag(selectedLanguage)) {
+      const selectedPrimary = selectedLanguage.split('-')[0].toLowerCase();
+      const resolvedPrimary = resolved.split('-')[0].toLowerCase();
+      // Treat fil and tl as same primary
+      const p1 = (selectedPrimary === 'fil') ? 'tl' : selectedPrimary;
+      const p2 = (resolvedPrimary === 'fil') ? 'tl' : resolvedPrimary;
+
+      if (p1 === p2) return; // Keep user selection if it matches primary (e.g. user selected 'tl', resolved 'tl-PH')
+
       setSelectedLanguage(resolved);
     }
   }, [availableLanguages, selectedLanguage]);
 
+  // Helper to find equivalent language metadata
+  const findEquivalentMetadata = (targetCode: string, list: LanguageMeta[]): LanguageMeta | null => {
+    if (list.length === 0) return null;
+
+    // 1. Exact match
+    const exact = list.find(l => l.code.toLowerCase() === targetCode.toLowerCase());
+    if (exact) return exact;
+
+    // 2. Primary/Fuzzy match (handling fil/tl equivalence)
+    const targetPrimary = targetCode.split("-")[0].toLowerCase();
+    const targetPrimaryNorm = (targetPrimary === 'fil') ? 'tl' : targetPrimary;
+
+    const fuzzy = list.find(l => {
+      const lPrimary = l.code.split("-")[0].toLowerCase();
+      const lPrimaryNorm = (lPrimary === 'fil') ? 'tl' : lPrimary;
+      return lPrimaryNorm === targetPrimaryNorm;
+    });
+
+    return fuzzy || null;
+  };
+
   // Derived current language meta
   const currentLanguage = React.useMemo<LanguageMeta | null>(() => {
-    // Try to resolve metadata for the exact selectedLanguage using master list
-    const masterExact = languages.find(l => l.code.toLowerCase() === selectedLanguage.toLowerCase());
+    // 1. Try to resolve metadata from the MASTER list first (for best flag/name)
+    const masterMeta = findEquivalentMetadata(selectedLanguage, languages);
 
     if (availableLanguages.length > 0) {
-      // If availability explicitly includes the selectedLanguage code, use it
-      const exactAvail = availableLanguages.find(l => l.code.toLowerCase() === selectedLanguage.toLowerCase());
-      if (exactAvail) return exactAvail as LanguageMeta;
+      // 2. If availability list exists, ensure we pick a valid entry from there (or map to it)
+      const availMeta = findEquivalentMetadata(selectedLanguage, availableLanguages);
 
-      // Otherwise, if master has metadata for the selectedLanguage (e.g., en-US while availability has only en),
-      // synthesize a meta that preserves the selectedLanguage code for UI
-      if (masterExact) {
-        return { code: selectedLanguage, name: masterExact.name, flag: masterExact.flag };
+      if (availMeta) return availMeta;
+
+      // 3. If selected language is somehow not in availability despite checks, fallback to master meta if we have it
+      if (masterMeta) {
+        return { code: selectedLanguage, name: masterMeta.name, flag: masterMeta.flag };
       }
 
-      // Fallbacks within availability list
-      const source = availableLanguages;
-      const lower = source.find(l => l.code.toLowerCase() === selectedLanguage.toLowerCase());
-      if (lower) return lower as LanguageMeta;
-      const primary = selectedLanguage.split("-")[0].toLowerCase();
-      const primaryMatch = source.find(l => l.code.split("-")[0].toLowerCase() === primary);
-      if (primaryMatch) return primaryMatch as LanguageMeta;
-      return (source[0] as LanguageMeta) || null;
+      // 4. Last resort: first available language
+      return (availableLanguages[0] as LanguageMeta) || null;
     }
 
-    // No availability specified: use master list
-    if (masterExact) return { code: selectedLanguage, name: masterExact.name, flag: masterExact.flag };
-
-    // Fuzzy match in master list (e.g. tl -> tl-PH)
-    const masterFuzzy = languages.find(l => l.code.split("-")[0].toLowerCase() === selectedLanguage.split("-")[0].toLowerCase());
-    if (masterFuzzy) return { code: selectedLanguage, name: masterFuzzy.name, flag: masterFuzzy.flag };
+    // No availability specified: use master list result
+    if (masterMeta) return { code: selectedLanguage, name: masterMeta.name, flag: masterMeta.flag };
 
     return (languages[0] as LanguageMeta) || null;
   }, [selectedLanguage, availableLanguages]);
@@ -244,5 +265,3 @@ export const useLanguage = ({
     getCountryCode
   };
 };
-
-
