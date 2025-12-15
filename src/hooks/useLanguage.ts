@@ -85,7 +85,11 @@ export const useLanguage = ({
       const normalizedTarget = normalizeBcp47Tag(initialLanguageFromUrl).toLowerCase();
       const hasLanguage = mapped.some(lang => normalizeBcp47Tag(lang.code).toLowerCase() === normalizedTarget);
       if (!hasLanguage) {
-        const master = languages.find(l => l.code.toLowerCase() === normalizedTarget);
+        let master = languages.find(l => l.code.toLowerCase() === normalizedTarget);
+        if (!master && !normalizedTarget.includes("-")) {
+          master = languages.find(l => l.code.split("-")[0].toLowerCase() === normalizedTarget);
+        }
+
         mapped.unshift({
           code: initialLanguageFromUrl,
           name: master?.name || formatLanguageLabel(initialLanguageFromUrl),
@@ -125,24 +129,6 @@ export const useLanguage = ({
   React.useEffect(() => {
     if (availableLanguages.length === 0) return;
     const supported = availableLanguages.map(l => l.code);
-    const selectedLower = selectedLanguage.toLowerCase();
-
-    // Special case: if "tl" is selected (from URL or otherwise) and "tl" is in supported languages, keep it
-    if ((selectedLower === 'tl' || selectedLower === 'tl-ph')) {
-      const hasTl = supported.some(c => {
-        const codeLower = c.toLowerCase();
-        return codeLower === 'tl' || normalizeBcp47Tag(c).toLowerCase() === 'tl';
-      });
-      if (hasTl) {
-        // Ensure we use the exact code from availableLanguages if it exists
-        const exactTl = supported.find(c => c.toLowerCase() === 'tl');
-        if (exactTl && exactTl !== selectedLanguage) {
-          setSelectedLanguage(exactTl);
-        }
-        return; // Keep "tl" as is
-      }
-    }
-
     const resolved = resolveSupportedLanguage(selectedLanguage, supported, availableLanguages[0]?.code);
     if (resolved && resolved !== selectedLanguage) {
       setSelectedLanguage(resolved);
