@@ -13,6 +13,8 @@ export const mapLegacyToBCP47 = (tag: string): string => {
         case "pt-br": return "pt-BR";
         case "zh-cn": return "zh-CN";
         case "zh-tw": return "zh-TW";
+        case "tl": return "tl"; // Map tl to tl (Filipino), avoid treating as alias if needed
+        case "fil": return "tl"; // Map fil to tl
         default: return tag.replace(/_/g, "-");
     }
 };
@@ -105,12 +107,14 @@ export const resolveSupportedLanguage = (tag: string, supportedCodes: string[], 
         const hasEnGb = normalizedAvailable.find(x => x.toLowerCase() === 'en-gb');
         if (hasEnGb) return hasEnGb;
     }
-    // Special rule: for "tl", check both "tl" and "tl-PH" in supported codes
-    if (primary === 'tl') {
+    // Special rule: for "tl" or "fil", check "tl", "tl-PH", "fil", "fil-PH"
+    if (primary === 'tl' || primary === 'fil') {
         const hasTlPh = normalizedAvailable.find(x => x.toLowerCase() === 'tl-ph');
         if (hasTlPh) return hasTlPh;
         const hasTl = normalizedAvailable.find(x => x.toLowerCase() === 'tl');
         if (hasTl) return hasTl;
+        const hasFil = normalizedAvailable.find(x => x.toLowerCase() === 'fil');
+        if (hasFil) return hasFil;
         // Also check original supportedCodes for "tl"
         const originalTl = supportedCodes.find(c => normalizeBcp47Tag(c).toLowerCase() === 'tl');
         if (originalTl) return normalizeBcp47Tag(originalTl);

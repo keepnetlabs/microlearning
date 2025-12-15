@@ -163,6 +163,11 @@ export const useLanguage = ({
 
     // No availability specified: use master list
     if (masterExact) return { code: selectedLanguage, name: masterExact.name, flag: masterExact.flag };
+
+    // Fuzzy match in master list (e.g. tl -> tl-PH)
+    const masterFuzzy = languages.find(l => l.code.split("-")[0].toLowerCase() === selectedLanguage.split("-")[0].toLowerCase());
+    if (masterFuzzy) return { code: selectedLanguage, name: masterFuzzy.name, flag: masterFuzzy.flag };
+
     return (languages[0] as LanguageMeta) || null;
   }, [selectedLanguage, availableLanguages]);
 
