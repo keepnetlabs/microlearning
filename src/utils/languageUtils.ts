@@ -254,6 +254,21 @@ export const formatLanguageLabel = (tag: string, locale: string = 'en'): string 
     const parts = norm.split('-');
     const language = parts[0];
     const region = extractRegionFromTag(norm);
+
+    // Special handling for "tl" (Tagalog/Filipino) - Intl.DisplayNames returns "Philippine" instead of "Filipino"
+    if (language.toLowerCase() === 'tl') {
+        const regionLabel = region ? (() => {
+            try {
+                // @ts-ignore
+                const regionNames = new (Intl as any).DisplayNames([locale], { type: 'region' });
+                return regionNames.of(region) || region;
+            } catch {
+                return region;
+            }
+        })() : '';
+        return regionLabel ? `Filipino (${regionLabel})` : 'Filipino';
+    }
+
     try {
         // @ts-ignore
         const langNames = new (Intl as any).DisplayNames([locale], { type: 'language' });
@@ -269,7 +284,9 @@ export const formatLanguageLabel = (tag: string, locale: string = 'en'): string 
             'en-GB': 'English (United Kingdom)',
             'en-US': 'English (United States)',
             'fr': 'French',
-            'fr-CA': 'French (Canada)'
+            'fr-CA': 'French (Canada)',
+            'tl': 'Filipino',
+            'tl-PH': 'Filipino (Philippines)'
         };
         return langMap[norm] || norm;
     }
