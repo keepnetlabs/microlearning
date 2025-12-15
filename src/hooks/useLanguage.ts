@@ -58,6 +58,8 @@ export const useLanguage = ({
           return "el";
         case "en-uk":
           return "en-GB";
+        case "tl":
+          return "tl-PH"; // Map "tl" to "tl-PH" to ensure correct display name
         default:
           return normalizeBcp47Tag(code);
       }
