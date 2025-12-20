@@ -208,13 +208,13 @@ export function ProgressBar({
   };
 
   return (
-    <div className={`w-full ${isMobile && progress === 100 ? 'mr-8' : 'mr-0'}`} role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label={`${finalConfig.ariaLabel}: %${Math.round(progress)} ${finalConfig.progressLabel}`} data-testid={dataTestId}>
+    <div className={`w-full ${isMobile && progress === 100 ? 'mr-8' : 'mr-0'}`} role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label={`${finalConfig.ariaLabel}: %${Math.round(progress)} ${finalConfig.progressLabel}`} data-testid={dataTestId} style={{ minHeight: '32px' }}>
       {/* Mobile Progress Bar - Header Bottom Row */}
       <div className="md:hidden md:mt-4">
         {/* Responsive Container with Margins */}
         <div className={`relative ${progress === 100 ? 'sm:mx-6 ml-4 mr-12' : 'mx-6'}`}>
-          {/* Progress Tooltip - Pill-shaped thumb on progress bar */}
-          <div className="relative w-full">
+          {/* Progress Tooltip - Pill-shaped thumb on progress bar - height matches progress bar height (h-2 = 8px) */}
+          <div className="relative w-full h-2" style={{ overflow: 'visible' }}>
             <motion.div
               initial={{ opacity: reducedMotion ? 1 : 0, scale: reducedMotion ? 1 : 0.9 }}
               animate={{
@@ -335,8 +335,8 @@ export function ProgressBar({
       <div className="hidden md:block">
         {/* Responsive Container with Margins */}
         <div className="relative mx-4 sm:mx-8 md:mx-16 lg:mx-20 xl:mx-24 2xl:mx-32">
-          {/* Progress Tooltip - Pill-shaped thumb on progress bar */}
-          <div className="relative w-full">
+          {/* Progress Tooltip - Pill-shaped thumb on progress bar - height matches progress bar height (h-2 = 8px) */}
+          <div className="relative w-full h-2" style={{ overflow: 'visible' }}>
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{

@@ -944,6 +944,7 @@ export default function App(props: AppProps = {}) {
                       <PointsBadge
                         totalPoints={totalPoints}
                         isMobile={isMobile}
+                        locale={selectedLanguage}
                         ariaLabel={appConfig.theme?.ariaTexts?.pointsLabel || "Total points earned"}
                         pointsDescription={appConfig.theme?.ariaTexts?.pointsDescription || "points earned"}
                       />

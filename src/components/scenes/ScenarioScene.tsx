@@ -59,51 +59,102 @@ const getIconComponent = (iconName: string): LucideIcon => {
 const DEFAULT_CONTAINER_CLASS = "flex flex-col items-center justify-start h-full sm:px-6 overflow-y-auto";
 const DEFAULT_VIDEO_CONTAINER_CLASS = "w-full max-w-sm sm:max-w-md lg:max-w-lg";
 
+// Parse text that contains inline timestamps (e.g., "00:00:05 Text 00:00:08 More text...")
+function parseInlineTimestampedText(text: string): TranscriptRow[] {
+  if (!text || typeof text !== "string") return [];
+
+  const rows: TranscriptRow[] = [];
+  // Match both formats: 00:00:05 and 00:00:05.000
+  const regex = /(\d{2}):(\d{2}):(\d{2})(?:\.(\d{3}))?/g;
+
+  let lastIndex = 0;
+  let currentStart = 0;
+  let match: RegExpExecArray | null;
+
+  const pushSegment = (segment: string, start: number) => {
+    const cleaned = segment
+      .replace(/\s+/g, " ")
+      .replace(/^\s+|\s+$/g, "");
+    if (cleaned.length > 0) {
+      rows.push({ start, text: cleaned });
+    }
+  };
+
+  while ((match = regex.exec(text)) !== null) {
+    const segment = text.slice(lastIndex, match.index);
+    pushSegment(segment, currentStart);
+
+    const hours = parseInt(match[1], 10);
+    const minutes = parseInt(match[2], 10);
+    const seconds = parseInt(match[3], 10);
+    const milliseconds = match[4] ? parseInt(match[4], 10) : 0;
+    currentStart = hours * 3600 + minutes * 60 + seconds + milliseconds / 1000;
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  const tail = text.slice(lastIndex);
+  pushSegment(tail, currentStart);
+
+  return rows;
+}
+
 // Enhanced video data with multi-language transcript support
 function parseTactiqTranscript(raw: string): TranscriptRow[] {
   if (!raw || typeof raw !== "string") {
     return [];
   }
 
-  // Backend'den gelen format: "00:00:00 Text\n00:00:04 More text\n..."
-  const lines = raw.split(/\\n|\n/); // Hem \n hem \\n destekle
-  const transcript: TranscriptRow[] = [];
+  // First check if transcript has line breaks (traditional format)
+  const hasLineBreaks = raw.includes('\n') || raw.includes('\\n');
+  
+  if (hasLineBreaks) {
+    // Backend'den gelen format: "00:00:00 Text\n00:00:04 More text\n..."
+    const lines = raw.split(/\\n|\n/); // Hem \n hem \\n destekle
+    const transcript: TranscriptRow[] = [];
 
-  for (const line of lines) {
-    if (!line.trim()) continue;
+    for (const line of lines) {
+      if (!line.trim()) continue;
 
-    // Backend format: 00:00:04 Text content
-    const backendMatch = line.match(/^(\d{2}):(\d{2}):(\d{2})\s+(.+)$/);
+      // Backend format: 00:00:04 Text content
+      const backendMatch = line.match(/^(\d{2}):(\d{2}):(\d{2})\s+(.+)$/);
 
-    // Önceki format: 00:00:02.000 [Music]
-    const tactiqMatch = line.match(/^(\d{2}):(\d{2}):(\d{2})\.(\d{3})\s+(.+)$/);
+      // Önceki format: 00:00:02.000 [Music]
+      const tactiqMatch = line.match(/^(\d{2}):(\d{2}):(\d{2})\.(\d{3})\s+(.+)$/);
 
-    if (backendMatch) {
-      const h = parseInt(backendMatch[1], 10);
-      const m = parseInt(backendMatch[2], 10);
-      const s = parseInt(backendMatch[3], 10);
-      const start = h * 3600 + m * 60 + s;
-      const text = backendMatch[4].trim();
+      if (backendMatch) {
+        const h = parseInt(backendMatch[1], 10);
+        const m = parseInt(backendMatch[2], 10);
+        const s = parseInt(backendMatch[3], 10);
+        const start = h * 3600 + m * 60 + s;
+        const text = backendMatch[4].trim();
 
-      if (text) {
-        transcript.push({ start, text });
-      }
-    } else if (tactiqMatch) {
-      const h = parseInt(tactiqMatch[1], 10);
-      const m = parseInt(tactiqMatch[2], 10);
-      const s = parseInt(tactiqMatch[3], 10);
-      const ms = parseInt(tactiqMatch[4], 10);
-      const start = h * 3600 + m * 60 + s + ms / 1000;
-      const text = tactiqMatch[5].trim();
+        if (text) {
+          transcript.push({ start, text });
+        }
+      } else if (tactiqMatch) {
+        const h = parseInt(tactiqMatch[1], 10);
+        const m = parseInt(tactiqMatch[2], 10);
+        const s = parseInt(tactiqMatch[3], 10);
+        const ms = parseInt(tactiqMatch[4], 10);
+        const start = h * 3600 + m * 60 + s + ms / 1000;
+        const text = tactiqMatch[5].trim();
 
-      if (text) {
-        transcript.push({ start, text });
+        if (text) {
+          transcript.push({ start, text });
+        }
       }
     }
-  }
 
-  console.log('Parsed transcript entries:', transcript.length);
-  return transcript;
+    console.log('Parsed transcript entries (line-by-line):', transcript.length);
+    return transcript.sort((a, b) => a.start - b.start);
+  } else {
+    // No line breaks - treat as inline timestamped text
+    // Format: "00:00:05 Text 00:00:08 More text..."
+    const parsed = parseInlineTimestampedText(raw);
+    console.log('Parsed transcript entries (inline timestamps):', parsed.length);
+    return parsed.sort((a, b) => a.start - b.start);
+  }
 }
 
 // URL'den transcript yükleme fonksiyonu
