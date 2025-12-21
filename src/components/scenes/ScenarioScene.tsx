@@ -12,7 +12,7 @@ import { ScientificBasisInfo } from "../common/ScientificBasisInfo";
 import { useIsMobile } from "../ui/use-mobile";
 import { CallToAction } from "../ui/CallToAction";
 import { deepMerge } from "../../utils/deepMerge";
-import { useIsEditMode } from "../../hooks/useIsEditMode";
+import { useEditMode } from "../../contexts/EditModeContext";
 import { CommentPinsOverlay } from "../ui/comment-pins-overlay";
 
 export interface TranscriptRow {
@@ -107,7 +107,7 @@ function parseTactiqTranscript(raw: string): TranscriptRow[] {
 
   // First check if transcript has line breaks (traditional format)
   const hasLineBreaks = raw.includes('\n') || raw.includes('\\n');
-  
+
   if (hasLineBreaks) {
     // Backend'den gelen format: "00:00:00 Text\n00:00:04 More text\n..."
     const lines = raw.split(/\\n|\n/); // Hem \n hem \\n destekle
@@ -237,8 +237,7 @@ export function ScenarioScene({
   onIsVideoCompletedChange?: (completed: boolean) => void;
 }) {
 
-  // Check if edit mode is enabled
-  const isEditMode = useIsEditMode();
+  // Edit mode is handled by EditModeProvider inside ScenarioSceneContent
 
   // State for edit changes and edit mode tracking
   const [editChanges, setEditChanges] = useState<Partial<ScenarioSceneConfig>>({});
@@ -254,7 +253,9 @@ export function ScenarioScene({
     setEditChanges({}); // Clear edit changes on language switch
   }, [config.title, config.subtitle]); // Use specific fields to detect language change
 
-  // Compute current config (memoized to prevent infinite loops)
+  // Get tempConfig from EditModeProvider (we're inside EditModeProvider)
+  // We'll use this in the internal component that's rendered inside EditModeProvider
+  // For now, keep using editChanges for backward compatibility
   const currentConfig = useMemo(() => {
     const merged = deepMerge(config, editChanges);
     console.log('ScenarioScene currentConfig updated - config:', config);
@@ -311,7 +312,13 @@ export function ScenarioScene({
   // Transcript'i dinamik olarak yükle (string veya URL'den)
   useEffect(() => {
     const loadTranscript = async () => {
-      if (!currentConfig.video?.transcript) return;
+      // Transcript boş veya undefined ise state'i temizle
+      if (!currentConfig.video?.transcript || currentConfig.video.transcript === '') {
+        setTranscriptData('');
+        setIsLoadingTranscript(false);
+        setTranscriptError(null);
+        return;
+      }
 
       const transcriptValue = currentConfig.video.transcript;
 
@@ -402,6 +409,84 @@ export function ScenarioScene({
       onSave={handleSave}
       onEditModeChange={setIsInEditMode}
     >
+      <ScenarioSceneContent
+        config={config}
+        editChanges={editChanges}
+        appConfig={appConfig}
+        onNextSlide={onNextSlide}
+        onVideoCompleted={onVideoCompleted}
+        sceneId={sceneId}
+        reducedMotion={reducedMotion}
+        disableDelays={disableDelays}
+        isVideoCompleted={isVideoCompleted}
+        setIsVideoCompleted={setIsVideoCompleted}
+        currentEditMode={currentEditMode}
+        isMobile={isMobile}
+        memoizedValues={memoizedValues}
+        tactiqTranscript={tactiqTranscript}
+        transcriptData={transcriptData}
+        isLoadingTranscript={isLoadingTranscript}
+        transcriptError={transcriptError}
+      />
+    </EditModeProvider>
+  );
+}
+
+// Internal component that uses EditModeProvider's tempConfig
+function ScenarioSceneContent({
+  config,
+  editChanges,
+  appConfig,
+  onNextSlide,
+  onVideoCompleted,
+  sceneId,
+  reducedMotion,
+  disableDelays,
+  isVideoCompleted,
+  setIsVideoCompleted,
+  currentEditMode,
+  isMobile,
+  memoizedValues,
+  tactiqTranscript,
+  transcriptData,
+  isLoadingTranscript,
+  transcriptError,
+}: {
+  config: ScenarioSceneConfig;
+  editChanges: Partial<ScenarioSceneConfig>;
+  appConfig?: any;
+  onNextSlide?: () => void;
+  onVideoCompleted?: (completed: boolean) => void;
+  sceneId?: string | number;
+  reducedMotion?: boolean;
+  disableDelays?: boolean;
+  isVideoCompleted: boolean;
+  setIsVideoCompleted: (completed: boolean) => void;
+  currentEditMode: boolean;
+  isMobile: boolean;
+  memoizedValues: any;
+  tactiqTranscript: TranscriptRow[];
+  transcriptData: string;
+  isLoadingTranscript: boolean;
+  transcriptError: string | null;
+}) {
+  // Get tempConfig from EditModeProvider
+  const { tempConfig, isEditMode } = useEditMode();
+
+  // Compute current config using tempConfig from EditModeProvider
+  const currentConfig = useMemo(() => {
+    // Merge config with editChanges first, then with tempConfig from EditModeProvider
+    const mergedWithEditChanges = deepMerge(config, editChanges);
+    const mergedWithTempConfig = deepMerge(mergedWithEditChanges, tempConfig || {});
+    console.log('ScenarioSceneContent currentConfig updated - config:', config);
+    console.log('ScenarioSceneContent currentConfig updated - editChanges:', editChanges);
+    console.log('ScenarioSceneContent currentConfig updated - tempConfig:', tempConfig);
+    console.log('ScenarioSceneContent currentConfig updated - merged:', mergedWithTempConfig);
+    return mergedWithTempConfig;
+  }, [config, editChanges, tempConfig]);
+
+  return (
+    <>
       <EditModePanel sceneId={sceneId} sceneLabel={(currentConfig as any)?.title} appConfig={appConfig} />
       <ScientificBasisInfo
         config={currentConfig}
@@ -552,6 +637,7 @@ export function ScenarioScene({
                   transcript={tactiqTranscript}
                   showTranscript={currentConfig.video.showTranscript}
                   transcriptTitle={currentConfig.video.transcriptTitle}
+                  sceneId={sceneId}
                   onEnded={() => setIsVideoCompleted(true)}
                 />
               ) : (
@@ -598,6 +684,6 @@ export function ScenarioScene({
           <CommentPinsOverlay sceneId={sceneId} />
         </main>
       </FontWrapper>
-    </EditModeProvider>
+    </>
   );
 }

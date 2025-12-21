@@ -349,7 +349,8 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
           throw new Error(`API request failed: ${response.status} ${response.statusText}`);
         }
 
-        updateTempConfig('videoUrl', tempVideoUrl);
+        // Update temp config for immediate preview - this updates ScenarioScene's currentConfig
+        updateTempConfig('video.src', tempVideoUrl);
         setShowUrlDialog(false);
       } catch (error) {
         console.error('Failed to save video URL config:', error);
@@ -689,7 +690,7 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
           </div>
 
           {/* Transcript Panel - Separate from video player like VideoPlayer.tsx */}
-          {transcript.length > 0 && (
+          {showTranscript && (isEditMode || transcript.length > 0) && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{

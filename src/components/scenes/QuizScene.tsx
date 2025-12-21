@@ -108,30 +108,50 @@ MemoizedQuestionOption.displayName = 'MemoizedQuestionOption';
 const MemoizedNavigationControls = React.memo(({
   currentEditMode,
   questionsLength,
+  currentQuestionIndex,
   onPrev,
   onNext
 }: {
   currentEditMode: boolean;
   questionsLength: number;
+  currentQuestionIndex: number;
   onPrev: () => void;
   onNext: () => void;
 }) => {
   if (!currentEditMode || questionsLength <= 1) return null;
 
+  const handlePrevClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onPrev();
+  };
+
+  const handleNextClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onNext();
+  };
+
   return (
-    <div className="fixed top-20 right-4 z-50 flex flex-col gap-2">
-      <div className="flex gap-2">
+    <div className="fixed top-20 right-4 flex flex-col gap-2" style={{ pointerEvents: 'auto', zIndex: 9999 }}>
+      <div className="flex gap-2" style={{ pointerEvents: 'auto' }}>
         <button
-          onClick={onPrev}
-          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200  text-[#1C1C1E] dark:text-[#F2F2F7] ${currentEditMode ? 'glass-border-1-no-overflow' : 'glass-border-1'}`}
+          type="button"
+          onClick={handlePrevClick}
+          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-[#1C1C1E] dark:text-[#F2F2F7] glass-border-2 glass-border-2-hide-before-z-index cursor-pointer hover:opacity-80 active:opacity-70`}
+          style={{ pointerEvents: 'auto', position: 'relative', zIndex: 10000 }}
           title="Previous Question"
+          aria-label="Previous Question"
         >
           ◀ Prev
         </button>
         <button
-          onClick={onNext}
-          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-[#1C1C1E] dark:text-[#F2F2F7] ${currentEditMode ? 'glass-border-1-no-overflow' : 'glass-border-1'}`}
+          type="button"
+          onClick={handleNextClick}
+          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-[#1C1C1E] dark:text-[#F2F2F7] glass-border-2 glass-border-2-hide-before-z-index cursor-pointer hover:opacity-80 active:opacity-70`}
+          style={{ pointerEvents: 'auto', position: 'relative', zIndex: 10000 }}
           title="Next Question"
+          aria-label="Next Question"
         >
           Next ▶
         </button>
@@ -603,20 +623,24 @@ export const QuizScene = React.memo(function QuizScene({
 
   // Edit mode navigation functions
   const goToNextQuestion = useCallback(() => {
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-    } else {
-      setCurrentQuestionIndex(0); // Loop back to first question
-    }
-  }, [currentQuestionIndex, questions.length, setCurrentQuestionIndex]);
+    setCurrentQuestionIndex((prevIndex) => {
+      if (prevIndex < questions.length - 1) {
+        return prevIndex + 1;
+      } else {
+        return 0; // Loop back to first question
+      }
+    });
+  }, [questions.length, setCurrentQuestionIndex]);
 
   const goToPrevQuestion = useCallback(() => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
-    } else {
-      setCurrentQuestionIndex(questions.length - 1); // Loop back to last question
-    }
-  }, [currentQuestionIndex, questions.length, setCurrentQuestionIndex]);
+    setCurrentQuestionIndex((prevIndex) => {
+      if (prevIndex > 0) {
+        return prevIndex - 1;
+      } else {
+        return questions.length - 1; // Loop back to last question
+      }
+    });
+  }, [questions.length, setCurrentQuestionIndex]);
 
 
 
@@ -2385,6 +2409,7 @@ export const QuizScene = React.memo(function QuizScene({
       <MemoizedNavigationControls
         currentEditMode={currentEditMode}
         questionsLength={questions.length}
+        currentQuestionIndex={currentQuestionIndex}
         onPrev={goToPrevQuestion}
         onNext={goToNextQuestion}
       />

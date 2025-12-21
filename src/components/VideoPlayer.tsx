@@ -219,6 +219,11 @@ export function VideoPlayer({
   // Use local video URL if available, otherwise fall back to original src
   const src = localVideoUrl !== undefined ? localVideoUrl : propSrc;
 
+  // propSrc değiştiğinde tempVideoUrl'i güncelle
+  useEffect(() => {
+    setTempVideoUrl(propSrc);
+  }, [propSrc]);
+
   // Convert transcript array back to text format
   const transcriptArrayToText = useCallback((transcriptArray: TranscriptRow[]): string => {
     return transcriptArray.map(row => {
@@ -393,8 +398,8 @@ export function VideoPlayer({
       // Update local video URL to reflect changes immediately
       setLocalVideoUrl(tempVideoUrl);
 
-      // Also update temp config for immediate preview
-      updateTempConfig('videoUrl', tempVideoUrl);
+      // Also update temp config for immediate preview - this updates ScenarioScene's currentConfig
+      updateTempConfig('video.src', tempVideoUrl);
 
     } catch (error) {
       console.error('Failed to save video URL config:', error);
@@ -859,7 +864,7 @@ export function VideoPlayer({
             }
           </div>
 
-          {parsedTranscript && parsedTranscript.length > 0 && (
+          {(showTranscript && (isEditMode || (parsedTranscript && parsedTranscript.length > 0))) && (
             <motion.button
               onClick={() =>
                 setIsTranscriptOpen(!isTranscriptOpen)
@@ -947,7 +952,7 @@ export function VideoPlayer({
       </div>
 
       {/* Transcript Panel */}
-      {parsedTranscript.length > 0 && (
+      {showTranscript && (isEditMode || parsedTranscript.length > 0) && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{
