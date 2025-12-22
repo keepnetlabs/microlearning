@@ -22,6 +22,7 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
     const [isUploadConfirmOpen, setIsUploadConfirmOpen] = useState(false);
     const [isUploadCompleted, setIsUploadCompleted] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
+    const [showTexts, setShowTexts] = useState(false);
     const {
         isEditMode,
         isViewMode,
@@ -37,6 +38,17 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
     const { uploadTraining } = useUploadTraining();
     const prevEditModeRef = useRef<boolean>(false);
     const { isPreviewMode } = useGlobalEditMode();
+
+    // Check window size for showing texts (width >= 1280px AND height >= 900px)
+    useEffect(() => {
+        const checkSize = () => {
+            setShowTexts(window.innerWidth >= 1280 && window.innerHeight >= 900);
+        };
+
+        checkSize();
+        window.addEventListener('resize', checkSize);
+        return () => window.removeEventListener('resize', checkSize);
+    }, []);
 
     const toggleCommentsPanel = useCallback((nextState?: boolean, options?: { enableComposer?: boolean }) => {
         if (!commentsContext) return;
@@ -340,20 +352,20 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
             data-comment-ignore="true"
         >
             <div className="glass-border-2 p-4 backdrop-blur-xl">
-                <div className="flex items-center gap-3">
+                <div className={`flex items-center ${showTexts ? 'gap-3' : 'gap-2'}`}>
                     {/* Edit Mode Toggle */}
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={handleToggleEditMode}
-                        className={`flex items-center gap-2 px-4 py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer ${isEditMode
+                        className={`flex items-center ${showTexts ? 'gap-2 px-4' : 'gap-1 px-2'} py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer ${isEditMode
                             ? 'text-[#1C1C1E] dark:text-[#F2F2F7] bg-blue-500/10'
                             : 'text-[#1C1C1E] dark:text-[#F2F2F7]'
                             }`}
                         style={{ pointerEvents: 'auto', cursor: 'pointer' }}
                     >
                         <Edit3 size={16} />
-                        {isEditMode ? 'Exit Edit' : 'Enter Edit'}
+                        {showTexts && <span>{isEditMode ? 'Exit Edit' : 'Enter Edit'}</span>}
                     </motion.button>
 
                     {/* Comment Button */}
@@ -362,13 +374,13 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => toggleCommentsPanel()}
-                            className={`flex items-center gap-2 px-4 py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer text-[#1C1C1E] dark:text-[#F2F2F7] ${commentsContext.isPanelOpen ? 'bg-sky-500/10' : ''}`}
+                            className={`flex items-center ${showTexts ? 'gap-2 px-4' : 'gap-1 px-2'} py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer text-[#1C1C1E] dark:text-[#F2F2F7] ${commentsContext.isPanelOpen ? 'bg-sky-500/10' : ''}`}
                             aria-pressed={commentsContext.isPanelOpen}
                             style={{ pointerEvents: 'auto', cursor: 'pointer' }}
                             title="Open comments"
                         >
                             <MessageSquareMore size={16} />
-                            Comments
+                            {showTexts && <span>Comments</span>}
                         </motion.button>
                     )}
 
@@ -377,12 +389,12 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={downloadSCORMPackage}
-                        className="flex items-center gap-2 px-4 py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer text-[#1C1C1E] dark:text-[#F2F2F7]"
+                        className={`flex items-center ${showTexts ? 'gap-2 px-4' : 'gap-1 px-2'} py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer text-[#1C1C1E] dark:text-[#F2F2F7]`}
                         style={{ pointerEvents: 'auto', cursor: 'pointer' }}
                         title="Download SCORM package"
                     >
                         <Download size={16} />
-                        Download SCORM
+                        {showTexts && <span>Download SCORM</span>}
                     </motion.button>
 
                     {/* Upload SCORM Button */}
@@ -391,7 +403,7 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
                         whileTap={!isUploadCompleted && !isUploading ? { scale: 0.97 } : {}}
                         onClick={handleUploadClick}
                         disabled={isUploadCompleted || isUploading}
-                        className={`flex items-center gap-2 px-4 py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer ${isUploadCompleted || isUploading
+                        className={`flex items-center ${showTexts ? 'gap-2 px-4' : 'gap-1 px-2'} py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer ${isUploadCompleted || isUploading
                             ? 'opacity-50 cursor-not-allowed text-[#1C1C1E]/50 dark:text-[#F2F2F7]/50'
                             : 'text-[#1C1C1E] dark:text-[#F2F2F7]'
                             }`}
@@ -399,7 +411,7 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
                         title={isUploadCompleted ? 'Upload already completed' : isUploading ? 'Uploading...' : 'Upload SCORM package'}
                     >
                         <Upload size={16} />
-                        {isUploading ? 'Uploading...' : isUploadCompleted ? 'Uploaded' : 'Upload'}
+                        {showTexts && <span>{isUploading ? 'Uploading...' : isUploadCompleted ? 'Uploaded' : 'Upload'}</span>}
                     </motion.button>
 
                     {/* View Mode Toggle */}
@@ -407,7 +419,7 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={toggleViewMode}
-                        className={`flex items-center gap-2 px-4 py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer ${isViewMode
+                        className={`flex items-center ${showTexts ? 'gap-2 px-4' : 'gap-1 px-2'} py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer ${isViewMode
                             ? 'text-[#1C1C1E] dark:text-[#F2F2F7] bg-green-500/10'
                             : 'text-[#1C1C1E] dark:text-[#F2F2F7]'
                             }`}
@@ -415,7 +427,7 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
                         title="View scientific basis information"
                     >
                         {isViewMode ? <EyeOff size={16} /> : <Eye size={16} />}
-                        {isViewMode ? 'Hide Info' : 'View Info'}
+                        {showTexts && <span>{isViewMode ? 'Hide Info' : 'View Info'}</span>}
                     </motion.button>
 
                     {/* Edit Mode Controls */}
@@ -464,9 +476,11 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
                                 <div className="flex items-center gap-2 text-sm">
                                     <div className={`w-2 h-2 rounded-full ${hasUnsavedChanges ? 'bg-yellow-500 animate-pulse' : 'bg-green-500'
                                         }`} />
-                                    <span className="text-[#1C1C1E]/70 dark:text-[#F2F2F7]/70">
-                                        {hasUnsavedChanges ? 'Unsaved changes' : 'All saved'}
-                                    </span>
+                                    {showTexts && (
+                                        <span className="text-[#1C1C1E]/70 dark:text-[#F2F2F7]/70">
+                                            {hasUnsavedChanges ? 'Unsaved changes' : 'All saved'}
+                                        </span>
+                                    )}
                                 </div>
                             </motion.div>
                         )}
@@ -480,7 +494,7 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
-                            className="mt-3 pt-3 border-t border-white/20 dark:border-gray-300/20 text-xs text-[#1C1C1E]/70 dark:text-[#F2F2F7]/70"
+                            className={`${showTexts ? 'block' : 'hidden'} mt-3 pt-3 border-t border-white/20 dark:border-gray-300/20 text-xs text-[#1C1C1E]/70 dark:text-[#F2F2F7]/70`}
                         >
                             {isEditMode && (
                                 <div>💡 Click on any text to edit it. Press Enter to save, Esc to cancel.</div>
