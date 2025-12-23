@@ -36,12 +36,21 @@ export const useLanguage = ({
 }: UseLanguageOptions) => {
   const initialLanguageFromUrl = React.useMemo(() => {
     const langUrlRaw = normalizeUrlParam(urlParams?.get("langUrl"));
-    if (langUrlRaw && langUrlRaw.startsWith("lang/")) {
+    if (!langUrlRaw) return null;
+
+    // Format 1: lang/tr-TR
+    if (langUrlRaw.startsWith("lang/")) {
       const langCode = langUrlRaw.split("/")[1];
       if (langCode) {
         return normalizeBcp47Tag(langCode);
       }
     }
+
+    // Format 2: tr-TR (direk dil kodu)
+    if (langUrlRaw && !langUrlRaw.includes("/")) {
+      return normalizeBcp47Tag(langUrlRaw);
+    }
+
     return null;
   }, [urlParams, normalizeUrlParam]);
 

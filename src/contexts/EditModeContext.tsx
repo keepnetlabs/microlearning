@@ -259,7 +259,9 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
                             };
 
                             const baseUrl = normalizeUrlParam(urlParams.get('baseUrl')) || DEFAULT_BASE_URL;
-                            const langUrl = normalizeUrlParam(urlParams.get('langUrl')) || DEFAULT_LANG_URL;
+                            const langUrlParam = normalizeUrlParam(urlParams.get('langUrl')) || DEFAULT_LANG_URL;
+                            // Normalize langUrl: support both "lang/tr-TR" and "tr-TR" formats
+                            const langUrl = langUrlParam.startsWith('lang/') ? langUrlParam : `lang/${langUrlParam}`;
                             return `${baseUrl}/${langUrl}`;
                         }
 

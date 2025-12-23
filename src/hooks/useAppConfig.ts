@@ -25,8 +25,20 @@ export const useAppConfig = ({ testOverrides }: UseAppConfigOptions = {}) => {
 
   const DEFAULT_BASE_URL = "https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001";
   const DEFAULT_LANG_URL = `lang/en`;
+
   const initialRemoteBaseUrl = normalizeUrlParam(urlParams?.get('baseUrl')) || DEFAULT_BASE_URL;
-  const initialRemoteLangUrl = `${initialRemoteBaseUrl}/${normalizeUrlParam(urlParams?.get('langUrl')) || DEFAULT_LANG_URL}`;
+
+  // langUrl parametresini formatlandır: hem "lang/tr-TR" hem de "tr-TR" formatlarını destekle
+  const normalizedLangUrl = (() => {
+    const langUrlParam = normalizeUrlParam(urlParams?.get('langUrl')) || DEFAULT_LANG_URL;
+    // Eğer "lang/" ile başlamıyorsa, ekle
+    if (!langUrlParam.startsWith("lang/")) {
+      return `lang/${langUrlParam}`;
+    }
+    return langUrlParam;
+  })();
+
+  const initialRemoteLangUrl = `${initialRemoteBaseUrl}/${normalizedLangUrl}`;
   const remoteBaseUrlRef = useRef<string>(initialRemoteBaseUrl);
   const remoteLangUrlTemplateRef = useRef<string>(initialRemoteLangUrl);
 

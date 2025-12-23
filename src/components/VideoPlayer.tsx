@@ -300,7 +300,9 @@ export function VideoPlayer({
       };
 
       const baseUrl = urlParams ? normalizeUrlParam(urlParams.get('baseUrl')) || DEFAULT_BASE_URL : DEFAULT_BASE_URL;
-      const langUrl = urlParams ? normalizeUrlParam(urlParams.get('langUrl')) || DEFAULT_LANG_URL : DEFAULT_LANG_URL;
+      const langUrlParam = urlParams ? normalizeUrlParam(urlParams.get('langUrl')) || DEFAULT_LANG_URL : DEFAULT_LANG_URL;
+      // Normalize langUrl: hem "lang/tr-TR" hem de "tr-TR" formatlarını destekle
+      const langUrl = langUrlParam.startsWith('lang/') ? langUrlParam : `lang/${langUrlParam}`;
       const patchUrl = `${baseUrl}/${langUrl}`;
 
       console.log('Sending PATCH to:', patchUrl);
@@ -374,7 +376,9 @@ export function VideoPlayer({
       };
 
       const baseUrl = urlParams ? normalizeUrlParam(urlParams.get('baseUrl')) || DEFAULT_BASE_URL : DEFAULT_BASE_URL;
-      const langUrl = urlParams ? normalizeUrlParam(urlParams.get('langUrl')) || DEFAULT_LANG_URL : DEFAULT_LANG_URL;
+      const langUrlParam = urlParams ? normalizeUrlParam(urlParams.get('langUrl')) || DEFAULT_LANG_URL : DEFAULT_LANG_URL;
+      // Normalize langUrl: hem "lang/tr-TR" hem de "tr-TR" formatlarını destekle
+      const langUrl = langUrlParam.startsWith('lang/') ? langUrlParam : `lang/${langUrlParam}`;
       const patchUrl = `${baseUrl}/${langUrl}`;
 
       console.log('Sending PATCH to:', patchUrl);

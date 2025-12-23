@@ -9,7 +9,7 @@ export const generateSCORMHTML = (baseUrl: string, courseTitle: string, langUrl?
   qs.set("baseUrl", baseUrl);
   if (langUrl) qs.set("langUrl", langUrl);
   if (inboxUrl) qs.set("inboxUrl", inboxUrl);
-  const iframeSrc = `https://microlearning.pages.dev/?${qs.toString()}`;
+  const iframeSrc = `https://agentic-ai-microlearning.keepnetlabs.com/?${qs.toString()}`;
   return generateSCORMHTMLTemplate(iframeSrc, courseTitle);
 };
 
@@ -269,6 +269,11 @@ const generateSCORMHTMLTemplate = (iframeSrc: string, courseTitle: string): stri
         var langUrl = pLang || launch.langUrl || "";
         var inboxUrl = pInbox || launch.inboxUrl || "";
 
+        // Normalize langUrl: support both "lang/tr-TR" and "tr-TR" formats
+        if (langUrl && !langUrl.startsWith('lang/')) {
+          langUrl = 'lang/' + langUrl;
+        }
+
         var qs = new URLSearchParams();
         if (baseUrl) qs.set("baseUrl", baseUrl);
         if (langUrl) qs.set("langUrl", langUrl);
@@ -292,7 +297,7 @@ const generateSCORMHTMLTemplate = (iframeSrc: string, courseTitle: string): stri
           try {
             return new URL(frame.src, location.href).origin;
           } catch (e) {
-            return "https://microlearning.pages.dev";
+            return "https://agentic-ai-microlearning.keepnetlabs.com";
           }
         })();
         frame.addEventListener("load", function () {
@@ -569,7 +574,9 @@ export const downloadSCORMPackage = () => {
   // Get current URL parameters
   const urlParams = new URLSearchParams(window.location.search);
   const baseUrl = urlParams.get('baseUrl') || 'https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001';
-  const langUrl = urlParams.get('langUrl') || 'lang/en';
+  // Normalize langUrl: support both "lang/tr-TR" and "tr-TR" formats
+  const langUrlParam = urlParams.get('langUrl') || 'lang/en';
+  const langUrl = langUrlParam.startsWith('lang/') ? langUrlParam : `lang/${langUrlParam}`;
   const inboxUrl = urlParams.get('inboxUrl') || 'inbox/all';
 
   // Extract course title from baseUrl or use default
@@ -578,7 +585,7 @@ export const downloadSCORMPackage = () => {
     : 'Microlearning Course';
 
   // Construct the iframe source URL
-  const iframeSrc = `https://microlearning.pages.dev/?baseUrl=${encodeURIComponent(baseUrl)}&langUrl=${encodeURIComponent(langUrl)}&inboxUrl=${encodeURIComponent(inboxUrl)}`;
+  const iframeSrc = `https://agentic-ai-microlearning.keepnetlabs.com/?baseUrl=${encodeURIComponent(baseUrl)}&langUrl=${encodeURIComponent(langUrl)}&inboxUrl=${encodeURIComponent(inboxUrl)}`;
 
   // SCORM 1.2 compliant HTML content
   const scormHTML = generateSCORMHTMLTemplate(iframeSrc, courseTitle);

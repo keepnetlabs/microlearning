@@ -36,10 +36,10 @@ const normalizeUrlParam = (value?: string | null): string => {
   return trimmed.startsWith('@') ? trimmed.slice(1) : trimmed;
 };
 
-const joinUrls = (...parts: string[]): string => {
+const joinUrls = (...parts: (string | undefined)[]): string => {
   return parts
-    .map(part => part.replace(/^\/+|\/+$/g, '')) // Remove leading/trailing slashes
-    .filter(part => part.length > 0)
+    .filter(part => part && part.length > 0) // Filter out undefined/empty values
+    .map(part => part!.replace(/^\/+|\/+$/g, '')) // Remove leading/trailing slashes
     .join('/');
 };
 
@@ -87,7 +87,8 @@ function ActionableContentSceneInternalCore({
   const initialRemoteBaseUrl = normalizeUrlParam(urlParams?.get('baseUrl')) || "https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001";
   const inboxUrl = normalizeUrlParam(urlParams?.get('inboxUrl')) || "inbox/all";
   const langUrl = normalizeUrlParam(urlParams?.get('langUrl')) || "lang/en";
-  const language = langUrl?.split('/')[1];
+  // Parse language: support both "lang/tr-TR" and "tr-TR" formats
+  const language = langUrl.includes('/') ? langUrl.split('/')[1] : langUrl;
   const baseInboxUrl = joinUrls(initialRemoteBaseUrl, inboxUrl, language);
   console.log("baseInboxUrl", baseInboxUrl);
   // Inbox config state

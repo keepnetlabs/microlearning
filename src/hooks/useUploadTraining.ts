@@ -141,7 +141,9 @@ export const useUploadTraining = () => {
 
       // Get URL parameters for SCORM
       const scormUrlParams = new URLSearchParams(window.location.search);
-      const langUrl = scormUrlParams.get('langUrl') || 'lang/en';
+      // Normalize langUrl: support both "lang/tr-TR" and "tr-TR" formats
+      const langUrlParam = scormUrlParams.get('langUrl') || 'lang/en';
+      const langUrl = langUrlParam.startsWith('lang/') ? langUrlParam : `lang/${langUrlParam}`;
       const inboxUrl = scormUrlParams.get('inboxUrl') || 'inbox/all';
 
       console.log('Generating SCORM HTML...');
