@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Save, RotateCcw, Edit3, Eye, EyeOff, Download, MessageSquareMore, Upload } from 'lucide-react';
+import { Save, RotateCcw, Pencil, PencilOff, Eye, EyeOff, Download, MessageSquareMore, MessageSquare, Upload } from 'lucide-react';
 import { useEditMode } from '../../contexts/EditModeContext';
 import { useGlobalEditMode } from '../../contexts/GlobalEditModeContext';
 import { downloadSCORMPackage } from '../../utils/scormDownload';
@@ -40,9 +40,12 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
     const { isPreviewMode } = useGlobalEditMode();
 
     // Check window size for showing texts (width >= 1280px AND height >= 900px)
+    // But always show texts if inside an iframe
     useEffect(() => {
         const checkSize = () => {
-            setShowTexts(window.innerWidth >= 1280 && window.innerHeight >= 900);
+            const isInIframe = window.self !== window.top;
+            const shouldShowTexts = isInIframe || (window.innerWidth >= 1280 && window.innerHeight >= 900);
+            setShowTexts(shouldShowTexts);
         };
 
         checkSize();
@@ -364,7 +367,17 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
                             }`}
                         style={{ pointerEvents: 'auto', cursor: 'pointer' }}
                     >
-                        <Edit3 size={16} />
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={isEditMode ? 'pencil' : 'pencil-off'}
+                                initial={{ opacity: 0, rotate: -180 }}
+                                animate={{ opacity: 1, rotate: 0 }}
+                                exit={{ opacity: 0, rotate: 180 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                {isEditMode ? <Pencil size={16} /> : <PencilOff size={16} />}
+                            </motion.div>
+                        </AnimatePresence>
                         {showTexts && <span>{isEditMode ? 'Exit Edit' : 'Enter Edit'}</span>}
                     </motion.button>
 
@@ -377,10 +390,20 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
                             className={`flex items-center ${showTexts ? 'gap-2 px-4' : 'gap-1 px-2'} py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer text-[#1C1C1E] dark:text-[#F2F2F7] ${commentsContext.isPanelOpen ? 'bg-sky-500/10' : ''}`}
                             aria-pressed={commentsContext.isPanelOpen}
                             style={{ pointerEvents: 'auto', cursor: 'pointer' }}
-                            title="Open comments"
+                            title={commentsContext.isPanelOpen ? 'Close comments' : 'Open comments'}
                         >
-                            <MessageSquareMore size={16} />
-                            {showTexts && <span>Comments</span>}
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={commentsContext.isPanelOpen ? 'open' : 'closed'}
+                                    initial={{ opacity: 0, rotate: -180 }}
+                                    animate={{ opacity: 1, rotate: 0 }}
+                                    exit={{ opacity: 0, rotate: 180 }}
+                                    transition={{ duration: 0.2 }}
+                                >
+                                    {commentsContext.isPanelOpen ? <MessageSquareMore size={16} /> : <MessageSquare size={16} />}
+                                </motion.div>
+                            </AnimatePresence>
+                            {showTexts && <span>{commentsContext.isPanelOpen ? 'Comments' : 'Comments'}</span>}
                         </motion.button>
                     )}
 
@@ -393,7 +416,11 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
                         style={{ pointerEvents: 'auto', cursor: 'pointer' }}
                         title="Download SCORM package"
                     >
-                        <Download size={16} />
+                        <motion.div
+                            whileHover={{ y: 2 }}
+                        >
+                            <Download size={16} />
+                        </motion.div>
                         {showTexts && <span>Download SCORM</span>}
                     </motion.button>
 
@@ -410,7 +437,12 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
                         style={{ pointerEvents: isUploadCompleted || isUploading ? 'none' : 'auto' }}
                         title={isUploadCompleted ? 'Upload already completed' : isUploading ? 'Uploading...' : 'Upload SCORM package'}
                     >
-                        <Upload size={16} />
+                        <motion.div
+                            animate={isUploading ? { rotate: 360 } : { rotate: 0 }}
+                            transition={isUploading ? { duration: 1.5, repeat: Infinity } : { duration: 0.3 }}
+                        >
+                            <Upload size={16} />
+                        </motion.div>
                         {showTexts && <span>{isUploading ? 'Uploading...' : isUploadCompleted ? 'Uploaded' : 'Upload'}</span>}
                     </motion.button>
 
@@ -426,7 +458,17 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
                         style={{ pointerEvents: 'auto', cursor: 'pointer' }}
                         title="View scientific basis information"
                     >
-                        {isViewMode ? <EyeOff size={16} /> : <Eye size={16} />}
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={isViewMode ? 'eye-off' : 'eye'}
+                                initial={{ opacity: 0, rotate: -180 }}
+                                animate={{ opacity: 1, rotate: 0 }}
+                                exit={{ opacity: 0, rotate: 180 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                {isViewMode ? <EyeOff size={16} /> : <Eye size={16} />}
+                            </motion.div>
+                        </AnimatePresence>
                         {showTexts && <span>{isViewMode ? 'Hide Info' : 'View Info'}</span>}
                     </motion.button>
 
@@ -441,8 +483,8 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
                             >
                                 {/* Save Button */}
                                 <motion.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
+                                    whileHover={hasUnsavedChanges ? { scale: 1.05 } : {}}
+                                    whileTap={hasUnsavedChanges ? { scale: 0.95 } : {}}
                                     onClick={saveChanges}
                                     disabled={!hasUnsavedChanges}
                                     className={`flex items-center gap-1 px-3 py-2 glass-border-1 font-medium transition-all ${hasUnsavedChanges
@@ -451,7 +493,12 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
                                         }`}
                                     title="Save Changes"
                                 >
-                                    <Save size={14} />
+                                    <motion.div
+                                        animate={hasUnsavedChanges ? { scale: [1, 1.1, 1] } : {}}
+                                        transition={hasUnsavedChanges ? { duration: 0.6, repeat: Infinity } : {}}
+                                    >
+                                        <Save size={14} />
+                                    </motion.div>
                                     {hasUnsavedChanges && (
                                         <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
                                     )}
@@ -459,8 +506,8 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
 
                                 {/* Discard Button */}
                                 <motion.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
+                                    whileHover={hasUnsavedChanges ? { scale: 1.05 } : {}}
+                                    whileTap={hasUnsavedChanges ? { scale: 0.95 } : {}}
                                     onClick={discardChanges}
                                     disabled={!hasUnsavedChanges}
                                     className={`flex items-center gap-1 px-3 py-2 glass-border-1 font-medium transition-all ${hasUnsavedChanges
@@ -469,7 +516,12 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
                                         }`}
                                     title="Discard Changes"
                                 >
-                                    <RotateCcw size={14} />
+                                    <motion.div
+                                        whileHover={hasUnsavedChanges ? { rotate: -180 } : {}}
+                                        transition={{ duration: 0.4 }}
+                                    >
+                                        <RotateCcw size={14} />
+                                    </motion.div>
                                 </motion.button>
 
                                 {/* Status Indicator */}
