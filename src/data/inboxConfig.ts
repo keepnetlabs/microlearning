@@ -41,6 +41,7 @@ export interface InboxSceneTexts {
   headersButtonText: string;
   correctReportMessage: string;
   cautiousReportMessage: string;
+  attachmentsLabel: string;
   phishingReportModal: PhishingReportModalTexts;
   phishingResultModal: PhishingResultModalTexts;
 }
@@ -93,6 +94,7 @@ export const defaultInboxConfig: InboxSceneConfig = {
     headersButtonText: "Headers",
     correctReportMessage: "Marked as phishing — well done identifying red flags.",
     cautiousReportMessage: "Marked as suspicious — good caution even when legitimate.",
+    attachmentsLabel: "Attachments",
     phishingReportModal: {
       title: "Phishing Reporter",
       subtitle: "Do you want to report this email to the system administrator for analysis and receive the result by email?",

@@ -24,6 +24,7 @@ interface CallToActionProps {
   iconPosition?: 'left' | 'right'; // position of the icon relative to text
   fieldLabels?: { mobile?: string; desktop?: string; }; // labels for MultiFieldEditor
   noCheckMobile?: boolean;
+  isRTL?: boolean; // right-to-left language support
 }
 
 export function CallToAction({
@@ -42,7 +43,8 @@ export function CallToAction({
   icon,
   iconPosition = 'right',
   fieldLabels,
-  noCheckMobile = false
+  noCheckMobile = false,
+  isRTL = false
 }: CallToActionProps) {
   const isMobile = useIsMobile();
 
@@ -238,8 +240,8 @@ export function CallToAction({
       >
         {/* Button shimmer effect */}
         <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-          animate={disabled || isEditMode || reducedMotion ? undefined : { x: ['-100%', '200%'] }}
+          className={`absolute inset-0 ${isRTL ? 'bg-gradient-to-l' : 'bg-gradient-to-r'} from-transparent via-white/20 to-transparent`}
+          animate={disabled || isEditMode || reducedMotion ? undefined : { x: isRTL ? ['100%', '-200%'] : ['-100%', '200%'] }}
           transition={reducedMotion ? undefined : {
             duration: 2,
             repeat: Infinity,
@@ -248,7 +250,9 @@ export function CallToAction({
         />
         {iconPosition === 'left' && !isEditMode && (
           <span className="relative z-10 flex items-center">
-            {icon !== undefined ? icon : (
+            {icon !== undefined ? icon : isRTL ? (
+              <div className="text-sm">▶</div>
+            ) : (
               <ArrowRight size={16} className="transition-transform group-hover:-translate-x-1" aria-hidden="true" />
             )}
           </span>
@@ -287,7 +291,9 @@ export function CallToAction({
         </span>
         {iconPosition === 'right' && !isEditMode && (
           <span className="relative z-10 flex items-center">
-            {icon !== undefined ? icon : (
+            {icon !== undefined ? icon : isRTL ? (
+              <div className="text-sm">◀</div>
+            ) : (
               <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" aria-hidden="true" />
             )}
           </span>

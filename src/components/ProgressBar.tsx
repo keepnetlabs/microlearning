@@ -208,15 +208,16 @@ export function ProgressBar({
   };
 
   return (
-    <div className={`w-full ${isMobile && progress === 100 ? 'mr-8' : 'mr-0'}`} role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label={`${finalConfig.ariaLabel}: %${Math.round(progress)} ${finalConfig.progressLabel}`} data-testid={dataTestId} style={{ minHeight: '32px' }}>
+    <div className="w-full" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label={`${finalConfig.ariaLabel}: %${Math.round(progress)} ${finalConfig.progressLabel}`} data-testid={dataTestId} style={{ minHeight: '40px', height: '40px' }}>
       {/* Mobile Progress Bar - Header Bottom Row */}
-      <div className="md:hidden md:mt-4">
+      <div className="md:hidden">
         {/* Responsive Container with Margins */}
-        <div className={`relative ${progress === 100 ? 'sm:mx-6 ml-4 mr-12' : 'mx-6'}`}>
+        <div className="relative mx-6">
           {/* Progress Tooltip - Pill-shaped thumb on progress bar - height matches progress bar height (h-2 = 8px) */}
           <div className="relative w-full h-2" style={{ overflow: 'visible' }}>
             <motion.div
-              initial={{ opacity: reducedMotion ? 1 : 0, scale: reducedMotion ? 1 : 0.9 }}
+              key={`thumb-${isRTL}`}
+              initial={false}
               animate={{
                 opacity: 1,
                 scale: 1,
@@ -235,16 +236,19 @@ export function ProgressBar({
             >
               {/* Pill-shaped thumb indicator */}
               <div
-                className="flex items-center glass-border-1 justify-center px-1.5 py-1 rounded-full shadow-lg relative"
+                className="flex items-center glass-border-1 justify-center px-1.5 rounded-full shadow-lg relative"
                 style={{
                   transform: 'translateZ(0)',
                   minWidth: '38px',
                   height: '24px',
-                  top: "-7.5px"
+                  top: "-8px"
                 }}
               >
                 {/* Percentage text */}
-                <span className="relative z-10 text-xs font-semibold text-[#1C1C1E] dark:text-[#F2F2F7]">
+                <span
+                  className="relative z-10 text-xs font-semibold text-[#1C1C1E] dark:text-[#F2F2F7]"
+                  style={{ direction: isRTL ? 'rtl' : 'ltr' }}
+                >
                   {formatPercent(progress, language)}
                 </span>
               </div>
@@ -338,7 +342,8 @@ export function ProgressBar({
           {/* Progress Tooltip - Pill-shaped thumb on progress bar - height matches progress bar height (h-2 = 8px) */}
           <div className="relative w-full h-2" style={{ overflow: 'visible' }}>
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
+              key={`thumb-desktop-${isRTL}`}
+              initial={false}
               animate={{
                 opacity: 1,
                 scale: 1,
@@ -363,17 +368,20 @@ export function ProgressBar({
             >
               {/* Pill-shaped thumb indicator */}
               <div
-                className="flex items-center glass-border-1 justify-center px-1.5 py-1 rounded-full shadow-lg relative"
+                className="flex items-center glass-border-1 justify-center px-1.5 rounded-full shadow-lg relative"
                 style={{
                   transform: 'translateZ(0)',
                   minWidth: '38px',
                   height: '24px',
-                  top: "-7.5px"
+                  top: "-8px"
                 }}
               >
 
                 {/* Percentage text */}
-                <span className="relative z-10 text-xs font-semibold text-[#1C1C1E] dark:text-[#F2F2F7]">
+                <span
+                  className="relative z-10 text-xs font-semibold text-[#1C1C1E] dark:text-[#F2F2F7]"
+                  style={{ direction: isRTL ? 'rtl' : 'ltr' }}
+                >
                   {formatPercent(progress, language)}
                 </span>
               </div>

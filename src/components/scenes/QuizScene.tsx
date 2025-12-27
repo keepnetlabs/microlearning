@@ -110,13 +110,15 @@ const MemoizedNavigationControls = React.memo(({
   questionsLength,
   currentQuestionIndex,
   onPrev,
-  onNext
+  onNext,
+  isRTL = false
 }: {
   currentEditMode: boolean;
   questionsLength: number;
   currentQuestionIndex: number;
   onPrev: () => void;
   onNext: () => void;
+  isRTL?: boolean;
 }) => {
   if (!currentEditMode || questionsLength <= 1) return null;
 
@@ -133,8 +135,15 @@ const MemoizedNavigationControls = React.memo(({
   };
 
   return (
-    <div className="fixed top-20 right-4 flex flex-col gap-2" style={{ pointerEvents: 'auto', zIndex: 9999 }}>
-      <div className="flex gap-2" style={{ pointerEvents: 'auto' }}>
+    <div
+      className="fixed top-20 flex flex-col gap-2"
+      style={{
+        pointerEvents: 'auto',
+        zIndex: 9999,
+        [isRTL ? 'left' : 'right']: '1rem'
+      }}
+    >
+      <div className={`flex gap-2 ${isRTL ? 'flex-row-reverse' : ''}`} style={{ pointerEvents: 'auto' }}>
         <button
           type="button"
           onClick={handlePrevClick}
@@ -143,7 +152,7 @@ const MemoizedNavigationControls = React.memo(({
           title="Previous Question"
           aria-label="Previous Question"
         >
-          ◀ Prev
+          {isRTL ? 'بعدی ◀' : '◀ Prev'}
         </button>
         <button
           type="button"
@@ -153,7 +162,7 @@ const MemoizedNavigationControls = React.memo(({
           title="Next Question"
           aria-label="Next Question"
         >
-          Next ▶
+          {isRTL ? '▶ قبلی' : 'Next ▶'}
         </button>
       </div>
     </div>
@@ -1137,7 +1146,7 @@ export const QuizScene = React.memo(function QuizScene({
                 handleAnswer(option.id)
               }
               disabled={currentEditMode ? undefined : (showResult || isLoading)}
-              className={`group relative w-full p-3 text-left ${currentEditMode ? 'glass-border-3-no-overflow' : 'glass-border-3'} transition-all duration-300 focus:outline-none ${currentEditMode ? '' : 'disabled:cursor-not-allowed'}`}
+              className={`group relative w-full p-3 ${appConfig?.isRTL ? 'text-right' : 'text-left'} ${currentEditMode ? 'glass-border-3-no-overflow' : 'glass-border-3'} transition-all duration-300 focus:outline-none ${currentEditMode ? '' : 'disabled:cursor-not-allowed'}`}
               role={currentEditMode ? undefined : "radio"}
               aria-checked={currentEditMode ? undefined : isSelected}
               aria-describedby={currentEditMode ? undefined : (showCorrectness ? `result-${option.id}` : undefined)}
@@ -1470,9 +1479,9 @@ export const QuizScene = React.memo(function QuizScene({
                 }}
                 onClick={currentEditMode ? undefined : () => handleMultiSelectToggle(option.id)}
                 disabled={currentEditMode ? undefined : (effectiveShowResult || isLoading)}
-                className={`w-full p-3 text-left rounded-lg transition-all duration-200 ${currentEditMode ? 'glass-border-1-no-overflow' : 'glass-border-1'} ${!currentEditMode ? 'hover:scale-[1.02]' : ''} ${isSelected ? 'bg-[#1C1C1E]/10 dark:bg-[#F2F2F7]/10' : ''} ${currentEditMode ? '' : 'disabled:cursor-not-allowed'}`}
+                className={`w-full p-3 ${appConfig?.isRTL ? 'text-right' : 'text-left'} rounded-lg transition-all duration-200 ${currentEditMode ? 'glass-border-1-no-overflow' : 'glass-border-1'} ${!currentEditMode ? 'hover:scale-[1.02]' : ''} ${isSelected ? 'bg-[#1C1C1E]/10 dark:bg-[#F2F2F7]/10' : ''} ${currentEditMode ? '' : 'disabled:cursor-not-allowed'}`}
               >
-                <div className="flex items-center space-x-4">
+                <div className={`flex items-center space-x-4 ${appConfig?.isRTL ? 'space-x-reverse' : ''}`}>
                   <div
                     className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all duration-300 cursor-pointer ${currentEditMode ? 'glass-border-0-no-overflow' : 'glass-border-0'} ${isSelected
                       ? "bg-[#1C1C1E]/30 dark:bg-[#F2F2F7]/30 border-[#1C1C1E] dark:border-[#F2F2F7]"
@@ -1558,12 +1567,12 @@ export const QuizScene = React.memo(function QuizScene({
               isLoading ||
               multiSelectAnswers.length < question.minCorrect
             }
-            className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
+            className={`relative flex items-center space-x-2 ${appConfig?.isRTL ? 'space-x-reverse' : ''} px-4 py-2 sm:px-6 sm:py-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
           >
             {/* Button shimmer effect */}
             <motion.div
               className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-              animate={{ x: ['-100%', '200%'] }}
+              animate={{ x: appConfig?.isRTL ? ['100%', '-200%'] : ['-100%', '200%'] }}
               transition={{
                 duration: 2,
                 repeat: Infinity,
@@ -1677,7 +1686,7 @@ export const QuizScene = React.memo(function QuizScene({
 
           <div className="text-center">
             <div
-              className={`inline-flex items-center space-x-2 px-3 py-1.5 ${currentEditMode ? 'glass-border-4-no-overflow' : 'glass-border-4'} `}
+              className={`inline-flex items-center space-x-2 ${appConfig?.isRTL ? 'space-x-reverse' : ''} px-3 py-1.5 ${currentEditMode ? 'glass-border-4-no-overflow' : 'glass-border-4'} `}
               role="status"
               aria-live="polite"
               aria-label={`Current slider value: ${sliderValue}${question.unit ? ` ${question.unit}` : ''}`}
@@ -1708,12 +1717,12 @@ export const QuizScene = React.memo(function QuizScene({
             onClick={() => handleAnswer(sliderValue)}
             disabled={showResult || isLoading}
             aria-label={isLoading ? "Processing evaluation" : "Complete evaluation"}
-            className={`relative flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
+            className={`relative flex items-center space-x-2 ${appConfig?.isRTL ? 'space-x-reverse' : ''} px-4 py-2 sm:px-6 sm:py-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
           >
             {/* Button shimmer effect */}
             <motion.div
               className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-              animate={{ x: ['-100%', '200%'] }}
+              animate={{ x: appConfig?.isRTL ? ['100%', '-200%'] : ['-100%', '200%'] }}
               transition={{
                 duration: 2,
                 repeat: Infinity,
@@ -1879,7 +1888,7 @@ export const QuizScene = React.memo(function QuizScene({
         {availableItems.length > 0 && (
           <div>
             <h4 className="font-medium mb-3 text-foreground flex items-center">
-              <Move className="w-4 h-4 mr-2 text-[#1C1C1E] dark:text-[#F2F2F7]" />
+              <Move className={`w-4 h-4 ${appConfig?.isRTL ? 'ml-2' : 'mr-2'} text-[#1C1C1E] dark:text-[#F2F2F7]`} />
               {config.texts?.options || "Seçenekler"}
             </h4>
 
@@ -1900,7 +1909,7 @@ export const QuizScene = React.memo(function QuizScene({
                     onClick={currentEditMode ? undefined : () => handleItemSelect(item.id)}
                     disabled={currentEditMode ? undefined : (effectiveShowResult || isLoading)}
                     className={`
-                      group relative p-3 rounded-xl text-left font-medium 
+                      group relative p-3 rounded-xl ${appConfig?.isRTL ? 'text-right' : 'text-left'} font-medium
                       transition-all duration-300 touch-manipulation
                       ${!showResult && !isLoading && !currentEditMode ? 'hover:scale-[1.02] active:scale-[0.98]' : ''}
                       ${isSelected ? 'scale-[1.02]' : ''}
@@ -1928,7 +1937,7 @@ export const QuizScene = React.memo(function QuizScene({
                       cursor: effectiveShowResult || isLoading || currentEditMode ? 'not-allowed' : 'pointer'
                     }}
                   >
-                    <div className="flex items-center space-x-3">
+                    <div className={`flex items-center space-x-3 ${appConfig?.isRTL ? 'space-x-reverse' : ''}`}>
                       <div
                         className="w-6 h-6 rounded-lg flex items-center justify-center"
                         style={{
@@ -1999,7 +2008,7 @@ export const QuizScene = React.memo(function QuizScene({
                   onDrop={(e) => handleDrop(e, category.id)}
                   onClick={() => handleCategoryTap(category.id)}
                   className={`
-                    min-h-[120px] p-4 rounded-xl text-left transition-all duration-300 touch-manipulation
+                    min-h-[120px] p-4 rounded-xl ${appConfig?.isRTL ? 'text-right' : 'text-left'} transition-all duration-300 touch-manipulation
                     ${!showResult && !isLoading && selectedItem ? 'hover:scale-[1.02] active:scale-[0.98]' : ''}
                     ${selectedItem ? 'cursor-pointer' : 'cursor-not-allowed'}
                     ${showResult || isLoading ? 'pointer-events-none' : 'pointer-events-auto'}
@@ -2008,7 +2017,7 @@ export const QuizScene = React.memo(function QuizScene({
                 >
                   {/* Category Header */}
                   <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center space-x-2">
+                    <div className={`flex items-center space-x-2 ${appConfig?.isRTL ? 'space-x-reverse' : ''}`}>
                       <div
                         className="w-8 h-8 rounded-lg flex items-center justify-center"
                         style={{
@@ -2048,7 +2057,7 @@ export const QuizScene = React.memo(function QuizScene({
                       </div>
                     </div>
 
-                    <div className="flex items-center space-x-2">
+                    <div className={`flex items-center space-x-2 ${appConfig?.isRTL ? 'space-x-reverse' : ''}`}>
                       <div
                         className="px-2 py-1 rounded-md text-xs font-medium"
                         style={{
@@ -2115,7 +2124,7 @@ export const QuizScene = React.memo(function QuizScene({
                         }}
                       >
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
+                          <div className={`flex items-center space-x-2 ${appConfig?.isRTL ? 'space-x-reverse' : ''}`}>
                             <CheckCircle className="w-3 h-3 text-green-600" />
                             <span className="text-foreground">{item.text}</span>
                           </div>
@@ -2170,12 +2179,12 @@ export const QuizScene = React.memo(function QuizScene({
               onClick={() => handleAnswer(draggedItems)}
               disabled={isLoading}
               aria-label={isLoading ? config.texts?.evaluating : config.texts?.checkAnswer}
-              className={`relative flex items-center space-x-2 w-full px-4 py-2 sm:px-6 sm:py-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
+              className={`relative flex items-center space-x-2 ${appConfig?.isRTL ? 'space-x-reverse' : ''} w-full px-4 py-2 sm:px-6 sm:py-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7]`}
             >
               {/* Button shimmer effect */}
               <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                animate={{ x: ['-100%', '200%'] }}
+                animate={{ x: appConfig?.isRTL ? ['100%', '-200%'] : ['-100%', '200%'] }}
                 transition={{
                   duration: 2,
                   repeat: Infinity,
@@ -2288,12 +2297,12 @@ export const QuizScene = React.memo(function QuizScene({
 
     switch (event.key) {
       case 'ArrowUp':
-      case 'ArrowLeft':
+      case appConfig?.isRTL ? 'ArrowRight' : 'ArrowLeft':
         event.preventDefault();
         // Navigate to previous option in current question type
         break;
       case 'ArrowDown':
-      case 'ArrowRight':
+      case appConfig?.isRTL ? 'ArrowLeft' : 'ArrowRight':
         event.preventDefault();
         // Navigate to next option in current question type
         break;
@@ -2412,9 +2421,15 @@ export const QuizScene = React.memo(function QuizScene({
         currentQuestionIndex={currentQuestionIndex}
         onPrev={goToPrevQuestion}
         onNext={goToNextQuestion}
+        isRTL={appConfig?.isRTL}
       />
       {currentEditMode && questions.length > 1 && (
-        <div className="fixed top-20 right-4 z-50 flex flex-col gap-2">
+        <div
+          className="fixed top-20 z-50 flex flex-col gap-2"
+          style={{
+            [appConfig?.isRTL ? 'left' : 'right']: '1rem'
+          }}
+        >
           <div className="text-center text-xs text-white bg-black/50 px-2 py-1 rounded mt-14">
             {currentQuestionIndex + 1} / {questions.length}
           </div>
@@ -2476,7 +2491,7 @@ export const QuizScene = React.memo(function QuizScene({
             )}
 
 
-            <div className="flex items-center justify-center space-x-4 sm:text-sm text-xs mb-5 text-[#1C1C1E] dark:text-[#F2F2F7]">
+            <div className={`flex items-center justify-center space-x-4 ${appConfig?.isRTL ? 'space-x-reverse' : ''} sm:text-sm text-xs mb-5 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
               <span aria-label={`Question ${currentQuestionIndex + 1} of ${questions.length}`}>
                 {config.texts?.question} {currentQuestionIndex + 1}/{questions.length}
               </span>
@@ -2590,7 +2605,7 @@ export const QuizScene = React.memo(function QuizScene({
                         <div className="mb-3">
                           <div className="grid gap-1">
                             {currentQuestion?.tips.map((tip: string, index: number) => (
-                              <div key={index} className="flex items-start space-x-2 text-sm">
+                              <div key={index} className={`flex items-start space-x-2 ${appConfig?.isRTL ? 'space-x-reverse' : ''} text-sm`}>
                                 <div className="w-1.5 h-1.5 bg-[#1C1C1E] dark:bg-[#F2F2F7] rounded-full mt-2 flex-shrink-0" />
                                 <span className="text-muted-foreground text-[#1C1C1E] dark:text-[#F2F2F7]">
                                   <EditableText
@@ -2687,7 +2702,7 @@ export const QuizScene = React.memo(function QuizScene({
                       <div>
                         <div className="grid gap-2">
                           {currentQuestion?.tips.map((tip: string, index: number) => (
-                            <div key={index} className="flex items-start space-x-2 text-sm">
+                            <div key={index} className={`flex items-start space-x-2 ${appConfig?.isRTL ? 'space-x-reverse' : ''} text-sm`}>
                               <div className="w-1.5 h-1.5 bg-[#1C1C1E] dark:bg-[#F2F2F7] rounded-full mt-2 flex-shrink-0" />
                               <span className="text-muted-foreground text-[#1C1C1E] dark:text-[#F2F2F7]">
                                 <EditableText
@@ -2728,12 +2743,12 @@ export const QuizScene = React.memo(function QuizScene({
                                 handleNextQuestion()
                               }, 300)
                             }}
-                            className={`relative flex items-center justify-center space-x-2 px-4 py-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full`}
+                            className={`relative flex items-center justify-center space-x-2 ${appConfig?.isRTL ? 'space-x-reverse' : ''} px-4 py-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full`}
                           >
                             {/* Button shimmer effect */}
                             <motion.div
                               className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                              animate={{ x: ['-100%', '200%'] }}
+                              animate={{ x: appConfig?.isRTL ? ['100%', '-200%'] : ['-100%', '200%'] }}
                               transition={{
                                 duration: 2,
                                 repeat: Infinity,
@@ -2741,7 +2756,11 @@ export const QuizScene = React.memo(function QuizScene({
                               }}
                             />
 
-                            <ArrowRight size={18} className={`relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
+                            {appConfig?.isRTL ? (
+                              <div className="w-4 h-4 relative z-10 flex items-center justify-center">◀</div>
+                            ) : (
+                              <ArrowRight size={18} className={`relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
+                            )}
                             <span className={`text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
                               {config.texts?.nextQuestion || "Sonraki Soru"}
                             </span>
@@ -2765,12 +2784,12 @@ export const QuizScene = React.memo(function QuizScene({
                                 onNextSlide();
                               }, 300)
                             }}
-                            className={`relative flex items-center justify-center space-x-2 px-4 py-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full`}
+                            className={`relative flex items-center justify-center space-x-2 ${appConfig?.isRTL ? 'space-x-reverse' : ''} px-4 py-3 ${currentEditMode ? 'glass-border-2-no-overflow' : 'glass-border-2'} transition-all shadow-lg hover:shadow-xl focus:outline-none overflow-hidden text-[#1C1C1E] dark:text-[#F2F2F7] w-full`}
                           >
                             {/* Button shimmer effect */}
                             <motion.div
                               className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                              animate={{ x: ['-100%', '200%'] }}
+                              animate={{ x: appConfig?.isRTL ? ['100%', '-200%'] : ['-100%', '200%'] }}
                               transition={{
                                 duration: 2,
                                 repeat: Infinity,
@@ -2778,7 +2797,11 @@ export const QuizScene = React.memo(function QuizScene({
                               }}
                             />
 
-                            <ArrowUpRight size={18} className={`relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
+                            {appConfig?.isRTL ? (
+                              <div className="w-4 h-4 relative z-10 flex items-center justify-center transform scale-x-[-1]">↖</div>
+                            ) : (
+                              <ArrowUpRight size={18} className={`relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`} />
+                            )}
                             <span className={`text-base font-medium relative z-10 text-[#1C1C1E] dark:text-[#F2F2F7]`}>
                               {config.texts?.nextSlide || "Sonraki Slayt"}
                             </span>
@@ -2857,11 +2880,12 @@ export const QuizScene = React.memo(function QuizScene({
               }
             }}
             disabled={!showResult && !isEditMode}
-            iconPosition={showResult && !isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked ? 'left' : 'right'}
+            iconPosition={showResult && !isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked ? (appConfig?.isRTL ? 'right' : 'left') : (appConfig?.isRTL ? 'left' : 'right')}
             icon={showResult && !isAnswerCorrect && attempts < maxAttempts && !isAnswerLocked ? (
               <RefreshCw size={16} className="transition-transform group-hover:-rotate-6 text-[#1C1C1E] dark:text-[#F2F2F7]" aria-hidden="true" />
             ) : undefined}
             dataTestId="cta-quiz"
+            isRTL={appConfig?.isRTL}
           />
 
         </div>

@@ -220,7 +220,7 @@ export function Inbox({ config, onEmailReport, onAllEmailsReported, selectedLang
         <Download size={14} className="text-[#1C1C1E] dark:text-[#F2F2F7]" />
         <FontWrapper>
           <span className="text-sm font-medium text-[#1C1C1E] dark:text-[#F2F2F7]">
-            Attachments ({attachments.length})
+            {config.texts.attachmentsLabel ?? 'Attachments'} ({attachments.length})
           </span>
         </FontWrapper>
       </div>
