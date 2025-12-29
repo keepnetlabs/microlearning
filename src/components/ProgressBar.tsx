@@ -1,6 +1,5 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { useIsMobile } from "../utils/languageUtils";
 
 // Yüzde formatı için localization fonksiyonu
 export const formatPercent = (value: number, locale = navigator.language) =>
@@ -186,7 +185,6 @@ export function ProgressBar({
     progressLabel: progressLabel ?? defaultConfig.progressLabel,
     ariaLabel: ariaLabel ?? defaultConfig.ariaLabel
   };
-  const isMobile = useIsMobile();
   const tooltipTransition = {
     duration: reducedMotion ? 0 : 0.8,
     ease: "easeOut" as const,

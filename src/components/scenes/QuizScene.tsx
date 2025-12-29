@@ -1243,7 +1243,7 @@ export const QuizScene = React.memo(function QuizScene({
         })}
       </div>
     );
-  }, [currentQuestion, editModeAnswer, effectiveShowResult, isLoading, handleAnswer, currentEditMode, ariaTexts?.multipleChoiceLabel, ariaTexts?.multipleChoiceDescription, ariaTexts?.correctAnswerLabel, ariaTexts?.incorrectAnswerLabel, currentQuestionIndex, showResult]);
+  }, [currentQuestion, editModeAnswer, effectiveShowResult, isLoading, handleAnswer, currentEditMode, ariaTexts?.multipleChoiceLabel, ariaTexts?.multipleChoiceDescription, ariaTexts?.correctAnswerLabel, ariaTexts?.incorrectAnswerLabel, currentQuestionIndex, showResult, appConfig?.isRTL]);
 
   const renderTrueFalseIcon = useCallback((iconName: string) => {
     const IconComponent = getIconComponent(iconName);
@@ -1592,7 +1592,7 @@ export const QuizScene = React.memo(function QuizScene({
         </div>
       </div>
     );
-  }, [currentQuestion, multiSelectAnswers, editModeAnswer, effectiveShowResult, isLoading, handleMultiSelectToggle, handleAnswer, currentEditMode, config.texts?.checkAnswer, currentQuestionIndex, showResult]);
+  }, [currentQuestion, multiSelectAnswers, editModeAnswer, effectiveShowResult, isLoading, handleMultiSelectToggle, handleAnswer, currentEditMode, config.texts?.checkAnswer, currentQuestionIndex, showResult, appConfig?.isRTL]);
 
   const renderSliderScale = useCallback(() => {
     const question = currentQuestion as SliderScaleQuestion;
@@ -1747,7 +1747,7 @@ export const QuizScene = React.memo(function QuizScene({
         </div>
       </div>
     );
-  }, [currentQuestion, sliderValue, editModeAnswer, effectiveShowResult, isLoading, handleSliderChange, handleAnswer, handleSliderContainerTouch, handleSliderContainerWheel, currentEditMode, config.texts?.evaluating, config.texts?.completeEvaluation, currentQuestionIndex, showResult]);
+  }, [currentQuestion, sliderValue, editModeAnswer, effectiveShowResult, isLoading, handleSliderChange, handleAnswer, handleSliderContainerTouch, handleSliderContainerWheel, currentEditMode, config.texts?.evaluating, config.texts?.completeEvaluation, currentQuestionIndex, showResult, appConfig?.isRTL]);
 
   const renderDragDrop = useCallback(() => {
     const question = currentQuestion as DragDropQuestion;
@@ -2211,7 +2211,7 @@ export const QuizScene = React.memo(function QuizScene({
         )}
       </div>
     );
-  }, [currentQuestion, draggedItems, editModeAnswer, selectedItem, effectiveShowResult, isLoading, setSelectedItem, setDraggedItems, handleAnswer, currentEditMode, config.texts?.mobileInstructions, config.texts?.desktopInstructions, config.texts?.options, config.texts?.tapHere, config.texts?.clearCategory, config.texts?.checkAnswer, config.texts?.evaluating, config.texts?.checkAnswerButton, config.texts?.categories, config.texts?.removeItem, showResult, currentQuestionIndex]);
+  }, [currentQuestion, draggedItems, editModeAnswer, selectedItem, effectiveShowResult, isLoading, setSelectedItem, setDraggedItems, handleAnswer, currentEditMode, config.texts?.mobileInstructions, config.texts?.desktopInstructions, config.texts?.options, config.texts?.tapHere, config.texts?.clearCategory, config.texts?.checkAnswer, config.texts?.evaluating, config.texts?.checkAnswerButton, config.texts?.categories, config.texts?.removeItem, showResult, currentQuestionIndex, appConfig?.isRTL]);
 
   const renderQuestion = useCallback(() => {
     switch (currentQuestion?.type) {
@@ -2315,7 +2315,7 @@ export const QuizScene = React.memo(function QuizScene({
         // Allow escape for accessibility
         break;
     }
-  }, [showResult, isLoading]);
+  }, [showResult, isLoading, appConfig?.isRTL]);
 
   // Focus management
   const mainRef = useRef<HTMLDivElement>(null);
