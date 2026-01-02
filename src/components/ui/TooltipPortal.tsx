@@ -5,12 +5,14 @@ interface TooltipPortalProps {
   children: React.ReactElement;
   tooltip: string;
   disabled?: boolean;
+  placement?: 'auto' | 'top' | 'bottom';
 }
 
 export const TooltipPortal: React.FC<TooltipPortalProps> = ({
   children,
   tooltip,
-  disabled = false
+  disabled = false,
+  placement = 'auto'
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -21,40 +23,53 @@ export const TooltipPortal: React.FC<TooltipPortalProps> = ({
 
     const updatePosition = () => {
       if (!elementRef.current) return;
-      
+
       const rect = elementRef.current.getBoundingClientRect();
       const tooltipWidth = 200; // Approximate tooltip width
       const tooltipHeight = 40; // Approximate tooltip height
-      
-      let x = rect.left + rect.width / 2 - tooltipWidth / 2;
-      let y = rect.top - tooltipHeight - 16;
-      
-      // Adjust if tooltip would go off screen
-      if (x < 8) x = 8;
-      if (x + tooltipWidth > window.innerWidth - 8) {
-        x = window.innerWidth - tooltipWidth - 8;
+      const horizontalPadding = 8;
+
+      const centerX = rect.left + rect.width / 2;
+      const topY = rect.top - tooltipHeight - 16;
+      const bottomY = rect.bottom + 8;
+
+      const effectivePlacement = placement === 'auto'
+        ? (topY >= horizontalPadding ? 'top' : 'bottom')
+        : placement;
+
+      let y =
+        effectivePlacement === 'bottom'
+          ? Math.min(bottomY, window.innerHeight - tooltipHeight - horizontalPadding)
+          : topY;
+
+      if (effectivePlacement === 'top' && y < horizontalPadding) {
+        y = Math.max(bottomY, horizontalPadding);
       }
-      
-      // If tooltip would go above viewport, show below instead
-      if (y < 8) {
-        y = rect.bottom + 8;
+
+      // Adjust horizontal center if tooltip would go off screen
+      let adjustedX = centerX;
+      if (centerX - tooltipWidth / 2 < horizontalPadding) {
+        adjustedX = horizontalPadding + tooltipWidth / 2;
       }
-      
-      setPosition({ x, y });
+      if (centerX + tooltipWidth / 2 > window.innerWidth - horizontalPadding) {
+        adjustedX = window.innerWidth - horizontalPadding - tooltipWidth / 2;
+      }
+
+      setPosition({ x: adjustedX, y });
     };
 
     updatePosition();
-    
+
     // Update position on scroll or resize
     const handleUpdate = () => updatePosition();
     window.addEventListener('scroll', handleUpdate, { passive: true });
     window.addEventListener('resize', handleUpdate, { passive: true });
-    
+
     return () => {
       window.removeEventListener('scroll', handleUpdate);
       window.removeEventListener('resize', handleUpdate);
     };
-  }, [isVisible]);
+  }, [isVisible, placement]);
 
   const handleMouseEnter = () => {
     if (!disabled && tooltip) {
@@ -81,13 +96,14 @@ export const TooltipPortal: React.FC<TooltipPortalProps> = ({
 
   const tooltipElement = isVisible && tooltip ? (
     <div
-      className="fixed z-[100000] pointer-events-none"
+      className="fixed z-[2147483647] pointer-events-none"
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,
+        transform: 'translateX(-50%)'
       }}
     >
-      <div className="bg-black/90 text-white px-3 py-2 rounded-lg text-sm font-medium shadow-lg backdrop-blur-md border border-white/10 max-w-xs break-words">
+      <div className="relative glass-border-1 glass-border-1-no-overflow px-3 py-2 text-sm font-medium text-[#1C1C1E] dark:text-[#F2F2F7] max-w-xs break-words shadow-[0_20px_60px_rgba(15,23,42,0.35)]">
         {tooltip}
       </div>
     </div>

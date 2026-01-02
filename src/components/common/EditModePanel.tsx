@@ -9,6 +9,7 @@ import { useUploadTraining } from '../../hooks/useUploadTraining';
 import { useIsMobile } from '../ui/use-mobile';
 import { CommentPanel } from '../ui/comment-panel';
 import { useOptionalComments } from '../../contexts/CommentsContext';
+import { TooltipPortal } from '../ui/TooltipPortal';
 
 interface EditModePanelProps {
     sceneId?: string | number;
@@ -357,120 +358,121 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
             <div className="glass-border-2 p-4 backdrop-blur-xl">
                 <div className={`flex items-center ${showTexts ? 'gap-3' : 'gap-2'}`}>
                     {/* Edit Mode Toggle */}
-                    <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={handleToggleEditMode}
-                        className={`flex items-center ${showTexts ? 'gap-2 px-4' : 'gap-1 px-2'} py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer ${isEditMode
-                            ? 'text-[#1C1C1E] dark:text-[#F2F2F7] bg-blue-500/10'
-                            : 'text-[#1C1C1E] dark:text-[#F2F2F7]'
-                            }`}
-                        style={{ pointerEvents: 'auto', cursor: 'pointer' }}
-                    >
-                        <AnimatePresence mode="wait">
-                            <motion.div
-                                key={isEditMode ? 'pencil' : 'pencil-off'}
-                                initial={{ opacity: 0, rotate: -180 }}
-                                animate={{ opacity: 1, rotate: 0 }}
-                                exit={{ opacity: 0, rotate: 180 }}
-                                transition={{ duration: 0.2 }}
-                            >
-                                {isEditMode ? <Pencil size={16} /> : <PencilOff size={16} />}
-                            </motion.div>
-                        </AnimatePresence>
-                        {showTexts && <span>{isEditMode ? 'Exit Edit' : 'Enter Edit'}</span>}
-                    </motion.button>
-
-                    {/* Comment Button */}
-                    {isEditMode && commentsContext && (
+                    <TooltipPortal tooltip={isEditMode ? 'Exit edit mode' : 'Enter edit mode'} placement="bottom">
                         <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            onClick={() => toggleCommentsPanel()}
-                            className={`flex items-center ${showTexts ? 'gap-2 px-4' : 'gap-1 px-2'} py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer text-[#1C1C1E] dark:text-[#F2F2F7] ${commentsContext.isPanelOpen ? 'bg-sky-500/10' : ''}`}
-                            aria-pressed={commentsContext.isPanelOpen}
+                            onClick={handleToggleEditMode}
+                            className={`flex items-center ${showTexts ? 'gap-2 px-4' : 'gap-1 px-2'} py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer ${isEditMode
+                                ? 'text-[#1C1C1E] dark:text-[#F2F2F7] bg-blue-500/10'
+                                : 'text-[#1C1C1E] dark:text-[#F2F2F7]'
+                                }`}
                             style={{ pointerEvents: 'auto', cursor: 'pointer' }}
-                            title={commentsContext.isPanelOpen ? 'Close comments' : 'Open comments'}
                         >
                             <AnimatePresence mode="wait">
                                 <motion.div
-                                    key={commentsContext.isPanelOpen ? 'open' : 'closed'}
+                                    key={isEditMode ? 'pencil-off' : 'pencil'}
+                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.8 }}
+                                    transition={{ duration: 0.2 }}
+                                >
+                                    {isEditMode ? <PencilOff size={16} /> : <Pencil size={16} />}
+                                </motion.div>
+                            </AnimatePresence>
+                        </motion.button>
+                    </TooltipPortal>
+
+                    {/* Comment Button */}
+                    {isEditMode && commentsContext && (
+                        <TooltipPortal tooltip={commentsContext.isPanelOpen ? 'Hide comments' : 'Show comments'} placement="bottom">
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => toggleCommentsPanel()}
+                                className={`flex items-center ${showTexts ? 'gap-2 px-4' : 'gap-1 px-2'} py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer text-[#1C1C1E] dark:text-[#F2F2F7] ${commentsContext.isPanelOpen ? 'bg-sky-500/10' : ''}`}
+                                aria-pressed={commentsContext.isPanelOpen}
+                                style={{ pointerEvents: 'auto', cursor: 'pointer' }}
+                            >
+                                <AnimatePresence mode="wait">
+                                    <motion.div
+                                        key={commentsContext.isPanelOpen ? 'open' : 'closed'}
+                                        initial={{ opacity: 0, rotate: -180 }}
+                                        animate={{ opacity: 1, rotate: 0 }}
+                                        exit={{ opacity: 0, rotate: 180 }}
+                                        transition={{ duration: 0.2 }}
+                                    >
+                                        {commentsContext.isPanelOpen ? <MessageSquareMore size={16} /> : <MessageSquare size={16} />}
+                                    </motion.div>
+                                </AnimatePresence>
+                            </motion.button>
+                        </TooltipPortal>
+                    )}
+
+                    {/* Download SCORM Button */}
+                    <TooltipPortal tooltip="Download SCORM package" placement="bottom">
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={downloadSCORMPackage}
+                            className={`flex items-center ${showTexts ? 'gap-2 px-4' : 'gap-1 px-2'} py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer text-[#1C1C1E] dark:text-[#F2F2F7]`}
+                            style={{ pointerEvents: 'auto', cursor: 'pointer' }}
+                        >
+                            <motion.div
+                                whileHover={{ y: 2 }}
+                            >
+                                <Download size={16} />
+                            </motion.div>
+                        </motion.button>
+                    </TooltipPortal>
+
+                    {/* Upload SCORM Button */}
+                    <TooltipPortal tooltip={isUploadCompleted ? 'Upload already completed' : isUploading ? 'Uploading...' : 'Upload SCORM package'} placement="bottom">
+                        <motion.button
+                            whileHover={!isUploadCompleted && !isUploading ? { scale: 1.05 } : {}}
+                            whileTap={!isUploadCompleted && !isUploading ? { scale: 0.97 } : {}}
+                            onClick={handleUploadClick}
+                            disabled={isUploadCompleted || isUploading}
+                            className={`flex items-center ${showTexts ? 'gap-2 px-4' : 'gap-1 px-2'} py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer ${isUploadCompleted || isUploading
+                                ? 'opacity-50 cursor-not-allowed text-[#1C1C1E]/50 dark:text-[#F2F2F7]/50'
+                                : 'text-[#1C1C1E] dark:text-[#F2F2F7]'
+                                }`}
+                            style={{ pointerEvents: isUploadCompleted || isUploading ? 'none' : 'auto' }}
+                        >
+                            <motion.div
+                                animate={isUploading ? { rotate: 360 } : { rotate: 0 }}
+                                transition={isUploading ? { duration: 1.5, repeat: Infinity } : { duration: 0.3 }}
+                            >
+                                <Upload size={16} />
+                            </motion.div>
+                        </motion.button>
+                    </TooltipPortal>
+
+                    {/* View Mode Toggle */}
+                    <TooltipPortal tooltip={isViewMode ? 'Hide scientific basis info' : 'Show scientific basis info'} placement="bottom">
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={toggleViewMode}
+                            className={`flex items-center ${showTexts ? 'gap-2 px-4' : 'gap-1 px-2'} py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer ${isViewMode
+                                ? 'text-[#1C1C1E] dark:text-[#F2F2F7] bg-green-500/10'
+                                : 'text-[#1C1C1E] dark:text-[#F2F2F7]'
+                                }`}
+                            style={{ pointerEvents: 'auto', cursor: 'pointer' }}
+                        >
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={isViewMode ? 'eye-off' : 'eye'}
                                     initial={{ opacity: 0, rotate: -180 }}
                                     animate={{ opacity: 1, rotate: 0 }}
                                     exit={{ opacity: 0, rotate: 180 }}
                                     transition={{ duration: 0.2 }}
                                 >
-                                    {commentsContext.isPanelOpen ? <MessageSquareMore size={16} /> : <MessageSquare size={16} />}
+                                    {isViewMode ? <EyeOff size={16} /> : <Eye size={16} />}
                                 </motion.div>
                             </AnimatePresence>
-                            {showTexts && <span>{commentsContext.isPanelOpen ? 'Comments' : 'Comments'}</span>}
                         </motion.button>
-                    )}
-
-                    {/* Download SCORM Button */}
-                    <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={downloadSCORMPackage}
-                        className={`flex items-center ${showTexts ? 'gap-2 px-4' : 'gap-1 px-2'} py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer text-[#1C1C1E] dark:text-[#F2F2F7]`}
-                        style={{ pointerEvents: 'auto', cursor: 'pointer' }}
-                        title="Download SCORM package"
-                    >
-                        <motion.div
-                            whileHover={{ y: 2 }}
-                        >
-                            <Download size={16} />
-                        </motion.div>
-                        {showTexts && <span>Download SCORM</span>}
-                    </motion.button>
-
-                    {/* Upload SCORM Button */}
-                    <motion.button
-                        whileHover={!isUploadCompleted && !isUploading ? { scale: 1.05 } : {}}
-                        whileTap={!isUploadCompleted && !isUploading ? { scale: 0.97 } : {}}
-                        onClick={handleUploadClick}
-                        disabled={isUploadCompleted || isUploading}
-                        className={`flex items-center ${showTexts ? 'gap-2 px-4' : 'gap-1 px-2'} py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer ${isUploadCompleted || isUploading
-                            ? 'opacity-50 cursor-not-allowed text-[#1C1C1E]/50 dark:text-[#F2F2F7]/50'
-                            : 'text-[#1C1C1E] dark:text-[#F2F2F7]'
-                            }`}
-                        style={{ pointerEvents: isUploadCompleted || isUploading ? 'none' : 'auto' }}
-                        title={isUploadCompleted ? 'Upload already completed' : isUploading ? 'Uploading...' : 'Upload SCORM package'}
-                    >
-                        <motion.div
-                            animate={isUploading ? { rotate: 360 } : { rotate: 0 }}
-                            transition={isUploading ? { duration: 1.5, repeat: Infinity } : { duration: 0.3 }}
-                        >
-                            <Upload size={16} />
-                        </motion.div>
-                        {showTexts && <span>{isUploading ? 'Uploading...' : isUploadCompleted ? 'Uploaded' : 'Upload'}</span>}
-                    </motion.button>
-
-                    {/* View Mode Toggle */}
-                    <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={toggleViewMode}
-                        className={`flex items-center ${showTexts ? 'gap-2 px-4' : 'gap-1 px-2'} py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer ${isViewMode
-                            ? 'text-[#1C1C1E] dark:text-[#F2F2F7] bg-green-500/10'
-                            : 'text-[#1C1C1E] dark:text-[#F2F2F7]'
-                            }`}
-                        style={{ pointerEvents: 'auto', cursor: 'pointer' }}
-                        title="View scientific basis information"
-                    >
-                        <AnimatePresence mode="wait">
-                            <motion.div
-                                key={isViewMode ? 'eye-off' : 'eye'}
-                                initial={{ opacity: 0, rotate: -180 }}
-                                animate={{ opacity: 1, rotate: 0 }}
-                                exit={{ opacity: 0, rotate: 180 }}
-                                transition={{ duration: 0.2 }}
-                            >
-                                {isViewMode ? <EyeOff size={16} /> : <Eye size={16} />}
-                            </motion.div>
-                        </AnimatePresence>
-                        {showTexts && <span>{isViewMode ? 'Hide Info' : 'View Info'}</span>}
-                    </motion.button>
+                    </TooltipPortal>
 
                     {/* Edit Mode Controls */}
                     <AnimatePresence>
@@ -482,47 +484,49 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
                                 className="flex items-center gap-2 border-l border-white/20 dark:border-gray-300/20 pl-3"
                             >
                                 {/* Save Button */}
-                                <motion.button
-                                    whileHover={hasUnsavedChanges ? { scale: 1.05 } : {}}
-                                    whileTap={hasUnsavedChanges ? { scale: 0.95 } : {}}
-                                    onClick={saveChanges}
-                                    disabled={!hasUnsavedChanges}
-                                    className={`flex items-center gap-1 px-3 py-2 glass-border-1 font-medium transition-all ${hasUnsavedChanges
-                                        ? 'text-[#1C1C1E] dark:text-[#F2F2F7]'
-                                        : 'text-[#1C1C1E] dark:text-[#F2F2F7] cursor-not-allowed opacity-50'
-                                        }`}
-                                    title="Save Changes"
-                                >
-                                    <motion.div
-                                        animate={hasUnsavedChanges ? { scale: [1, 1.1, 1] } : {}}
-                                        transition={hasUnsavedChanges ? { duration: 0.6, repeat: Infinity } : {}}
+                                <TooltipPortal tooltip="Save changes" placement="bottom">
+                                    <motion.button
+                                        whileHover={hasUnsavedChanges ? { scale: 1.05 } : {}}
+                                        whileTap={hasUnsavedChanges ? { scale: 0.95 } : {}}
+                                        onClick={saveChanges}
+                                        disabled={!hasUnsavedChanges}
+                                        className={`flex items-center gap-1 px-3 py-2 glass-border-1 font-medium transition-all ${hasUnsavedChanges
+                                            ? 'text-[#1C1C1E] dark:text-[#F2F2F7]'
+                                            : 'text-[#1C1C1E] dark:text-[#F2F2F7] cursor-not-allowed opacity-50'
+                                            }`}
                                     >
-                                        <Save size={14} />
-                                    </motion.div>
-                                    {hasUnsavedChanges && (
-                                        <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                                    )}
-                                </motion.button>
+                                        <motion.div
+                                            animate={hasUnsavedChanges ? { scale: [1, 1.1, 1] } : {}}
+                                            transition={hasUnsavedChanges ? { duration: 0.6, repeat: Infinity } : {}}
+                                        >
+                                            <Save size={14} />
+                                        </motion.div>
+                                        {hasUnsavedChanges && (
+                                            <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                                        )}
+                                    </motion.button>
+                                </TooltipPortal>
 
                                 {/* Discard Button */}
-                                <motion.button
-                                    whileHover={hasUnsavedChanges ? { scale: 1.05 } : {}}
-                                    whileTap={hasUnsavedChanges ? { scale: 0.95 } : {}}
-                                    onClick={discardChanges}
-                                    disabled={!hasUnsavedChanges}
-                                    className={`flex items-center gap-1 px-3 py-2 glass-border-1 font-medium transition-all ${hasUnsavedChanges
-                                        ? 'text-[#1C1C1E] dark:text-[#F2F2F7]'
-                                        : 'text-[#1C1C1E] dark:text-[#F2F2F7] cursor-not-allowed opacity-50'
-                                        }`}
-                                    title="Discard Changes"
-                                >
-                                    <motion.div
-                                        whileHover={hasUnsavedChanges ? { rotate: -180 } : {}}
-                                        transition={{ duration: 0.4 }}
+                                <TooltipPortal tooltip="Discard changes" placement="bottom">
+                                    <motion.button
+                                        whileHover={hasUnsavedChanges ? { scale: 1.05 } : {}}
+                                        whileTap={hasUnsavedChanges ? { scale: 0.95 } : {}}
+                                        onClick={discardChanges}
+                                        disabled={!hasUnsavedChanges}
+                                        className={`flex items-center gap-1 px-3 py-2 glass-border-1 font-medium transition-all ${hasUnsavedChanges
+                                            ? 'text-[#1C1C1E] dark:text-[#F2F2F7]'
+                                            : 'text-[#1C1C1E] dark:text-[#F2F2F7] cursor-not-allowed opacity-50'
+                                            }`}
                                     >
-                                        <RotateCcw size={14} />
-                                    </motion.div>
-                                </motion.button>
+                                        <motion.div
+                                            whileHover={hasUnsavedChanges ? { rotate: -180 } : {}}
+                                            transition={{ duration: 0.4 }}
+                                        >
+                                            <RotateCcw size={14} />
+                                        </motion.div>
+                                    </motion.button>
+                                </TooltipPortal>
 
                                 {/* Status Indicator */}
                                 <div className="flex items-center gap-2 text-sm">
