@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { getApiBaseUrl, normalizeUrlParam } from '../utils/urlManager';
 
 interface EditModeContextType {
     isEditMode: boolean;
@@ -245,27 +246,20 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
             // Ardından backend'e patch gönder
             const sendPatchRequest = async () => {
                 try {
-                    // Use provided apiUrl or fallback to default  
+                    // Use provided apiUrl or construct from URL parameters
                     let patchUrl = apiUrl || (() => {
                         const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-                        const DEFAULT_BASE_URL = "https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001";
+                        const baseUrl = getApiBaseUrl();
                         const DEFAULT_LANG_URL = "lang/en";
 
                         if (urlParams) {
-                            const normalizeUrlParam = (value?: string | null): string => {
-                                if (!value) return '';
-                                const trimmed = value.trim().replace(/^['"]|['"]$/g, '');
-                                return trimmed.startsWith('@') ? trimmed.slice(1) : trimmed;
-                            };
-
-                            const baseUrl = normalizeUrlParam(urlParams.get('baseUrl')) || DEFAULT_BASE_URL;
                             const langUrlParam = normalizeUrlParam(urlParams.get('langUrl')) || DEFAULT_LANG_URL;
                             // Normalize langUrl: support both "lang/tr-TR" and "tr-TR" formats
                             const langUrl = langUrlParam.startsWith('lang/') ? langUrlParam : `lang/${langUrlParam}`;
                             return `${baseUrl}/${langUrl}`;
                         }
 
-                        return `${DEFAULT_BASE_URL}/${DEFAULT_LANG_URL}`;
+                        return `${baseUrl}/${DEFAULT_LANG_URL}`;
                     })();
 
                     // Clean up double slashes in URL

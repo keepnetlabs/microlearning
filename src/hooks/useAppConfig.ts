@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { detectBrowserLanguage } from '../utils/languageUtils';
 import { createConfigChangeEvent, loadAppConfigAsyncCombined } from '../components/configs/appConfigLoader';
+import { getApiBaseUrl, normalizeUrlParam } from '../utils/urlManager';
 
 interface TestOverrides {
   language?: string;
@@ -17,16 +18,9 @@ export const useAppConfig = ({ testOverrides }: UseAppConfigOptions = {}) => {
 
   // Read remote URLs from query params (no env fallbacks), with defaults; store in refs for reuse
   const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-  const normalizeUrlParam = (value?: string | null): string => {
-    if (!value) return '';
-    const trimmed = value.trim().replace(/^['"]|['"]$/g, '');
-    return trimmed.startsWith('@') ? trimmed.slice(1) : trimmed;
-  };
-
-  const DEFAULT_BASE_URL = "https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001";
   const DEFAULT_LANG_URL = `lang/en`;
 
-  const initialRemoteBaseUrl = normalizeUrlParam(urlParams?.get('baseUrl')) || DEFAULT_BASE_URL;
+  const initialRemoteBaseUrl = getApiBaseUrl();
 
   // langUrl parametresini formatlandır: hem "lang/tr-TR" hem de "tr-TR" formatlarını destekle
   const normalizedLangUrl = (() => {

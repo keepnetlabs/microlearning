@@ -13,6 +13,7 @@ import { Inbox } from "../Inbox";
 import { InboxSceneConfig } from "../../data/inboxConfig";
 import { ActionableContentSceneProps } from "./actionable/types";
 import { CommentPinsOverlay } from "../ui/comment-pins-overlay";
+import { getApiBaseUrl, normalizeUrlParam } from "../../utils/urlManager";
 
 const getIconComponent = (iconName: string): LucideIcon => {
   // İkon adını camelCase'e çevir (örn: "book-open" -> "BookOpen")
@@ -29,11 +30,6 @@ const getIconComponent = (iconName: string): LucideIcon => {
   // Fallback ikon
   console.warn(`Icon "${iconName}" not found, using default icon`);
   return LucideIcons.HelpCircle;
-};
-const normalizeUrlParam = (value?: string | null): string => {
-  if (!value) return '';
-  const trimmed = value.trim().replace(/^['"]|['"]$/g, '');
-  return trimmed.startsWith('@') ? trimmed.slice(1) : trimmed;
 };
 
 const joinUrls = (...parts: (string | undefined)[]): string => {
@@ -84,7 +80,7 @@ function ActionableContentSceneInternalCore({
   // Default values for container classes
   const defaultContainerClassName = "flex flex-col items-center justify-start min-h-full sm:px-6 overflow-y-auto";
   const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-  const initialRemoteBaseUrl = normalizeUrlParam(urlParams?.get('baseUrl')) || "https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001";
+  const initialRemoteBaseUrl = getApiBaseUrl();
   const inboxUrl = normalizeUrlParam(urlParams?.get('inboxUrl')) || "inbox/all";
   const langUrl = normalizeUrlParam(urlParams?.get('langUrl')) || "lang/en";
   // Parse language: support both "lang/tr-TR" and "tr-TR" formats

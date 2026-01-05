@@ -13,6 +13,7 @@ import { createPortal } from "react-dom";
 import { FileText, Lock, RotateCw, Edit3 } from "lucide-react";
 import { useIsMobile } from "./ui/use-mobile";
 import { useEditMode } from "../contexts/EditModeContext";
+import { getApiBaseUrl, normalizeUrlParam } from "../utils/urlManager";
 
 // HTMLVideoElement'e _lastTime özelliği ekle
 interface VideoWithLastTime extends HTMLVideoElement {
@@ -290,16 +291,9 @@ export function VideoPlayer({
       }
 
       const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-      const DEFAULT_BASE_URL = "https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001";
       const DEFAULT_LANG_URL = "lang/en";
 
-      const normalizeUrlParam = (value?: string | null): string => {
-        if (!value) return '';
-        const trimmed = value.trim().replace(/^['"]|['"]$/g, '');
-        return trimmed.startsWith('@') ? trimmed.slice(1) : trimmed;
-      };
-
-      const baseUrl = urlParams ? normalizeUrlParam(urlParams.get('baseUrl')) || DEFAULT_BASE_URL : DEFAULT_BASE_URL;
+      const baseUrl = getApiBaseUrl();
       const langUrlParam = urlParams ? normalizeUrlParam(urlParams.get('langUrl')) || DEFAULT_LANG_URL : DEFAULT_LANG_URL;
       // Normalize langUrl: hem "lang/tr-TR" hem de "tr-TR" formatlarını destekle
       const langUrl = langUrlParam.startsWith('lang/') ? langUrlParam : `lang/${langUrlParam}`;
@@ -366,16 +360,9 @@ export function VideoPlayer({
       };
 
       const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-      const DEFAULT_BASE_URL = "https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001";
       const DEFAULT_LANG_URL = "lang/en";
 
-      const normalizeUrlParam = (value?: string | null): string => {
-        if (!value) return '';
-        const trimmed = value.trim().replace(/^['"]|['"]$/g, '');
-        return trimmed.startsWith('@') ? trimmed.slice(1) : trimmed;
-      };
-
-      const baseUrl = urlParams ? normalizeUrlParam(urlParams.get('baseUrl')) || DEFAULT_BASE_URL : DEFAULT_BASE_URL;
+      const baseUrl = getApiBaseUrl();
       const langUrlParam = urlParams ? normalizeUrlParam(urlParams.get('langUrl')) || DEFAULT_LANG_URL : DEFAULT_LANG_URL;
       // Normalize langUrl: hem "lang/tr-TR" hem de "tr-TR" formatlarını destekle
       const langUrl = langUrlParam.startsWith('lang/') ? langUrlParam : `lang/${langUrlParam}`;

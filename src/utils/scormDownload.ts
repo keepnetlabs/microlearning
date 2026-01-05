@@ -2,6 +2,7 @@
 // Generates and downloads SCORM 1.2 compliant HTML package
 
 import JSZip from 'jszip';
+import { getApiBaseUrl, normalizeUrlParam } from './urlManager';
 
 // Helper function to generate SCORM HTML content
 export const generateSCORMHTML = (baseUrl: string, courseTitle: string, langUrl?: string, inboxUrl?: string): string => {
@@ -573,11 +574,11 @@ export const generateSCORMManifest = (courseTitle: string): string => {
 export const downloadSCORMPackage = () => {
   // Get current URL parameters
   const urlParams = new URLSearchParams(window.location.search);
-  const baseUrl = urlParams.get('baseUrl') || 'https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001';
+  const baseUrl = getApiBaseUrl();
   // Normalize langUrl: support both "lang/tr-TR" and "tr-TR" formats
-  const langUrlParam = urlParams.get('langUrl') || 'lang/en';
+  const langUrlParam = normalizeUrlParam(urlParams.get('langUrl')) || 'lang/en';
   const langUrl = langUrlParam.startsWith('lang/') ? langUrlParam : `lang/${langUrlParam}`;
-  const inboxUrl = urlParams.get('inboxUrl') || 'inbox/all';
+  const inboxUrl = normalizeUrlParam(urlParams.get('inboxUrl')) || 'inbox/all';
 
   // Extract course title from baseUrl or use default
   const courseTitle = baseUrl.includes('/microlearning/')

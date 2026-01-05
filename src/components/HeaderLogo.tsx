@@ -4,6 +4,7 @@ import { Edit3, X } from "lucide-react";
 import ModalFooter from "./ui/ModalFooter";
 import { useOptionalEditMode } from "../contexts/EditModeContext";
 import { useGlobalEditMode } from "../contexts/GlobalEditModeContext";
+import { getApiBaseUrl } from "../utils/urlManager";
 
 export function getHeaderLogoClassName(isMobile: boolean, isFirstOrLastScene: boolean): string {
   const baseLogoClasses = "relative z-10 h-8 sm:h-10 lg:h-14 w-full object-contain md:w-auto p-1.5 sm:p-2";
@@ -97,18 +98,7 @@ const HeaderLogoContent: React.FC<HeaderLogoProps> = ({
         }
       };
 
-      const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-      const DEFAULT_BASE_URL = "https://microlearning-api.keepnet-labs-ltd-business-profile4086.workers.dev/microlearning/phishing-001";
-
-      const normalizeUrlParam = (value?: string | null): string => {
-        if (!value) return '';
-        const trimmed = value.trim().replace(/^['"]|['"]$/g, '');
-        return trimmed.startsWith('@') ? trimmed.slice(1) : trimmed;
-      };
-
-      const baseUrl = urlParams ? normalizeUrlParam(urlParams.get('baseUrl')) || DEFAULT_BASE_URL : DEFAULT_BASE_URL;
-      const patchUrl = `${baseUrl}`;
-
+      const patchUrl = getApiBaseUrl();
       console.log('Sending PATCH to:', patchUrl);
       console.log('Payload:', patchPayload);
 

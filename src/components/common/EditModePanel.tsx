@@ -10,6 +10,7 @@ import { useIsMobile } from '../ui/use-mobile';
 import { CommentPanel } from '../ui/comment-panel';
 import { useOptionalComments } from '../../contexts/CommentsContext';
 import { TooltipPortal } from '../ui/TooltipPortal';
+import { getApiBaseUrl } from '../../utils/urlManager';
 
 interface EditModePanelProps {
     sceneId?: string | number;
@@ -221,7 +222,7 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
             // Get params from URL
             const urlParams = new URLSearchParams(window.location.search);
             const accessToken = urlParams.get('accessToken');
-            const baseUrl = urlParams.get('baseUrl');
+            const baseUrl = getApiBaseUrl();
             const baseApiUrl = urlParams.get('baseApiUrl') || baseUrl;
 
             console.log('Upload confirmed');
@@ -238,8 +239,8 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
             }
 
             if (!baseUrl) {
-                console.error('baseUrl not found in URL');
-                alert('baseUrl not found in URL');
+                console.error('baseUrl not found');
+                alert('baseUrl not found');
                 setIsUploading(false);
                 return;
             }
