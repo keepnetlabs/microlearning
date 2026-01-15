@@ -182,7 +182,7 @@ export function CommentComposerOverlay() {
                                 ref={textareaRef}
                                 value={message}
                                 onChange={(event) => setMessage(event.target.value)}
-                                placeholder="Write your comment... (@ to mention)"
+                                placeholder="Write your comment..."
                                 rows={4}
                                 maxLength={maxCharacters}
                                 className="w-full resize-none rounded-xl glass-border-2 px-3 py-2 text-sm text-[#1C1C1E] placeholder:text-[#1C1C1E]/40 dark:text-[#F2F2F7] dark:placeholder:text-[#F2F2F7]/50"

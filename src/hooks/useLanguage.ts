@@ -253,6 +253,14 @@ export const useLanguage = ({
   // Derived RTL state
   const isRTL = React.useMemo(() => isRTLLanguage(selectedLanguage), [selectedLanguage]);
 
+  // Sync document lang attribute
+  React.useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const primary = selectedLanguage.split('-')[0].toLowerCase();
+      document.documentElement.lang = primary;
+    }
+  }, [selectedLanguage]);
+
   return {
     // state
     selectedLanguage,
