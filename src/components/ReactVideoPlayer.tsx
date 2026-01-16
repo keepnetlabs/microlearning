@@ -258,11 +258,6 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
     const toggleCaptions = React.useCallback(() => {
       // Önce state'leri güncelle
       setIsCaptionsOn(prevCC => !prevCC);
-
-      // Küçük bir gecikme ile player'ı yeniden mount et
-      setTimeout(() => {
-        setPlayerKey(prev => prev + 1);
-      }, 100);
     }, []);
 
     const handleTranscriptClick = React.useCallback((startTime: number) => {
@@ -538,19 +533,19 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
               }}
               config={{
                 youtube: {
-                  modestbranding: 1,                  // YouTube logosunu gizle
-                  rel: 0,                             // Video sonunda ilgili videoları gösterme
-                  controls: 0,                        // YouTube native kontrol barını gizle
-                  fs: 1,                              // Fullscreen düğmesini aktif et
-                  iv_load_policy: 3,                  // İçerik uyarılarını gizle
+                  modestbranding: 1,
+                  rel: 0,
+                  controls: 0,
+                  fs: 1,
+                  iv_load_policy: 3,
                   disablekb: disableForwardSeek ? 1 : 0,
-                  cc_load_policy: isCaptionsOn ? 1 : 0, // CC state'e göre
-                  start: Math.floor(currentTime || 0), // Başlangıç saniyesi
+                  cc_load_policy: isCaptionsOn ? 1 : 0,
+                  start: Math.floor(currentTime || 0),
                   playerVars: {
-                    origin: window.location.origin,  // YouTube için origin belirt
+                    origin: window.location.origin,
+                    rel: 0, // Ensure rel is here for API to block recommendations
                   },
                   embedOptions: {
-                    // iframe'e allow attribute ekle - tüm izinler (başka siteden embed için)
                     allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen; magnetometer; microphone; camera; geolocation; payment; usb; midi; xr-spatial-tracking',
                   }
                 } as any,
@@ -558,10 +553,11 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
               {...props}
             />
 
-            {/* Custom Controls Overlay - Video başladıktan sonra göster */}
+            {/* Custom Controls Overlay - Video başladıktan sonra göster */
+            /* Video bittiğinde arkadaki önerileri gizlemek için bg-black ekle */}
             {showCustomControls && (
               <div
-                className={`absolute inset-0 pointer-events-none ${isFullscreen ? 'z-[60]' : ''}`}
+                className={`absolute inset-0 pointer-events-none ${isFullscreen ? 'z-[60]' : ''} ${hasEnded ? 'bg-black' : ''}`}
               >
                 {/* Center Play/Pause Button */}
                 <div className="absolute inset-0 flex items-center justify-center">

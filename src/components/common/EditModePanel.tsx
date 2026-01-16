@@ -40,13 +40,15 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
     const { uploadTraining } = useUploadTraining();
     const prevEditModeRef = useRef<boolean>(false);
     const { isPreviewMode } = useGlobalEditMode();
+    const [isInIframe, setIsInIframe] = useState(false);
 
     // Check window size for showing texts (width >= 1280px AND height >= 900px)
     // But always show texts if inside an iframe
     useEffect(() => {
         const checkSize = () => {
-            const isInIframe = window.self !== window.top;
-            const shouldShowTexts = isInIframe || (window.innerWidth >= 1280 && window.innerHeight >= 900);
+            const inIframe = window.self !== window.top;
+            setIsInIframe(inIframe);
+            const shouldShowTexts = inIframe || (window.innerWidth >= 1280 && window.innerHeight >= 900);
             setShowTexts(shouldShowTexts);
         };
 
@@ -428,26 +430,28 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
                     </TooltipPortal>
 
                     {/* Upload SCORM Button */}
-                    <TooltipPortal tooltip={isUploadCompleted ? 'Upload already completed' : isUploading ? 'Uploading...' : 'Upload SCORM package'} placement="bottom">
-                        <motion.button
-                            whileHover={!isUploadCompleted && !isUploading ? { scale: 1.05 } : {}}
-                            whileTap={!isUploadCompleted && !isUploading ? { scale: 0.97 } : {}}
-                            onClick={handleUploadClick}
-                            disabled={isUploadCompleted || isUploading}
-                            className={`flex items-center ${showTexts ? 'gap-2 px-4' : 'gap-1 px-2'} py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer ${isUploadCompleted || isUploading
-                                ? 'opacity-50 cursor-not-allowed text-[#1C1C1E]/50 dark:text-[#F2F2F7]/50'
-                                : 'text-[#1C1C1E] dark:text-[#F2F2F7]'
-                                }`}
-                            style={{ pointerEvents: isUploadCompleted || isUploading ? 'none' : 'auto' }}
-                        >
-                            <motion.div
-                                animate={isUploading ? { rotate: 360 } : { rotate: 0 }}
-                                transition={isUploading ? { duration: 1.5, repeat: Infinity } : { duration: 0.3 }}
+                    {isInIframe && (
+                        <TooltipPortal tooltip={isUploadCompleted ? 'Upload already completed' : isUploading ? 'Uploading...' : 'Upload SCORM package'} placement="bottom">
+                            <motion.button
+                                whileHover={!isUploadCompleted && !isUploading ? { scale: 1.05 } : {}}
+                                whileTap={!isUploadCompleted && !isUploading ? { scale: 0.97 } : {}}
+                                onClick={handleUploadClick}
+                                disabled={isUploadCompleted || isUploading}
+                                className={`flex items-center ${showTexts ? 'gap-2 px-4' : 'gap-1 px-2'} py-2 glass-border-1 font-medium transition-all pointer-events-auto cursor-pointer ${isUploadCompleted || isUploading
+                                    ? 'opacity-50 cursor-not-allowed text-[#1C1C1E]/50 dark:text-[#F2F2F7]/50'
+                                    : 'text-[#1C1C1E] dark:text-[#F2F2F7]'
+                                    }`}
+                                style={{ pointerEvents: isUploadCompleted || isUploading ? 'none' : 'auto' }}
                             >
-                                <Upload size={16} />
-                            </motion.div>
-                        </motion.button>
-                    </TooltipPortal>
+                                <motion.div
+                                    animate={isUploading ? { rotate: 360 } : { rotate: 0 }}
+                                    transition={isUploading ? { duration: 1.5, repeat: Infinity } : { duration: 0.3 }}
+                                >
+                                    <Upload size={16} />
+                                </motion.div>
+                            </motion.button>
+                        </TooltipPortal>
+                    )}
 
                     {/* View Mode Toggle */}
                     <TooltipPortal tooltip={isViewMode ? 'Hide scientific basis info' : 'Show scientific basis info'} placement="bottom">
