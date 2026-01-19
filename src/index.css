@@ -789,6 +789,11 @@
 [data-rsbs-has-footer="false"] [data-rsbs-content] {
   opacity: 1 !important;
 }
+.bottom-sheet-glass [data-rsbs-content] {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+}
 .bottom-sheet-glass div[role="dialog"]::before {
   content: "";
   position: absolute;

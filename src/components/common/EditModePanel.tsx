@@ -41,6 +41,7 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
     const prevEditModeRef = useRef<boolean>(false);
     const { isPreviewMode } = useGlobalEditMode();
     const [isInIframe, setIsInIframe] = useState(false);
+    const [hasThemeUnsavedChanges, setHasThemeUnsavedChanges] = useState(false);
 
     // Check window size for showing texts (width >= 1280px AND height >= 900px)
     // But always show texts if inside an iframe
@@ -55,6 +56,15 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
         checkSize();
         window.addEventListener('resize', checkSize);
         return () => window.removeEventListener('resize', checkSize);
+    }, []);
+
+    useEffect(() => {
+        const handleThemeDirty = (event: Event) => {
+            const detail = (event as CustomEvent<{ dirty?: boolean }>).detail;
+            setHasThemeUnsavedChanges(!!detail?.dirty);
+        };
+        window.addEventListener('theme-config-dirty', handleThemeDirty as EventListener);
+        return () => window.removeEventListener('theme-config-dirty', handleThemeDirty as EventListener);
     }, []);
 
     const toggleCommentsPanel = useCallback((nextState?: boolean, options?: { enableComposer?: boolean }) => {
@@ -491,11 +501,16 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
                                 {/* Save Button */}
                                 <TooltipPortal tooltip="Save changes" placement="bottom">
                                     <motion.button
-                                        whileHover={hasUnsavedChanges ? { scale: 1.05 } : {}}
-                                        whileTap={hasUnsavedChanges ? { scale: 0.95 } : {}}
-                                        onClick={saveChanges}
-                                        disabled={!hasUnsavedChanges}
-                                        className={`flex items-center gap-1 px-3 py-2 glass-border-1 font-medium transition-all ${hasUnsavedChanges
+                                        whileHover={hasUnsavedChanges || hasThemeUnsavedChanges ? { scale: 1.05 } : {}}
+                                        whileTap={hasUnsavedChanges || hasThemeUnsavedChanges ? { scale: 0.95 } : {}}
+                                        onClick={() => {
+                                            saveChanges();
+                                            if (hasThemeUnsavedChanges) {
+                                                try { window.dispatchEvent(new CustomEvent('theme-config-save')); } catch { }
+                                            }
+                                        }}
+                                        disabled={!hasUnsavedChanges && !hasThemeUnsavedChanges}
+                                        className={`flex items-center gap-1 px-3 py-2 glass-border-1 font-medium transition-all ${hasUnsavedChanges || hasThemeUnsavedChanges
                                             ? 'text-[#1C1C1E] dark:text-[#F2F2F7]'
                                             : 'text-[#1C1C1E] dark:text-[#F2F2F7] cursor-not-allowed opacity-50'
                                             }`}
@@ -515,11 +530,16 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
                                 {/* Discard Button */}
                                 <TooltipPortal tooltip="Discard changes" placement="bottom">
                                     <motion.button
-                                        whileHover={hasUnsavedChanges ? { scale: 1.05 } : {}}
-                                        whileTap={hasUnsavedChanges ? { scale: 0.95 } : {}}
-                                        onClick={discardChanges}
-                                        disabled={!hasUnsavedChanges}
-                                        className={`flex items-center gap-1 px-3 py-2 glass-border-1 font-medium transition-all ${hasUnsavedChanges
+                                        whileHover={hasUnsavedChanges || hasThemeUnsavedChanges ? { scale: 1.05 } : {}}
+                                        whileTap={hasUnsavedChanges || hasThemeUnsavedChanges ? { scale: 0.95 } : {}}
+                                        onClick={() => {
+                                            discardChanges();
+                                            if (hasThemeUnsavedChanges) {
+                                                try { window.dispatchEvent(new CustomEvent('theme-config-discard')); } catch { }
+                                            }
+                                        }}
+                                        disabled={!hasUnsavedChanges && !hasThemeUnsavedChanges}
+                                        className={`flex items-center gap-1 px-3 py-2 glass-border-1 font-medium transition-all ${hasUnsavedChanges || hasThemeUnsavedChanges
                                             ? 'text-[#1C1C1E] dark:text-[#F2F2F7]'
                                             : 'text-[#1C1C1E] dark:text-[#F2F2F7] cursor-not-allowed opacity-50'
                                             }`}
@@ -535,11 +555,11 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
 
                                 {/* Status Indicator */}
                                 <div className="flex items-center gap-2 text-sm">
-                                    <div className={`w-2 h-2 rounded-full ${hasUnsavedChanges ? 'bg-yellow-500 animate-pulse' : 'bg-green-500'
+                                    <div className={`w-2 h-2 rounded-full ${hasUnsavedChanges || hasThemeUnsavedChanges ? 'bg-yellow-500 animate-pulse' : 'bg-green-500'
                                         }`} />
                                     {showTexts && (
                                         <span className="text-[#1C1C1E]/70 dark:text-[#F2F2F7]/70">
-                                            {hasUnsavedChanges ? 'Unsaved changes' : 'All saved'}
+                                            {hasUnsavedChanges || hasThemeUnsavedChanges ? 'Unsaved changes' : 'All saved'}
                                         </span>
                                     )}
                                 </div>

@@ -31,9 +31,12 @@ import { useDarkMode } from "./hooks/useDarkMode";
 import { useIsIOS } from "./hooks/useIsIOS";
 import { FontFamilyProvider } from "./contexts/FontFamilyContext";
 import { GlobalEditModeProvider } from "./contexts/GlobalEditModeContext";
+import { EditModeProvider, useEditMode } from "./contexts/EditModeContext";
 import { CommentsProvider } from "./contexts/CommentsContext";
 import { CommentComposerOverlay } from "./components/ui/comment-composer-overlay";
+import { EditableText } from "./components/common/EditableText";
 import { scormService, destroySCORMService } from "./utils/scormService";
+import { getApiBaseUrl } from "./utils/urlManager";
 import { logger } from "./utils/logger";
 import { slideVariants } from "./utils/animationVariants";
 import { MEMOIZED_CONSTANTS } from "./utils/constants";
@@ -45,6 +48,32 @@ const MemoizedProgressBar = React.memo(ProgressBar);
 const MemoizedNavButton = React.memo(NavButton);
 const MemoizedIntroScene = React.memo(IntroScene);
 const MemoizedGoalScene = React.memo(GoalScene);
+function ThemeConfigBridge() {
+  const { hasUnsavedChanges, saveChanges, discardChanges } = useEditMode();
+
+  useEffect(() => {
+    try {
+      window.dispatchEvent(new CustomEvent('theme-config-dirty', { detail: { dirty: hasUnsavedChanges } }));
+    } catch { }
+  }, [hasUnsavedChanges]);
+
+  useEffect(() => {
+    const handleSave = () => {
+      saveChanges();
+    };
+    const handleDiscard = () => {
+      discardChanges();
+    };
+    window.addEventListener('theme-config-save', handleSave as EventListener);
+    window.addEventListener('theme-config-discard', handleDiscard as EventListener);
+    return () => {
+      window.removeEventListener('theme-config-save', handleSave as EventListener);
+      window.removeEventListener('theme-config-discard', handleDiscard as EventListener);
+    };
+  }, [saveChanges, discardChanges]);
+
+  return null;
+}
 const MemoizedScenarioScene = React.memo(ScenarioScene);
 const MemoizedActionableContentScene = React.memo(ActionableContentScene);
 const MemoizedQuizScene = React.memo(QuizScene);
@@ -102,11 +131,18 @@ export default function App(props: AppProps = {}) {
     appConfig,
     themeConfig,
     isConfigLoading,
+    setThemeConfig,
     setIsConfigLoading,
     changeLanguage,
     urlParams,
     normalizeUrlParam,
   } = useAppConfig({ testOverrides });
+
+  const themeApiUrl = useMemo(() => {
+    const langUrlParam = normalizeUrlParam(urlParams?.get('langUrl')) || 'lang/en';
+    const langUrl = langUrlParam.startsWith('lang/') ? langUrlParam : `lang/${langUrlParam}`;
+    return `${getApiBaseUrl()}/${langUrl}`;
+  }, [normalizeUrlParam, urlParams]);
 
   // Dynamic scene mapping based on appConfig.scenes
   const sceneComponentMap = useMemo(() => ({
@@ -1286,25 +1322,58 @@ export default function App(props: AppProps = {}) {
                 </div>
               </main>
 
-              {/* Enhanced Achievement Notifications */}
-              <AchievementNotification
-                show={showAchievementNotification}
-                hasAchievements={achievements.length > 0}
-                onClose={() => setShowAchievementNotification(false)}
-                message={themeConfig.texts?.achievementNotification}
-                ariaLabel={appConfig.theme?.ariaTexts?.achievementLabel || "Achievement notification"}
-                closeAriaLabel={themeConfig.texts?.closeNotification}
-              />
+              <EditModeProvider
+                key={`toast-edit-${selectedLanguage}`}
+                initialConfig={themeConfig}
+                sceneId="app"
+                apiUrl={themeApiUrl}
+                onSave={(nextConfig) => {
+                  setThemeConfig(nextConfig);
+                }}
+              >
+                <ThemeConfigBridge />
+                {/* Enhanced Achievement Notifications */}
+                <AchievementNotification
+                  show={showAchievementNotification || (isEditMode && currentScene === sceneIndices.quiz)}
+                  hasAchievements={achievements.length > 0 || (isEditMode && currentScene === sceneIndices.quiz)}
+                  onClose={() => setShowAchievementNotification(false)}
+                  message={isEditMode ? (
+                    <EditableText
+                      configPath="texts.achievementNotification"
+                      placeholder="Enter achievement notification..."
+                      maxLength={120}
+                      as="span"
+                    >
+                      {themeConfig.texts?.achievementNotification}
+                    </EditableText>
+                  ) : themeConfig.texts?.achievementNotification}
+                  ariaLabel={appConfig.theme?.ariaTexts?.achievementLabel || "Achievement notification"}
+                  closeAriaLabel={themeConfig.texts?.closeNotification}
+                  align="left"
+                  showClose={!isEditMode}
+                />
 
-              {/* Survey Submitted Notification */}
-              <SurveyNotification
-                show={showSurveySubmittedNotification}
-                onClose={() => setShowSurveySubmittedNotification(false)}
-                message={themeConfig.texts?.surveySubmittedToast || "Geri bildiriminiz için teşekkürler!"}
-                ariaLabel={appConfig.theme?.ariaTexts?.quizCompletionLabel || "Survey submitted"}
-                closeAriaLabel={themeConfig.texts?.closeNotification}
-                portalTarget={portalTarget}
-              />
+                {/* Survey Submitted Notification */}
+                <SurveyNotification
+                  show={showSurveySubmittedNotification || (isEditMode && currentScene === sceneIndices.survey)}
+                  onClose={() => setShowSurveySubmittedNotification(false)}
+                  message={isEditMode ? (
+                    <EditableText
+                      configPath="texts.surveySubmittedToast"
+                      placeholder="Enter survey submitted toast..."
+                      maxLength={120}
+                      as="span"
+                    >
+                      {themeConfig.texts?.surveySubmittedToast || "Geri bildiriminiz için teşekkürler!"}
+                    </EditableText>
+                  ) : (themeConfig.texts?.surveySubmittedToast || "Geri bildiriminiz için teşekkürler!")}
+                  ariaLabel={appConfig.theme?.ariaTexts?.quizCompletionLabel || "Survey submitted"}
+                  closeAriaLabel={themeConfig.texts?.closeNotification}
+                  portalTarget={portalTarget}
+                  align="left"
+                  showClose={!isEditMode}
+                />
+              </EditModeProvider>
               {/* Mobile Floating Scroll-to-Top Button */}
               <ScrollToTopButton
                 show={showScrollToTop}

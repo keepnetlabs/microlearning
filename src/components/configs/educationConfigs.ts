@@ -100,9 +100,6 @@ export interface SurveySceneConfig {
         ratingRequiredText?: string;
         dataSecurityNotice?: string;
         successTitle?: string;
-        successMessage1?: string;
-        successMessage2?: string;
-        successMessage3?: string;
         thankYouMessage?: string;
         // Accessibility texts
         mainLabel?: string;

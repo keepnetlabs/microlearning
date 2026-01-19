@@ -206,10 +206,16 @@ export function VideoPlayer({
   const { isEditMode, updateTempConfig } = useEditMode();
   const [showUrlDialog, setShowUrlDialog] = useState(false);
   const [tempVideoUrl, setTempVideoUrl] = useState(propSrc);
+  const [videoUrlError, setVideoUrlError] = useState<string | null>(null);
+  const [videoUrlStatus, setVideoUrlStatus] = useState<string | null>(null);
+  const [isSavingVideoUrl, setIsSavingVideoUrl] = useState(false);
   const [showTranscriptDialog, setShowTranscriptDialog] = useState(false);
   const [tempTranscriptUrl, setTempTranscriptUrl] = useState('');
   const [tempTranscriptText, setTempTranscriptText] = useState('');
   const [transcriptEditMode, setTranscriptEditMode] = useState<'url' | 'text'>('url');
+  const [transcriptUrlError, setTranscriptUrlError] = useState<string | null>(null);
+  const [transcriptStatus, setTranscriptStatus] = useState<string | null>(null);
+  const [isSavingTranscript, setIsSavingTranscript] = useState(false);
 
   // Local state to override transcript after successful save
   const [localTranscript, setLocalTranscript] = useState<TranscriptRow[] | string | undefined>(undefined);
@@ -262,6 +268,18 @@ export function VideoPlayer({
     }
   }, [transcript, transcriptArrayToText]);
 
+  const isUrlLike = useCallback((value: string) => {
+    if (!value.trim() || /\s/.test(value)) return false;
+    const urlPatterns = [
+      /^https?:\/\//,
+      /^\/\//,
+      /^\/[^/]/,
+      /^\.\/|\/\./,
+      /^[a-zA-Z0-9-]+:\/\//,
+    ];
+    return urlPatterns.some(pattern => pattern.test(value.trim()));
+  }, []);
+
   // Handle transcript save - update local config and send to API
   const handleTranscriptSave = useCallback(async () => {
     console.log('Saving transcript config:', { transcriptEditMode, tempTranscriptUrl, tempTranscriptText });
@@ -273,6 +291,10 @@ export function VideoPlayer({
         return;
       }
 
+      setTranscriptStatus(null);
+      setTranscriptUrlError(null);
+      setIsSavingTranscript(true);
+
       const patchPayload: any = {};
 
       // Create nested structure with scene ID
@@ -281,13 +303,14 @@ export function VideoPlayer({
       };
 
       if (transcriptEditMode === 'url') {
-        patchPayload[sceneId].video.transcriptUrl = tempTranscriptUrl;
-        // Clear transcript text when using URL
-        patchPayload[sceneId].video.transcript = undefined;
+        if (!isUrlLike(tempTranscriptUrl)) {
+          setTranscriptUrlError("Please enter a valid transcript URL.");
+          setIsSavingTranscript(false);
+          return;
+        }
+        patchPayload[sceneId].video.transcript = tempTranscriptUrl;
       } else {
         patchPayload[sceneId].video.transcript = tempTranscriptText;
-        // Clear transcript URL when using text
-        patchPayload[sceneId].video.transcriptUrl = undefined;
       }
 
       const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
@@ -327,17 +350,20 @@ export function VideoPlayer({
 
       // Also update temp config for immediate preview
       if (transcriptEditMode === 'url') {
-        updateTempConfig('transcriptUrl', tempTranscriptUrl);
+        updateTempConfig('video.transcript', tempTranscriptUrl);
       } else {
-        updateTempConfig('transcriptText', tempTranscriptText);
+        updateTempConfig('video.transcript', tempTranscriptText);
       }
 
+      setTranscriptStatus("Saved.");
+      setIsSavingTranscript(false);
+      setShowTranscriptDialog(false);
     } catch (error) {
       console.error('Failed to save transcript config:', error);
+      setTranscriptUrlError("Failed to save. Please try again.");
+      setIsSavingTranscript(false);
     }
-
-    setShowTranscriptDialog(false);
-  }, [transcriptEditMode, tempTranscriptUrl, tempTranscriptText, updateTempConfig, sceneId]);
+  }, [transcriptEditMode, tempTranscriptUrl, tempTranscriptText, updateTempConfig, sceneId, isUrlLike]);
 
   // Handle video URL save - update local config and send to API
   const handleVideoUrlSave = useCallback(async () => {
@@ -347,6 +373,16 @@ export function VideoPlayer({
       // Ensure we have a scene ID
       if (!sceneId) {
         console.error('Scene ID is required for saving video URL');
+        return;
+      }
+
+      setVideoUrlStatus(null);
+      setVideoUrlError(null);
+      setIsSavingVideoUrl(true);
+
+      if (!isUrlLike(tempVideoUrl)) {
+        setVideoUrlError("Please enter a valid URL.");
+        setIsSavingVideoUrl(false);
         return;
       }
 
@@ -392,12 +428,15 @@ export function VideoPlayer({
       // Also update temp config for immediate preview - this updates ScenarioScene's currentConfig
       updateTempConfig('video.src', tempVideoUrl);
 
+      setVideoUrlStatus("Saved.");
+      setIsSavingVideoUrl(false);
+      setShowUrlDialog(false);
     } catch (error) {
       console.error('Failed to save video URL config:', error);
+      setVideoUrlError("Failed to save. Please try again.");
+      setIsSavingVideoUrl(false);
     }
-
-    setShowUrlDialog(false);
-  }, [tempVideoUrl, updateTempConfig, sceneId]);
+  }, [tempVideoUrl, updateTempConfig, sceneId, isUrlLike]);
 
   // Dark mode detection
   useEffect(() => {
@@ -922,7 +961,11 @@ export function VideoPlayer({
         {/* URL Edit Button - Slightly outside video container, only show in edit mode */}
         {isEditMode && (
           <motion.button
-            onClick={() => setShowUrlDialog(true)}
+            onClick={() => {
+              setVideoUrlError(null);
+              setVideoUrlStatus(null);
+              setShowUrlDialog(true);
+            }}
             whileHover={reducedMotion ? undefined : { scale: 1.05 }}
             whileTap={reducedMotion ? undefined : { scale: 0.95 }}
             className="z-20 p-2 glass-border-2 rounded-full transition-all duration-300"
@@ -933,6 +976,8 @@ export function VideoPlayer({
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
+                setVideoUrlError(null);
+                setVideoUrlStatus(null);
                 setShowUrlDialog(true);
               }
             }}
@@ -995,6 +1040,8 @@ export function VideoPlayer({
                   <motion.button
                     onClick={() => {
                       initializeTranscriptData();
+                      setTranscriptUrlError(null);
+                      setTranscriptStatus(null);
                       setShowTranscriptDialog(true);
                     }}
                     whileHover={reducedMotion ? undefined : { scale: 1.05 }}
@@ -1008,6 +1055,8 @@ export function VideoPlayer({
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
                         initializeTranscriptData();
+                        setTranscriptUrlError(null);
+                        setTranscriptStatus(null);
                         setShowTranscriptDialog(true);
                       }
                     }}
@@ -1188,10 +1237,24 @@ export function VideoPlayer({
                       id="video-url"
                       type="url"
                       value={tempVideoUrl}
-                      onChange={(e) => setTempVideoUrl(e.target.value)}
+                      onChange={(e) => {
+                        setTempVideoUrl(e.target.value);
+                        setVideoUrlError(null);
+                        setVideoUrlStatus(null);
+                      }}
                       className="w-full px-3 py-2 glass-border-1 rounded-lg bg-white/10 dark:bg-black/10 text-[#1C1C1E] dark:text-[#F2F2F7] outline-none border border-white/20 dark:border-white/10"
                       placeholder="https://example.com/video.m3u8"
                     />
+                    {videoUrlError && (
+                      <p className="text-xs text-red-500 mt-2">
+                        {videoUrlError}
+                      </p>
+                    )}
+                    {videoUrlStatus && (
+                      <p className="text-xs text-emerald-500 mt-2">
+                        {videoUrlStatus}
+                      </p>
+                    )}
                   </div>
 
                 </div>
@@ -1204,6 +1267,8 @@ export function VideoPlayer({
                     onClick={() => {
                       setShowUrlDialog(false);
                       setTempVideoUrl(src);
+                      setVideoUrlError(null);
+                      setVideoUrlStatus(null);
                     }}
                     className="flex-1 py-3 px-4 glass-border-3 font-medium text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors"
                   >
@@ -1213,9 +1278,10 @@ export function VideoPlayer({
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleVideoUrlSave}
-                    className="flex-1 py-3 px-4 glass-border-3 font-medium text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors"
+                    disabled={isSavingVideoUrl}
+                    className="flex-1 py-3 px-4 glass-border-3 font-medium text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    Save
+                    {isSavingVideoUrl ? "Saving..." : "Save"}
                   </motion.button>
                 </div>
               </motion.div>
@@ -1263,6 +1329,8 @@ export function VideoPlayer({
                         e.preventDefault();
                         e.stopPropagation();
                         setTranscriptEditMode('url');
+                        setTranscriptUrlError(null);
+                        setTranscriptStatus(null);
                       }}
                       className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all cursor-pointer relative z-20 ${transcriptEditMode === 'url'
                         ? 'bg-white/20 text-[#1C1C1E] dark:text-[#F2F2F7]'
@@ -1277,6 +1345,8 @@ export function VideoPlayer({
                         e.preventDefault();
                         e.stopPropagation();
                         setTranscriptEditMode('text');
+                        setTranscriptUrlError(null);
+                        setTranscriptStatus(null);
                       }}
                       className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all cursor-pointer relative z-20 ${transcriptEditMode === 'text'
                         ? 'bg-white/20 text-[#1C1C1E] dark:text-[#F2F2F7]'
@@ -1299,12 +1369,26 @@ export function VideoPlayer({
                         id="transcript-url"
                         type="url"
                         value={tempTranscriptUrl}
-                        onChange={(e) => setTempTranscriptUrl(e.target.value)}
+                        onChange={(e) => {
+                          setTempTranscriptUrl(e.target.value);
+                          setTranscriptUrlError(null);
+                          setTranscriptStatus(null);
+                        }}
                         onClick={(e) => e.stopPropagation()}
                         onFocus={(e) => e.stopPropagation()}
                         className="w-full p-3 glass-border-4 rounded bg-transparent text-[#1C1C1E] dark:text-[#F2F2F7] placeholder-[#1C1C1E]/50 dark:placeholder-[#F2F2F7]/50 focus:outline-none"
                         placeholder="https://example.com/transcript.txt"
                       />
+                      {transcriptUrlError && (
+                        <p className="text-xs text-red-500 mt-2">
+                          {transcriptUrlError}
+                        </p>
+                      )}
+                      {transcriptStatus && (
+                        <p className="text-xs text-emerald-500 mt-2">
+                          {transcriptStatus}
+                        </p>
+                      )}
                       <p className="text-xs text-[#1C1C1E]/60 dark:text-[#F2F2F7]/60 mt-1">
                         Enter a URL to fetch transcript content
                       </p>
@@ -1317,7 +1401,10 @@ export function VideoPlayer({
                       <textarea
                         id="transcript-text"
                         value={tempTranscriptText}
-                        onChange={(e) => setTempTranscriptText(e.target.value)}
+                        onChange={(e) => {
+                          setTempTranscriptText(e.target.value);
+                          setTranscriptStatus(null);
+                        }}
                         onClick={(e) => e.stopPropagation()}
                         onFocus={(e) => e.stopPropagation()}
                         onWheel={(e) => e.stopPropagation()}
@@ -1338,6 +1425,11 @@ export function VideoPlayer({
                       <p className="text-xs text-[#1C1C1E]/60 dark:text-[#F2F2F7]/60 mt-1">
                         Enter transcript in format: HH:MM:SS.mmm Text content
                       </p>
+                      {transcriptStatus && (
+                        <p className="text-xs text-emerald-500 mt-2">
+                          {transcriptStatus}
+                        </p>
+                      )}
                     </div>
                   )}
                 </div>
@@ -1351,6 +1443,8 @@ export function VideoPlayer({
                       setShowTranscriptDialog(false);
                       setTempTranscriptUrl('');
                       setTempTranscriptText('');
+                      setTranscriptUrlError(null);
+                      setTranscriptStatus(null);
                     }}
                     className="flex-1 py-3 px-4 glass-border-3 font-medium text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors"
                   >
@@ -1360,9 +1454,10 @@ export function VideoPlayer({
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleTranscriptSave}
-                    className="flex-1 py-3 px-4 glass-border-3 font-medium text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors"
+                    disabled={isSavingTranscript}
+                    className="flex-1 py-3 px-4 glass-border-3 font-medium text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    Save
+                    {isSavingTranscript ? "Saving..." : "Save"}
                   </motion.button>
                 </div>
               </motion.div>

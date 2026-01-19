@@ -216,8 +216,30 @@ function SummarySceneContent({ config, appConfig, completionData, sceneId, reduc
   }), [currentEditMode]);
 
   const tryCloseWindow = useCallback(() => {
-    try { window.top && (window.top as Window).close && (window.top as Window).close(); } catch { }
-    try { window.opener && window.close(); } catch { }
+    let isTopLevel = false;
+    try {
+      isTopLevel = window.top === window;
+    } catch {
+      isTopLevel = false;
+    }
+
+    const hasOpener = typeof window !== 'undefined' && !!window.opener;
+    if (!isTopLevel && !hasOpener) {
+      return;
+    }
+
+    try {
+      if (isTopLevel && window.close) {
+        window.close();
+      }
+    } catch { }
+
+    try {
+      if (hasOpener && window.close) {
+        window.close();
+      }
+    } catch { }
+
     try {
       // Safari/Chrome workaround
       const newWindow = window.open('', '_self');

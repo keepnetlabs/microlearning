@@ -328,9 +328,6 @@
       "ratingRequiredText": "Please select a rating before you submit.",
       "dataSecurityNotice": "Your responses are anonymous and protected.",
       "successTitle": "Thank you",
-      "successMessage1": "Thanks for your feedback.",
-      "successMessage2": "Your rating will help us improve this training.",
-      "successMessage3": "Keep building your security awareness.",
       "thankYouMessage": "Stay safe."
     },
     "ariaTexts": {

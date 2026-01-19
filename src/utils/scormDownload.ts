@@ -61,7 +61,7 @@ const generateSCORMHTMLTemplate = (iframeSrc: string, courseTitle: string): stri
       id="mlFrame" 
       allowfullscreen 
       title="Microlearning"
-      allow="accelerometer; autoplay; camera; clipboard-write; encrypted-media; fullscreen; geolocation; gyroscope; magnetometer; microphone; midi; payment; picture-in-picture; usb; xr-spatial-tracking"
+      allow="accelerometer; autoplay; camera; clipboard-write; encrypted-media; fullscreen; geolocation; gyroscope; magnetometer; microphone; midi; payment; picture-in-picture; usb; xr-spatial-tracking; allow-top-navigation; allow-top-navigation-by-user-activation"
     ></iframe>
 
     <script>

@@ -22,8 +22,8 @@ export function BottomSheetComponent({
             open={open}
             onDismiss={onDismiss}
             className="bottom-sheet-glass"
-            snapPoints={({ minHeight }) => [Math.max(380, minHeight), 0]}
-            defaultSnap={({ maxHeight }) => Math.max(380, maxHeight)}
+            snapPoints={({ maxHeight }) => [maxHeight, 0]}
+            defaultSnap={({ maxHeight }) => maxHeight}
         >
             {title && (
                 <div className="pt-10">

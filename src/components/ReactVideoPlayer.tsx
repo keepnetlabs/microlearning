@@ -2,6 +2,7 @@ import * as React from "react";
 import ReactPlayer from "react-player";
 import { Play, Pause, RotateCw, Maximize, Minimize, FileText, Lock, Edit3 } from "lucide-react";
 import { cn } from "./ui/utils";
+import { useIsMobile } from "./ui/use-mobile";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
 import { useEditMode } from "../contexts/EditModeContext";
@@ -53,6 +54,7 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
     onProgress,
     ...props
   }, ref) => {
+    const isMobile = useIsMobile();
     const [lastTime, setLastTime] = React.useState(0);
     const [isPlaying, setIsPlaying] = React.useState(playing || false);
     const [hasEnded, setHasEnded] = React.useState(false);
@@ -62,6 +64,7 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
     const [currentTime, setCurrentTime] = React.useState(0);
     const [playerKey, setPlayerKey] = React.useState(0); // Player yeniden mount için
     const [showCustomControls, setShowCustomControls] = React.useState(false); // Custom button'ları göster (video başladıktan sonra)
+    const [localTranscriptItems, setLocalTranscriptItems] = React.useState<TranscriptItem[] | null>(null);
     const playerRef = React.useRef<any>(null);
     const containerRef = React.useRef<HTMLDivElement>(null);
     const lastTimeRef = React.useRef(0); // Ref ile callback yeniden oluşturmayı önle
@@ -72,10 +75,16 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
     const { isEditMode, updateTempConfig } = useEditMode();
     const [showUrlDialog, setShowUrlDialog] = React.useState(false);
     const [tempVideoUrl, setTempVideoUrl] = React.useState(src);
+    const [videoUrlError, setVideoUrlError] = React.useState<string | null>(null);
+    const [videoUrlStatus, setVideoUrlStatus] = React.useState<string | null>(null);
+    const [isSavingVideoUrl, setIsSavingVideoUrl] = React.useState(false);
     const [showTranscriptDialog, setShowTranscriptDialog] = React.useState(false);
     const [tempTranscriptUrl, setTempTranscriptUrl] = React.useState('');
     const [tempTranscriptText, setTempTranscriptText] = React.useState('');
     const [transcriptEditMode, setTranscriptEditMode] = React.useState<'url' | 'text'>('text');
+    const [transcriptUrlError, setTranscriptUrlError] = React.useState<string | null>(null);
+    const [transcriptStatus, setTranscriptStatus] = React.useState<string | null>(null);
+    const [isSavingTranscript, setIsSavingTranscript] = React.useState(false);
 
     // playing prop değiştiğinde state'i güncelle
     React.useEffect(() => {
@@ -304,11 +313,33 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
       }
     }, []);
 
+    const isUrlLike = React.useCallback((value: string) => {
+      if (!value.trim() || /\s/.test(value)) return false;
+      const urlPatterns = [
+        /^https?:\/\//,
+        /^\/\//,
+        /^\/[^/]/,
+        /^\.\/|\/\./,
+        /^[a-zA-Z0-9-]+:\/\//,
+      ];
+      return urlPatterns.some(pattern => pattern.test(value.trim()));
+    }, []);
+
     // Handle video URL save
     const handleVideoUrlSave = React.useCallback(async () => {
       try {
         if (!sceneId) {
           console.error('Scene ID is required for saving video URL');
+          return;
+        }
+
+        setVideoUrlStatus(null);
+        setVideoUrlError(null);
+        setIsSavingVideoUrl(true);
+
+        if (!isUrlLike(tempVideoUrl)) {
+          setVideoUrlError("Please enter a valid URL.");
+          setIsSavingVideoUrl(false);
           return;
         }
 
@@ -342,17 +373,80 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
 
         // Update temp config for immediate preview - this updates ScenarioScene's currentConfig
         updateTempConfig('video.src', tempVideoUrl);
+        setIsSavingVideoUrl(false);
         setShowUrlDialog(false);
       } catch (error) {
         console.error('Failed to save video URL config:', error);
+        setVideoUrlError("Failed to save. Please try again.");
+        setIsSavingVideoUrl(false);
       }
-    }, [tempVideoUrl, sceneId, updateTempConfig]);
+    }, [tempVideoUrl, sceneId, updateTempConfig, isUrlLike]);
+
+    const parseTranscriptText = React.useCallback((raw: string): TranscriptItem[] => {
+      if (!raw || typeof raw !== "string") return [];
+
+      const hasLineBreaks = raw.includes('\n') || raw.includes('\\n');
+      if (hasLineBreaks) {
+        const lines = raw.split(/\\n|\n/);
+        const transcriptRows: TranscriptItem[] = [];
+        for (const line of lines) {
+          if (!line.trim()) continue;
+          const backendMatch = line.match(/^(\d{2}):(\d{2}):(\d{2})\s+(.+)$/);
+          const tactiqMatch = line.match(/^(\d{2}):(\d{2}):(\d{2})\.(\d{3})\s+(.+)$/);
+          if (backendMatch) {
+            const h = parseInt(backendMatch[1], 10);
+            const m = parseInt(backendMatch[2], 10);
+            const s = parseInt(backendMatch[3], 10);
+            const start = h * 3600 + m * 60 + s;
+            const text = backendMatch[4].trim();
+            if (text) transcriptRows.push({ start, text });
+          } else if (tactiqMatch) {
+            const h = parseInt(tactiqMatch[1], 10);
+            const m = parseInt(tactiqMatch[2], 10);
+            const s = parseInt(tactiqMatch[3], 10);
+            const ms = parseInt(tactiqMatch[4], 10);
+            const start = h * 3600 + m * 60 + s + ms / 1000;
+            const text = tactiqMatch[5].trim();
+            if (text) transcriptRows.push({ start, text });
+          }
+        }
+        return transcriptRows.sort((a, b) => a.start - b.start);
+      }
+
+      const rows: TranscriptItem[] = [];
+      const regex = /(\d{2}):(\d{2}):(\d{2})(?:\.(\d{3}))?/g;
+      let lastIndex = 0;
+      let currentStart = 0;
+      let match: RegExpExecArray | null;
+      const pushSegment = (segment: string, start: number) => {
+        const cleaned = segment.replace(/\s+/g, " ").replace(/^\s+|\s+$/g, "");
+        if (cleaned.length > 0) rows.push({ start, text: cleaned });
+      };
+      while ((match = regex.exec(raw)) !== null) {
+        const segment = raw.slice(lastIndex, match.index);
+        pushSegment(segment, currentStart);
+        const hours = parseInt(match[1], 10);
+        const minutes = parseInt(match[2], 10);
+        const seconds = parseInt(match[3], 10);
+        const milliseconds = match[4] ? parseInt(match[4], 10) : 0;
+        currentStart = hours * 3600 + minutes * 60 + seconds + milliseconds / 1000;
+        lastIndex = match.index + match[0].length;
+      }
+      const tail = raw.slice(lastIndex);
+      pushSegment(tail, currentStart);
+      return rows.sort((a, b) => a.start - b.start);
+    }, []);
+
+    React.useEffect(() => {
+      setLocalTranscriptItems(null);
+    }, [transcript]);
 
     // Initialize transcript form data when dialog opens
     const initializeTranscriptData = React.useCallback(() => {
-      if (Array.isArray(transcript) && transcript.length > 0) {
+      const editableTranscript = localTranscriptItems ?? transcript;
+      if (Array.isArray(editableTranscript) && editableTranscript.length > 0) {
         // Convert transcript array to text format
-        const textFormat = transcript.map(row => {
+        const textFormat = editableTranscript.map(row => {
           const hours = Math.floor(row.start / 3600);
           const minutes = Math.floor((row.start % 3600) / 60);
           const seconds = Math.floor(row.start % 60);
@@ -368,7 +462,7 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
         setTempTranscriptUrl('');
         setTranscriptEditMode('url');
       }
-    }, [transcript]);
+    }, [transcript, localTranscriptItems]);
 
     // Handle transcript save
     const handleTranscriptSave = React.useCallback(async () => {
@@ -378,17 +472,25 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
           return;
         }
 
+        setTranscriptStatus(null);
+        setTranscriptUrlError(null);
+        setIsSavingTranscript(true);
+
         const patchPayload: any = {};
         patchPayload[sceneId] = {
           video: {}
         };
 
         if (transcriptEditMode === 'url') {
-          patchPayload[sceneId].video.transcriptUrl = tempTranscriptUrl;
-          patchPayload[sceneId].video.transcript = undefined;
+          if (!isUrlLike(tempTranscriptUrl)) {
+            setTranscriptUrlError("Please enter a valid transcript URL.");
+            setIsSavingTranscript(false);
+            return;
+          }
+
+          patchPayload[sceneId].video.transcript = tempTranscriptUrl;
         } else {
           patchPayload[sceneId].video.transcript = tempTranscriptText;
-          patchPayload[sceneId].video.transcriptUrl = undefined;
         }
 
         const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
@@ -413,27 +515,35 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
         }
 
         if (transcriptEditMode === 'url') {
-          updateTempConfig('transcriptUrl', tempTranscriptUrl);
+          updateTempConfig('video.transcript', tempTranscriptUrl);
         } else {
-          updateTempConfig('transcriptText', tempTranscriptText);
+          updateTempConfig('video.transcript', tempTranscriptText);
         }
+        if (transcriptEditMode === 'text') {
+          setLocalTranscriptItems(parseTranscriptText(tempTranscriptText));
+        }
+        setIsSavingTranscript(false);
         setShowTranscriptDialog(false);
       } catch (error) {
         console.error('Failed to save transcript config:', error);
+        setTranscriptUrlError("Failed to save. Please try again.");
+        setIsSavingTranscript(false);
       }
-    }, [transcriptEditMode, tempTranscriptUrl, tempTranscriptText, sceneId, updateTempConfig]);
+    }, [transcriptEditMode, tempTranscriptUrl, tempTranscriptText, sceneId, updateTempConfig, isUrlLike, parseTranscriptText]);
 
     // Aktif transcript item'ini bul
     const activeTranscriptIndex = React.useMemo(() => {
-      return transcript.findIndex((item: TranscriptItem, index: number) => {
-        const nextItem = transcript[index + 1];
+      const effectiveTranscript = localTranscriptItems ?? transcript;
+      return effectiveTranscript.findIndex((item: TranscriptItem, index: number) => {
+        const nextItem = effectiveTranscript[index + 1];
         return currentTime >= item.start && (!nextItem || currentTime < nextItem.start);
       });
-    }, [transcript, currentTime]);
+    }, [transcript, localTranscriptItems, currentTime]);
 
     // Transcript items'ları memoize et lastTime ile
     const transcriptItems = React.useMemo(() => {
-      return transcript.map((item: TranscriptItem, index: number) => {
+      const effectiveTranscript = localTranscriptItems ?? transcript;
+      return effectiveTranscript.map((item: TranscriptItem, index: number) => {
         const isActive = index === activeTranscriptIndex;
         const isLocked = item.start > lastTime; // Video süresini geçmemişse locked
         const canAccess = !isLocked;
@@ -452,7 +562,7 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
           canAccess: boolean;
         };
       });
-    }, [transcript, activeTranscriptIndex, lastTime]);
+    }, [transcript, localTranscriptItems, activeTranscriptIndex, lastTime]);
 
     const toggleFullscreen = React.useCallback(() => {
       if (!containerRef.current) return;
@@ -500,6 +610,9 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
       };
     }, []);
 
+    const shouldUseAspectRatio = !isFullscreen && isMobile;
+    const playerWrapperStyle = !isFullscreen && !isMobile ? { width, height } : undefined;
+
     return (
       <div className="w-full space-y-4">
         <div className="relative">
@@ -507,51 +620,56 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
             ref={containerRef}
             className={cn("w-full rounded-lg relative group", isFullscreen && "fixed inset-0 z-50 bg-black rounded-none", className)}
           >
-            <ReactPlayer
-              key={`player-${playerKey}-cc-${isCaptionsOn}`} // Key ile yeniden mount
-              ref={(player) => {
-                playerRef.current = player;
-                if (typeof ref === 'function') {
-                  ref(player);
-                } else if (ref) {
-                  ref.current = player;
-                }
-              }}
-              src={src}
-              width={isFullscreen ? "100vw" : width}
-              height={isFullscreen ? "100vh" : height}
-              controls={controls}
-              playing={isPlaying}
-              onPlay={handlePlay}
-              onPause={handlePause}
-              onEnded={handleEnded}
-              onReady={handleReady}
-              onProgress={handleProgress}
-              style={{
-                borderRadius: '8px',
-                overflow: 'hidden'
-              }}
-              config={{
-                youtube: {
-                  modestbranding: 1,
-                  rel: 0,
-                  controls: 0,
-                  fs: 1,
-                  iv_load_policy: 3,
-                  disablekb: disableForwardSeek ? 1 : 0,
-                  cc_load_policy: isCaptionsOn ? 1 : 0,
-                  start: Math.floor(currentTime || 0),
-                  playerVars: {
-                    origin: window.location.origin,
-                    rel: 0, // Ensure rel is here for API to block recommendations
-                  },
-                  embedOptions: {
-                    allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen; magnetometer; microphone; camera; geolocation; payment; usb; midi; xr-spatial-tracking',
+            <div
+              className={cn("w-full overflow-hidden", shouldUseAspectRatio && "aspect-video", isFullscreen && "h-full")}
+              style={playerWrapperStyle}
+            >
+              <ReactPlayer
+                key={`player-${playerKey}-cc-${isCaptionsOn}`} // Key ile yeniden mount
+                ref={(player) => {
+                  playerRef.current = player;
+                  if (typeof ref === 'function') {
+                    ref(player);
+                  } else if (ref) {
+                    ref.current = player;
                   }
-                } as any,
-              }}
-              {...props}
-            />
+                }}
+                src={src}
+                width="100%"
+                height="100%"
+                controls={controls}
+                playing={isPlaying}
+                onPlay={handlePlay}
+                onPause={handlePause}
+                onEnded={handleEnded}
+                onReady={handleReady}
+                onProgress={handleProgress}
+                style={{
+                  borderRadius: '8px',
+                  overflow: 'hidden'
+                }}
+                config={{
+                  youtube: {
+                    modestbranding: 1,
+                    rel: 0,
+                    controls: 0,
+                    fs: 1,
+                    iv_load_policy: 3,
+                    disablekb: disableForwardSeek ? 1 : 0,
+                    cc_load_policy: isCaptionsOn ? 1 : 0,
+                    start: Math.floor(currentTime || 0),
+                    playerVars: {
+                      origin: window.location.origin,
+                      rel: 0, // Ensure rel is here for API to block recommendations
+                    },
+                    embedOptions: {
+                      allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen; magnetometer; microphone; camera; geolocation; payment; usb; midi; xr-spatial-tracking',
+                    }
+                  } as any,
+                }}
+                {...props}
+              />
+            </div>
 
             {/* Custom Controls Overlay - Video başladıktan sonra göster */
             /* Video bittiğinde arkadaki önerileri gizlemek için bg-black ekle */}
@@ -663,7 +781,11 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
             {/* URL Edit Button - Top right corner */}
             {isEditMode && (
               <motion.button
-                onClick={() => setShowUrlDialog(true)}
+                onClick={() => {
+                  setVideoUrlError(null);
+                  setVideoUrlStatus(null);
+                  setShowUrlDialog(true);
+                }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="z-30 p-2 glass-border-2 rounded-full transition-all duration-300"
@@ -686,7 +808,7 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
                 height: isTranscriptOpen ? "auto" : 0,
               }}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="relative overflow-hidden glass-border-2"
+              className="relative overflow-hidden glass-border-2 mt-4"
               style={{
                 display: isTranscriptOpen ? "block" : "none",
               }}
@@ -734,6 +856,8 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
                       <motion.button
                         onClick={() => {
                           initializeTranscriptData();
+                          setTranscriptUrlError(null);
+                          setTranscriptStatus(null);
                           setShowTranscriptDialog(true);
                         }}
                         whileHover={{ scale: 1.05 }}
@@ -863,10 +987,24 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
                           id="video-url"
                           type="url"
                           value={tempVideoUrl}
-                          onChange={(e) => setTempVideoUrl(e.target.value)}
+                          onChange={(e) => {
+                            setTempVideoUrl(e.target.value);
+                            setVideoUrlError(null);
+                            setVideoUrlStatus(null);
+                          }}
                           className="w-full px-3 py-2 glass-border-1 rounded-lg bg-white/10 dark:bg-black/10 text-[#1C1C1E] dark:text-[#F2F2F7] outline-none border border-white/20 dark:border-white/10"
                           placeholder="https://example.com/video.m3u8"
                         />
+                        {videoUrlError && (
+                          <p className="text-xs text-red-500 mt-2">
+                            {videoUrlError}
+                          </p>
+                        )}
+                        {videoUrlStatus && (
+                          <p className="text-xs text-emerald-500 mt-2">
+                            {videoUrlStatus}
+                          </p>
+                        )}
                       </div>
                     </div>
 
@@ -878,6 +1016,8 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
                         onClick={() => {
                           setShowUrlDialog(false);
                           setTempVideoUrl(src);
+                          setVideoUrlError(null);
+                          setVideoUrlStatus(null);
                         }}
                         className="flex-1 py-3 px-4 glass-border-3 font-medium text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors"
                       >
@@ -887,9 +1027,10 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={handleVideoUrlSave}
-                        className="flex-1 py-3 px-4 glass-border-3 font-medium text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors"
+                        disabled={isSavingVideoUrl}
+                        className="flex-1 py-3 px-4 glass-border-3 font-medium text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                       >
-                        Save
+                        {isSavingVideoUrl ? "Saving..." : "Save"}
                       </motion.button>
                     </div>
                   </motion.div>
@@ -937,6 +1078,8 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
                             e.preventDefault();
                             e.stopPropagation();
                             setTranscriptEditMode('url');
+                            setTranscriptUrlError(null);
+                            setTranscriptStatus(null);
                           }}
                           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all cursor-pointer relative z-20 ${transcriptEditMode === 'url'
                             ? 'bg-white/20 text-[#1C1C1E] dark:text-[#F2F2F7]'
@@ -951,6 +1094,8 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
                             e.preventDefault();
                             e.stopPropagation();
                             setTranscriptEditMode('text');
+                            setTranscriptUrlError(null);
+                            setTranscriptStatus(null);
                           }}
                           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all cursor-pointer relative z-20 ${transcriptEditMode === 'text'
                             ? 'bg-white/20 text-[#1C1C1E] dark:text-[#F2F2F7]'
@@ -973,12 +1118,26 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
                             id="transcript-url"
                             type="url"
                             value={tempTranscriptUrl}
-                            onChange={(e) => setTempTranscriptUrl(e.target.value)}
+                            onChange={(e) => {
+                              setTempTranscriptUrl(e.target.value);
+                              setTranscriptUrlError(null);
+                              setTranscriptStatus(null);
+                            }}
                             onClick={(e) => e.stopPropagation()}
                             onFocus={(e) => e.stopPropagation()}
                             className="w-full p-3 glass-border-4 rounded bg-transparent text-[#1C1C1E] dark:text-[#F2F2F7] placeholder-[#1C1C1E]/50 dark:placeholder-[#F2F2F7]/50 focus:outline-none"
                             placeholder="https://example.com/transcript.txt"
                           />
+                          {transcriptUrlError && (
+                            <p className="text-xs text-red-500 mt-2">
+                              {transcriptUrlError}
+                            </p>
+                          )}
+                          {transcriptStatus && (
+                            <p className="text-xs text-emerald-500 mt-2">
+                              {transcriptStatus}
+                            </p>
+                          )}
                           <p className="text-xs text-[#1C1C1E]/60 dark:text-[#F2F2F7]/60 mt-1">
                             Enter a URL to fetch transcript content
                           </p>
@@ -991,7 +1150,10 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
                           <textarea
                             id="transcript-text"
                             value={tempTranscriptText}
-                            onChange={(e) => setTempTranscriptText(e.target.value)}
+                            onChange={(e) => {
+                              setTempTranscriptText(e.target.value);
+                              setTranscriptStatus(null);
+                            }}
                             onClick={(e) => e.stopPropagation()}
                             onFocus={(e) => e.stopPropagation()}
                             onWheel={(e) => e.stopPropagation()}
@@ -1012,6 +1174,11 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
                           <p className="text-xs text-[#1C1C1E]/60 dark:text-[#F2F2F7]/60 mt-1">
                             Enter transcript in format: HH:MM:SS.mmm Text content
                           </p>
+                          {transcriptStatus && (
+                            <p className="text-xs text-emerald-500 mt-2">
+                              {transcriptStatus}
+                            </p>
+                          )}
                         </div>
                       )}
                     </div>
@@ -1025,6 +1192,8 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
                           setShowTranscriptDialog(false);
                           setTempTranscriptUrl('');
                           setTempTranscriptText('');
+                          setTranscriptUrlError(null);
+                          setTranscriptStatus(null);
                         }}
                         className="flex-1 py-3 px-4 glass-border-3 font-medium text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors"
                       >
@@ -1034,9 +1203,10 @@ const ReactVideoPlayer = React.forwardRef<any, ReactVideoPlayerProps>(
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={handleTranscriptSave}
-                        className="flex-1 py-3 px-4 glass-border-3 font-medium text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors"
+                        disabled={isSavingTranscript}
+                        className="flex-1 py-3 px-4 glass-border-3 font-medium text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-white/5 dark:hover:bg-white/5 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                       >
-                        Save
+                        {isSavingTranscript ? "Saving..." : "Save"}
                       </motion.button>
                     </div>
                   </motion.div>

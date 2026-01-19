@@ -486,9 +486,6 @@
           "ratingRequiredText": "Please provide a rating",
           "dataSecurityNotice": "Your data is securely protected",
           "successTitle": "Thank you!",
-          "successMessage1": "Thank you for your feedback.",
-          "successMessage2": "Your evaluation will help us improve our trainings.",
-          "successMessage3": "Continue enhancing your security awareness!",
           "thankYouMessage": "Stay secure!"
         },
         "ariaTexts": {

@@ -480,9 +480,6 @@
           "ratingRequiredText": "Lütfen bir değerlendirme yapın",
           "dataSecurityNotice": "Verileriniz güvenle korunmaktadır",
           "successTitle": "Teşekkürler!",
-          "successMessage1": "Geri bildiriminiz için teşekkür ederiz.",
-          "successMessage2": "Değerlendirmeniz eğitimlerimizi geliştirmemize yardımcı olacak.",
-          "successMessage3": "Güvenlik farkındalığınızı artırmaya devam edin!",
           "thankYouMessage": "Güvenli kalın!"
         },
         "ariaTexts": {
