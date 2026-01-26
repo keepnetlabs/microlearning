@@ -224,6 +224,26 @@ export interface NudgeSceneConfig {
     };
 }
 
+export interface VishingSceneConfig {
+    iconName?: string;
+    title?: string;
+    subtitle?: string;
+    prompt?: string;
+    firstMessage?: string;
+    callerName?: string;
+    callerNumber?: string;
+    callToActionText?: string | { mobile?: string; desktop?: string; };
+    successCallToActionText?: string | { mobile?: string; desktop?: string; };
+    key_message?: string[];
+    texts?: {
+        mobileHint?: string;
+        feedbackCorrect?: string;
+        feedbackWrong?: string;
+    };
+    scientific_basis?: string;
+    scene_type?: string;
+}
+
 
 const smishingGoalConfig = {
     title: "SMS Güvenlik Hedefleri",

@@ -223,8 +223,22 @@ export function EditModePanel({ sceneId, sceneLabel, appConfig }: EditModePanelP
 
     // Show Upload confirmation dialog
     const handleUploadClick = useCallback(() => {
+        if (isInIframe) {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const parentOrigin = urlParams.get('parentOrigin') || '*';
+                window.parent.postMessage({
+                    type: 'ui:uploadClick',
+                    payload: {
+                        prompt: 'Upload to platform',
+                        sceneId: normalizedSceneId,
+                        sceneLabel
+                    }
+                }, parentOrigin);
+            } catch { }
+        }
         setIsUploadConfirmOpen(true);
-    }, []);
+    }, [isInIframe, normalizedSceneId, sceneLabel]);
 
     // Handle Upload SCORM (actual upload)
     const handleUploadConfirm = useCallback(async () => {

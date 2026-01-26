@@ -22,6 +22,7 @@ import { SurveyScene } from "./components/scenes/SurveyScene";
 import { SummaryScene } from "./components/scenes/SummaryScene";
 import { NudgeScene } from "./components/scenes/NudgeScene";
 import { CodeReviewScene } from "./components/scenes/CodeReviewScene";
+import { VishingScene } from "./components/scenes/VishingScene";
 //import { CodeReviewSceneConfig } from "./components/scenes/code-review/types";
 import { useIsMobile } from "./utils/languageUtils";
 import { useFontFamily } from "./hooks/useFontFamily";
@@ -81,6 +82,7 @@ const MemoizedSurveyScene = React.memo(SurveyScene);
 const MemoizedNudgeScene = React.memo(NudgeScene);
 const MemoizedSummaryScene = React.memo(SummaryScene);
 const MemoizedCodeReviewScene = React.memo(CodeReviewScene);
+const MemoizedVishingScene = React.memo(VishingScene);
 
 interface AppProps {
   initialScene?: number;
@@ -151,6 +153,7 @@ export default function App(props: AppProps = {}) {
     scenario: MemoizedScenarioScene,
     actionable_content: MemoizedActionableContentScene,
     code_review: MemoizedCodeReviewScene,
+    vishing_simulation: MemoizedVishingScene,
     quiz: MemoizedQuizScene,
     survey: MemoizedSurveyScene,
     summary: MemoizedSummaryScene,
