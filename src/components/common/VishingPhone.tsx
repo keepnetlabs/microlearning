@@ -68,6 +68,7 @@ export function VishingPhone({
 }: VishingPhoneProps) {
   const [status, setStatus] = useState<CallStatus>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [voiceLevel, setVoiceLevel] = useState(0);
   const wsRef = useRef<WebSocket | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -188,6 +189,13 @@ export function VishingPhone({
     statusRef.current = next;
     onStatusChange?.(next);
   }, [onStatusChange]);
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setVoiceLevel(prev => Math.max(0, prev - 0.05));
+    }, 80);
+    return () => window.clearInterval(id);
+  }, []);
 
   const cleanupSession = useCallback(() => {
     try {
@@ -322,6 +330,7 @@ export function VishingPhone({
       const now = performance.now();
       if (rms >= gateThreshold) {
         lastVoiceMsRef.current = now;
+        setVoiceLevel(Math.min(1, rms * 5));
       } else if (now - lastVoiceMsRef.current > gateHangoverMs) {
         continue;
       }
@@ -1018,8 +1027,29 @@ export function VishingPhone({
               <div className="flex items-center gap-2 text-xs font-medium text-[#1C1C1E]/60 dark:text-[#F2F2F7]/60">
                 {statusText}
               </div>
-              {/* Home indicator */}
-              <div className="mt-1 h-1 w-32 rounded-full bg-black/10 dark:bg-white/15" />
+              {status === "live" ? (
+                <div className="mt-2 flex h-6 items-end justify-center gap-2">
+                  {Array.from({ length: 4 }).map((_, idx) => {
+                    const level = voiceLevel;
+                    const fraction = (idx + 1) / 4;
+                    const heightValue = Math.max(4, 4 + level * 12 * fraction);
+                    const opacity = Math.max(0.25, Math.min(1, level * 1.2 - idx * 0.1));
+                    return (
+                      <span
+                        key={idx}
+                        className="rounded-full bg-emerald-400 transition-all duration-150 dark:bg-emerald-300"
+                        style={{
+                          width: "4px",
+                          height: `${heightValue}px`,
+                          opacity
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="mt-2 h-1 w-24 rounded-full bg-black/10 dark:bg-white/15" />
+              )}
             </div>
           </div>
         </div>
