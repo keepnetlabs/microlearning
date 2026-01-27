@@ -239,9 +239,11 @@ export interface VishingSceneConfig {
         mobileHint?: string;
         feedbackCorrect?: string;
         feedbackWrong?: string;
+        shortCallWarning?: string;
     };
     scientific_basis?: string;
     scene_type?: string;
+    statusTexts?: Partial<Record<"idle" | "requesting-mic" | "connecting" | "live" | "ending" | "error", string>>;
 }
 
 

@@ -18,7 +18,11 @@ class VishingCaptureProcessor extends AudioWorkletProcessor {
 }
 registerProcessor("vishing-capture", VishingCaptureProcessor);
 `;
-const DEFAULT_VISHING_ENDPOINT = "http://localhost:4111/vishing/prompt";
+const FALLBACK_VISHING_ENDPOINT = "https://agentic-ai-microlearning.keepnetlabs.com/vishing/prompt";
+const DEFAULT_VISHING_ENDPOINT = typeof window !== "undefined" && (
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1"
+) ? "http://localhost:4111/vishing/prompt" : FALLBACK_VISHING_ENDPOINT;
 
 interface VishingPromptResponse {
   signedUrl?: string;
@@ -41,6 +45,7 @@ interface VishingPhoneProps {
   endLabel?: string;
   prompt?: string;
   firstMessage?: string;
+  statusTexts?: Partial<Record<CallStatus, string>>;
   onStatusChange?: (status: CallStatus) => void;
 }
 
@@ -58,6 +63,7 @@ export function VishingPhone({
   endLabel = "End call",
   prompt,
   firstMessage,
+  statusTexts,
   onStatusChange
 }: VishingPhoneProps) {
   const [status, setStatus] = useState<CallStatus>("idle");
@@ -574,21 +580,20 @@ export function VishingPhone({
   }, [cleanupSession]);
 
   const statusText = useMemo(() => {
-    switch (status) {
-      case "requesting-mic":
-        return "Requesting microphone...";
-      case "connecting":
-        return "Connecting...";
-      case "live":
-        return "Live";
-      case "ending":
-        return "Ending call...";
-      case "error":
-        return "Something went wrong";
-      default:
-        return subtitle;
+    const defaultLabels: Record<CallStatus, string> = {
+      "requesting-mic": "Requesting microphone...",
+      "connecting": "Connecting...",
+      "live": "Live",
+      "ending": "Ending call...",
+      "error": "Something went wrong",
+      "idle": subtitle
+    };
+    const override = statusTexts?.[status] ?? statusTexts?.idle;
+    if (override) {
+      return override;
     }
-  }, [status, subtitle]);
+    return defaultLabels[status] ?? subtitle;
+  }, [status, subtitle, statusTexts]);
 
   const startCall = useCallback(async () => {
     if (status !== "idle" && status !== "error") return;

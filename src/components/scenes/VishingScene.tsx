@@ -185,6 +185,7 @@ export const VishingScene = memo(function VishingScene({
               firstMessage={currentConfig.firstMessage}
               callerName={currentConfig.callerName}
               callerNumber={currentConfig.callerNumber}
+              statusTexts={currentConfig.statusTexts}
               onStatusChange={setCallStatus}
             />
           </div>
