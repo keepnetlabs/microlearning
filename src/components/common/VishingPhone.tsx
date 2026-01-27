@@ -18,7 +18,7 @@ class VishingCaptureProcessor extends AudioWorkletProcessor {
 }
 registerProcessor("vishing-capture", VishingCaptureProcessor);
 `;
-const FALLBACK_VISHING_ENDPOINT = "https://agentic-ai-microlearning.keepnetlabs.com/vishing/prompt";
+const FALLBACK_VISHING_ENDPOINT = "https://agentic-ai-agent.keepnetlabs.com/vishing/prompt";
 const DEFAULT_VISHING_ENDPOINT = typeof window !== "undefined" && (
   window.location.hostname === "localhost" ||
   window.location.hostname === "127.0.0.1"
