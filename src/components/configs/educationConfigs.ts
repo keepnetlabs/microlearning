@@ -240,6 +240,7 @@ export interface VishingSceneConfig {
         feedbackCorrect?: string;
         feedbackWrong?: string;
         shortCallWarning?: string;
+        privacyNotice?: string;
     };
     scientific_basis?: string;
     scene_type?: string;

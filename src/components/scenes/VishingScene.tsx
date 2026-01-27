@@ -55,15 +55,18 @@ export const VishingScene = memo(function VishingScene({
   const [configKey, setConfigKey] = useState(0);
   const [callStatus, setCallStatus] = useState<"idle" | "requesting-mic" | "connecting" | "live" | "ending" | "error">("idle");
   const [hasCompletedCall, setHasCompletedCall] = useState(false);
+  const [hasCallEnded, setHasCallEnded] = useState(false);
   const callLiveStartRef = useRef<number | null>(null);
   const [shortCallWarning, setShortCallWarning] = useState(false);
   const MIN_CALL_DURATION_MS = 30000;
+  const prevStatusRef = useRef<typeof callStatus>("idle");
   const isMobile = useIsMobile();
 
   useEffect(() => {
     setConfigKey(prev => prev + 1);
     setEditChanges({});
     setHasCompletedCall(false);
+    setHasCallEnded(false);
     setShortCallWarning(false);
     setCallStatus("idle");
   }, [config.title, config.subtitle]);
@@ -82,6 +85,7 @@ export const VishingScene = memo(function VishingScene({
     if (callStatus === "live") {
       callLiveStartRef.current = performance.now();
       setHasCompletedCall(false);
+      setHasCallEnded(false);
       setShortCallWarning(false);
       return;
     }
@@ -91,6 +95,7 @@ export const VishingScene = memo(function VishingScene({
       const meetsDuration = duration >= MIN_CALL_DURATION_MS;
       setHasCompletedCall(meetsDuration);
       setShortCallWarning(!meetsDuration && duration > 0);
+      setHasCallEnded(true);
       callLiveStartRef.current = null;
       return;
     }
@@ -106,6 +111,7 @@ export const VishingScene = memo(function VishingScene({
     if (callStatus === "requesting-mic" || callStatus === "connecting") {
       setShortCallWarning(false);
     }
+    prevStatusRef.current = callStatus;
   }, [callStatus]);
 
   const IconComponent = useMemo(() => {
@@ -137,6 +143,8 @@ export const VishingScene = memo(function VishingScene({
     hasCompletedCall,
     shortCallWarning
   ]);
+
+  const canAdvance = hasCompletedCall && hasCallEnded;
 
   return (
     <EditModeProvider
@@ -195,8 +203,15 @@ export const VishingScene = memo(function VishingScene({
               {statusHint}
             </EditableText>
           </div>
+          {currentConfig.texts?.privacyNotice && (
+            <div className="mt-3 max-w-xl rounded-xl bg-black/5 px-4 py-2 text-xs text-[#1C1C1E]/70 dark:bg-white/5 dark:text-[#F2F2F7]/70">
+              <EditableText configPath="texts.privacyNotice" placeholder="Privacy notice text">
+                {currentConfig.texts.privacyNotice}
+              </EditableText>
+            </div>
+          )}
 
-          {hasCompletedCall && (
+          {canAdvance && (
             <CallToAction
               text={typeof currentConfig.successCallToActionText === "string" ? currentConfig.successCallToActionText : undefined}
               mobileText={typeof currentConfig.successCallToActionText === "object" ? currentConfig.successCallToActionText.mobile : undefined}
