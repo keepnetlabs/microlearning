@@ -236,10 +236,6 @@ export interface VishingSceneConfig {
     successCallToActionText?: string | { mobile?: string; desktop?: string; };
     key_message?: string[];
     texts?: {
-        mobileHint?: string;
-        feedbackCorrect?: string;
-        feedbackWrong?: string;
-        shortCallWarning?: string;
         privacyNotice?: string;
     };
     scientific_basis?: string;

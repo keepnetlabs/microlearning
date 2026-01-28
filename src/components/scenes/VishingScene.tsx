@@ -57,7 +57,6 @@ export const VishingScene = memo(function VishingScene({
   const [hasCompletedCall, setHasCompletedCall] = useState(false);
   const [hasCallEnded, setHasCallEnded] = useState(false);
   const callLiveStartRef = useRef<number | null>(null);
-  const [shortCallWarning, setShortCallWarning] = useState(false);
   const MIN_CALL_DURATION_MS = 30000;
   const prevStatusRef = useRef<typeof callStatus>("idle");
   const isMobile = useIsMobile();
@@ -67,7 +66,6 @@ export const VishingScene = memo(function VishingScene({
     setEditChanges({});
     setHasCompletedCall(false);
     setHasCallEnded(false);
-    setShortCallWarning(false);
     setCallStatus("idle");
   }, [config.title, config.subtitle]);
 
@@ -86,7 +84,6 @@ export const VishingScene = memo(function VishingScene({
       callLiveStartRef.current = performance.now();
       setHasCompletedCall(false);
       setHasCallEnded(false);
-      setShortCallWarning(false);
       return;
     }
 
@@ -94,22 +91,13 @@ export const VishingScene = memo(function VishingScene({
       const duration = performance.now() - callLiveStartRef.current;
       const meetsDuration = duration >= MIN_CALL_DURATION_MS;
       setHasCompletedCall(meetsDuration);
-      setShortCallWarning(!meetsDuration && duration > 0);
       setHasCallEnded(true);
       callLiveStartRef.current = null;
       return;
     }
 
-    if (callStatus === "idle") {
-      setShortCallWarning(false);
-    }
-
     if (callStatus === "error") {
-      setShortCallWarning(false);
       callLiveStartRef.current = null;
-    }
-    if (callStatus === "requesting-mic" || callStatus === "connecting") {
-      setShortCallWarning(false);
     }
     prevStatusRef.current = callStatus;
   }, [callStatus]);
@@ -124,26 +112,6 @@ export const VishingScene = memo(function VishingScene({
 
   const microlearningId = (appConfig as any)?.microlearning_id || "unknown";
   const startLabel = resolveText(currentConfig.callToActionText, isMobile) || "Start Call Practice";
-  const statusHint = useMemo(() => {
-    if (shortCallWarning) {
-      return "Stay on the call for at least 30 seconds.";
-    }
-    if (callStatus === "error") {
-      return currentConfig.texts?.feedbackWrong || "Try again — verify the caller first.";
-    }
-    if (hasCompletedCall) {
-      return currentConfig.texts?.feedbackCorrect || "✅ Well done, you handled the call safely.";
-    }
-    return currentConfig.texts?.mobileHint || "Verify, refuse, and report suspicious calls.";
-  }, [
-    callStatus,
-    currentConfig.texts?.feedbackCorrect,
-    currentConfig.texts?.feedbackWrong,
-    currentConfig.texts?.mobileHint,
-    hasCompletedCall,
-    shortCallWarning
-  ]);
-
   const canAdvance = hasCompletedCall && hasCallEnded;
 
   return (
@@ -198,11 +166,6 @@ export const VishingScene = memo(function VishingScene({
             />
           </div>
 
-          <div className="max-w-xl text-sm text-[#1C1C1E]/70 dark:text-[#F2F2F7]/70">
-            <EditableText configPath={callStatus === "error" ? "texts.feedbackWrong" : hasCompletedCall ? "texts.feedbackCorrect" : "texts.mobileHint"} placeholder="Feedback text">
-              {statusHint}
-            </EditableText>
-          </div>
           {currentConfig.texts?.privacyNotice && (
             <div className="mt-3 max-w-xl rounded-xl bg-black/5 px-4 py-2 text-xs text-[#1C1C1E]/70 dark:bg-white/5 dark:text-[#F2F2F7]/70">
               <EditableText configPath="texts.privacyNotice" placeholder="Privacy notice text">
