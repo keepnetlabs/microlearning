@@ -62,36 +62,18 @@ export function CallToAction({
   const [hasScroll, setHasScroll] = useState<boolean>(false);
 
   // Initialize callToActionText as object if we're in edit mode and need multi-field editing
+  // No automatic object promotion to avoid dirty state loops
   useEffect(() => {
+    // Only handle special ActionableContentScene initialization if missing
     if (isEditMode && fieldLabels?.mobile === "Initial Text") {
-      // ActionableContentScene: Initialize both callToActionText and successCallToActionText
       if (!tempConfig?.callToActionText) {
         updateTempConfig('callToActionText', text || "Start Reporting");
       }
       if (!tempConfig?.successCallToActionText) {
         updateTempConfig('successCallToActionText', "Go to Reinforcement");
       }
-    } else if (isEditMode && !tempConfig?.callToActionText) {
-      // Other scenes: Create object if mobileText/desktopText props exist OR if text suggests multi-platform support
-      const shouldCreateObject = mobileText || desktopText ||
-        (text && typeof text === 'string');
-
-      if (shouldCreateObject) {
-        const callToActionObject = {
-          mobile: mobileText || text || "Continue",
-          desktop: desktopText || text || "Continue"
-        };
-        updateTempConfig('callToActionText', callToActionObject);
-      }
-    } else if (isEditMode && tempConfig?.callToActionText && typeof tempConfig.callToActionText === 'string') {
-      // Convert string to object for multi-field editing
-      const callToActionObject = {
-        mobile: tempConfig.callToActionText,
-        desktop: tempConfig.callToActionText
-      };
-      updateTempConfig('callToActionText', callToActionObject);
     }
-  }, [isEditMode, mobileText, desktopText, text, tempConfig?.callToActionText, tempConfig?.successCallToActionText, updateTempConfig, fieldLabels]);
+  }, [isEditMode, fieldLabels, tempConfig?.callToActionText, tempConfig?.successCallToActionText, updateTempConfig]);
 
   // Check if page has scroll
   useEffect(() => {

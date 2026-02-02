@@ -243,6 +243,25 @@ export interface VishingSceneConfig {
     statusTexts?: Partial<Record<"idle" | "requesting-mic" | "connecting" | "live" | "ending" | "error", string>>;
 }
 
+export interface SmishingSceneConfig {
+    iconName?: string;
+    title?: string;
+    subtitle?: string;
+    senderName?: string;
+    senderNumber?: string;
+    prompt?: string;
+    firstMessage?: string;
+    callToActionText?: string | { mobile?: string; desktop?: string; };
+    successCallToActionText?: string | { mobile?: string; desktop?: string; };
+    key_message?: string[];
+    texts?: {
+        privacyNotice?: string;
+    };
+    statusTexts?: Partial<Record<"idle" | "sending" | "receiving" | "ending" | "error", string>>;
+    scientific_basis?: string;
+    scene_type?: string;
+}
+
 
 const smishingGoalConfig = {
     title: "SMS Güvenlik Hedefleri",

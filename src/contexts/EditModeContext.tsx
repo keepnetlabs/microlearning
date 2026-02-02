@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import { getApiBaseUrl, normalizeUrlParam } from '../utils/urlManager';
 
 interface EditModeContextType {
@@ -20,21 +20,14 @@ const EditModeContext = createContext<EditModeContextType | undefined>(undefined
 
 // Nested object update helper
 const setNestedValue = (obj: any, path: string, value: any) => {
-    console.log('=== SET NESTED VALUE ===');
-    console.log('Object:', obj);
-    console.log('Path:', path);
-    console.log('Value:', value);
-
     const keys = path.split('.');
     const result = { ...obj };
     let current = result;
 
     for (let i = 0; i < keys.length - 1; i++) {
         const key = keys[i];
-        console.log(`Processing key [${i}]: ${key}`);
 
         if (!(key in current) || typeof current[key] !== 'object') {
-            console.log(`Creating new object for key: ${key}`);
             // Check if the key is a number and we should create an array
             if (!isNaN(Number(key)) && i === 0) {
                 current[key] = [];
@@ -42,7 +35,6 @@ const setNestedValue = (obj: any, path: string, value: any) => {
                 current[key] = {};
             }
         } else {
-            console.log(`Spreading existing object for key: ${key}`);
             // Preserve array type when spreading
             if (Array.isArray(current[key])) {
                 current[key] = [...current[key]];
@@ -51,14 +43,11 @@ const setNestedValue = (obj: any, path: string, value: any) => {
             }
         }
         current = current[key];
-        console.log(`Current after processing ${key}:`, current);
     }
 
     const finalKey = keys[keys.length - 1];
-    console.log(`Setting final key: ${finalKey} = ${value}`);
     current[finalKey] = value;
 
-    console.log('Final result:', result);
     return result;
 };
 
@@ -76,14 +65,31 @@ const getNestedValue = (obj: any, path: string) => {
     return current;
 };
 
-const isDeepEqual = (a: any, b: any) => {
+const isDeepEqual = (a: any, b: any): boolean => {
     if (a === b) return true;
-    try {
-        return JSON.stringify(a) === JSON.stringify(b);
-    } catch {
+
+    if (a === null || b === null || typeof a !== 'object' || typeof b !== 'object') {
         return false;
     }
+
+    if (Array.isArray(a) !== Array.isArray(b)) {
+        return false;
+    }
+
+    const keysA = Object.keys(a).filter(k => a[k] !== undefined);
+    const keysB = Object.keys(b).filter(k => b[k] !== undefined);
+
+    if (keysA.length !== keysB.length) return false;
+
+    for (const key of keysA) {
+        if (!Object.prototype.hasOwnProperty.call(b, key)) return false;
+        if (!isDeepEqual(a[key], b[key])) return false;
+    }
+
+    return true;
 };
+
+
 
 interface EditModeProviderProps {
     children: React.ReactNode;
@@ -142,9 +148,16 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
     // View Mode cleanup is centralized in App.tsx beforeunload handler
 
     // Broadcast unsaved state to App (include active editing as unsaved)
+    // Broadcast unsaved state to App (include active editing as unsaved)
     useEffect(() => {
         try {
             if (typeof window !== 'undefined' && sceneId) {
+                console.log('[EditModeProvider] Dispatching sceneUnsavedChanged', {
+                    sceneId,
+                    hasUnsavedChanges,
+                    editingField,
+                    result: hasUnsavedChanges || !!editingField
+                });
                 window.dispatchEvent(new CustomEvent('sceneUnsavedChanged', {
                     detail: { sceneId, hasUnsavedChanges: hasUnsavedChanges || !!editingField }
                 }));
@@ -152,12 +165,36 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
         } catch { }
     }, [hasUnsavedChanges, editingField, sceneId]);
 
+    // Sync hasUnsavedChanges with config state
+    const isFirstRender = useRef(true);
+    useEffect(() => {
+        // Skip first render check to avoid false positives on mount
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+
+        const equal = isDeepEqual(baseConfig, tempConfig);
+        setHasUnsavedChanges(!equal);
+    }, [baseConfig, tempConfig, sceneId]);
+
+    // Sync local state with prop updates (e.g. when App passes new config after save)
+    useEffect(() => {
+        if (!isDeepEqual(initialConfig, baseConfig)) {
+            // If data changed upstream, update our base
+            setBaseConfig(initialConfig);
+            // If we're currently clean (no unsaved changes), update temp too
+            if (isDeepEqual(baseConfig, tempConfig)) {
+                setTempConfig(initialConfig);
+            }
+        }
+    }, [initialConfig, baseConfig, tempConfig]);
+
     const toggleEditMode = useCallback(() => {
         if (isEditMode && hasUnsavedChanges) {
             const confirmDiscard = window.confirm('You have unsaved changes. Do you want to discard them?');
             if (!confirmDiscard) return;
             setTempConfig(baseConfig);
-            setHasUnsavedChanges(false);
         }
         const newEditMode = !isEditMode;
         setIsEditMode(newEditMode);
@@ -209,35 +246,18 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
     }, [isViewMode, isEditMode, onViewModeChange, onEditModeChange]);
 
     const updateTempConfig = useCallback((path: string, value: any) => {
-        console.log('=== UPDATE TEMP CONFIG ===');
-        console.log('Updating path:', path);
-        console.log('New value:', value);
-        let didChange = false;
         setTempConfig((prev: any) => {
             const prevVal = getNestedValue(prev, path);
             if (isDeepEqual(prevVal, value)) {
-                console.log('No change detected at path, skipping update');
                 return prev;
             }
-            const updated = setNestedValue(prev, path, value);
-            didChange = true;
-            return updated;
+            return setNestedValue(prev, path, value);
         });
-        if (didChange) setHasUnsavedChanges(true);
     }, []);
 
     const saveChanges = useCallback(() => {
-        console.log('=== SAVE CHANGES CALLED ===');
-        console.log('tempConfig being saved:', tempConfig);
-        console.log('tempConfig.emails:', tempConfig.emails);
-        console.log('onSave function exists:', !!onSave);
-        console.log('apiUrl:', apiUrl);
-
         // Backend'e göndermek için tempConfig'i scene ID ile wrap et
         const patchPayload = sceneId ? { [sceneId]: tempConfig } : tempConfig;
-
-        console.log('Scene ID:', sceneId);
-        console.log('Patch payload:', patchPayload);
 
         if (onSave) {
             // İlk önce local state'i güncelle
@@ -265,9 +285,6 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
                     // Clean up double slashes in URL
                     patchUrl = patchUrl.replace(/([^:]\/)\/+/, '$1');
 
-                    console.log('Sending PATCH to:', patchUrl);
-                    console.log('Payload:', patchPayload);
-
                     const response = await fetch(patchUrl, {
                         method: 'PATCH',
                         headers: {
@@ -282,8 +299,6 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
                     }
 
                     const result = await response.json();
-                    console.log('Backend patch successful:', result);
-
                 } catch (error) {
                     console.error('Backend patch failed:', error);
 
@@ -295,8 +310,6 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
                         console.warn('3. Allow origin:', window.location.origin);
                         console.warn('4. Handle OPTIONS preflight requests');
                     }
-
-                    // Don't throw error to avoid breaking the user experience
                 }
             };
 
@@ -304,7 +317,6 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
             sendPatchRequest();
         }
 
-        setHasUnsavedChanges(false);
         setBaseConfig(tempConfig); // Update base config with saved values
         // Force tempConfig update for immediate re-render with new reference
         setTempConfig((prev: any) => ({ ...prev }));
@@ -316,19 +328,16 @@ export const EditModeProvider: React.FC<EditModeProviderProps> = ({
                 }));
             }
         } catch { }
-        console.log('=== SAVE CHANGES COMPLETED ===');
     }, [tempConfig, onSave, sceneId, apiUrl]);
 
     const discardChanges = useCallback(() => {
         setTempConfig(baseConfig);
-        setHasUnsavedChanges(false);
         setEditingField(null);
     }, [baseConfig]);
 
     const commitTempLocally = useCallback(() => {
         // Mark current tempConfig as clean without sending to backend
         setBaseConfig(tempConfig);
-        setHasUnsavedChanges(false);
     }, [tempConfig]);
 
     const value: EditModeContextType = {

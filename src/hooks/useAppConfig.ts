@@ -100,7 +100,18 @@ export const useAppConfig = ({ testOverrides }: UseAppConfigOptions = {}) => {
       const custom = e as CustomEvent<{ sceneId: string; updatedConfig: any }>;
       const detail = custom.detail;
       if (!detail || !detail.sceneId || !detail.updatedConfig) return;
+
       setAppConfig((prev: any) => {
+        // Handle global theme update (sceneId="app")
+        if (detail.sceneId === "app") {
+          const newTheme = { ...prev.theme, ...detail.updatedConfig };
+          return {
+            ...prev,
+            theme: newTheme
+          };
+        }
+
+        // Handle scene metadata update
         if (!prev || !Array.isArray(prev.scenes)) return prev;
         const idx = prev.scenes.findIndex((s: any) => String(s.scene_id) === String(detail.sceneId));
         if (idx === -1) return prev;

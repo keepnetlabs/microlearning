@@ -46,6 +46,9 @@ export const GoalScene = memo(({
 
   // Compute current config (memoized to prevent infinite loops)
   const currentConfig = useMemo(() => {
+    if (Object.keys(editChanges).length === 0) {
+      return config;
+    }
     return deepMerge(config, editChanges);
   }, [config, editChanges]);
 

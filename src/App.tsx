@@ -23,6 +23,7 @@ import { SummaryScene } from "./components/scenes/SummaryScene";
 import { NudgeScene } from "./components/scenes/NudgeScene";
 import { CodeReviewScene } from "./components/scenes/CodeReviewScene";
 import { VishingScene } from "./components/scenes/VishingScene";
+import { SmishingScene } from "./components/scenes/SmishingScene";
 //import { CodeReviewSceneConfig } from "./components/scenes/code-review/types";
 import { useIsMobile } from "./utils/languageUtils";
 import { useFontFamily } from "./hooks/useFontFamily";
@@ -83,6 +84,7 @@ const MemoizedNudgeScene = React.memo(NudgeScene);
 const MemoizedSummaryScene = React.memo(SummaryScene);
 const MemoizedCodeReviewScene = React.memo(CodeReviewScene);
 const MemoizedVishingScene = React.memo(VishingScene);
+const MemoizedSmishingScene = React.memo(SmishingScene);
 
 interface AppProps {
   initialScene?: number;
@@ -154,6 +156,7 @@ export default function App(props: AppProps = {}) {
     actionable_content: MemoizedActionableContentScene,
     code_review: MemoizedCodeReviewScene,
     vishing_simulation: MemoizedVishingScene,
+    smishing_simulation: MemoizedSmishingScene,
     quiz: MemoizedQuizScene,
     survey: MemoizedSurveyScene,
     summary: MemoizedSummaryScene,
@@ -572,13 +575,17 @@ export default function App(props: AppProps = {}) {
   // ULTRA FAST MOBILE TRANSITIONS - NO LOADING DELAY
   const nextScene = useCallback(() => {
     // Guard: warn if current scene has unsaved edits
-    const currentSceneId = (scenes[currentScene] as any)?.sceneId;
-    const hasUnsaved = currentSceneId ? unsavedBySceneRef.current.get(String(currentSceneId)) : false;
+    const sceneObj = scenes[currentScene] as any;
+    const currentSceneId = sceneObj?.scene_id || sceneObj?.sceneId;
+    // Check both current scene AND global app config (theme updates)
+    const hasUnsaved = (currentSceneId ? unsavedBySceneRef.current.get(String(currentSceneId)) : false) || unsavedBySceneRef.current.get('app');
+
     if (hasUnsaved) {
       const confirmProceed = window.confirm('You have unsaved changes. Do you want to discard them?');
       if (!confirmProceed) return;
       // clear flag to avoid repeated prompts if user proceeds
       if (currentSceneId) unsavedBySceneRef.current.set(String(currentSceneId), false);
+      unsavedBySceneRef.current.set('app', false);
     }
     // Allow progression if quiz is completed or we're not on quiz scene (bypass in preview mode)
     if (currentScene === sceneIndices.quiz && !quizCompleted && !isEditMode && !isPreviewMode) {

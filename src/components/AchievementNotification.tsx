@@ -43,9 +43,9 @@ export const AchievementNotification: React.FC<AchievementNotificationProps> = (
           <div className={`${contentClassName} overflow-visible`}>
             <div className="flex items-center space-x-3 relative z-10">
               <Award size={16} className="text-[#1C1C1E] dark:text-[#F2F2F7] flex-shrink-0" aria-hidden="true" />
-              <span className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold transition-colors duration-300 flex-1 min-w-0">
+              <div className="text-sm text-[#1C1C1E] dark:text-[#F2F2F7] font-semibold transition-colors duration-300 flex-1 min-w-0">
                 {message}
-              </span>
+              </div>
               {showClose && (
                 <button
                   onClick={onClose}
